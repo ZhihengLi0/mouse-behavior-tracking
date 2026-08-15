@@ -1,0 +1,32 @@
+.DS_Store
+*.textClipping
+
+# Papers and unpublished/review materials. Keep local only.
+*.pdf
+
+# Large raw videos. Keep these locally or use Git LFS / external storage.
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# DeepLabCut generated outputs and caches.
+dlc-models/
+labeled-data/
+videos/
+evaluation-results/
+training-datasets/
+*.h5
+*.pickle
+*.csv
+*.log
+
+# Python / notebook caches.
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Temporary outputs.
+tmp/
+output/
