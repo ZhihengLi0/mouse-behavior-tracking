@@ -1,0 +1,14 @@
+name: DEEPLABCUT
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - ffmpeg
+  - pip:
+      - "deeplabcut[gui]"
+      - pandas
+      - numpy
+      - matplotlib
+      - opencv-python
+      - scipy
