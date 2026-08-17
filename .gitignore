@@ -28,5 +28,6 @@ __pycache__/
 venv/
 
 # Temporary outputs.
+local_data/
 tmp/
 output/

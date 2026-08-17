@@ -79,6 +79,12 @@ python -c "import deeplabcut; print(deeplabcut.__version__)"
 python -c "import torch, torchvision; print(torch.__version__); print(torchvision.__version__)"
 ```
 
+Or run the project check script:
+
+```bash
+bash scripts/check_setup.sh
+```
+
 If the GUI package is installed, this should open the DeepLabCut GUI:
 
 ```bash
