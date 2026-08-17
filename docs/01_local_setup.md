@@ -1,7 +1,7 @@
 # 01 Local Setup
 
 Use Terminal for environment setup and VS Code for reading/editing project files.
-Use the DeepLabCut GUI for frame extraction, labeling, training, and video inspection at the beginning.
+Start with the DeepLabCut core package so the pipeline can run locally. Install the GUI later if the large PySide6 download is reliable.
 
 ## 1. Open The Project Folder
 
@@ -58,16 +58,52 @@ conda activate DEEPLABCUT
 conda env update -f environment.yml --prune
 ```
 
-## 4. Test DeepLabCut
+## 4. Install DeepLabCut Core
+
+Install the stable core package first:
+
+```bash
+python -m pip install --no-cache-dir --progress-bar off deeplabcut==3.0.1
+```
+
+The GUI package is larger because it downloads napari and PySide6. Add it later only when needed:
+
+```bash
+python -m pip install --no-cache-dir --progress-bar off "deeplabcut[gui]==3.0.1"
+```
+
+## 5. Test DeepLabCut
 
 ```bash
 python -c "import deeplabcut; print(deeplabcut.__version__)"
+python -c "import torch, torchvision; print(torch.__version__); print(torchvision.__version__)"
+```
+
+If the GUI package is installed, this should open the DeepLabCut GUI:
+
+```bash
 python -m deeplabcut
 ```
 
-The second command should open the DeepLabCut GUI.
+## 6. Current Local Status
 
-## 5. Do Not Move These Files
+On this machine, Miniforge is installed at:
+
+```text
+/Users/lizhiheng/miniforge3
+```
+
+The `DEEPLABCUT` environment currently imports:
+
+```text
+deeplabcut 3.0.1
+torch 2.13.0
+torchvision 0.28.0
+```
+
+This is CPU-only on the current install, so training can be slow. It is still enough for setup, project creation, labeling preparation, and small pipeline tests.
+
+## 7. Do Not Move These Files
 
 Keep these local files in the project folder:
 
