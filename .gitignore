@@ -12,6 +12,7 @@
 
 # DeepLabCut generated outputs and caches.
 dlc-models/
+dlc-models-pytorch/
 labeled-data/
 videos/
 evaluation-results/
