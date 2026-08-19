@@ -41,11 +41,14 @@ def main() -> None:
     axes[0].tick_params(axis="x", rotation=35)
     axes[0].legend()
 
-    axes[1].plot(per_frame.index, per_frame["pupil_center_error_px"], color="#2CA02C", linewidth=1.8)
+    frame_numbers = range(len(per_frame))
+    axes[1].plot(frame_numbers, per_frame["pupil_center_error_px"], color="#2CA02C", linewidth=1.8)
     axes[1].axhline(center, color="#D62728", linestyle="--", linewidth=1.5, label=f"pupil center RMSE = {center:.2f}px")
     axes[1].set_title(f"Pupil center error across 100 held-out frames; width MAE = {width:.2f}px")
-    axes[1].set_xlabel("test frame")
+    axes[1].set_xlabel("test frame index")
     axes[1].set_ylabel("center error (px)")
+    axes[1].set_xlim(0, max(0, len(per_frame) - 1))
+    axes[1].set_xticks(range(0, len(per_frame), 10))
     axes[1].legend()
 
     fig.savefig(OUT_PNG, dpi=200)
