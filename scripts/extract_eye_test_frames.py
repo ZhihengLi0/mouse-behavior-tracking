@@ -7,9 +7,10 @@ import numpy as np
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 TEST_DIR = PROJECT_DIR / "local_data" / "test_sets" / "eye_last_minute_100"
-VIDEO_PATH = TEST_DIR / "face_last60s.mp4"
+VIDEO_PATH = PROJECT_DIR / "face.mp4"
 OUT_DIR = TEST_DIR / "frames"
 N_FRAMES = 100
+TEST_SECONDS = 60
 
 
 def main() -> None:
@@ -30,26 +31,36 @@ def main() -> None:
     if total <= 0:
         raise RuntimeError(f"Video has no readable frames: {VIDEO_PATH}")
 
-    indices = np.linspace(0, total - 1, N_FRAMES).round().astype(int)
+    start_frame = max(0, int(round(total - TEST_SECONDS * fps)))
+    indices = np.linspace(start_frame, total - 1, N_FRAMES).round().astype(int)
+    frame_index_to_output_index = {int(frame_idx): i for i, frame_idx in enumerate(indices)}
 
     saved = 0
-    for i, frame_idx in enumerate(indices):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, int(frame_idx))
+    frame_idx = 0
+    while True:
         ok, frame = cap.read()
         if not ok:
-            raise RuntimeError(f"Could not read frame {frame_idx}")
+            break
 
-        out_path = OUT_DIR / f"test_{i:03d}_frame{frame_idx:05d}.png"
-        cv2.imwrite(str(out_path), frame)
-        saved += 1
+        if frame_idx in frame_index_to_output_index:
+            i = frame_index_to_output_index[frame_idx]
+            out_path = OUT_DIR / f"test_{i:03d}_frame{frame_idx:05d}.png"
+            cv2.imwrite(str(out_path), frame)
+            saved += 1
+
+        frame_idx += 1
 
     cap.release()
+
+    if saved != N_FRAMES:
+        raise RuntimeError(f"Expected {N_FRAMES} frames, but saved {saved}")
 
     print(f"video: {VIDEO_PATH}")
     print(f"total_frames: {total}")
     print(f"fps: {fps:.3f}")
     print(f"saved_frames: {saved}")
     print(f"output_dir: {OUT_DIR}")
+    print(f"test_start_frame: {start_frame}")
     print(f"first_frame: {indices[0]}")
     print(f"last_frame: {indices[-1]}")
 
