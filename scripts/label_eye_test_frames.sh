@@ -3,14 +3,10 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON="/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python"
-CONFIG="$PROJECT_DIR/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/config.yaml"
-IMAGE_FOLDER="$PROJECT_DIR/local_data/test_sets/eye_last_minute_100/frames"
+CONFIG="$PROJECT_DIR/local_data/test_sets/eye_last_minute_100/dlc_label_project/config.yaml"
+IMAGE_FOLDER="$PROJECT_DIR/local_data/test_sets/eye_last_minute_100/dlc_label_project/labeled-data/eye_last_minute_100"
 
-if [ ! -d "$IMAGE_FOLDER" ]; then
-  echo "Missing test frame folder: $IMAGE_FOLDER" >&2
-  echo "Run scripts/extract_eye_test_frames.py first." >&2
-  exit 1
-fi
+"$PYTHON" "$PROJECT_DIR/scripts/prepare_eye_test_label_project.py"
 
 mkdir -p \
   "$PROJECT_DIR/local_data/matplotlib" \
