@@ -78,6 +78,15 @@ local_data/test_sets/eye_last_minute_100/predictions_20train/eye_test_20train_su
 
 The 20-frame model is only a baseline. The next scientific step is to repeat training with larger training sets from the first 4 minutes, such as 50, 100, and 150 frames, and evaluate each model on the same fixed 100-frame test set.
 
+Next scaling step:
+
+```bash
+/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/expand_eye_training_frames.py --target 50
+bash scripts/label_eye_frames.sh
+```
+
+After labeling the added frames, recreate the training dataset, train the next model, and evaluate it on the same fixed 100-frame test set.
+
 ## Useful Commands
 
 Check the environment:
