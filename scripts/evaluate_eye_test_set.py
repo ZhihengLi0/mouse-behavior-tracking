@@ -26,7 +26,11 @@ def frame_name(index_value: object) -> str:
 
 
 def drop_scorer_level(df: pd.DataFrame) -> pd.DataFrame:
-    if isinstance(df.columns, pd.MultiIndex) and df.columns.nlevels == 3:
+    if not isinstance(df.columns, pd.MultiIndex):
+        return df
+    if df.columns.nlevels == 4:
+        return df.droplevel([0, 1], axis=1)
+    if df.columns.nlevels == 3:
         return df.droplevel(0, axis=1)
     return df
 
@@ -71,7 +75,7 @@ def main() -> None:
         destfolder=str(PREDICTION_DIR),
         shuffle=1,
         save_as_csv=True,
-        plotting=True,
+        plotting=False,
         pcutoff=0.0,
     )
 
@@ -138,7 +142,8 @@ def main() -> None:
         )
 
     all_errors_arr = np.concatenate(all_errors)
-    pcutoff_errors_arr = np.concatenate([x for x in all_errors_pcutoff if len(x) > 0])
+    pcutoff_error_groups = [x for x in all_errors_pcutoff if len(x) > 0]
+    pcutoff_errors_arr = np.concatenate(pcutoff_error_groups) if pcutoff_error_groups else np.array([])
 
     manual_center, manual_width, manual_area = pupil_metrics(manual)
     pred_center, pred_width, pred_area = pupil_metrics(pred)
