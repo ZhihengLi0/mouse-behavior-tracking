@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 from pathlib import Path
 
 import deeplabcut
@@ -14,7 +15,6 @@ MAIN_CONFIG = PROJECT_DIR / "dlc_projects" / "EyePupilBlink-Zhiheng-2026-08-17" 
 TEST_ROOT = PROJECT_DIR / "local_data" / "test_sets" / "eye_last_minute_100"
 TEST_LABEL_DIR = TEST_ROOT / "dlc_label_project" / "labeled-data" / "eye_last_minute_100"
 TEST_LABELS = TEST_LABEL_DIR / "CollectedData_Zhiheng.h5"
-PREDICTION_DIR = TEST_ROOT / "predictions_20train"
 PCUTOFF = 0.6
 PUPIL_PARTS = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
 
@@ -57,6 +57,13 @@ def pupil_metrics(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Evaluate an eye DLC model on the fixed 100-frame held-out test set.")
+    parser.add_argument("--train-frames", type=int, default=20, help="Training frame count label for the output folder.")
+    parser.add_argument("--shuffle", type=int, default=1, help="DLC shuffle/model number to evaluate.")
+    args = parser.parse_args()
+
+    prediction_dir = TEST_ROOT / f"predictions_{args.train_frames}train"
+
     if not MAIN_CONFIG.exists():
         raise FileNotFoundError(f"Missing config: {MAIN_CONFIG}")
     if not TEST_LABELS.exists():
@@ -66,22 +73,22 @@ def main() -> None:
     if len(image_files) != 100:
         raise RuntimeError(f"Expected 100 test images in {TEST_LABEL_DIR}, found {len(image_files)}")
 
-    PREDICTION_DIR.mkdir(parents=True, exist_ok=True)
+    prediction_dir.mkdir(parents=True, exist_ok=True)
 
     deeplabcut.analyze_images(
         str(MAIN_CONFIG),
         [str(TEST_LABEL_DIR)],
         frame_type=".png",
-        destfolder=str(PREDICTION_DIR),
-        shuffle=1,
+        destfolder=str(prediction_dir),
+        shuffle=args.shuffle,
         save_as_csv=True,
         plotting=False,
         pcutoff=0.0,
     )
 
-    prediction_files = sorted(PREDICTION_DIR.glob("image_predictions_*.h5"))
+    prediction_files = sorted(prediction_dir.glob("image_predictions_*.h5"))
     if not prediction_files:
-        raise FileNotFoundError(f"No prediction H5 files found in {PREDICTION_DIR}")
+        raise FileNotFoundError(f"No prediction H5 files found in {prediction_dir}")
 
     predictions_h5 = prediction_files[-1]
     manual = pd.read_hdf(TEST_LABELS)
@@ -170,9 +177,9 @@ def main() -> None:
     )
 
     summary = pd.DataFrame(summary_rows)
-    per_frame_path = PREDICTION_DIR / "eye_test_per_frame_errors.csv"
-    summary_path = PREDICTION_DIR / "eye_test_summary.csv"
-    json_path = PREDICTION_DIR / "eye_test_summary.json"
+    per_frame_path = prediction_dir / "eye_test_per_frame_errors.csv"
+    summary_path = prediction_dir / "eye_test_summary.csv"
+    json_path = prediction_dir / "eye_test_summary.json"
 
     per_frame.to_csv(per_frame_path)
     summary.to_csv(summary_path, index=False)
@@ -180,6 +187,8 @@ def main() -> None:
 
     print(f"manual_labels: {TEST_LABELS}")
     print(f"predictions: {predictions_h5}")
+    print(f"train_frames: {args.train_frames}")
+    print(f"shuffle: {args.shuffle}")
     print(f"matched_frames: {len(common_frames)}")
     print(f"per_frame_errors: {per_frame_path}")
     print(f"summary: {summary_path}")

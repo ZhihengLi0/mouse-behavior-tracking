@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -6,20 +7,26 @@ import pandas as pd
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
-RESULT_DIR = PROJECT_DIR / "local_data" / "test_sets" / "eye_last_minute_100" / "predictions_20train"
-SUMMARY_CSV = RESULT_DIR / "eye_test_summary.csv"
-PER_FRAME_CSV = RESULT_DIR / "eye_test_per_frame_errors.csv"
-OUT_PNG = RESULT_DIR / "eye_test_20train_summary.png"
+TEST_ROOT = PROJECT_DIR / "local_data" / "test_sets" / "eye_last_minute_100"
 
 
 def main() -> None:
-    if not SUMMARY_CSV.exists():
-        raise FileNotFoundError(f"Missing summary file: {SUMMARY_CSV}")
-    if not PER_FRAME_CSV.exists():
-        raise FileNotFoundError(f"Missing per-frame file: {PER_FRAME_CSV}")
+    parser = argparse.ArgumentParser(description="Plot eye held-out test metrics for a training-frame count.")
+    parser.add_argument("--train-frames", type=int, default=20, help="Training frame count label for the result folder.")
+    args = parser.parse_args()
 
-    summary = pd.read_csv(SUMMARY_CSV)
-    per_frame = pd.read_csv(PER_FRAME_CSV, index_col=0)
+    result_dir = TEST_ROOT / f"predictions_{args.train_frames}train"
+    summary_csv = result_dir / "eye_test_summary.csv"
+    per_frame_csv = result_dir / "eye_test_per_frame_errors.csv"
+    out_png = result_dir / f"eye_test_{args.train_frames}train_summary.png"
+
+    if not summary_csv.exists():
+        raise FileNotFoundError(f"Missing summary file: {summary_csv}")
+    if not per_frame_csv.exists():
+        raise FileNotFoundError(f"Missing per-frame file: {per_frame_csv}")
+
+    summary = pd.read_csv(summary_csv)
+    per_frame = pd.read_csv(per_frame_csv, index_col=0)
 
     keypoint_rmse = summary[
         summary["metric"].str.endswith("_rmse_px")
@@ -36,7 +43,7 @@ def main() -> None:
 
     axes[0].bar(keypoint_rmse["bodypart"], keypoint_rmse["value"], color="#4C78A8")
     axes[0].axhline(overall, color="#D62728", linestyle="--", linewidth=1.5, label=f"overall RMSE = {overall:.2f}px")
-    axes[0].set_title("20 training frames: keypoint test RMSE")
+    axes[0].set_title(f"{args.train_frames} training frames: keypoint test RMSE")
     axes[0].set_ylabel("RMSE (px)")
     axes[0].tick_params(axis="x", rotation=35)
     axes[0].legend()
@@ -51,8 +58,8 @@ def main() -> None:
     axes[1].set_xticks(range(0, len(per_frame), 10))
     axes[1].legend()
 
-    fig.savefig(OUT_PNG, dpi=200)
-    print(f"saved_plot: {OUT_PNG}")
+    fig.savefig(out_png, dpi=200)
+    print(f"saved_plot: {out_png}")
 
 
 if __name__ == "__main__":
