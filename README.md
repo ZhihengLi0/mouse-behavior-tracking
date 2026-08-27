@@ -7,18 +7,19 @@ Raw videos, PDFs, trained models, extracted labels, and generated results stay l
 
 ## Repository Logic
 
-GitHub stores the reproducible pipeline:
+There are two layers:
 
-- setup notes and project documentation.
-- DeepLabCut config files.
-- scripts for extraction, labeling launchers, evaluation, and plotting.
+1. GitHub/repository layer: code, configuration, documentation, and reproducible commands.
+2. Local research-data layer: raw videos, PDFs, extracted frames, labels, model weights, predictions, and plots.
 
-Local-only files store the private or heavy research data:
+The local research-data layer is intentionally ignored by Git. This keeps private or large files out of GitHub.
 
-- `face.mp4`: eye close-up video for pupil and blink tracking.
-- `body.mp4`: face/body video for facial features, ears, and forepaws.
-- `*.pdf`: local reading materials and unpublished/review materials.
-- `local_data/`: extracted frames, labels, predictions, result plots, caches, and AI handoff notes.
+Main local inputs:
+
+- `face.mp4`: eye video for pupil and blink tracking.
+- `body.mp4`: deferred face/body video for facial features, ears, and forepaws.
+- `*.pdf`: local reading material.
+- `local_data/`: temporary files and local results.
 
 ## Current Eye Project
 
@@ -50,33 +51,35 @@ held-out test pool: last 1 minute of face.mp4
 
 ## Current Status
 
-Completed:
+The eye scaling experiment has been run with 20, 50, and 100 training frames from the first 4 minutes. All three models were evaluated on the same 100 manually labeled frames from the final minute.
 
-1. DeepLabCut environment setup.
-2. Eye project creation.
-3. 20 training frames extracted from the first 4 minutes.
-4. 20 training frames manually labeled.
-5. First model trained from the 20-frame training set.
-6. 100-frame held-out test set extracted from the last minute.
-7. 100 test frames manually labeled.
-8. The 20-frame model evaluated on the 100-frame test set.
-9. A summary plot generated locally.
-
-Current 20-frame baseline:
+The current results are organized locally under:
 
 ```text
-overall keypoint RMSE: 38.27 px
-pupil center RMSE:    17.83 px
-pupil width MAE:      36.36 px
+local_data/test_sets/eye_last_minute_100/deliverables/
 ```
 
-Local result plot:
+The curve is not yet a reliable plateau: the overall error is not monotonically decreasing with training-frame count. The next step is to audit the remaining outliers and verify that the training subsets are comparable before adding 150 frames or testing other architectures.
+
+Current test metrics:
 
 ```text
-local_data/test_sets/eye_last_minute_100/predictions_20train/eye_test_20train_summary.png
+20 frames:  overall RMSE 36.17 px, pupil center RMSE 16.50 px, pupil width MAE 40.44 px
+50 frames:  overall RMSE 42.14 px, pupil center RMSE 17.18 px, pupil width MAE 25.41 px
+100 frames: overall RMSE 56.83 px, pupil center RMSE 35.17 px, pupil width MAE 29.44 px
 ```
 
-The 20-frame model is only a baseline. The next scientific step is to repeat training with larger training sets from the first 4 minutes, such as 50, 100, and 150 frames, and evaluate each model on the same fixed 100-frame test set.
+## Where To Look
+
+Use `docs/` for the learning workflow and `scripts/` for executable steps. Use the local `deliverables/` folder for advisor-facing outputs:
+
+```text
+01_summary_figures/  plots and curves
+02_outlier_checks/   worst-frame visual inspections
+03_share_videos/     videos with prediction overlays
+04_tables/           metrics and audit CSV files
+05_reference_inputs/ source test clip
+```
 
 Next scaling step:
 
