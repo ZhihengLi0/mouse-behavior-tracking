@@ -59,15 +59,18 @@ The current results are organized locally under:
 local_data/test_sets/eye_last_minute_100/deliverables/
 ```
 
-The curve is not yet a reliable plateau: the overall error is not monotonically decreasing with training-frame count. The next step is to audit the remaining outliers and verify that the training subsets are comparable before adding 150 frames or testing other architectures.
+The curve is not yet a reliable plateau: the overall error is not monotonically decreasing with training-frame count. The remaining outliers have been regenerated from the latest manual labels, and a controlled 100-frame architecture comparison has also been completed.
 
 Current test metrics:
 
 ```text
-20 frames:  overall RMSE 36.17 px, pupil center RMSE 16.50 px, pupil width MAE 40.44 px
-50 frames:  overall RMSE 42.14 px, pupil center RMSE 17.18 px, pupil width MAE 25.41 px
-100 frames: overall RMSE 56.83 px, pupil center RMSE 35.17 px, pupil width MAE 29.44 px
+ResNet-50, 20 frames:  overall RMSE 35.48 px, pupil center RMSE 16.79 px, pupil width MAE 43.10 px
+ResNet-50, 50 frames:  overall RMSE 42.25 px, pupil center RMSE 17.45 px, pupil width MAE 28.74 px
+ResNet-50, 100 frames: overall RMSE 56.82 px, pupil center RMSE 35.77 px, pupil width MAE 32.48 px
+HRNet-W32, 100 frames: overall RMSE 25.68 px, pupil center RMSE 11.96 px, pupil width MAE 26.31 px
 ```
+
+The ResNet-50 and HRNet-W32 100-frame runs use the same 95 internal training images, the same 5 internal validation images, and the same fixed 100-frame held-out test set. HRNet-W32 has substantially lower raw-coordinate error, but all 800 held-out predictions have likelihood below `0.6`. This confidence-calibration problem must be reported alongside the error improvement.
 
 ## Where To Look
 
@@ -81,14 +84,14 @@ Use `docs/` for the learning workflow and `scripts/` for executable steps. Use t
 05_reference_inputs/ source test clip
 ```
 
-Next scaling step:
+Next scientific checks:
 
-```bash
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/expand_eye_training_frames.py --target 50
-bash scripts/label_eye_frames.sh
+```text
+1. Inspect the current ResNet-50 and HRNet-W32 outlier montages.
+2. Generate and inspect a final-minute HRNet-W32 labeled video with all points visible.
+3. Diagnose HRNet-W32 likelihood calibration before choosing a confidence cutoff.
+4. Only then decide whether to add more training frames or another architecture.
 ```
-
-After labeling the added frames, recreate the training dataset, train the next model, and evaluate it on the same fixed 100-frame test set.
 
 ## Useful Commands
 
@@ -126,6 +129,13 @@ Regenerate the current result plot:
 
 ```bash
 /Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/plot_eye_test_results.py
+```
+
+Regenerate outlier tables and montages:
+
+```bash
+/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/plot_eye_outliers.py --train-frames 100
+/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/plot_eye_outliers.py --train-frames 100 --model-label hrnet_w32
 ```
 
 ## Documentation
