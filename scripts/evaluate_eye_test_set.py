@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import argparse
+import re
 from pathlib import Path
 
 import deeplabcut
@@ -60,9 +61,20 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate an eye DLC model on the fixed 100-frame held-out test set.")
     parser.add_argument("--train-frames", type=int, default=20, help="Training frame count label for the output folder.")
     parser.add_argument("--shuffle", type=int, default=1, help="DLC shuffle/model number to evaluate.")
+    parser.add_argument(
+        "--model-label",
+        default="",
+        help="Optional architecture label appended to the output folder, such as hrnet_w32.",
+    )
     args = parser.parse_args()
 
-    prediction_dir = TEST_ROOT / f"predictions_{args.train_frames}train"
+    if args.model_label and not re.fullmatch(r"[A-Za-z0-9_-]+", args.model_label):
+        raise ValueError("--model-label may contain only letters, numbers, underscores, and hyphens")
+
+    output_name = f"predictions_{args.train_frames}train"
+    if args.model_label:
+        output_name += f"_{args.model_label}"
+    prediction_dir = TEST_ROOT / output_name
 
     if not MAIN_CONFIG.exists():
         raise FileNotFoundError(f"Missing config: {MAIN_CONFIG}")
@@ -189,6 +201,7 @@ def main() -> None:
     print(f"predictions: {predictions_h5}")
     print(f"train_frames: {args.train_frames}")
     print(f"shuffle: {args.shuffle}")
+    print(f"model_label: {args.model_label or 'default'}")
     print(f"matched_frames: {len(common_frames)}")
     print(f"per_frame_errors: {per_frame_path}")
     print(f"summary: {summary_path}")

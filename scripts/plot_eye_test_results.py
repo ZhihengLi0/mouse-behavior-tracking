@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import re
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -13,12 +14,24 @@ TEST_ROOT = PROJECT_DIR / "local_data" / "test_sets" / "eye_last_minute_100"
 def main() -> None:
     parser = argparse.ArgumentParser(description="Plot eye held-out test metrics for a training-frame count.")
     parser.add_argument("--train-frames", type=int, default=20, help="Training frame count label for the result folder.")
+    parser.add_argument(
+        "--model-label",
+        default="",
+        help="Optional architecture label used by evaluate_eye_test_set.py, such as hrnet_w32.",
+    )
     args = parser.parse_args()
 
-    result_dir = TEST_ROOT / f"predictions_{args.train_frames}train"
+    if args.model_label and not re.fullmatch(r"[A-Za-z0-9_-]+", args.model_label):
+        raise ValueError("--model-label may contain only letters, numbers, underscores, and hyphens")
+
+    output_name = f"predictions_{args.train_frames}train"
+    if args.model_label:
+        output_name += f"_{args.model_label}"
+    result_dir = TEST_ROOT / output_name
     summary_csv = result_dir / "eye_test_summary.csv"
     per_frame_csv = result_dir / "eye_test_per_frame_errors.csv"
-    out_png = result_dir / f"eye_test_{args.train_frames}train_summary.png"
+    suffix = f"_{args.model_label}" if args.model_label else ""
+    out_png = result_dir / f"eye_test_{args.train_frames}train{suffix}_summary.png"
 
     if not summary_csv.exists():
         raise FileNotFoundError(f"Missing summary file: {summary_csv}")
@@ -43,7 +56,8 @@ def main() -> None:
 
     axes[0].bar(keypoint_rmse["bodypart"], keypoint_rmse["value"], color="#4C78A8")
     axes[0].axhline(overall, color="#D62728", linestyle="--", linewidth=1.5, label=f"overall RMSE = {overall:.2f}px")
-    axes[0].set_title(f"{args.train_frames} training frames: keypoint test RMSE")
+    model_name = args.model_label or "default model"
+    axes[0].set_title(f"{args.train_frames} training frames ({model_name}): keypoint test RMSE")
     axes[0].set_ylabel("RMSE (px)")
     axes[0].tick_params(axis="x", rotation=35)
     axes[0].legend()
