@@ -45,6 +45,7 @@ def main() -> None:
         summary["metric"].str.endswith("_rmse_px")
         & ~summary["metric"].str.startswith("overall")
         & ~summary["metric"].str.contains("pcutoff")
+        & (summary["metric"] != "pupil_center_rmse_px")
     ].copy()
     keypoint_rmse["bodypart"] = keypoint_rmse["metric"].str.replace("_rmse_px", "", regex=False)
 
