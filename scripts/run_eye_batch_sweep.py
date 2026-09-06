@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+import fcntl
 import os
 import subprocess
 import sys
@@ -82,6 +83,13 @@ def write_metadata(rows: list[dict[str, object]]) -> None:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    lock_handle = (OUT / "runner.lock").open("w", encoding="utf-8")
+    try:
+        fcntl.flock(lock_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        raise SystemExit("Another batch sweep runner is already active") from None
+    lock_handle.write(f"{os.getpid()}\n")
+    lock_handle.flush()
     (OUT / "background.pid").write_text(f"{os.getpid()}\n", encoding="utf-8")
     (ROOT / "local_data" / "matplotlib").mkdir(parents=True, exist_ok=True)
     (ROOT / "local_data" / "numba").mkdir(parents=True, exist_ok=True)
