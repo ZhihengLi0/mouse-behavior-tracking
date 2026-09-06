@@ -70,6 +70,7 @@ def write_metadata(rows: list[dict[str, object]]) -> None:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "background.pid").write_text(f"{os.getpid()}\n", encoding="utf-8")
     (ROOT / "local_data" / "matplotlib").mkdir(parents=True, exist_ok=True)
     (ROOT / "local_data" / "numba").mkdir(parents=True, exist_ok=True)
     (OUT / "runner_started_at.txt").write_text(now() + "\n", encoding="utf-8")
