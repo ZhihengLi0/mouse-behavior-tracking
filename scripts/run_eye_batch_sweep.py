@@ -31,6 +31,18 @@ def now() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
 
+def evaluation_complete(model_label: str) -> bool:
+    summary = (
+        ROOT
+        / "local_data"
+        / "test_sets"
+        / "eye_last_minute_100"
+        / f"predictions_100train_{model_label}"
+        / "eye_test_summary.csv"
+    )
+    return summary.exists()
+
+
 def training_complete(shuffle: int) -> bool:
     train_dir = DLC_PROJECT / "dlc-models-pytorch" / "iteration-0" / f"EyePupilBlinkAug17-trainset95shuffle{shuffle}" / "train"
     stats_path = train_dir / "learning_stats.csv"
@@ -104,16 +116,20 @@ def main() -> None:
 
         if status == "complete":
             model_label = f"hrnet_w32_batch{batch_size}"
-            code = run_logged(
-                [
-                    str(PYTHON),
-                    str(SCRIPTS / "evaluate_eye_test_set.py"),
-                    "--train-frames", "100",
-                    "--shuffle", str(shuffle),
-                    "--model-label", model_label,
-                ],
-                log_path,
-            )
+            if evaluation_complete(model_label):
+                code = 0
+            else:
+                code = run_logged(
+                    [
+                        str(PYTHON),
+                        str(SCRIPTS / "evaluate_eye_test_set.py"),
+                        "--train-frames", "100",
+                        "--shuffle", str(shuffle),
+                        "--model-label", model_label,
+                    ],
+                    log_path,
+                )
+
             if code:
                 status = "evaluation_failed"
             else:

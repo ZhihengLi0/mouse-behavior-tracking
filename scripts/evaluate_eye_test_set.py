@@ -96,6 +96,7 @@ def main() -> None:
         save_as_csv=True,
         plotting=False,
         pcutoff=0.0,
+        device="cpu",
     )
 
     prediction_files = sorted(prediction_dir.glob("image_predictions_*.h5"))
