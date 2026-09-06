@@ -149,3 +149,21 @@ docs/04_metrics_and_outputs.md
 ```
 
 The body video workflow is documented but deferred until the eye pipeline is more mature.
+
+## HRNet-W32 Batch-Size Sweep
+
+The controlled sweep compares batch sizes `1, 2, 4, 8, 16` with the same 100-frame label pool, identical 95/5 internal split, 200 epochs, and the locked 100-frame final-minute evaluation set. Existing `shuffle4` is the batch-size 8 baseline; `shuffle5-8` represent batch sizes 1, 2, 4, and 16. Batch size is selected only by internal validation loss; final-minute metrics are report-only.
+
+Run or resume the queue:
+
+```bash
+nohup caffeinate -ims /Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/run_eye_batch_sweep.py > local_data/experiments/01_batch_size_sweep/launcher.log 2>&1 &
+```
+
+Check progress:
+
+```bash
+bash scripts/status_eye_batch_sweep.sh
+```
+
+Local outputs are written to `local_data/experiments/01_batch_size_sweep/` and are intentionally ignored by Git.
