@@ -22,6 +22,9 @@ training-datasets/
 *.csv
 *.log
 
+# Aggregated, publication-safe result tables are intentionally versioned.
+!results/**/*.csv
+
 # Python / notebook caches.
 __pycache__/
 .ipynb_checkpoints/

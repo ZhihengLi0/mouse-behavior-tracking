@@ -1,0 +1,8 @@
+{
+  "selection_rule": "lowest minimum internal validation total loss",
+  "selected_batch_size": 16,
+  "selected_minimum_internal_validation_loss": 0.00790342874825,
+  "external_test_policy": "report only; not used for hyperparameter selection",
+  "lowest_external_overall_rmse_batch_size": 2,
+  "checkpoint_rule_within_each_run": "DeepLabCut snapshot-best selected by maximum internal test.mAP"
+}

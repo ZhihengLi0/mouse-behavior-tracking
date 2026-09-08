@@ -51,47 +51,49 @@ held-out test pool: last 1 minute of face.mp4
 
 ## Current Status
 
-The eye scaling experiment has been run with 20, 50, and 100 training frames from the first 4 minutes. All three models were evaluated on the same 100 manually labeled frames from the final minute.
+The first 20/50/100-frame scaling study and the 100-frame ResNet-50 versus
+HRNet-W32 comparison are complete. The controlled HRNet-W32 batch-size
+sweep is also complete for batch sizes `1, 2, 4, 8, 16`.
 
-The current results are organized locally under:
+Every batch-size run used the same 100-frame label pool from the first
+four minutes, the same 95/5 internal split, 200 epochs, and the same
+locked 100-frame final-minute test set.
 
-```text
-local_data/test_sets/eye_last_minute_100/deliverables/
-```
+| Batch | DLC best epoch | Minimum internal valid loss | External overall RMSE | Pupil center RMSE | Pupil width MAE |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 20 | 0.00836 | 51.31 px | 15.76 px | 32.95 px |
+| 2 | 90 | 0.00824 | 20.06 px | 9.53 px | 20.11 px |
+| 4 | 20 | 0.00820 | 24.31 px | 10.53 px | 22.86 px |
+| 8 | 10 | 0.00806 | 25.68 px | 11.96 px | 26.31 px |
+| 16 | 10 | 0.00790 | 38.61 px | 16.68 px | 37.99 px |
 
-The curve is not yet a reliable plateau: the overall error is not monotonically decreasing with training-frame count. The remaining outliers have been regenerated from the latest manual labels, and a controlled 100-frame architecture comparison has also been completed.
+The pre-specified internal-validation rule selects batch size **16**.
+Batch size **2** has the lowest external-test errors, but that final-minute
+result is report-only and must not be used retroactively for tuning. The
+disagreement matters because internal validation contains only five
+images and all five runs were performed once.
 
-Current test metrics:
-
-```text
-ResNet-50, 20 frames:  overall RMSE 35.48 px, pupil center RMSE 16.79 px, pupil width MAE 43.10 px
-ResNet-50, 50 frames:  overall RMSE 42.25 px, pupil center RMSE 17.45 px, pupil width MAE 28.74 px
-ResNet-50, 100 frames: overall RMSE 56.82 px, pupil center RMSE 35.77 px, pupil width MAE 32.48 px
-HRNet-W32, 100 frames: overall RMSE 25.68 px, pupil center RMSE 11.96 px, pupil width MAE 26.31 px
-```
-
-The ResNet-50 and HRNet-W32 100-frame runs use the same 95 internal training images, the same 5 internal validation images, and the same fixed 100-frame held-out test set. HRNet-W32 has substantially lower raw-coordinate error, but all 800 held-out predictions have likelihood below `0.6`. This confidence-calibration problem must be reported alongside the error improvement.
+Audited, publication-safe outputs are in
+[`results/01_batch_size_sweep/`](results/01_batch_size_sweep/).
+The detailed interpretation is in the
+[result report](results/01_batch_size_sweep/README.md).
 
 ## Where To Look
 
-Use `docs/` for the learning workflow and `scripts/` for executable steps. Use the local `deliverables/` folder for advisor-facing outputs:
+- `docs/`: learning workflow and metric definitions.
+- `scripts/`: extraction, labeling, training, evaluation, and publishing.
+- `results/`: versioned aggregate tables, figures, and reports.
+- `local_data/`: ignored local predictions, outlier montages, and test assets.
+- `dlc_projects/`: DeepLabCut project; generated models and labels are ignored.
 
-```text
-01_summary_figures/  plots and curves
-02_outlier_checks/   worst-frame visual inspections
-03_share_videos/     videos with prediction overlays
-04_tables/           metrics and audit CSV files
-05_reference_inputs/ source test clip
-```
+Next scientific work:
 
-Next scientific checks:
-
-```text
-1. Inspect the current ResNet-50 and HRNet-W32 outlier montages.
-2. Generate and inspect a final-minute HRNet-W32 labeled video with all points visible.
-3. Diagnose HRNet-W32 likelihood calibration before choosing a confidence cutoff.
-4. Only then decide whether to add more training frames or another architecture.
-```
+1. Use the frozen internally selected batch size for a controlled
+   architecture comparison.
+2. Improve or explicitly account for the small internal validation set.
+3. Calibrate DLC likelihood before applying a confidence cutoff.
+4. Run the active-learning comparison using K-means frame selection and
+   the `uncertain`, `jump`, and `fitting` outlier methods.
 
 ## Useful Commands
 
@@ -152,18 +154,24 @@ The body video workflow is documented but deferred until the eye pipeline is mor
 
 ## HRNet-W32 Batch-Size Sweep
 
-The controlled sweep compares batch sizes `1, 2, 4, 8, 16` with the same 100-frame label pool, identical 95/5 internal split, 200 epochs, and the locked 100-frame final-minute evaluation set. Existing `shuffle4` is the batch-size 8 baseline; `shuffle5-8` represent batch sizes 1, 2, 4, and 16. Batch size is selected only by internal validation loss; final-minute metrics are report-only.
+The sweep completed on 2026-09-08. Existing `shuffle4` is batch size 8;
+`shuffle5-8` are batch sizes 1, 2, 4, and 16. All five model runs,
+external evaluations, and plots completed successfully.
 
-Run or resume the queue:
-
-```bash
-nohup caffeinate -ims /Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/run_eye_batch_sweep.py > local_data/experiments/01_batch_size_sweep/launcher.log 2>&1 &
-```
-
-Check progress:
+Regenerate and audit the versioned result package:
 
 ```bash
-bash scripts/status_eye_batch_sweep.sh
+/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/publish_eye_batch_sweep.py
 ```
 
-Local outputs are written to `local_data/experiments/01_batch_size_sweep/` and are intentionally ignored by Git.
+The command validates completion, architecture, configured batch sizes,
+tested snapshot epochs, and identical external frame order before writing
+the result package. Full local artifacts remain in:
+
+```text
+local_data/experiments/01_batch_size_sweep/
+local_data/test_sets/eye_last_minute_100/predictions_100train_hrnet_w32_batch*/
+```
+
+These local directories contain predictions and logs and remain ignored
+by Git. Only aggregate result tables, plots, and reports are published.
