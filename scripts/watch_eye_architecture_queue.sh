@@ -20,7 +20,7 @@ while true; do
     ps -axo ppid=,rss= |
       awk -v parent="$PID" '$1 == parent {sum += $2} END {print sum + 0}'
   )"
-  printf '%s free_memory=%s%% child_rss_kb=%s disk_free_kb=%s\n' +    "$(date -Iseconds)" "$FREE_PERCENT" "$CHILD_RSS_KB" "$DISK_FREE_KB" +    >> "$LOG"
+  printf '%s free_memory=%s%% child_rss_kb=%s disk_free_kb=%s\n' "$(date -Iseconds)" "$FREE_PERCENT" "$CHILD_RSS_KB" "$DISK_FREE_KB" >> "$LOG"
 
   if [[ "$FREE_PERCENT" -lt 10 || "$CHILD_RSS_KB" -gt 10485760 ]]; then
     LOW_COUNT=$((LOW_COUNT + 1))
@@ -29,7 +29,7 @@ while true; do
   fi
 
   if [[ "$LOW_COUNT" -ge 3 || "$DISK_FREE_KB" -lt 20971520 ]]; then
-    printf '%s STOPPING queue: resource safety threshold reached\n' +      "$(date -Iseconds)" >> "$LOG"
+    printf '%s STOPPING queue: resource safety threshold reached\n' "$(date -Iseconds)" >> "$LOG"
     pkill -TERM -P "$PID" 2>/dev/null || true
     kill -TERM "$PID" 2>/dev/null || true
     exit 2
