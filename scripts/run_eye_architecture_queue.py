@@ -34,7 +34,7 @@ TEST_ROOT = ROOT / "local_data" / "test_sets" / "eye_last_minute_100"
 RUNS = [
     ("hrnet_w18", 10),
     ("resnet_50", 11),
-    ("rtmpose_s", 12),
+    ("cspnext_s", 14),
     ("hrnet_w48", 13),
 ]
 

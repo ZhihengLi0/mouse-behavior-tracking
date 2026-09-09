@@ -190,7 +190,7 @@ bash scripts/status_eye_batch32_extension.sh
 ```
 
 The architecture sweep fixes `batch_size=2` and uses the same 95/5
-split for HRNet-W18, HRNet-W32, HRNet-W48, ResNet-50, and RTMPose-S.
+split for HRNet-W18, HRNet-W32, HRNet-W48, ResNet-50, and CSPNeXt-S.
 Check the serial queue:
 
 ```bash
