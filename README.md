@@ -55,6 +55,10 @@ The first 20/50/100-frame scaling study and the 100-frame ResNet-50 versus
 HRNet-W32 comparison are complete. The controlled HRNet-W32 batch-size
 sweep is also complete for batch sizes `1, 2, 4, 8, 16`.
 
+A controlled batch-size `32` extension uses the same HRNet-W32 model,
+95/5 split, 200 epochs, and locked external test (`shuffle9`). Batch 64
+is intentionally excluded because this machine has 16 GB of memory.
+
 Every batch-size run used the same 100-frame label pool from the first
 four minutes, the same 95/5 internal split, 200 epochs, and the same
 locked 100-frame final-minute test set.
@@ -175,3 +179,9 @@ local_data/test_sets/eye_last_minute_100/predictions_100train_hrnet_w32_batch*/
 
 These local directories contain predictions and logs and remain ignored
 by Git. Only aggregate result tables, plots, and reports are published.
+
+Batch-32 extension status:
+
+```bash
+bash scripts/status_eye_batch32_extension.sh
+```
