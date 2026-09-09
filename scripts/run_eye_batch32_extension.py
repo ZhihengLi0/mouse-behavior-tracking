@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+import argparse
 import fcntl
 import os
 import subprocess
@@ -63,6 +64,22 @@ def training_complete() -> bool:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Run the memory-intensive HRNet-W32 batch-32 extension."
+    )
+    parser.add_argument(
+        "--force-memory-risk",
+        action="store_true",
+        help="Required after this run exhausted swap on a 16 GiB Mac.",
+    )
+    args = parser.parse_args()
+    if not args.force_memory_risk:
+        raise SystemExit(
+            "Refusing batch 32 by default: the 2026-09-08 attempt expanded "
+            "swap to 15 GiB before epoch 1. Use --force-memory-risk only "
+            "on a machine with substantially more RAM."
+        )
+
     OUT.mkdir(parents=True, exist_ok=True)
     lock = (OUT / "runner.lock").open("w", encoding="utf-8")
     try:

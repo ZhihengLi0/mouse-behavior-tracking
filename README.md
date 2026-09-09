@@ -55,9 +55,10 @@ The first 20/50/100-frame scaling study and the 100-frame ResNet-50 versus
 HRNet-W32 comparison are complete. The controlled HRNet-W32 batch-size
 sweep is also complete for batch sizes `1, 2, 4, 8, 16`.
 
-A controlled batch-size `32` extension uses the same HRNet-W32 model,
-95/5 split, 200 epochs, and locked external test (`shuffle9`). Batch 64
-is intentionally excluded because this machine has 16 GB of memory.
+A controlled batch-size `32` extension was attempted with the same
+HRNet-W32 model and split (`shuffle9`). It was stopped before epoch 1
+because swap grew to about 14.5 GB on this 16 GB Mac. It has no valid
+result and is excluded together with batch 64.
 
 Every batch-size run used the same 100-frame label pool from the first
 four minutes, the same 95/5 internal split, 200 epochs, and the same
@@ -180,8 +181,18 @@ local_data/test_sets/eye_last_minute_100/predictions_100train_hrnet_w32_batch*/
 These local directories contain predictions and logs and remain ignored
 by Git. Only aggregate result tables, plots, and reports are published.
 
-Batch-32 extension status:
+The batch-32 script now refuses to rerun unless its explicit
+`--force-memory-risk` flag is passed on a machine with substantially
+more RAM. Inspect the local attempt:
 
 ```bash
 bash scripts/status_eye_batch32_extension.sh
+```
+
+The architecture sweep fixes `batch_size=2` and uses the same 95/5
+split for HRNet-W18, HRNet-W32, HRNet-W48, ResNet-50, and RTMPose-S.
+Check the serial queue:
+
+```bash
+bash scripts/status_eye_architecture_queue.sh
 ```
