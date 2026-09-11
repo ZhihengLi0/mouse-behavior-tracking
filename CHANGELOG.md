@@ -128,3 +128,25 @@ experiment:
 
 Interrupted runs are restarted from scratch rather than resumed, to avoid the
 best-snapshot destruction described above.
+
+## v0.3.0 - 2026-09-11 - Second-era batch sweep: internal and external agree
+
+Tag: `v0.3.0`
+
+First result of the second era (reviewed labels, temporal block 80/20 split,
+100 epochs, milestones [80, 95], snapshots every 10 epochs, no-resume policy).
+
+- Internal rule (declared before results): within-run snapshot-best by
+  internal mAP; across batches lowest minimum validation loss. It selected
+  **batch 2** (0.01107 at epoch 50).
+- The reviewed final-minute set, used report-only, independently ranks batch 2
+  lowest: 21.07 px overall RMSE, 11.08 px pupil-center RMSE, 375/800 points at
+  likelihood >= 0.6 (era-1 best was 59/800).
+- **Internal and external agree for the first time**, the direct evidence that
+  the rebuilt validation set resolves what the five-frame one could not.
+- Best snapshots land mid-training (epochs 90/60/50/50), not at epoch 10-20.
+- The rescaled LR milestones fired on schedule (loss drop at epoch 80).
+- Published: `results/04_batch_sweep_80_20/`. Not comparable with v0.1.0.
+
+Architecture comparison at batch 2 started the same morning (shuffles 25-28
+plus shuffle 21 reused for HRNet-W32).

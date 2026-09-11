@@ -1,0 +1,24 @@
+{
+  "labels_reviewed": "2026-09-10, all 100 training-pool and 100 test frames",
+  "training_label_rows": 100,
+  "external_test_label_rows": 100,
+  "missing_coordinate_values": 0,
+  "train_test_frame_overlap": false,
+  "split": "temporal block 80/20",
+  "block_boundary": {
+    "last_training_frame": 1954,
+    "first_validation_frame": 2026,
+    "gap_frames": 72
+  },
+  "identical_split_across_all_shuffles": true,
+  "advisor_approved_split": "2026-09-10 22:15 CDT, Slack: \u8fd9\u4e2a\u6211\u89c9\u5f97\u6ca1\u6709\u95ee\u9898",
+  "four_runs_complete": true,
+  "all_runs_reached_100_epochs": true,
+  "no_resumed_runs": true,
+  "all_models_hrnet_w32": true,
+  "milestones_rescaled_to_80_95": true,
+  "snapshots_every_10_epochs": true,
+  "evaluated_snapshot_matches_best_snapshot": true,
+  "identical_external_frame_order": true,
+  "external_test_used_for_reporting_only": true
+}

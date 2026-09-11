@@ -80,10 +80,20 @@ The second era changes, agreed with the advisor:
 - interrupted runs restart from scratch; resuming resets DeepLabCut's
   best-metric memory and destroyed a best snapshot in the first era
 
-Currently running: HRNet-W32 batch-size sweep at batch 16, 8, 4, 2
-(shuffles 24, 23, 22, 21) under `local_data/experiments/04_batch_sweep_80_20/`.
-The final-minute test labels are being re-reviewed to the same standard in
-parallel; no external evaluation happens until that review is done.
+**Batch sweep complete (2026-09-11), and the two signals AGREE for the first
+time.** The pre-declared internal rule (lowest minimum validation loss on the
+20 block-split frames) selected **batch 2** (0.01107 at epoch 50), and the
+reviewed, untouched final-minute set independently ranks batch 2 lowest
+(21.07 px overall RMSE). In the first era the two signals disagreed, which is
+what exposed the five-frame validation set; agreement is the first evidence
+the rebuilt validation set can be trusted. Full package:
+[`results/04_batch_sweep_80_20/`](results/04_batch_sweep_80_20/).
+
+Currently running: the architecture comparison at batch 2 - CSPNeXt-S,
+HRNet-W18, ResNet-50, HRNet-W48 (shuffles 25-28) under
+`local_data/experiments/05_arch_sweep_80_20/`, with HRNet-W32 reused directly
+from the batch sweep (shuffle 21). RTMPose-S stays excluded by design
+(top-down with an SSDLite detector).
 
 ## Where To Look
 

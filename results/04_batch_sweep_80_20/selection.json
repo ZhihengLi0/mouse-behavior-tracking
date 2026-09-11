@@ -1,0 +1,14 @@
+{
+  "era": "second (reviewed labels, 80/20 block split, 100 epochs)",
+  "rules_declared_before_results": true,
+  "within_run_checkpoint_rule": "DeepLabCut snapshot-best by maximum internal test.mAP on the 20 validation frames",
+  "across_batch_rule": "lowest minimum internal validation total loss",
+  "external_policy": "report-only; never selects",
+  "internal_rule_selects_batch": 2,
+  "external_lowest_batch_report_only": 2,
+  "internal_external_agree": true,
+  "not_comparable_with": [
+    "v0.1.0",
+    "v0.2.0"
+  ]
+}
