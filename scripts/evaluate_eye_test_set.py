@@ -66,6 +66,17 @@ def main() -> None:
         default="",
         help="Optional architecture label appended to the output folder, such as hrnet_w32.",
     )
+    parser.add_argument(
+        "--snapshot-index",
+        type=int,
+        default=None,
+        help=(
+            "Index into the sorted snapshot list (the best snapshot sorts last, "
+            "so -1 picks it when one exists). Omit to use the project config. "
+            "Use this only to evaluate a specific numbered snapshot, such as "
+            "when a resumed run destroyed the best checkpoint."
+        ),
+    )
     args = parser.parse_args()
 
     if args.model_label and not re.fullmatch(r"[A-Za-z0-9_-]+", args.model_label):
@@ -97,6 +108,7 @@ def main() -> None:
         plotting=False,
         pcutoff=0.0,
         device="cpu",
+        **({} if args.snapshot_index is None else {"snapshot_index": args.snapshot_index}),
     )
 
     prediction_files = sorted(prediction_dir.glob("image_predictions_*.h5"))

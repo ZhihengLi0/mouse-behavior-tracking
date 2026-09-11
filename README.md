@@ -83,6 +83,70 @@ Audited, publication-safe outputs are in
 The detailed interpretation is in the
 [result report](results/01_batch_size_sweep/README.md).
 
+### Architecture Comparison At Batch 2
+
+Five bottom-up backbones were trained with the identical 95/5 split, identical
+labels, batch 2, 200 epochs, CPU, and seed 42, then evaluated on the same
+100 final-minute frames. RTMPose-S is excluded by design: DeepLabCut configured
+it as a top-down model with an SSDLite detector, so it is not controlled against
+these bottom-up single-eye models.
+
+Results are in [`results/02_architecture_sweep/`](results/02_architecture_sweep/).
+
+**That comparison does not support an architecture ranking, and the reason is
+measured rather than assumed.** Each model was tested at the checkpoint
+DeepLabCut selected by maximum internal mAP over five validation frames. Those
+five labels are imperfect, and evaluating every surviving checkpoint of every
+architecture showed that checkpoint choice alone moves a single model by up to
+16 px, which is larger than several architecture gaps.
+
+The full architecture-by-checkpoint matrix is in
+[`results/03_checkpoint_matrix/`](results/03_checkpoint_matrix/). It reports
+four views of the same data and claims a ranking only where two error ranges do
+not overlap. Two corrections came out of it:
+
+- CSPNeXt-S is not a 70 px model. That number came from an epoch-10 checkpoint.
+  Across epochs 100-200 it sits at 25.8 px and is the most stable backbone
+  tested (SD 0.10 px).
+- The five-frame rule cost ResNet-50 9.75 px and CSPNeXt-S 44.40 px, but cost
+  HRNet-W32 only 0.16 px. HRNet-W32 led the published table largely because the
+  selection rule happened to work for it.
+
+On the mean over the five checkpoints every model kept, which selects nothing
+and never touches the validation labels, ResNet-50 (20.47 px) and HRNet-W32
+(21.57 px) are within one standard deviation of each other and cannot be
+separated.
+
+### Next: Rebuilt Validation Set
+
+Agreed with the advisor, the hyperparameters are being settled again before the
+active-learning experiment, with three changes:
+
+1. All 100 training-pool labels are reviewed, including the five validation
+   frames that carried a slight offset and were deliberately left unchanged
+   mid-sweep to hold the comparison variables fixed.
+2. The internal split changes from 95/5 to 80/20, so internal validation can
+   actually separate models.
+3. The epoch budget drops from 200 to 100, because validation loss bottoms out
+   near epoch 50-75 and everything after that was overfitting.
+
+Two configuration changes are required for the shorter schedule to remain a
+valid experiment, and they are easy to miss:
+
+- The learning-rate milestones must scale from `[160, 190]` to `[80, 95]`.
+  Left unchanged they never fire in a 100-epoch run, so the model would train at
+  the initial rate throughout and never reach its fine-tuning phase.
+- `save_epochs` drops from 25 to 10 and snapshot retention is raised, because
+  the surviving checkpoints in the matrix above were too coarse to locate a real
+  optimum.
+
+Interrupted runs are restarted from scratch rather than resumed. Resuming resets
+DeepLabCut's memory of the best metric, which is how HRNet-W48's best checkpoint
+was destroyed: the first evaluation after a resume writes a new best snapshot,
+and when that epoch matches the existing best epoch the manager overwrites the
+file and then deletes it as a stale copy. At 100 epochs a restart is cheaper
+than the risk.
+
 ## Where To Look
 
 - `docs/`: learning workflow and metric definitions.
@@ -93,10 +157,11 @@ The detailed interpretation is in the
 
 Next scientific work:
 
-1. Use the frozen internally selected batch size for a controlled
-   architecture comparison.
-2. Improve or explicitly account for the small internal validation set.
-3. Calibrate DLC likelihood before applying a confidence cutoff.
+1. Review all 100 training-pool labels and re-split 80/20.
+2. Rerun the architecture comparison at batch 2, 100 epochs, with rescaled
+   learning-rate milestones and denser snapshots.
+3. Calibrate DLC likelihood before applying a confidence cutoff; no backbone
+   currently produces enough points above 0.6 for a hard filter.
 4. Run the active-learning comparison using K-means frame selection and
    the `uncertain`, `jump`, and `fitting` outlier methods.
 

@@ -22,12 +22,30 @@ def latest_numbered_snapshot(train_dir: Path) -> Path | None:
     return max(snapshots, default=(0, None))[1]
 
 
-def completed(train_dir: Path, epochs: int) -> bool:
+def reached_epochs(train_dir: Path, epochs: int) -> bool:
     stats_path = train_dir / "learning_stats.csv"
-    if not stats_path.exists() or not list(train_dir.glob("snapshot-best-*.pt")):
+    if not stats_path.exists():
         return False
     stats = pd.read_csv(stats_path)
     return bool(len(stats) and int(stats["step"].max()) >= epochs)
+
+
+def has_best_snapshot(train_dir: Path) -> bool:
+    """Whether DeepLabCut's best-metric checkpoint survived training.
+
+    Resuming can destroy it. TorchSnapshotManager restarts with
+    `_best_metric=None`, so the first evaluation of a resumed run always writes
+    a new best. If that epoch equals the epoch of the existing best, the manager
+    captures the old best (same path), overwrites it, and then unlinks it when
+    the epoch is not a multiple of `save_epochs` -- deleting the file it just
+    wrote. No later epoch that merely ties the best metric will recreate it,
+    because the update requires a strict improvement.
+    """
+    return bool(list(train_dir.glob("snapshot-best-*.pt")))
+
+
+def completed(train_dir: Path, epochs: int) -> bool:
+    return reached_epochs(train_dir, epochs) and has_best_snapshot(train_dir)
 
 
 def main() -> None:
@@ -42,15 +60,34 @@ def main() -> None:
     if completed(train_dir, args.epochs):
         print(f"already_complete: shuffle={args.shuffle} batch_size={args.batch_size}")
         return
+    if reached_epochs(train_dir, args.epochs) and not has_best_snapshot(train_dir):
+        # Retraining would silently discard finished weights. Stop instead and
+        # let a human decide between evaluating a numbered snapshot and a
+        # controlled retrain.
+        raise RuntimeError(
+            f"Shuffle {args.shuffle} already reached {args.epochs} epochs but has "
+            "no snapshot-best-*.pt (destroyed by a resumed run). Refusing to "
+            "retrain over finished weights; audit the numbered snapshots first."
+        )
 
     resume = latest_numbered_snapshot(train_dir)
+    epochs_to_train = args.epochs
     if resume:
-        print(f"resuming_from: {resume}")
+        # DLC treats `epochs` as additional epochs beyond the resumed snapshot
+        # (observed: epochs=200 resumed from snapshot-025 targets 225). Subtract
+        # the snapshot epoch so every run ends at exactly args.epochs total.
+        resume_epoch = int(resume.stem.removeprefix("snapshot-"))
+        epochs_to_train = args.epochs - resume_epoch
+        print(
+            f"resuming_from: {resume} "
+            f"(epoch {resume_epoch}, {epochs_to_train} more to reach {args.epochs})",
+            flush=True,
+        )
 
     deeplabcut.train_network(
         str(CONFIG),
         shuffle=args.shuffle,
-        epochs=args.epochs,
+        epochs=epochs_to_train,
         save_epochs=25,
         max_snapshots_to_keep=5,
         batch_size=args.batch_size,

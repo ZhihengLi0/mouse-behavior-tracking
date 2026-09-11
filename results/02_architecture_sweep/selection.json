@@ -1,0 +1,67 @@
+{
+  "held_fixed": {
+    "training_label_pool": 100,
+    "internal_train_frames": 95,
+    "internal_validation_frames": 5,
+    "batch_size": 2,
+    "epochs": 200,
+    "device": "cpu",
+    "dlc_seed": 42,
+    "external_report_frames": 100
+  },
+  "checkpoint_rule_within_each_run": "DeepLabCut snapshot-best selected by maximum internal test.mAP",
+  "checkpoint_deviation": {
+    "HRNet-W48": {
+      "rule_applied": "final epoch 200 snapshot",
+      "rule_for_other_models": "DeepLabCut snapshot-best selected by maximum internal test.mAP",
+      "cause": "the best snapshot was destroyed by DeepLabCut's snapshot manager during a resumed run, and the snapshots holding the maximum internal mAP had already been pruned",
+      "declared_before_seeing_external_error": true,
+      "sensitivity_labels": {
+        "100": "arch_hrnet_w48_batch2_snap100",
+        "125": "arch_hrnet_w48_batch2_snap125",
+        "150": "arch_hrnet_w48_batch2_snap150",
+        "175": "arch_hrnet_w48_batch2_snap175"
+      }
+    }
+  },
+  "internal_five_frame_rule_would_select": "CSPNeXt-S",
+  "lowest_external_overall_rmse_model": "HRNet-W32",
+  "selected_for_active_learning": "HRNet-W32",
+  "models_with_inconclusive_comparison": [
+    "HRNet-W48"
+  ],
+  "selection_basis": "lowest external overall RMSE on the fixed final-minute comparison set, supported by pupil-center error, likelihood behavior, and runtime; the internal five-frame rule is reported but not used",
+  "caveats": [
+    "one run per architecture; no repeated seeds",
+    "internal validation set has only five frames",
+    "the final-minute set has been inspected before and is a comparison set rather than a pristine test set"
+  ],
+  "excluded": {
+    "model": "RTMPose-S",
+    "shuffle": 12,
+    "reason": "top-down pose model with an SSDLite detector; not controlled against the bottom-up single-eye models",
+    "stopped_at": "detector epoch 30/250"
+  },
+  "ranking_external_overall_rmse": [
+    {
+      "model": "HRNet-W32",
+      "external_overall_keypoint_rmse_px": 20.0578
+    },
+    {
+      "model": "HRNet-W48",
+      "external_overall_keypoint_rmse_px": 21.7405
+    },
+    {
+      "model": "ResNet-50",
+      "external_overall_keypoint_rmse_px": 28.5996
+    },
+    {
+      "model": "HRNet-W18",
+      "external_overall_keypoint_rmse_px": 31.2515
+    },
+    {
+      "model": "CSPNeXt-S",
+      "external_overall_keypoint_rmse_px": 70.1249
+    }
+  ]
+}
