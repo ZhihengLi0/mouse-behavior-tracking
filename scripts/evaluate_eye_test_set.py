@@ -67,6 +67,15 @@ def main() -> None:
         help="Optional architecture label appended to the output folder, such as hrnet_w32.",
     )
     parser.add_argument(
+        "--trainingsetindex",
+        type=int,
+        default=0,
+        help=(
+            "Index into the project config's TrainingFraction list; must match "
+            "the fraction the shuffle was built with (0 = 0.95 era, 1 = 0.8 era)."
+        ),
+    )
+    parser.add_argument(
         "--snapshot-index",
         type=int,
         default=None,
@@ -104,6 +113,7 @@ def main() -> None:
         frame_type=".png",
         destfolder=str(prediction_dir),
         shuffle=args.shuffle,
+        trainingsetindex=args.trainingsetindex,
         save_as_csv=True,
         plotting=False,
         pcutoff=0.0,

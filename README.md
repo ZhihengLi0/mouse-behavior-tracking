@@ -110,7 +110,7 @@ Next scientific work:
 Check the environment:
 
 ```bash
-bash scripts/check_setup.sh
+bash environment/check_setup.sh
 ```
 
 Open training-frame labeling:
@@ -155,7 +155,7 @@ Regenerate outlier tables and montages:
 Start with:
 
 ```text
-docs/01_local_setup.md
+environment/01_local_setup.md
 docs/02_eye_project.md
 docs/04_metrics_and_outputs.md
 ```
