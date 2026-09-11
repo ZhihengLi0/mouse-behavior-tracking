@@ -54,9 +54,41 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, required=True)
     parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument(
+        "--trainset-fraction", type=int, default=95,
+        help="Training-set percentage in the DLC model folder name.",
+    )
+    parser.add_argument(
+        "--trainingsetindex", type=int, default=0,
+        help=(
+            "Index into the project config's TrainingFraction list. It must "
+            "point at the fraction this shuffle was built with, or "
+            "train_network cannot find the shuffle."
+        ),
+    )
+    parser.add_argument(
+        "--save-epochs", type=int, default=25,
+        help="Snapshot interval. train_network's argument overrides the model config.",
+    )
+    parser.add_argument(
+        "--max-snapshots", type=int, default=5,
+        help="Numbered snapshots to keep. Raise it to stop pruning useful checkpoints.",
+    )
+    parser.add_argument(
+        "--no-resume", action="store_true",
+        help=(
+            "Never resume from a numbered snapshot; restart from scratch "
+            "instead. Resuming resets DeepLabCut's memory of the best metric, "
+            "which can destroy the best snapshot (see has_best_snapshot)."
+        ),
+    )
     args = parser.parse_args()
 
-    train_dir = MODEL_ROOT / f"EyePupilBlinkAug17-trainset95shuffle{args.shuffle}" / "train"
+    train_dir = (
+        MODEL_ROOT
+        / f"EyePupilBlinkAug17-trainset{args.trainset_fraction}shuffle{args.shuffle}"
+        / "train"
+    )
     if completed(train_dir, args.epochs):
         print(f"already_complete: shuffle={args.shuffle} batch_size={args.batch_size}")
         return
@@ -70,8 +102,10 @@ def main() -> None:
             "retrain over finished weights; audit the numbered snapshots first."
         )
 
-    resume = latest_numbered_snapshot(train_dir)
+    resume = None if args.no_resume else latest_numbered_snapshot(train_dir)
     epochs_to_train = args.epochs
+    if args.no_resume:
+        print("no_resume: training from scratch", flush=True)
     if resume:
         # DLC treats `epochs` as additional epochs beyond the resumed snapshot
         # (observed: epochs=200 resumed from snapshot-025 targets 225). Subtract
@@ -87,9 +121,10 @@ def main() -> None:
     deeplabcut.train_network(
         str(CONFIG),
         shuffle=args.shuffle,
+        trainingsetindex=args.trainingsetindex,
         epochs=epochs_to_train,
-        save_epochs=25,
-        max_snapshots_to_keep=5,
+        save_epochs=args.save_epochs,
+        max_snapshots_to_keep=args.max_snapshots,
         batch_size=args.batch_size,
         device=args.device,
         snapshot_path=str(resume) if resume else None,
