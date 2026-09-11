@@ -23,15 +23,21 @@ silent failures if forgotten:
   are pruned, because the v0.2.0 snapshots were too coarse to locate an optimum
   and its best snapshot was lost to a resumed run.
 
-The validation frames are chosen by uniform temporal spacing over the sorted
-label table, not at random and not by any measured quantity, so the choice
-cannot have been influenced by any result.
+The split is a temporal block split: the chronologically first 80 labelled
+frames train, the last 20 validate. Interleaving them (the first attempt)
+put half the validation frames within 0.07 s of a training frame at 60 fps,
+which rewards memorising a near-duplicate neighbour -- the same disease as the
+five-frame era, milder. The block split leaves a 1.2 s boundary gap, and it
+makes the validation condition match the test condition: training sees
+0-33 s, validation extrapolates to 34-236 s, and the final-minute report set
+extrapolates further to the fifth minute. No measured quantity was consulted.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import pickle
+import re
 from pathlib import Path
 
 import deeplabcut
@@ -55,7 +61,7 @@ SPLIT_PATH = ROOT / "local_data" / "experiments" / "split_80_20.json"
 
 EPOCHS = 100
 VALIDATION_FRAMES = 20
-VALIDATION_OFFSET = 2  # skip frame 0, which is the very first video frame
+MIN_BOUNDARY_GAP_FRAMES = 30  # >= 0.5 s at 60 fps between the two blocks
 SAVE_EPOCHS = 10
 MAX_SNAPSHOTS = 12  # 10 numbered saves plus headroom, so none are pruned
 MILESTONES = [80, 95]
@@ -80,23 +86,45 @@ def label_frame_names() -> list[str]:
     return [str(v[-1] if isinstance(v, tuple) else v) for v in labels.index]
 
 
+def frame_number(name: str) -> int:
+    match = re.search(r"img(\d+)", name)
+    if not match:
+        raise RuntimeError(f"Cannot parse frame number from {name}")
+    return int(match.group(1))
+
+
 def build_split(names: list[str]) -> tuple[np.ndarray, np.ndarray, dict]:
-    """Uniformly spaced validation rows over the label table's own order."""
+    """Temporal block split: first 80 frames train, last 20 validate."""
     total = len(names)
-    step = total // VALIDATION_FRAMES
-    validation = np.arange(VALIDATION_OFFSET, total, step)[:VALIDATION_FRAMES]
+    by_time = sorted(range(total), key=lambda i: frame_number(names[i]))
+    training = np.array(sorted(by_time[: total - VALIDATION_FRAMES]))
+    validation = np.array(sorted(by_time[total - VALIDATION_FRAMES :]))
     if len(validation) != VALIDATION_FRAMES:
         raise RuntimeError(f"Selected {len(validation)} validation frames")
-    training = np.array([i for i in range(total) if i not in set(validation)])
-    if len(training) != total - VALIDATION_FRAMES:
-        raise RuntimeError(f"Selected {len(training)} training frames")
+
+    last_train = max(frame_number(names[i]) for i in training)
+    first_val = min(frame_number(names[i]) for i in validation)
+    gap = first_val - last_train
+    if gap < MIN_BOUNDARY_GAP_FRAMES:
+        raise RuntimeError(
+            f"Boundary gap is only {gap} frames (< {MIN_BOUNDARY_GAP_FRAMES}); "
+            "the two blocks are too close for a leak-free split"
+        )
+
     record = {
         "era": "80/20",
         "supersedes": "95/5 split used up to tag v0.2.0",
         "selection_method": (
-            f"every {step}th row of the label table starting at row "
-            f"{VALIDATION_OFFSET}; no measured quantity was consulted"
+            "temporal block split: the chronologically first "
+            f"{total - VALIDATION_FRAMES} labelled frames train, the last "
+            f"{VALIDATION_FRAMES} validate; boundary gap {gap} frames "
+            f"({gap / 60:.2f} s at 60 fps); no measured quantity was consulted"
         ),
+        "boundary": {
+            "last_training_frame": int(last_train),
+            "first_validation_frame": int(first_val),
+            "gap_frames": int(gap),
+        },
         "epochs": EPOCHS,
         "save_epochs": SAVE_EPOCHS,
         "max_snapshots": MAX_SNAPSHOTS,
