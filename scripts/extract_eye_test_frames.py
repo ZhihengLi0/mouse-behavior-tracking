@@ -7,7 +7,7 @@ import numpy as np
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 TEST_DIR = PROJECT_DIR / "local_data" / "test_sets" / "eye_last_minute_100"
-VIDEO_PATH = PROJECT_DIR / "face.mp4"
+VIDEO_PATH = PROJECT_DIR / "最原始的视频body1h，eye5min" / "face.mp4"
 OUT_DIR = TEST_DIR / "frames"
 N_FRAMES = 100
 TEST_SECONDS = 60

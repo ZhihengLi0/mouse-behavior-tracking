@@ -10,7 +10,7 @@ import numpy as np
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
-VIDEO_PATH = PROJECT_DIR / "face.mp4"
+VIDEO_PATH = PROJECT_DIR / "最原始的视频body1h，eye5min" / "face.mp4"
 LABEL_DIR = (
     PROJECT_DIR
     / "dlc_projects"

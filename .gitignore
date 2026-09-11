@@ -38,3 +38,4 @@ output/
 
 # Local archive of superseded eras; versioned by its own inner git repo
 archive/
+ai-notes/
