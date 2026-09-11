@@ -149,6 +149,7 @@ than the risk.
 
 ## Where To Look
 
+- `CHANGELOG.md`: experiment phases and what each tagged version established.
 - `docs/`: learning workflow and metric definitions.
 - `scripts/`: extraction, labeling, training, evaluation, and publishing.
 - `results/`: versioned aggregate tables, figures, and reports.
