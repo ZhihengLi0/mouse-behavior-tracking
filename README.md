@@ -88,6 +88,7 @@ parallel; no external evaluation happens until that review is done.
 ## Where To Look
 
 - `CHANGELOG.md`: experiment phases and what each tagged version established.
+- `archive/`: superseded-era artifacts (own inner git repo; ignored, never pushed).
 - `docs/`: learning workflow and metric definitions.
 - `scripts/`: extraction, labeling, training, evaluation, and publishing.
 - `results/`: versioned aggregate tables, figures, and reports.
