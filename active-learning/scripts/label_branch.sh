@@ -6,7 +6,9 @@ BRANCH="${1:?usage: label_branch.sh uncertain|jump|fitting}"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PYTHON="/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python"
 CONFIG="$PROJECT_DIR/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/config.yaml"
-FOLDER="$PROJECT_DIR/active-learning/frames/$BRANCH"
+ROUND="${2:-}"
+if [[ -n "$ROUND" ]]; then FOLDER="$PROJECT_DIR/active-learning/frames/round$ROUND/$BRANCH"
+else FOLDER="$PROJECT_DIR/active-learning/frames/$BRANCH"; fi
 [[ -d "$FOLDER" ]] || { echo "no such branch folder: $FOLDER"; exit 1; }
 mkdir -p "$PROJECT_DIR/local_data/matplotlib" "$PROJECT_DIR/local_data/numba" \
          "$PROJECT_DIR/local_data/xdg_cache" "$PROJECT_DIR/local_data/napari_config"
