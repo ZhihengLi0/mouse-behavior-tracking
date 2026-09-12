@@ -75,7 +75,8 @@ def branch_store(branch: str) -> Path:
 
 def normalized_branch_table(branch: str, round_no: int) -> pd.DataFrame:
     """This round's freshly reviewed table, index rewritten for the project."""
-    src = UNIT / "frames" / branch / "CollectedData_Zhiheng.h5"
+    base = UNIT / "frames" / branch if round_no == 1         else UNIT / "frames" / f"round{round_no}" / branch
+    src = base / "CollectedData_Zhiheng.h5"
     t = pd.read_hdf(src)
     t.index = pd.MultiIndex.from_tuples(
         [("labeled-data", "face_first4min", i[-1]) for i in t.index]
@@ -180,7 +181,7 @@ def select_next(branch: str, spec: dict, shuffle: int, tsi: int, round_no: int) 
     log(f"{branch}: analyzing clip with round-{round_no} model ...")
     deeplabcut.analyze_videos(str(CONFIG), [str(CLIP)], shuffle=shuffle,
                               trainingsetindex=tsi, snapshot_index=-1,
-                              device="mps", save_as_csv=False)
+                              device="mps", batch_size=32, save_as_csv=False)
     already = labeled_numbers(branch, round_no)
     pick = 20
     for attempt in range(4):
