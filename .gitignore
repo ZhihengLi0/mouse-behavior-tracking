@@ -36,6 +36,10 @@ local_data/
 tmp/
 output/
 
-# Local archive of superseded eras; versioned by its own inner git repo
-archive/
 ai-notes/
+
+# Per-task units: label tables and demo videos stay local
+**/training-data/
+scaling-curve/demo_clips/
+**/logs/
+**/predictions/
