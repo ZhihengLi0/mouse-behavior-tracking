@@ -43,3 +43,5 @@ ai-notes/
 scaling-curve/demo_clips/
 **/logs/
 **/predictions/
+active-learning/branches/
+active-learning/frames/
