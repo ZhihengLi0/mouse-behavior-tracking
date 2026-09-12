@@ -18,6 +18,8 @@ engine: pytorch
 video_sets:
   /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/videos/face.mp4:
     crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/videos/face_first4min.mp4:
+    crop: 0, 928, 0, 736
 bodyparts:
 - pupil_top
 - pupil_bottom
