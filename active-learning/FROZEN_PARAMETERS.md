@@ -26,9 +26,14 @@ never used to adapt any of it.
   human-reviewed TRAINING frames (validation's 20 not counted).
 - Branches (independent seed copies; no branch inherits another's frames):
   extractionalgorithm = "kmeans" for all three;
-  outlieralgorithm = "uncertain" (p_bound = 0.6)
-                   | "jump"      (epsilon = 20 px)
-                   | "fitting"   (epsilon = 20 px, DLC default AR/MA degrees).
+  outlieralgorithm = "uncertain" (p_bound = 0.6; DLC default is 0.01, raised
+                       deliberately to align with the pcutoff convention -
+                       at 0.01 almost no frame would qualify)
+                   | "jump"      (epsilon = 20 px, DLC default)
+                   | "fitting"   (epsilon = 20 px, ARdegree = 3, MAdegree = 1,
+                       alpha = 0.01 - all DLC defaults, used explicitly).
+  comparisonbodyparts = "all" (all 8 keypoints participate in detection).
+  k-means details: cluster_resizewidth = 30, cluster_color = False (defaults).
   Candidate pool: frames 0-14399 of face.mp4 only (first 4 minutes).
 - k-means: DLC's built-in implementation as shipped; numframes2pick = 20.
   numpy seed 42 set before each call (DLC does not expose its own seed - the
