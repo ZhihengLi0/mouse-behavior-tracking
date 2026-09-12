@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = Path(sys.executable)
-OUT = ROOT / "local_data" / "experiments" / "04_batch_sweep_80_20"
+OUT = ROOT / "local_data" / "experiments" / "batch-size-selection"
 SPLIT = ROOT / "local_data" / "experiments" / "split_80_20.json"
 
 EPOCHS = 100

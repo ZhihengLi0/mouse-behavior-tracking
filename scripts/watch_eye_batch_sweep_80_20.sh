@@ -2,7 +2,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-OUT="$ROOT/local_data/experiments/04_batch_sweep_80_20"
+OUT="$ROOT/local_data/experiments/batch-size-selection"
 LOG="$OUT/resource_watchdog.log"
 LOW_COUNT=0
 

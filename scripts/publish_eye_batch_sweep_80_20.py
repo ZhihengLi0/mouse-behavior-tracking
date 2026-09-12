@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish the second-era batch-size sweep into results/04_batch_sweep_80_20.
+"""Publish the second-era batch-size sweep into results/batch-size-selection.
 
 Second era: reviewed labels (all 100 training-pool frames re-reviewed on
 2026-09-10, pupil_top definition corrected by ~20 px), temporal block split
@@ -35,9 +35,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / "dlc_projects" / "EyePupilBlink-Zhiheng-2026-08-17"
 MODEL_ROOT = PROJECT / "dlc-models-pytorch" / "iteration-0"
 TEST_ROOT = ROOT / "local_data" / "test_sets" / "eye_last_minute_100"
-EXPERIMENT_ROOT = ROOT / "local_data" / "experiments" / "04_batch_sweep_80_20"
+EXPERIMENT_ROOT = ROOT / "local_data" / "experiments" / "batch-size-selection"
 SPLIT_PATH = ROOT / "local_data" / "experiments" / "split_80_20.json"
-OUTPUT_ROOT = ROOT / "results" / "04_batch_sweep_80_20"
+OUTPUT_ROOT = ROOT / "results" / "batch-size-selection"
 
 EPOCHS = 100
 MILESTONES = [80, 95]

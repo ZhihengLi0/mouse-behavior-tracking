@@ -146,7 +146,7 @@ First result of the second era (reviewed labels, temporal block 80/20 split,
   the rebuilt validation set resolves what the five-frame one could not.
 - Best snapshots land mid-training (epochs 90/60/50/50), not at epoch 10-20.
 - The rescaled LR milestones fired on schedule (loss drop at epoch 80).
-- Published: `results/04_batch_sweep_80_20/`. Not comparable with v0.1.0.
+- Published: `results/batch-size-selection/`. Not comparable with v0.1.0.
 
 Architecture comparison at batch 2 started the same morning (shuffles 25-28
 plus shuffle 21 reused for HRNet-W32).

@@ -87,7 +87,7 @@ reviewed, untouched final-minute set independently ranks batch 2 lowest
 (21.07 px overall RMSE). In the first era the two signals disagreed, which is
 what exposed the five-frame validation set; agreement is the first evidence
 the rebuilt validation set can be trusted. Full package:
-[`results/04_batch_sweep_80_20/`](results/04_batch_sweep_80_20/).
+[`results/batch-size-selection/`](results/batch-size-selection/).
 
 Currently running: the architecture comparison at batch 2 - CSPNeXt-S,
 HRNet-W18, ResNet-50, HRNet-W48 (shuffles 25-28) under
@@ -185,7 +185,7 @@ Run the batch sweep queue (fcntl-locked, no-resume, training only):
 ```bash
 nohup caffeinate -i /Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python \
   scripts/run_eye_batch_sweep_80_20.py >> \
-  local_data/experiments/04_batch_sweep_80_20_stdout.log 2>&1 &
+  local_data/experiments/batch-size-selection_stdout.log 2>&1 &
 nohup bash scripts/watch_eye_batch_sweep_80_20.sh >/dev/null 2>&1 &
 ```
 
