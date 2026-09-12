@@ -19,8 +19,14 @@ never used to adapt any of it.
 ## Fixed configuration
 - Seed labels: the reviewed 100-frame tables (copies in training-data/).
 - Split: temporal block 80 train / 20 validation; validation NEVER grows.
-- Training: 100 epochs, batch 2, CPU, LR milestones [80, 95], snapshots every
-  10 epochs (retention 12), from scratch each round (--no-resume), DLC seed 42.
+- Training: 100 epochs, batch 2, device = MPS (Apple GPU; switched from CPU on
+  2026-09-12 09:00, before any round-1 result existed, for a ~9x speedup). The
+  round-0 baseline is an MPS-trained twin (shuffle 30) of the selected model,
+  so every point on every curve is device-homogeneous. Clip analysis for frame
+  selection also runs on MPS; external evaluation inference stays on CPU for
+  strict comparability of the report numbers. LR milestones [80, 95],
+  snapshots every 10 epochs (retention 12), from scratch each round
+  (--no-resume), DLC seed 42.
 - Rounds: 5. Frames per round per branch: 20. Cumulative training frames per
   branch: 80 -> 180. x-axis of every convergence curve = cumulative
   human-reviewed TRAINING frames (validation's 20 not counted).

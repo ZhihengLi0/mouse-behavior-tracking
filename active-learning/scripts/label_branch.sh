@@ -2,7 +2,7 @@
 # Open one active-learning branch's 20 frames for human review.
 # Usage: bash label_branch.sh {uncertain|jump|fitting}
 set -euo pipefail
-BRANCH="${1:?usage: label_branch.sh {uncertain|jump|fitting}}"
+BRANCH="${1:?usage: label_branch.sh uncertain|jump|fitting}"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PYTHON="/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python"
 CONFIG="$PROJECT_DIR/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/config.yaml"
