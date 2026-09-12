@@ -209,8 +209,18 @@ def select_next(branch: str, spec: dict, shuffle: int, tsi: int, round_no: int) 
     dest.mkdir(parents=True)
     for f in clean:
         shutil.copy(STAGING / f"img{f:05d}.png", dest / f"img{f:05d}.png")
-    for extra in STAGING.glob("machinelabels*"):
-        shutil.copy(extra, dest / extra.name)
+    # rewrite the prelabel index to match the destination folder, otherwise
+    # napari-deeplabcut cannot pair rows with slices and the GUI shows offset
+    # ghost points and black padding slices
+    ml = pd.read_hdf(STAGING / "machinelabels-iter0.h5")
+    keep = [i for i in ml.index if int(i[-1][3:-4]) in set(clean)]
+    ml = ml.loc[keep]
+    ml.index = pd.MultiIndex.from_tuples(
+        [(f"round{round_no + 1}", branch, i[-1]) for i in ml.index]
+    )
+    ml = ml.sort_index()
+    ml.to_hdf(dest / "machinelabels-iter0.h5", key="df_with_missing", mode="w")
+    ml.to_csv(dest / "machinelabels.csv")
     pd.DataFrame({"frame": clean,
                   "time_s": [round(f / 60, 2) for f in clean]}
                  ).to_csv(dest / "manifest.csv", index=False)
