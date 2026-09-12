@@ -1,193 +1,130 @@
-# Mouse Behavior Tracking
+# Mouse Eye Keypoint Tracking
 
-Local DeepLabCut workflow for mouse eye, pupil, blink, face, ear, and forepaw tracking.
+A reproducible DeepLabCut pipeline that tracks eight keypoints on a mouse eye
+(pupil top/bottom/left/right, upper/lower eyelid, nasal/temporal corner),
+derives pupil center/width and eye opening, and is built toward blink
+detection and label-efficient generalization to new videos.
 
-This repository tracks code, configuration templates, and notes only.
-Raw videos, PDFs, trained models, extracted labels, and generated results stay local.
+The repository is organised as **four sequential projects**, each a
+self-contained unit with `scripts/`, `results/`, and (locally) the exact
+`training-data/` its numbers rest on:
 
-## Repository Logic
-
-There are two layers:
-
-1. GitHub/repository layer: code, configuration, documentation, and reproducible commands.
-2. Local research-data layer: raw videos, PDFs, extracted frames, labels, model weights, predictions, and plots.
-
-The local research-data layer is intentionally ignored by Git. This keeps private or large files out of GitHub.
-
-Main local inputs:
-
-- `face.mp4`: eye video for pupil and blink tracking.
-- `body.mp4`: deferred face/body video for facial features, ears, and forepaws.
-- `*.pdf`: local reading material.
-- `local_data/`: temporary files and local results.
-
-## Current Eye Project
-
-Active DeepLabCut project:
-
-```text
-dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/config.yaml
+```
+scaling-curve/           How does error scale with 20/50/100 labels?   [superseded]
+batch-size-selection/    Which batch size? -> batch 2                  [complete]
+model-selection/         Which backbone?   -> ResNet-50                [complete]
+active-learning/         Which frame-selection algorithm? [running]
 ```
 
-Tracked eye keypoints:
+Shared infrastructure stays at the root: `dlc_projects/` (the DeepLabCut
+workspace holding live labels and model weights), `local_data/` (the held-out
+test set and caches), `environment/` (conda env and setup), `scripts/` (the
+canonical tools each unit snapshots). Raw videos and papers live in their own
+folders and never enter git.
 
-```text
-pupil_top
-pupil_bottom
-pupil_left
-pupil_right
-eyelid_top
-eyelid_bottom
-eye_nasal_corner
-eye_temporal_corner
+## The data discipline behind every number
+
+```
+face.mp4 (5 min, 60 fps)
+├── first 4 minutes ── training pool
+│     ├── 80 frames   train        (chronologically first; weights learn here)
+│     └── 20 frames   validation   (34-236 s; every SELECTION is made here)
+└── last minute ────── 100 frames  test (REPORT ONLY - never selects,
+                                    never tunes, never stops anything)
 ```
 
-Current train/test split:
+Temporal block splits prevent near-duplicate leakage (adjacent frames at
+60 fps are near-identical); a verified 1.2 s gap separates train from
+validation. Selection rules are declared before results are seen. Each unit
+pins the exact label tables it used, because the label standard changed once
+(2026-09-10: all 200 labels re-reviewed; `pupil_top` moved ~20 px) - numbers
+on opposite sides of that boundary are never compared.
 
-```text
-training pool: first 4 minutes of face.mp4
-held-out test pool: last 1 minute of face.mp4
-```
+## Step 1 - Scaling curve (superseded, kept for the record)
 
-## Current Status
+ResNet-50 trained on 20 -> 50 -> 100 labels, judged on the fixed final-minute
+set. Error *rose* with more labels (38 -> 42 -> 56 px), driven by a cluster of
+catastrophic `pupil_left` failures - the first evidence that label quality and
+frame diversity dominate label count, and the first recorded disagreement
+between internal validation and the external test. Those findings triggered
+everything that followed. Figures are reconstructions (originals predate git);
+all numbers use the old label standard.
 
-**Second experimental era, in progress.** All 100 training-pool labels were
-re-reviewed on 2026-09-10. The review moved `pupil_top` systematically by about
-20 px (86% of points in the same direction), which is a definition correction,
-not noise removal. Every model, prediction, and error number produced before
-the review is therefore measured against labels that no longer exist and must
-not be compared with anything produced after it.
+## Step 2 - Batch size selection -> batch 2
 
-First-era results were removed from `main` and remain retrievable, with the
-READMEs explaining their limitations, at:
+HRNet-W32 at batch 2/4/8/16, reviewed labels, 80/20 block split, 100 epochs,
+LR milestones rescaled to [80, 95], snapshots every 10 epochs.
 
-- tag `v0.1.0`: HRNet-W32 batch-size sweep (95/5 split, 200 epochs)
-- tag `v0.2.0`: five-backbone architecture sweep and the
-  architecture-by-checkpoint matrix that showed why its ranking could not be
-  trusted: checkpoint choice alone moved one model 16 px, more than the
-  architecture gaps being measured, because checkpoints were selected on five
-  suspect validation frames.
+The pre-declared internal rule (lowest validation loss) picked **batch 2** -
+and the untouched final-minute set independently ranked batch 2 lowest
+(21.07 px). **Internal and external agreed for the first time**, the direct
+evidence that the rebuilt 20-frame validation set resolves what the earlier
+5-frame one could not. Confidence calibration recovered from 59/800 points
+above likelihood 0.6 (old era) to 375/800.
 
-The second era changes, agreed with the advisor:
+See `batch-size-selection/results/`: overview, learning curves (stars = the
+mAP-chosen snapshots), per-keypoint heatmaps, per-frame boxplots, and the
+dual-ruler mAP figure.
 
-- reviewed labels for all 100 training-pool frames
-- internal split 80/20 instead of 95/5, so validation can separate models
-- 100 epochs instead of 200; validation loss bottomed out near epoch 50-75
-- learning-rate milestones rescaled from `[160, 190]` to `[80, 95]` (left
-  unchanged they would never fire in a 100-epoch run)
-- snapshots every 10 epochs with retention raised, so checkpoint analysis is
-  no longer limited to five coarse survivors
-- interrupted runs restart from scratch; resuming resets DeepLabCut's
-  best-metric memory and destroyed a best snapshot in the first era
+## Step 3 - Model selection -> ResNet-50
 
-**Batch sweep complete (2026-09-11), and the two signals AGREE for the first
-time.** The pre-declared internal rule (lowest minimum validation loss on the
-20 block-split frames) selected **batch 2** (0.01107 at epoch 50), and the
-reviewed, untouched final-minute set independently ranks batch 2 lowest
-(21.07 px overall RMSE). In the first era the two signals disagreed, which is
-what exposed the five-frame validation set; agreement is the first evidence
-the rebuilt validation set can be trusted. Full package:
-[`results/batch-size-selection/`](results/batch-size-selection/).
+Five bottom-up backbones (ResNet-50, HRNet-W18/W32/W48, CSPNeXt-S) at batch 2
+on the identical split and labels. RTMPose-S excluded by design (top-down,
+SSDLite detector - not controlled).
 
-Currently running: the architecture comparison at batch 2 - CSPNeXt-S,
-HRNet-W18, ResNet-50, HRNet-W48 (shuffles 25-28) under
-`local_data/experiments/05_arch_sweep_80_20/`, with HRNet-W32 reused directly
-from the batch sweep (shuffle 21). RTMPose-S stays excluded by design
-(top-down with an SSDLite detector).
+On accuracy the five are a statistical tie: validation losses span 1.4%, and a
+paired frame-level bootstrap (10,000 resamples) puts zero in every pairwise
+95% CI. The pre-declared tie-break - confidence on the validation frames -
+separates decisively: **ResNet-50 73%** vs 61% (W32) vs ~13% (rest). The
+report-only test set independently agrees (ResNet-50 lowest, 20.10 px), and it
+is also the fastest practical trainer (1.7 h vs 3.7 h for W32), which matters
+because active learning retrains every round.
 
-## Where To Look
+A cautionary figure worth opening: `model-selection/results/03_internal_mAP_curves.png`
+shows the loss rule and the mAP rule pointing at nearly the same epoch for
+four models - but for HRNet-W18 the loss minimum sits at an epoch whose mAP is
+64%, exactly why loss-only ranking had crowned the externally-worst model.
 
-- `CHANGELOG.md`: experiment phases and what each tagged version established.
-- `archive/`: superseded-era artifacts (own inner git repo; ignored, never pushed).
-- `docs/`: learning workflow and metric definitions.
-- `scripts/`: extraction, labeling, training, evaluation, and publishing.
-- `results/`: versioned aggregate tables, figures, and reports.
-- `local_data/`: ignored local predictions, outlier montages, and test assets.
-- `dlc_projects/`: DeepLabCut project; generated models and labels are ignored.
+## Step 4 - Active learning (running): the convergence curves
 
-Next scientific work:
+Three branches compete under one frozen protocol
+(`active-learning/FROZEN_PARAMETERS.md`): identical seed labels, identical
+ResNet-50/batch-2/100-epoch training from scratch each round, k-means frame
+extraction - the **only** difference is the outlier detector that nominates
+candidate frames:
 
-1. Review all 100 training-pool labels and re-split 80/20.
-2. Rerun the architecture comparison at batch 2, 100 epochs, with rescaled
-   learning-rate milestones and denser snapshots.
-3. Calibrate DLC likelihood before applying a confidence cutoff; no backbone
-   currently produces enough points above 0.6 for a hard filter.
-4. Run the active-learning comparison using K-means frame selection and
-   the `uncertain`, `jump`, and `fitting` outlier methods.
+| branch | suspicion logic | knob |
+|---|---|---|
+| `uncertain` | the model's own low confidence | p_bound = 0.6 |
+| `jump` | physically impossible frame-to-frame jumps | epsilon = 20 px |
+| `fitting` | deviation from an ARIMA-fitted trajectory | epsilon = 20 px |
 
-## Useful Commands
+Each round: train on the branch's labels -> analyze the first four minutes ->
+detector + k-means select 20 unreviewed frames -> human corrects all eight
+keypoints -> retrain -> score ONCE on the final-minute set -> one point on
+that branch's curve. Five rounds take each branch 80 -> 180 training frames.
 
-Check the environment:
+The final deliverable is three convergence curves (x = cumulative reviewed
+training frames, y = external RMSE). Interpretation rules fixed in advance:
+a measured single-run noise band of ±2.4 px (two identical trainings differed
+by that much) gates any claim of a lead; the plateau is judged retrospectively
+after round 5, never used to stop early; RMSE is reported alongside the
+per-frame median because a handful of catastrophic frames (typically blinks)
+can dominate the mean - itself a finding that feeds the blink-detection goal.
 
-```bash
-bash environment/check_setup.sh
-```
+Live progress: `active-learning/results/convergence.csv` and
+`01_convergence_curves.png`.
 
-Open training-frame labeling:
+## History and provenance
 
-```bash
-bash scripts/label_eye_frames.sh
-```
+- `CHANGELOG.md` - what each tagged version established: `v0.1.0` (old-label
+  batch sweep), `v0.2.0` (old-label architecture sweep and the
+  checkpoint-matrix analysis that invalidated it), `v0.3.0` (reviewed-label
+  batch sweep, first internal/external agreement).
+- Superseded-era published packages remain at their tags; the old-label tables
+  pinned in `scaling-curve/training-data/` are the only surviving copy of the
+  pre-review labels.
+- Setup: `environment/` (conda env, install guide, `check_setup.sh`).
 
-Extract the fixed 100-frame eye test set:
-
-```bash
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/extract_eye_test_frames.py
-```
-
-Open test-frame labeling:
-
-```bash
-bash scripts/label_eye_test_frames.sh
-```
-
-Evaluate the current model on the test set:
-
-```bash
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/evaluate_eye_test_set.py
-```
-
-Regenerate the current result plot:
-
-```bash
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/plot_eye_test_results.py
-```
-
-Regenerate outlier tables and montages:
-
-```bash
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/plot_eye_outliers.py --train-frames 100
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/plot_eye_outliers.py --train-frames 100 --model-label hrnet_w32
-```
-
-## Documentation
-
-Start with:
-
-```text
-environment/01_local_setup.md
-docs/02_eye_project.md
-docs/04_metrics_and_outputs.md
-```
-
-The body video workflow is documented but deferred until the eye pipeline is more mature.
-
-## Second-Era Commands
-
-Recreate the 80/20 split and shuffles (idempotent, refuses mismatched splits):
-
-```bash
-/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python scripts/prepare_eye_split_80_20.py
-```
-
-Run the batch sweep queue (fcntl-locked, no-resume, training only):
-
-```bash
-nohup caffeinate -i /Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python \
-  scripts/run_eye_batch_sweep_80_20.py >> \
-  local_data/experiments/batch-size-selection_stdout.log 2>&1 &
-nohup bash scripts/watch_eye_batch_sweep_80_20.sh >/dev/null 2>&1 &
-```
-
-The split record with filenames is `local_data/experiments/split_80_20.json`.
-External evaluation deliberately waits for the reviewed final-minute labels.
+Raw videos, labels, model weights, logs, and per-frame predictions stay local
+by design; git carries code, documentation, and audited aggregate results.
