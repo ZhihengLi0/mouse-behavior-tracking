@@ -27,6 +27,7 @@ import json
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -290,6 +291,19 @@ def main() -> None:
     for branch, spec in BRANCHES.items():
         shuffle = spec["shuffle_base"] + (r - 1)
         log(f"===== {branch} round {r} (shuffle {shuffle}) =====")
+
+        # crash-safe rerun: a branch whose point is already recorded is done
+        done = pd.read_csv(CONVERGENCE)
+        if ((done["branch"] == branch) & (done["round"] == r)).any():
+            log(f"{branch}: round {r} already recorded, skipping")
+            continue
+
+        # interleaved schedule: block until the human has saved this
+        # branch's reviewed labels for the round
+        src_dir = UNIT / "frames" / branch if r == 1 else UNIT / "frames" / f"round{r}" / branch
+        while not (src_dir / "CollectedData_Zhiheng.h5").exists():
+            log(f"{branch}: waiting for reviewed labels in {src_dir.name}/ ...")
+            time.sleep(60)
 
         # persist this round's reviewed table into the branch store
         fresh = normalized_branch_table(branch, r)
