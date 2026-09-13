@@ -57,3 +57,30 @@ anywhere among the three bought the same (null) improvement.
 Caveats: single run per point (no repeated seeds); the report set, while
 never used for selection, is one specific minute of one video; conclusions
 are about this data scale and difficulty, not about active learning at large.
+
+## Round 6 addendum (2026-09-13): the plateau-verification round
+
+The lab meeting asked for extra rounds to confirm the plateau. Round 6
+(+20 frames per branch, 200 training frames) produced the experiment's
+first genuinely interesting movement: **all three branch medians dropped
+together** - uncertain 15.18 px, jump 14.13 px, fitting 15.17 px - after six
+rounds pinned at 16.3-17.5 px, and jump's point sits *below* the ±2.4 px
+noise band (band floor 14.55 px). Means stayed unremarkable (17.5-19.9 px,
+in/near band).
+
+**Interpretation requires one honest caveat.** Round 6 is the first round
+labeled under the amended eyelid rule (blink-frame eyelids are now labeled
+rather than left empty), so two variables changed at once: +20 frames AND a
+labeling-standard change. A synchronized drop across all three branches is
+more consistent with the shared cause (the labeling amendment supplying
+eyelid supervision on hard frames) than with three independent detectors
+suddenly winning simultaneously. The rounds 0-5 conclusion (saturation under
+the *old* labeling standard) stands; round 6 suggests the next gains come
+from *what* is labeled, not *how many* - which is itself the meeting's
+thesis.
+
+**How to disambiguate** (round 7, if run): candidates are already selected;
+labeling them under the same amended rule and watching whether medians keep
+falling (labeling-standard effect saturates) or revert (noise) would settle
+it. A control - relabeling only the round-6 frames' eyelids under the old
+rule and retraining - would isolate the amendment's contribution exactly.
