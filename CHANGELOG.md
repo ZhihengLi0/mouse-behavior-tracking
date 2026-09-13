@@ -150,3 +150,25 @@ First result of the second era (reviewed labels, temporal block 80/20 split,
 
 Architecture comparison at batch 2 started the same morning (shuffles 25-28
 plus shuffle 21 reused for HRNet-W32).
+
+## v0.4.0 - 2026-09-12 - Active learning complete: a decisive null result
+
+Tag: `v0.4.0`
+
+Five rounds, three branches (uncertain / jump / fitting), 300 human-reviewed
+frames added under the frozen protocol, every point scored once on the
+report-only final-minute set.
+
+- Median frame error flat for every branch and round (16.3-17.5 px, inside
+  the measured ±2.4 px single-run noise band); no mean finished below the
+  17.70 px baseline. The frozen plateau rule fires at round 2 everywhere.
+- Detectors statistically indistinguishable; the branch means' excursions
+  (up to 48 px) trace to 3-6 blink/occlusion frames - all branches kept
+  rediscovering the same 160.5-160.7 s event from different suspicion logics.
+- Conclusion delivered by the curves: ~80 consistent labels saturate
+  typical-frame accuracy here; the residual budget is label-noise-order floor
+  plus ill-posed occluded frames, so the next lever is likelihood-gated
+  blink/occlusion handling, not more keypoint labels.
+- Operationally: MPS training (9x) plus interleaved human/machine scheduling
+  compressed the planned 5-day experiment into ~30 hours; 15/15 label batches
+  audited; per-round provenance in active-learning/branches (local).
