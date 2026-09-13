@@ -1,0 +1,16 @@
+branch,frame,t_s,baseline_px,round2_px,delta_px
+uncertain,test_050_frame16232.png,270.53,15.4,182.2,166.8
+uncertain,test_085_frame17504.png,291.73,13.5,120.4,106.9
+uncertain,test_069_frame16922.png,282.03,20.6,108.4,87.8
+uncertain,test_077_frame17213.png,286.88,13.2,66.5,53.3
+uncertain,test_029_frame15468.png,257.8,18.2,48.6,30.4
+jump,test_074_frame17104.png,285.07,15.4,61.7,46.3
+jump,test_024_frame15286.png,254.77,12.0,17.7,5.7
+jump,test_088_frame17613.png,293.55,17.1,21.6,4.5
+jump,test_093_frame17795.png,296.58,12.0,16.1,4.1
+jump,test_029_frame15468.png,257.8,18.2,22.1,3.9
+fitting,test_003_frame14523.png,242.05,13.0,36.7,23.7
+fitting,test_008_frame14705.png,245.08,12.3,35.8,23.5
+fitting,test_005_frame14596.png,243.27,15.4,38.4,23.1
+fitting,test_006_frame14632.png,243.87,11.5,33.7,22.1
+fitting,test_051_frame16268.png,271.13,18.3,27.1,8.8
