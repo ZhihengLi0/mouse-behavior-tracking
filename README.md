@@ -13,7 +13,7 @@ self-contained unit with `scripts/`, `results/`, and (locally) the exact
 scaling-curve/           How does error scale with 20/50/100 labels?   [superseded]
 batch-size-selection/    Which batch size? -> batch 2                  [complete]
 model-selection/         Which backbone?   -> ResNet-50                [complete]
-active-learning/         Which frame-selection algorithm? [running]
+active-learning/         Which frame-selection algorithm? -> none needed [complete]
 ```
 
 Shared infrastructure stays at the root: `dlc_projects/` (the DeepLabCut
@@ -112,8 +112,37 @@ after round 5, never used to stop early; RMSE is reported alongside the
 per-frame median because a handful of catastrophic frames (typically blinks)
 can dominate the mean - itself a finding that feeds the blink-detection goal.
 
-Live progress: `active-learning/results/convergence.csv` and
-`01_convergence_curves.png`.
+**Completed 2026-09-12, rounds 0-5.** The result is a clean null: median
+frame error stayed flat (16.3-17.5 px, inside the ±2.4 px noise band) for all
+three branches while labels grew 80 -> 180, and the three detectors are
+indistinguishable. Read as designed, the curves answer the lab's question:
+~80 consistent labels already saturate typical-frame accuracy on this video;
+the remaining error lives in an ~16-17 px floor of the same order as human
+relabeling noise plus a few blink/occlusion frames (the recurring
+160.5-160.7 s event) that no amount of keypoint labeling can fix - pointing
+the next effort at likelihood-gated blink detection. Full analysis:
+`active-learning/results/README.md`.
+
+## Next phase (defined at the 2026-09-12 lab meeting)
+
+The long-term engineering goal is fixed: on much larger videos, find and
+correct the model's error frames with minimal human effort, detect blinks, and
+add pupil area (ellipse fit; ~3 pupil points suffice) to the derived
+statistics - all in service of aligning behavior frames with brain signals.
+Two immediate tasks:
+
+1. **Extend the convergence experiment** a few more rounds to confirm the
+   plateau is real, keeping the frozen discipline: every round retrains from
+   scratch on the full cumulative set (never fine-tuning the previous
+   weights). Round-6 candidate frames are already selected.
+2. **Keypoint-vs-time series figures**: plot each keypoint's trajectory over
+   time, flag frames whose fitted-trajectory residual is large, and open those
+   frames to attribute *when* the model fails (blinks, occlusion) - then
+   correct or document the failure mode.
+
+Labeling amendment going forward (not retroactive): during blinks the eyelids
+usually remain visible, so `eyelid_top`/`eyelid_bottom` must be labeled on
+blink frames rather than left empty.
 
 ## History and provenance
 

@@ -37,6 +37,7 @@ tmp/
 output/
 
 ai-notes/
+meeting-notes/
 
 # Per-task units: label tables and demo videos stay local
 **/training-data/
