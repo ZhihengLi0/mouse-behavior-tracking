@@ -23,7 +23,7 @@ training-datasets/
 *.log
 
 # Aggregated, publication-safe result tables are intentionally versioned.
-!results/**/*.csv
+!**/results/**/*.csv
 
 # Python / notebook caches.
 __pycache__/
