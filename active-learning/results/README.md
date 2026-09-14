@@ -84,3 +84,26 @@ labeling them under the same amended rule and watching whether medians keep
 falling (labeling-standard effect saturates) or revert (noise) would settle
 it. A control - relabeling only the round-6 frames' eyelids under the old
 rule and retraining - would isolate the amendment's contribution exactly.
+
+## Final chapter (2026-09-14): second saturation, experiment closed
+
+The extension phase (rounds 6-11, all labeled under the amended blink-eyelid
+rule) ended by the pre-declared referee rules:
+
+- Rounds 0-5 (old labeling standard): medians flat at 16.3-17.5 px -
+  **first saturation** at ~80 frames.
+- Round 6: all three branches dropped together (the amendment supplying
+  eyelid supervision on blink frames) - the floor moved to 14-15 px.
+- Rounds 7-11: the three branches oscillate in a 14.0-15.4 px band with no
+  branch beating its own r8-r10 minimum by more than 0.5 px at round 11
+  (uncertain 14.80 -> 15.08, jump 13.97 -> 14.60, fitting 14.82 -> 15.14) -
+  **second saturation**, declared by the pre-registered stopping rule at
+  round 11 (cap was 12; round-12 labels exist but were never trained on).
+
+Final story in one sentence: **label count saturates quickly (twice), and
+the one intervention that moved the floor was changing what gets labeled,
+not how much** - the amended eyelid rule bought ~2.3 px (17 -> 14.7) where
+120 extra frames under the old standard bought nothing. Detector choice
+never mattered at any stage. 12 rounds, 36 trainings, 300 human-reviewed
+frames per branch, one held-out minute never touched by any decision except
+the two pre-declared referee reads.
