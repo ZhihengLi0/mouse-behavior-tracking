@@ -44,3 +44,14 @@ blinks. Findings:
 This pass is the prototype of the meeting's long-term goal: on a new
 unlabeled video, these flagged events are where minimal human attention
 should go first.
+
+## Update 2026-09-14: rerun with the round-10 model
+
+Same rule, stronger model (jump r10, shuffle 50): flagged frames shrink from
+2,059 (14.3%) to 1,647 (11.4%) and events 124 -> 120 - model improvement
+directly reduces the human-review workload. Likely-blink events drop 20 -> 9
+for an instructive reason: with blink-frame eyelids now labeled (amended
+rule), the model stays confident during blinks, so the low-confidence gate
+rarely fires there. Blink detection should therefore lean on the eye-opening
+/ pupil-area dips as the primary signal, with likelihood as a secondary
+check - confirming the advisor's call to label eyelids through blinks.

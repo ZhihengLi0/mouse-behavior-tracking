@@ -4,8 +4,8 @@
 flag frames whose residual from a rolling-median fit is large, and dump the
 flagged intervals with representative frame snapshots.
 
-Uses an existing analyze_videos output (no GPU work): the jump round-5 model
-(shuffle 45), an arbitrary member of the statistically tied round-5 trio.
+Uses an existing analyze_videos output (no GPU work): the jump round-10 model
+(shuffle 50), the current strongest generation.
 Derived statistics:
   eye_opening = |eyelid_top - eyelid_bottom|            (px)
   pupil_area  = pi/4 * |p_left-p_right| * |p_top-p_bottom|   (px^2, ellipse)
@@ -26,7 +26,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 UNIT = ROOT / "time-series-analysis"
 PRED = (ROOT / "active-learning/training-data/"
-        "face_first4minDLC_Resnet50_EyePupilBlinkAug17shuffle45_snapshot_best-70.h5")
+        "face_first4minDLC_Resnet50_EyePupilBlinkAug17shuffle50_snapshot_best-50.h5")
 CLIP = ROOT / "active-learning/training-data/face_first4min.mp4"
 FPS = 60.0
 PCUT = 0.6
@@ -114,7 +114,7 @@ axes[4].fill_between(t, 0, 1, where=low_conf, color="red", alpha=0.15,
 axes[4].set_ylabel("min pupil likelihood")
 axes[4].set_xlabel("time (s)")
 axes[4].legend(loc="upper right", fontsize=8)
-fig.suptitle("Keypoint time series, first 4 minutes (jump r5 model, shuffle 45) - "
+fig.suptitle("Keypoint time series, first 4 minutes (jump r10 model, shuffle 50) - "
              f"{len(events)} flagged events", fontsize=14)
 fig.tight_layout()
 fig.savefig(UNIT / "results/01_keypoint_timeseries.png", dpi=130)

@@ -1,0 +1,3 @@
+model,train_frames,overall_keypoint_rmse_px,pupil_center_rmse_px,pupil_width_mae_px,points_likelihood_ge_0_6_of_800
+ResNet-50,100,56.823711,35.774610,32.475003,260
+HRNet-W32,100,25.679873,11.962801,26.306246,0

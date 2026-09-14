@@ -1,0 +1,4 @@
+train_frames,model,overall_keypoint_rmse_px,pupil_center_rmse_px,pupil_width_mae_px
+20,ResNet-50,38.274117,17.833111,36.357171
+50,ResNet-50,41.909130,18.443535,21.123087
+100,ResNet-50,55.941481,34.777243,25.572791
