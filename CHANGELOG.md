@@ -172,3 +172,15 @@ report-only final-minute set.
 - Operationally: MPS training (9x) plus interleaved human/machine scheduling
   compressed the planned 5-day experiment into ~30 hours; 15/15 label batches
   audited; per-round provenance in active-learning/branches (local).
+
+## v0.5.0 - 2026-09-14
+
+Active learning extension (rounds 6-11) and closure. Round 6, the first
+round labeled under the amended blink-eyelid rule, dropped all three branch
+medians together (17 -> 14-15 px floor); rounds 7-11 confirmed a second
+saturation by pre-registered referee rules, and the experiment closed at
+round 11 (cap 12). New units: time-series-analysis (unsupervised error
+mining: 120 events, 11.4% of frames, blink signals) and
+active-learning/analysis-120frame-spike (the round-2 mean spike autopsied
+to 3-5 teleporting frames). Central finding upgraded: labeling standards,
+not label count, move the error floor; detector choice never mattered.

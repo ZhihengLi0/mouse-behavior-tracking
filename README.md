@@ -13,7 +13,7 @@ self-contained unit with `scripts/`, `results/`, and (locally) the exact
 scaling-curve/           How does error scale with 20/50/100 labels?   [superseded]
 batch-size-selection/    Which batch size? -> batch 2                  [complete]
 model-selection/         Which backbone?   -> ResNet-50                [complete]
-active-learning/         Which frame-selection algorithm? -> none needed [complete]
+active-learning/         Which frame-selection algorithm? -> none; labeling standard is the lever [complete]
 ```
 
 Shared infrastructure stays at the root: `dlc_projects/` (the DeepLabCut
@@ -143,6 +143,12 @@ Two immediate tasks:
 Labeling amendment going forward (not retroactive): during blinks the eyelids
 usually remain visible, so `eyelid_top`/`eyelid_bottom` must be labeled on
 blink frames rather than left empty.
+
+**Outcome (2026-09-14).** The extension ran rounds 6-11 under the amended
+rule and ended by a pre-registered stopping rule: a second saturation at
+14-15 px. The amendment itself - not the 120 extra frames - moved the floor
+(17 -> 14.7 px), sharpening the project thesis: what gets labeled beats how
+much. Full account: `active-learning/results/README.md`.
 
 ## History and provenance
 
