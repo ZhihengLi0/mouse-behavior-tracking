@@ -107,3 +107,15 @@ not how much** - the amended eyelid rule bought ~2.3 px (17 -> 14.7) where
 never mattered at any stage. 12 rounds, 36 trainings, 300 human-reviewed
 frames per branch, one held-out minute never touched by any decision except
 the two pre-declared referee reads.
+
+## Production model (post-experiment, 2026-09-15)
+
+With the experiment closed, one model was trained on the union of every
+human-reviewed label (80 seed + 596 unique frames across all branches and
+the untrained round-12 sets; frozen recipe; shuffle 60). Scored once on the
+report-only set as `al_production_v1`: **median 13.94 px, mean 14.77 px,
+98% of points above likelihood 0.6** - the best of all three metrics in the
+project, with the mean and confidence gains (previous best mean 15.07;
+selection-time confidence 73%) showing what the merged pool's diversity
+buys: fewer catastrophic frames and near-total calibration. This model
+(shuffle 60, best snapshot) is the deployment model for new videos.
