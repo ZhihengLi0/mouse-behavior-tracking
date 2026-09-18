@@ -179,6 +179,15 @@ if len(need):
     fig.savefig(out / "review_montage.png", dpi=120)
 cap.release()
 
+flag_frac = union.mean()
+if flag_frac > 0.30:
+    (out / "MODEL_MISMATCH.txt").write_text(
+        f"flagged fraction {flag_frac:.0%} exceeds 30%: predictions are not\n"
+        "trustworthy on this video, so behavior labels (blink/saccade) are\n"
+        "VOID. Do not use events.csv for behavior. Action: label ~80 diverse\n"
+        "frames from this video and retrain before re-running.\n")
+    print(f"*** MODEL MISMATCH: {flag_frac:.0%} of frames flagged - "
+          "behavior labels are void; see MODEL_MISMATCH.txt ***")
 counts = ev["class"].value_counts().to_dict()
 summary = (f"video: {video.name}\nframes: {len(df)}  fps: {fps:.0f}\n"
            f"events: {len(ev)}  flagged frames: {int(union.sum())} "
