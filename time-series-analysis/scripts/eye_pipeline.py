@@ -128,6 +128,7 @@ for s, e in to_events(union):
                  "needs_human": bool(label in ("TRACK_LOSS", "residual")
                                      or masks["TRACK_LOSS"][seg].any())})
 ev = pd.DataFrame(rows)
+ev.insert(0, "event_id", [f"E{i+1:03d}" for i in range(len(ev))])
 ev.to_csv(out / "events.csv", index=False)
 
 # ---- timeseries figure ----------------------------------------------------
@@ -169,7 +170,7 @@ if len(need):
             for bp in df.columns.get_level_values(0).unique():
                 c = "red" if df[bp]["likelihood"].iloc[mid] < PCUT else "lime"
                 ax.plot(df[bp]["x"].iloc[mid], df[bp]["y"].iloc[mid], "o", color=c, ms=4)
-        ax.set_title(f"{r.start_s:.1f}-{r.end_s:.1f}s {r['class']}", fontsize=9)
+        ax.set_title(f"{r.event_id}  {r.start_s:.1f}-{r.end_s:.1f}s {r['class']}", fontsize=9)
         ax.axis("off")
     for ax in np.ravel(axs)[len(need):]:
         ax.axis("off")

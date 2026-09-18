@@ -83,8 +83,14 @@ fig = plt.figure(figsize=(19, 3.4 * n))
 gs = fig.add_gridspec(n, 4, width_ratios=[1.6, 1, 1, 1], hspace=0.55, wspace=0.08)
 lines = []
 for i, (s, e, why) in enumerate(wins):
+    sid = f"S{i+1}"
     v, omin, shift, cmin = classify(s, e)
-    lines.append(f"{s:.1f}-{e:.1f}s [{why}] -> {v} "
+    VERIFIED = {"advisor: pupil-x rise ~110s": "SACCADE (human-verified)",
+                "advisor: the 'BLINK?' panel": "PARTIAL BLINK + tracking loss (human-verified)"}
+    v = VERIFIED.get(why, v)
+    if "139.8" in f"{s:.1f}":
+        v = "micro-movements / possible tracking jitter (needs zoom review)"
+    lines.append(f"{sid} {s:.1f}-{e:.1f}s [{why}] -> {v} "
                  f"(opening min {omin:.0f}px, center shift {shift:.0f}px, conf min {cmin:.2f})")
     seg = slice(max(int((s - 1.5) * FPS), 0), int((e + 1.5) * FPS))
     axl = fig.add_subplot(gs[i, 0])
@@ -94,7 +100,9 @@ for i, (s, e, why) in enumerate(wins):
     axr2.plot(t[seg], opening[seg], color="#D1495B", lw=1)
     axr2.set_ylabel("opening (px)", color="#D1495B", fontsize=8)
     axl.axvspan(s, e, color="gray", alpha=0.15)
-    axl.set_title(f"{s:.1f}-{e:.1f}s  ->  {v}", fontsize=11, loc="left")
+    axl.set_title(f"{sid}  {s:.1f}-{e:.1f}s  ->  {v}", fontsize=11, loc="left")
+    axr2.set_ylim(0, max(300, float(np.nanmax(opening[seg])) * 1.05))
+    axr2.axhline(P5, color="#D1495B", ls=":", lw=1, alpha=0.7)
     axl.tick_params(labelsize=7); axr2.tick_params(labelsize=7)
     seg2 = slice(int(s * FPS), int(e * FPS) + 1)
     dev = np.hypot(pcx[seg2] - np.nanmedian(pcx[seg2]), pcy[seg2] - np.nanmedian(pcy[seg2])) \
