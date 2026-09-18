@@ -37,11 +37,11 @@ if a.stage == "test":
     picks = np.linspace(lo, hi, 100).astype(int)
     name = "test100"
 elif a.stage == "val":
-    lo, hi = 15 * 60 * FPS, 16 * 60 * FPS
+    lo, hi = n_frames - 240 * FPS, n_frames - 120 * FPS
     picks = np.linspace(lo, hi - 1, 20).astype(int)
     name = "val20"
 else:
-    pool_hi = 15 * 60 * FPS
+    pool_hi = n_frames - 240 * FPS
     stride = 5
     idxs = np.arange(0, pool_hi, stride)
     # already-labeled frames from earlier batches

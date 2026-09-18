@@ -10,17 +10,21 @@ template for every future video.
 - **Test set**: 100 frames evenly spaced over the FINAL 2 minutes. Labeled
   once, then frozen. REPORT-ONLY: never selects frames, never tunes, never
   stops anything, never enters training.
-- **Validation set**: 20 frames evenly spaced over minute 15-16 (a segment
-  excluded from the training pool). Labeled once, frozen. Used only to pick
-  the best snapshot within each training run.
-- **Training pool**: 0 to 15 min. All scale batches come from here, so a
-  >=1 minute temporal gap separates pool from validation and ~3 minutes from
-  test (same anti-leakage logic as the original 80/20/100 design).
+- **Validation set**: 20 frames evenly spaced over the 2-to-4-minutes-from-
+  the-end window (T-4 to T-2 for a video of length T). Labeled once, frozen.
+  Used only to pick the best snapshot within each training run. Defined
+  relative to the video end so the rule is length-agnostic, and adjacent to
+  the test segment so validation reflects the same late-session conditions.
+- **Training pool**: 0 to T-4 min. All scale batches come from here; hard
+  temporal blocks separate pool / validation / test (the original design's
+  anti-leakage logic, expressed relative to video length).
+  (Amended 2026-09-18 from an absolute minute-15-16 rule BEFORE any frame
+  was labeled; the absolute rule would not generalize across video lengths.)
 
 ## Fixed frame-selection algorithm (the "which frames" rule)
 
-k-means on frame appearance (graysale, downsampled 32x24, every 5th frame of
-the pool), `numpy` seed 42. Batch r uses k = 20*r clusters and takes the
+k-means on frame appearance (grayscale, downsampled 32x24, every 5th frame of
+the 0..T-4 pool), `numpy` seed 42. Batch r uses k = 20*r clusters and takes the
 frame nearest each centroid, drops frames already labeled in earlier batches
 (collision-safe: enlarge k until 20 new unique frames), yielding exactly +20
 per batch: cumulative 20, 40, 60, ...
