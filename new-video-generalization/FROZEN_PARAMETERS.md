@@ -7,19 +7,22 @@ template for every future video.
 
 ## Per-video split rule (applies to any new video)
 
-- **Test set**: 100 frames evenly spaced over the FINAL 2 minutes. Labeled
-  once, then frozen. REPORT-ONLY: never selects frames, never tunes, never
-  stops anything, never enters training.
-- **Validation set**: 20 frames evenly spaced over the 2-to-4-minutes-from-
-  the-end window (T-4 to T-2 for a video of length T). Labeled once, frozen.
-  Used only to pick the best snapshot within each training run. Defined
-  relative to the video end so the rule is length-agnostic, and adjacent to
-  the test segment so validation reflects the same late-session conditions.
-- **Training pool**: 0 to T-4 min. All scale batches come from here; hard
-  temporal blocks separate pool / validation / test (the original design's
-  anti-leakage logic, expressed relative to video length).
-  (Amended 2026-09-18 from an absolute minute-15-16 rule BEFORE any frame
-  was labeled; the absolute rule would not generalize across video lengths.)
+- **Test set**: 100 frames evenly spaced over the final 10% of the video
+  (minimum 1 minute). Labeled once, then frozen. REPORT-ONLY: never selects
+  frames, never tunes, never stops anything, never enters training.
+- **Validation set**: 20 frames evenly spaced over the 80%-90% segment
+  (minimum 1 minute). Labeled once, frozen. Used only to pick the best
+  snapshot within each run; adjacent to the test segment so it reflects the
+  same late-session conditions.
+- **Training pool**: the first 80% of the video. All scale batches come from
+  here. Validation and test stay CONTIGUOUS END BLOCKS, never interleaved
+  with the pool: at 60 fps, frames 0.07 s apart are near-duplicates, so a
+  spread-out validation set is effectively trained on (the era-1 leakage
+  lesson). Coverage/diversity is the job of the k-means selection over the
+  whole pool, not of the evaluation sets.
+  (Amended twice on 2026-09-18, both BEFORE any frame was labeled: absolute
+  minutes -> length-relative -> percentage-based. For this 19.9-min video
+  all three yield the same frames.)
 
 ## Fixed frame-selection algorithm (the "which frames" rule)
 
