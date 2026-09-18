@@ -48,18 +48,24 @@ else:
     done = set()
     for d in sorted((TD / "labels").glob("batch*")):
         done |= {int(p.stem.replace("img", "")) for p in d.glob("img*.png")}
-    feats = []
+    feats, kept = [], []
     step = max(len(idxs) // 6000, 1)          # cap ~6000 samples for kmeans
-    sub = idxs[::step]
-    for i in sub:
-        cap.set(cv2.CAP_PROP_POS_FRAMES, int(i))
-        ok, im = cap.read()
+    every = stride * step
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    for i in range(int(pool_hi)):             # sequential grab: far faster than seeking
+        if not cap.grab():
+            break
+        if i % every:
+            continue
+        ok, im = cap.retrieve()
         if not ok:
             continue
         g = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
         v = cv2.resize(g, (32, 24)).ravel().astype(np.float32)
         v = (v - v.mean()) / (v.std() + 1e-6)   # per-frame normalization:
         feats.append(v)                          # cluster by shape, not brightness
+        kept.append(i)
+    sub = np.asarray(kept)
     feats = np.asarray(feats, dtype=np.float32)
     from scipy.cluster.vq import kmeans2
     np.random.seed(SEED)
@@ -82,9 +88,12 @@ else:
             break
         k += 10
     name = f"batch{a.batch_no:02d}"
+    state = dict(feats=feats, labels=lab, frame_idx=sub, centroids=cents, picks=np.asarray(picks), k=k)
 
 out = TD / "labels" / name
 out.mkdir(parents=True, exist_ok=True)
+if a.stage == "batch":
+    np.savez_compressed(out / "kmeans_state.npz", **state)
 
 pred = pd.read_hdf(H5)
 scorer = pred.columns.get_level_values(0)[0]
