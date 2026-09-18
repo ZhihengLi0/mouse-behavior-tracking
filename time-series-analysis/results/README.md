@@ -55,3 +55,28 @@ rule), the model stays confident during blinks, so the low-confidence gate
 rarely fires there. Blink detection should therefore lean on the eye-opening
 / pupil-area dips as the primary signal, with likelihood as a secondary
 check - confirming the advisor's call to label eyelids through blinks.
+
+## Update 2026-09-17: spike-by-spike behavioral attribution (advisor request)
+
+`03_spike_behaviors.png`: for each major spike, zoomed traces (pupil x +
+eye opening) with start/peak/end video frames. Human-verified verdicts:
+
+- **~108.8 s pupil-x rise: a real SACCADE**, exactly as the advisor
+  suspected - square-wave x excursion (622->645 px, held ~1 s, return),
+  eye fully open in every frame, confidence high. The v1 rule had
+  mislabeled it "blink" because opening grazed its 5th percentile.
+- **191.9-193.1 s: NOT a full blink** - also as the advisor suspected.
+  Opening dips 270->200 px (~25%, a squint/partial blink; a real closure
+  at 233.3 s reaches 185 px within 3 frames). During the squint the pupil
+  points teleport (conf 0.14) - the event is "partial blink + tracking
+  loss", two phenomena stacked.
+- Remaining spikes: 148-150 s = saccade + slow eyelid widening;
+  124-126 s / 139.8-143.3 s / 225.5-227.7 s = clusters of small rapid
+  x-oscillations with the eye open (micro eye movements / tracking jitter
+  between nearby attractors - needs higher-zoom review to separate).
+
+Classifier v2 requirements that follow: add a SACCADE class (center shift
+with stable opening), grade blinks by absolute closure depth instead of a
+video-relative percentile, and treat low confidence as a tracking-loss
+flag rather than blink evidence - fully consistent with the advisor's
+"confidence as secondary signal" position.
