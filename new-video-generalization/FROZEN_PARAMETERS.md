@@ -26,11 +26,22 @@ template for every future video.
 
 ## Fixed frame-selection algorithm (the "which frames" rule)
 
-k-means on frame appearance (grayscale, downsampled 32x24, every 5th frame of
-the 0..T-4 pool), `numpy` seed 42. Batch r uses k = 20*r clusters and takes the
-frame nearest each centroid, drops frames already labeled in earlier batches
-(collision-safe: enlarge k until 20 new unique frames), yielding exactly +20
-per batch: cumulative 20, 40, 60, ...
+Two-phase, pre-declared (amended 2026-09-18 before any labeling):
+
+- **Batch 1 (bootstrap)**: pure k-means on frame appearance (grayscale,
+  downsampled 32x24, every 5th frame of the pool), `numpy` seed 42, k=20.
+  With the unadapted model ~100% of frames are flagged, so error-guided
+  selection has no discriminative power yet; diversity is the only signal.
+- **Batch r >= 2 (error-guided)**: analyze the pool with the latest trained
+  model, flag candidates with the `jump` outlier detector (epsilon = 20, the
+  frozen AL setting; chosen as the preferred detector - best numbers,
+  mildest failure modes, calibration-free - while noting the original
+  experiment proved the three detectors equivalent only to EACH OTHER, not
+  against pure k-means), then k-means (seed 42) among the flagged frames for
+  20 new unique picks, collision-safe against all earlier labels.
+
+This is a single-arm protocol: it measures minimal labeling cost under our
+best selection practice, and does not re-test selection methods.
 
 ## Training and evaluation per scale step
 
