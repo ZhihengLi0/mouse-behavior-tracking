@@ -29,7 +29,11 @@ template for every future video.
 Two-phase, pre-declared (amended 2026-09-18 before any labeling):
 
 - **Batch 1 (bootstrap)**: pure k-means on frame appearance (grayscale,
-  downsampled 32x24, every 5th frame of the pool), `numpy` seed 42, k=20.
+  downsampled 32x24, per-frame zero-mean/unit-variance normalized so
+  clusters form on shape rather than illumination, every 5th frame of the
+  pool), `numpy` seed 42, k=20. Honest scope: k-means covers the ~20 most
+  COMMON appearance modes; rare extremes are deliberately left to the
+  error-guided batches, whose job is exactly the tail.
   With the unadapted model ~100% of frames are flagged, so error-guided
   selection has no discriminative power yet; diversity is the only signal.
 - **Batch r >= 2 (error-guided)**: analyze the pool with the latest trained

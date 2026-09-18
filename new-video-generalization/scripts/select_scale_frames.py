@@ -57,7 +57,9 @@ else:
         if not ok:
             continue
         g = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-        feats.append(cv2.resize(g, (32, 24)).ravel())
+        v = cv2.resize(g, (32, 24)).ravel().astype(np.float32)
+        v = (v - v.mean()) / (v.std() + 1e-6)   # per-frame normalization:
+        feats.append(v)                          # cluster by shape, not brightness
     feats = np.asarray(feats, dtype=np.float32)
     from scipy.cluster.vq import kmeans2
     np.random.seed(SEED)
