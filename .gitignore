@@ -46,3 +46,4 @@ scaling-curve/demo_clips/
 **/predictions/
 active-learning/branches/
 active-learning/frames/
+new-video-generalization/pipeline_*/
