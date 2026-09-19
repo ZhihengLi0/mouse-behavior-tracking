@@ -34,14 +34,30 @@ No headline number is ever computed by an ad-hoc inline snippet.
 ## Fixed frame-selection algorithm (implemented in scripts/select_scale_frames.py)
 
 - **Batch 1 (bootstrap)**: k-means (scikit-learn, k = 20, n_init = 10,
-  max_iter = 300, random_state = 42) on 32x24 grayscale fingerprints,
-  per-frame zero-mean/unit-variance normalized, of every 5th pool frame; the
-  medoid of each cluster is picked. Audited 2026-09-18: stride, fingerprint
-  resolution, normalization and seed change WHICH frames are picked but no
-  measurable property of the pick set, so they are fixed by reasoning, not
-  tuned. Visual check (results/01, 02): appearance space is a continuum
-  (silhouette ~0.08), so k-means acts as an even partition of that continuum
-  - 20 evenly spread "ticks" - rather than a discovery of 20 discrete modes.
+  max_iter = 300, random_state = 42) over every 5th pool frame, each frame
+  described by an edge fingerprint: difference of Gaussians (sigma 1 minus
+  sigma 6) on a 128x96 downscale, reduced to 32x24 and normalized to zero
+  mean / unit variance. The medoid of each cluster is picked.
+  How this was settled (2026-09-18/19, all before batch 1 was labeled):
+  1. Advisor-requested visualization (results/01, 02): appearance space is
+     a continuum, so k-means acts as an even partition of it - 20 spread-out
+     "ticks" - not a discovery of 20 discrete modes.
+  2. Audit: stride, fingerprint resolution and seed change WHICH frames are
+     picked but no measurable property of the pick set - fixed by reasoning.
+  3. Label-free check on a video whose eye states are known (old video,
+     10 k-means seeds, scripts/validate_selector.py): average coverage of
+     pupil area / eye opening / pupil position is within noise of random
+     picks (0.92 vs 0.88), but ALL FOUR rare extremes (lowest/highest
+     opening and pupil area) are covered in 10/10 seeds with edge
+     fingerprints, vs 7/10 with raw pixels and 27% of random draws.
+  4. Three Pluto sessions (scripts/selector_check.py): edge fingerprints
+     double cluster separation (silhouette 0.07 -> 0.15) and raise pick
+     diversity on every video. A brightness criterion tried in two forms
+     proved non-diagnostic (frame brightness co-varies with eye and face
+     state) and was dropped.
+  Conclusion: the selection method matters little for common states and
+  matters for rare ones; k-means on edge fingerprints is the most reliable
+  of the variants tested. Not yet shown on a different mouse.
 - **Batch r >= 2 (error-guided)**: analyze the video with the latest trained
   model; flag pool frames where any keypoint moves more than 3% of the
   median eye width between consecutive frames (the `jump` detector, made

@@ -51,14 +51,14 @@ def flat(df):
     return df
 
 
-def evaluate(shuffle, tsi, label, arm, n_new):
+def evaluate(shuffle, tsi, label, arm, n_new, snapshot_index=-1, rule="best validation mAP"):
     import deeplabcut
     out = TD / "eval" / label
     out.mkdir(parents=True, exist_ok=True)
     deeplabcut.analyze_images(str(rtp.CONFIG), [str(TEST_FRAMES)], frame_type=".png",
                               destfolder=str(out), shuffle=shuffle, trainingsetindex=tsi,
                               save_as_csv=True, plotting=False, pcutoff=0.0, device="cpu",
-                              snapshot_index=-1)
+                              snapshot_index=snapshot_index)
     gt = flat(pd.read_hdf(TEST_GT))
     pr = flat(pd.read_hdf(sorted(out.glob("image_predictions_*.h5"))[-1])).loc[gt.index]
     per = pd.DataFrame(index=gt.index)
@@ -76,6 +76,7 @@ def evaluate(shuffle, tsi, label, arm, n_new):
         "overall_rmse_px": round(float(np.sqrt(np.nanmean(e.to_numpy() ** 2))), 2),
         "frac_points_conf_ge_0.6": round(float((lk[labeled] >= 0.6).mean()), 3),
         "n_test_frames": len(e), "n_test_points": int(labeled.sum()),
+        "snapshot_rule": f"{rule} ({sorted(out.glob('image_predictions_*.h5'))[-1].stem.split('snapshot_')[-1]})",
     }
     cur = pd.read_csv(CURVE) if CURVE.exists() else pd.DataFrame()
     cur = cur[cur["label"] != label] if len(cur) else cur
@@ -183,7 +184,15 @@ def main():
              "--batch-size", rtp.BATCH, "--epochs", rtp.EPOCHS, "--device", "mps",
              "--trainset-fraction", pct, "--trainingsetindex", tsi, "--save-epochs", 10,
              "--max-snapshots", 12, "--no-resume"])
+    # Score under BOTH snapshot rules until the rule is decided (2026-09-19: best-mAP on 20
+    # validation frames picked an undertrained epoch-20 snapshot at step 2).
     evaluate(a.shuffle, tsi, label, "scratch", n_new)
+    tdir = glob.glob(str(rtp.PROJECT / "dlc-models-pytorch" / "iteration-0" / f"*shuffle{a.shuffle}" / "train"))[0]
+    snaps = sorted(Path(x).name for x in glob.glob(tdir + "/snapshot-*.pt"))
+    fin = snaps.index(f"snapshot-{int(rtp.EPOCHS):03d}.pt")
+    evaluate(a.shuffle, tsi, label.replace("_scratch", "_final"), "scratch", n_new,
+             snapshot_index=fin, rule="final snapshot")
+    print(f"FINAL_INDEX={fin}")
     print(f"TSI={tsi}")
 
 
