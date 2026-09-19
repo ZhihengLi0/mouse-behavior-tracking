@@ -56,7 +56,7 @@ ax.scatter(proj[pick_pos, 0], proj[pick_pos, 1], marker="*", s=260, c="black", z
 for pp, cl in zip(pick_pos, pick_cluster):
     ax.annotate(str(cl), (proj[pp, 0], proj[pp, 1]), fontsize=8, color="white",
                 ha="center", va="center", zorder=6)
-ax.set_title(f"Step 3: {len(feats)} sampled frames in appearance space (PCA of 768-d fingerprints, "
+ax.set_title(f"Step 3: {len(feats)} sampled frames in appearance space (PCA of 768-d edge fingerprints, "
              f"{expl:.0%} variance shown)\n{k} k-means clusters by color; black stars = the {len(picks)} "
              f"picked representatives (cluster id inside). silhouette = {sil:.2f}", fontsize=10)
 ax.set_xlabel("PC1"); ax.set_ylabel("PC2")

@@ -27,6 +27,8 @@ ROOT = Path(__file__).resolve().parents[2]
 CLIP = ROOT / "active-learning/training-data/face_first4min.mp4"
 H5 = sorted(glob.glob(str(ROOT / "active-learning/training-data/face_first4minDLC*shuffle60*.h5")))[-1]
 SEED, STRIDE, N = 42, 5, 20
+import os
+FEAT = os.environ.get('FEAT', 'raw')
 
 pr = pd.read_hdf(H5)
 pr.columns = pr.columns.droplevel(0)
@@ -53,7 +55,13 @@ for i in range(pool_hi):
     ok, im = cap.retrieve()
     if not ok:
         continue
-    v = cv2.resize(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY), (32, 24)).ravel().astype(np.float32)
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY).astype(np.float32)
+    if FEAT == "dog":
+        sm = cv2.resize(gray, (128, 96), interpolation=cv2.INTER_AREA)
+        sm = cv2.GaussianBlur(sm, (0, 0), 1.0) - cv2.GaussianBlur(sm, (0, 0), 6.0)
+        v = cv2.resize(sm, (32, 24), interpolation=cv2.INTER_AREA).ravel()
+    else:
+        v = cv2.resize(gray, (32, 24)).ravel()
     feats.append((v - v.mean()) / (v.std() + 1e-6))
     ids.append(i)
 cap.release()
@@ -93,7 +101,7 @@ rd, rj = np.array([r[0] for r in rand]), np.array([r[1] for r in rand])
 r_ext = {k: np.mean([r[2][k] for r in rand]) for k in rand[0][2]}
 r_allfour = np.mean([all(v > 0 for v in r[2].values()) for r in rand])
 
-print(f"old video pool: {pool_hi} frames; {N} picks per method\n")
+print(f"[features: {FEAT}] old video pool: {pool_hi} frames; {N} picks per method\n")
 print(f"{'method':14s} {'decile cov':>11s} {'joint 5x5':>10s}   extremes (open_low/open_high/area_low/area_high)")
 for name, p in [("k-means", kmeans_picks), ("uniform-time", uniform_picks)]:
     d, j, e = score(p)

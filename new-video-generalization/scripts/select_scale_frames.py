@@ -11,9 +11,10 @@ Implements FROZEN_PARAMETERS.md exactly (rewritten 2026-09-18 after audit):
              (>= 60 s), pool = everything earlier; a GUARD of 2 s is removed
              on both sides of val so no pool/val/test frames are near-duplicates.
              fps and length are read from the video, never hardcoded.
-  batch 1    k-means (sklearn, k=20, n_init=10, random_state=42) on per-frame
-             normalized 32x24 grayscale fingerprints of every 5th pool frame;
-             one medoid per cluster.
+  batch 1    k-means (sklearn, k=20, n_init=10, random_state=42) on 32x24
+             difference-of-Gaussians fingerprints (sigma 1 - sigma 6 on a
+             128x96 downscale, then per-frame normalized) of every 5th pool
+             frame; one medoid per cluster.
   batch >=2  error-guided: `jump` detector on the latest model's predictions
              (any keypoint moving more than EPS_FRAC * median eye width
              between consecutive frames), then k-means (k=20) among the
@@ -51,10 +52,12 @@ ap.add_argument("--pred-h5", default=None, help="latest model's predictions (bat
 ap.add_argument("--force", action="store_true")
 a = ap.parse_args()
 
-videos = [Path(a.video)] if a.video else sorted(TD.glob("*.mp4"))
+FIRST = "20251031_Pluto_spont_1"
+videos = [Path(a.video)] if a.video else sorted(TD.rglob(f"{FIRST}.mp4"))
 if len(videos) != 1:
-    sys.exit(f"expected exactly one video, found {videos}")
+    sys.exit(f"expected exactly one video, found {videos}; pass --video")
 VIDEO = videos[0]
+LABELS = TD / "labels" if VIDEO.stem == FIRST else TD / f"labels_{VIDEO.stem}"
 cap = cv2.VideoCapture(str(VIDEO))
 n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 fps = float(cap.get(cv2.CAP_PROP_FPS)) or 60.0
@@ -70,7 +73,7 @@ if pool_hi < int(60 * fps):
     sys.exit("video too short for the 80/10/10 rule with 60 s floors")
 
 name = {"test": "test100", "val": "val20"}.get(a.stage, f"batch{a.batch_no:02d}")
-out = TD / "labels" / name
+out = LABELS / name
 if out.exists() and any(out.glob("img*.png")):
     if not a.force:
         sys.exit(f"{out} already populated; refusing to overwrite (use --force to wipe and redo)")
@@ -80,7 +83,7 @@ out.mkdir(parents=True, exist_ok=True)
 
 def labeled_elsewhere():
     done = set()
-    for d in (TD / "labels").glob("batch*"):
+    for d in LABELS.glob("batch*"):
         if d != out:
             done |= {int(p.stem.replace("img", "")) for p in d.glob("img*.png")}
     return done
@@ -114,7 +117,10 @@ def fingerprints(frame_ids):
         ok, im = cap.retrieve()
         if not ok:
             continue
-        v = cv2.resize(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY), (32, 24)).ravel().astype(np.float32)
+        gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY).astype(np.float32)
+        sm = cv2.resize(gray, (128, 96), interpolation=cv2.INTER_AREA)
+        sm = cv2.GaussianBlur(sm, (0, 0), 1.0) - cv2.GaussianBlur(sm, (0, 0), 6.0)   # edges/shape, not slow lighting
+        v = cv2.resize(sm, (32, 24), interpolation=cv2.INTER_AREA).ravel()
         feats.append((v - v.mean()) / (v.std() + 1e-6))
         kept.append(i)
     return np.asarray(feats, np.float32), np.asarray(kept)
