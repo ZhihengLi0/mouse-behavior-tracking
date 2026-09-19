@@ -184,3 +184,14 @@ mining: 120 events, 11.4% of frames, blink signals) and
 active-learning/analysis-120frame-spike (the round-2 mean spike autopsied
 to 3-5 teleporting frames). Central finding upgraded: labeling standards,
 not label count, move the error floor; detector choice never mattered.
+
+## v0.5.1 - 2026-09-18 (correction)
+
+Audit finding: the median-frame-error series mixed two definitions (per-frame
+RMSE for rounds 0-5, per-frame mean-abs for rounds 6-11 and production_v1).
+The v0.5.0 claims of a round-6 drop, a second saturation, and "labeling
+standards move the error floor" are retracted; under one definition the
+curve is flat through all 12 rounds. convergence.csv and the figure are
+recomputed with both definitions in explicitly named columns. Unaffected:
+saturation at ~80 labels, detector equivalence, the 120-frame spike
+analysis, time-series/blink/saccade work, the Pluto generalization result.

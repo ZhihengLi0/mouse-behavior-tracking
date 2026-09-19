@@ -1,5 +1,23 @@
 # Active Learning: Final Results (rounds 0-5 complete)
 
+> **CORRECTION (2026-09-18).** An internal audit found that the "median frame
+> error" on this page mixed two definitions: rounds 0-5 used the per-frame
+> RMSE over the 8 keypoints, rounds 6-11 (and production_v1) used the
+> per-frame MEAN absolute error, which is ~1.7-2 px lower on the same data.
+> The reported "round-6 drop" (17 -> 14-15 px), the "second saturation", and
+> the claim that the amended eyelid-labeling rule moved the error floor were
+> artifacts of that switch and are RETRACTED. Under one definition the curve
+> is flat from round 0 to round 11 (median frame RMSE 15.7-17.5 px, baseline
+> 16.95; the amendment's before/after difference is ~0.3 px, inside noise).
+> What stands: ~80 labels saturate typical-frame accuracy and nothing up to
+> 300 labels moves it; the three detectors are indistinguishable; the
+> round-11 stop was correct. production_v1 under the same definition:
+> median 16.01 px (baseline 16.95), mean-abs median 13.94 px, 98% of points
+> above likelihood 0.6. `convergence.csv` and the figure are recomputed;
+> both definitions are now stored in separate, explicitly named columns.
+> Sections below are kept for the record; read them through this notice.
+
+
 Three outlier detectors competed under one frozen protocol
 (../FROZEN_PARAMETERS.md): identical ResNet-50 / batch 2 / 100-epoch training
 from scratch each round, identical seed labels, k-means extraction; the only
