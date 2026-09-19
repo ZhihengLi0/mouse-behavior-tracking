@@ -1,6 +1,6 @@
-label,arm,pluto_training_frames,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule
-x000_production_v1,unadapted,0,185.18,100.37,185.83,0.426,59,439,n/a (pretrained production model)
-x020_step01_scratch,scratch,20,12.08,9.86,38.21,0.747,59,439,best validation mAP -> epoch 70
-x040_step02_scratch,scratch,40,101.74,43.54,102.09,0.285,59,439,best validation mAP -> epoch 20 (undertrained; pupil_left fails on 53% of test frames)
-x020_step01_final,scratch,20,13.83,,42.0,0.62,59,439,final snapshot (epoch 100)
-x040_step02_final,scratch,40,12.04,,48.86,0.7,59,439,final snapshot (epoch 100)
+label,arm,pluto_training_frames,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,p90_frame_rmse_px,frac_frames_rmse_gt_50px
+x000_production_v1,unadapted,0,185.18,100.37,185.83,0.426,59,439,n/a (pretrained production model),249.81,0.881
+x020_step01_scratch,scratch,20,12.08,9.86,38.21,0.747,59,439,best validation mAP -> epoch 70,90.03,0.119
+x040_step02_scratch,scratch,40,101.74,43.54,102.09,0.285,59,439,best validation mAP -> epoch 20 (undertrained; pupil_left fails on 53% of test frames),147.71,0.542
+x020_step01_final,scratch,20,13.83,,42.0,0.62,59,439,final snapshot (epoch 100),44.6,0.102
+x040_step02_final,scratch,40,12.04,,48.86,0.7,59,439,final snapshot (epoch 100),27.58,0.085

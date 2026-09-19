@@ -74,6 +74,9 @@ def evaluate(shuffle, tsi, label, arm, n_new, snapshot_index=-1, rule="best vali
         "median_frame_rmse_px": round(float(np.sqrt((e ** 2).mean(axis=1)).median()), 2),
         "median_frame_mean_abs_px": round(float(e.mean(axis=1).median()), 2),
         "overall_rmse_px": round(float(np.sqrt(np.nanmean(e.to_numpy() ** 2))), 2),
+        # the project's goal is the error TAIL (find and fix failing frames); the median saturates early
+        "p90_frame_rmse_px": round(float(np.sqrt((e ** 2).mean(axis=1)).quantile(0.9)), 2),
+        "frac_frames_rmse_gt_50px": round(float((np.sqrt((e ** 2).mean(axis=1)) > 50).mean()), 3),
         "frac_points_conf_ge_0.6": round(float((lk[labeled] >= 0.6).mean()), 3),
         "n_test_frames": len(e), "n_test_points": int(labeled.sum()),
         "snapshot_rule": f"{rule} ({sorted(out.glob('image_predictions_*.h5'))[-1].stem.split('snapshot_')[-1]})",

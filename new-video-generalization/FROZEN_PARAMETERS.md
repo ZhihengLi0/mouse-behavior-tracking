@@ -10,15 +10,30 @@ template for every future video.
 Every number on the scale curve comes from ONE script and ONE definition:
 per test frame, RMSE over the 8 keypoints = sqrt(mean of squared keypoint
 errors); the curve's y value is the MEDIAN of that over the 100 test frames
-("median frame RMSE"). The mean over frames and the per-frame mean-absolute
+("median frame RMSE"). Because the project goal concerns the error TAIL (finding
+and fixing failing frames) and the median saturates early, the 90th
+percentile of frame RMSE and the fraction of frames above 50 px are
+reported in every row. The mean over frames and the per-frame mean-absolute
 error are reported alongside in explicitly named columns, never substituted.
 No headline number is ever computed by an ad-hoc inline snippet.
 
 ## Per-video split rule (applies to any new video; fps and length read from the file)
 
 - **Test set**: 100 frames evenly spaced over the final 10% of the video
-  (minimum 60 s). Labeled once, then frozen. REPORT-ONLY: never selects
-  frames, never tunes, never enters training.
+  (minimum 60 s) are EXTRACTED; labeled once, then frozen. REPORT-ONLY:
+  never selects frames, never tunes, never enters training.
+  **For Pluto spont_1 the frozen test set is 59 frames, not 100**: the
+  annotator labeled the extracted frames in time order and stopped after
+  slider positions 0-58 for labeling-cost reasons (2026-09-18, before any
+  model had been scored on them). The 41 dropped frames are the LAST 49 s of
+  the segment - a contiguous time block, not a difficulty-based exclusion;
+  no frame was removed for being a blink or occluded. Within the 59 frames,
+  439 of 472 keypoints are labeled: a point is left empty only when it is
+  not visible (e.g. pupil points in a closed-eye frame), so errors on
+  occluded points are by construction not measured - the per-frame RMSE is
+  taken over the labeled points of that frame. Labels were made by
+  correcting the unadapted model's predictions; untouched points therefore
+  equal that model's output, a small bias in favour of x = 0.
 - **Validation set**: 20 frames evenly spaced over the 10% before the test
   segment (minimum 60 s). Labeled once, frozen. Used only to pick the best
   snapshot within each run.
