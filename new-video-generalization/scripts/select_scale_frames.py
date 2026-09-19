@@ -45,7 +45,7 @@ EPS_FRAC = 0.03          # jump threshold as a fraction of median eye width
 FLOOR_S = 60.0
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--stage", required=True, choices=["test", "val", "batch"])
+ap.add_argument("--stage", required=True, choices=["test", "val", "val_extra", "batch"])
 ap.add_argument("--batch-no", type=int, default=1)
 ap.add_argument("--video", default=None)
 ap.add_argument("--pred-h5", default=None, help="latest model's predictions (batch >= 2)")
@@ -72,7 +72,7 @@ pool_hi = val_lo - guard                      # exclusive
 if pool_hi < int(60 * fps):
     sys.exit("video too short for the 80/10/10 rule with 60 s floors")
 
-name = {"test": "test100", "val": "val20"}.get(a.stage, f"batch{a.batch_no:02d}")
+name = {"test": "test100", "val": "val20", "val_extra": "val30_extra"}.get(a.stage, f"batch{a.batch_no:02d}")
 out = LABELS / name
 if out.exists() and any(out.glob("img*.png")):
     if not a.force:
@@ -141,6 +141,18 @@ if a.stage == "test":
     picks = np.linspace(test_lo, n_frames - 1, 100).astype(int).tolist()
 elif a.stage == "val":
     picks = np.linspace(val_lo, val_hi - 1, 20).astype(int).tolist()
+elif a.stage == "val_extra":
+    # 2026-09-19: validation set enlarged 20 -> 50 so the best-mAP snapshot rule is less of a
+    # lottery (20 frames = 160 points; a 0.25 mAP gap picked an undertrained epoch at step 2).
+    # 30 more evenly spaced frames in the SAME segment, at least 1 s from every original one.
+    orig = np.linspace(val_lo, val_hi - 1, 20).astype(int)
+    grid = np.linspace(val_lo, val_hi - 1, 31)
+    picks = []
+    for f in ((grid[:-1] + grid[1:]) / 2).astype(int):
+        while np.min(np.abs(orig - f)) < int(round(MIN_GAP_S * fps)):
+            f += int(round(1.5 * MIN_GAP_S * fps))
+        picks.append(int(f))
+    assert len(set(picks)) == 30 and max(picks) < val_hi and not set(picks) & set(orig.tolist())
 else:
     done = labeled_elsewhere()
     if a.batch_no == 1:
