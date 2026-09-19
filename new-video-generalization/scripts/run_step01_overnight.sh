@@ -11,10 +11,10 @@ say(){ echo "[$(date '+%m-%d %H:%M')] $*" >> "$LOG"; }
 say "=== baseline (production_v1 unadapted) ==="
 $PY scale_step.py --baseline >> "$LOG" 2>&1 || say "BASELINE FAILED"
 
-say "=== arm A: scratch, shuffle 61 ==="
-if $PY scale_step.py --step 1 --arm scratch --shuffle 61 >> "$LOG" 2>&1; then
+say "=== step 1: from scratch, shuffle 61 ==="
+if $PY scale_step.py --step 1 --shuffle 61 >> "$LOG" 2>&1; then
   TSI=$(grep -o 'TSI=[0-9]*' "$LOG" | tail -1 | cut -d= -f2)
-  say "arm A done (tsi $TSI); analyzing the Pluto video with the new model"
+  say "step done (tsi $TSI); analyzing the Pluto video with the new model"
   mkdir -p "$UNIT/training-data/predictions_step01"
   $PY - >> "$LOG" 2>&1 <<PYEOF
 import deeplabcut
@@ -30,9 +30,7 @@ PYEOF
     say "no predictions h5 - batch02 not selected"
   fi
 else
-  say "ARM A FAILED"
+  say "STEP FAILED"
 fi
 
-say "=== arm B: warm start from production_v1, shuffle 62 ==="
-$PY scale_step.py --step 1 --arm warm --shuffle 62 >> "$LOG" 2>&1 && say "arm B done" || say "ARM B FAILED (exploratory arm; main line unaffected)"
 say "=== ALL DONE ==="

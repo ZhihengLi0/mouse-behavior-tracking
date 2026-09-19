@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """One step of the new-video scale experiment: build the dataset, train, evaluate.
 
-    python scale_step.py --step 1 --arm scratch --shuffle 61
-    python scale_step.py --step 1 --arm warm    --shuffle 62
+    python scale_step.py --step 1 --shuffle 61
     python scale_step.py --baseline            # score production_v1 as x = 0
 
 Dataset for step N (FROZEN_PARAMETERS.md):
@@ -10,10 +9,9 @@ Dataset for step N (FROZEN_PARAMETERS.md):
           + Pluto batch01..batchN (20 each)
   val   = the 20 Pluto validation frames (snapshot selection only)
   the 20 old-video validation frames are left unused.
-Arms differ ONLY in initialization:
-  scratch  frozen recipe, 100 epochs from ImageNet weights
-  warm     same data and config, initialized from the production_v1 best
-           snapshot, WARM_EPOCHS additional epochs
+Every step trains FROM SCRATCH (frozen recipe, 100 epochs from ImageNet
+weights) - advisor decision 2026-09-19: with only 20 new frames, continuing
+from an existing model risks overfitting to them.
 Evaluation: the frozen 59-frame Pluto test set, one definition of the metric
 (median over frames of the RMSE over the labeled keypoints of that frame).
 """
@@ -40,7 +38,6 @@ TEST_GT = LABELS / "test_frozen" / "test59_labels.h5"
 TEST_FRAMES = LABELS / "test100"
 CURVE = UNIT / "results" / "scale_curve.csv"
 PROD_SHUFFLE, PROD_TSI = 60, 11
-WARM_EPOCHS = 35
 BPS = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right",
        "eyelid_top", "eyelid_bottom", "eye_nasal_corner", "eye_temporal_corner"]
 
@@ -141,7 +138,6 @@ def stage_pluto(step):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--step", type=int, default=1)
-    ap.add_argument("--arm", choices=["scratch", "warm"], default="scratch")
     ap.add_argument("--shuffle", type=int)
     ap.add_argument("--baseline", action="store_true")
     a = ap.parse_args()
@@ -163,7 +159,7 @@ def main():
     fraction = round(len(train_idx) / (len(train_idx) + len(val_idx)), 2)
     tsi = rtp.ensure_fraction(fraction)
     pct = int(round(fraction * 100))
-    rtp.log(f"step {a.step} [{a.arm}]: {len(train_idx)} train ({n_new} Pluto) / {len(val_idx)} Pluto val, "
+    rtp.log(f"step {a.step}: {len(train_idx)} train ({n_new} Pluto) / {len(val_idx)} Pluto val, "
             f"fraction {fraction}, tsi {tsi}, shuffle {a.shuffle}")
 
     deeplabcut.create_training_dataset(str(rtp.CONFIG), Shuffles=[a.shuffle], trainIndices=[train_idx],
@@ -182,20 +178,12 @@ def main():
     rtp.log("index check passed: val = Pluto val20, train includes exactly the Pluto batch rows")
     rtp.patch_model_config(pct, a.shuffle, rtp.BATCH)
 
-    label = f"x{n_new:03d}_step{a.step:02d}_{a.arm}"
-    if a.arm == "scratch":
-        rtp.run([rtp.PYTHON, rtp.ROOT / "scripts/train_eye_model.py", "--shuffle", a.shuffle,
-                 "--batch-size", rtp.BATCH, "--epochs", rtp.EPOCHS, "--device", "mps",
-                 "--trainset-fraction", pct, "--trainingsetindex", tsi, "--save-epochs", 10,
-                 "--max-snapshots", 12, "--no-resume"])
-    else:
-        prod = sorted(glob.glob(str(rtp.PROJECT / "dlc-models-pytorch" / "iteration-0" /
-                                    f"*shuffle{PROD_SHUFFLE}" / "train" / "snapshot-best-*.pt")))[-1]
-        rtp.log(f"warm start from {prod}, {WARM_EPOCHS} additional epochs")
-        deeplabcut.train_network(str(rtp.CONFIG), shuffle=a.shuffle, trainingsetindex=tsi, device="mps",
-                                 batch_size=rtp.BATCH, epochs=WARM_EPOCHS, save_epochs=5,
-                                 max_snapshots_to_keep=12, snapshot_path=prod)
-    evaluate(a.shuffle, tsi, label, a.arm, n_new)
+    label = f"x{n_new:03d}_step{a.step:02d}_scratch"
+    rtp.run([rtp.PYTHON, rtp.ROOT / "scripts/train_eye_model.py", "--shuffle", a.shuffle,
+             "--batch-size", rtp.BATCH, "--epochs", rtp.EPOCHS, "--device", "mps",
+             "--trainset-fraction", pct, "--trainingsetindex", tsi, "--save-epochs", 10,
+             "--max-snapshots", 12, "--no-resume"])
+    evaluate(a.shuffle, tsi, label, "scratch", n_new)
     print(f"TSI={tsi}")
 
 
