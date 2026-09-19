@@ -17,6 +17,32 @@ reported in every row. The mean over frames and the per-frame mean-absolute
 error are reported alongside in explicitly named columns, never substituted.
 No headline number is ever computed by an ad-hoc inline snippet.
 
+## Snapshot rule (decided 2026-09-19)
+
+**Headline: the FINAL snapshot (epoch 100) of every run. Zero degrees of
+freedom.** Robustness column: the best-validation-mAP snapshot among epochs
+>= 80 only.
+
+Why: the frozen recipe decays the learning rate at epochs 80 and 95, so any
+snapshot before epoch 80 is a model that never entered the low-LR refinement
+phase. DeepLabCut's default - keep the best validation mAP over ALL
+snapshots - can select such a model, which contradicts the recipe itself;
+with a 20-frame validation set (160 points, one point = 0.6 mAP) it did: at
+step 2 it chose epoch 20 over epoch 70 on a 0.25 mAP gap, and the scored
+error was 101.74 px against 12.04 px for the final snapshot of the same run
+(an 8.5x swing, versus a 13% change from doubling the Pluto labels). This is
+the v0.2.0 checkpoint-choice failure again, an order of magnitude larger.
+History, kept honest: the default rule was in force for steps 1-2 and batch
+2 was selected by an mAP-best snapshot (epoch 70); batch 3 and later are
+selected by the final snapshot. The rule change was first proposed after
+seeing the step-2 result (and the final snapshots were scored on the test
+set to diagnose it); the recipe-based argument above is what justifies it
+independently of that result. The validation set was enlarged to 50 frames
+the same day; it now serves the robustness column and training monitoring.
+For consistency the completed active-learning experiment is re-scored under
+the same rule (active-learning/results/convergence_final_snapshot.csv).
+The stopping rule is evaluated on the final-snapshot series only.
+
 ## Per-video split rule (applies to any new video; fps and length read from the file)
 
 - **Test set**: 100 frames evenly spaced over the final 10% of the video
@@ -90,7 +116,7 @@ No headline number is ever computed by an ad-hoc inline snippet.
   per advisor) + cumulative Pluto batch frames. From scratch each step:
   ResNet-50, batch 2, 100 epochs, LR milestones [80, 95], MPS - the frozen
   recipe, unchanged.
-- Best snapshot by Pluto validation mAP; test set scored ONCE per step.
+- Snapshot per the rule above; test set scored once per step per reported column.
 - Curve: x = cumulative Pluto labels, y = external error (mean + median) on
   the frozen Pluto test set. Baseline point x=0 = production_v1 as-is.
 - Stopping (scale-free, amended after audit): let B be the running best
