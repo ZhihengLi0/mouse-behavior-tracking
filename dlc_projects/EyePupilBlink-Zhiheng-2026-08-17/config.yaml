@@ -14,6 +14,8 @@ video_sets:
     crop: 0, 928, 0, 736
   "/Users/lizhiheng/Desktop/\u751F\u7269/active-learning/training-data/face_first4min.mp4":
     crop: 0, 928, 0, 736
+  "/Users/lizhiheng/Desktop/\u751F\u7269/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/videos/pluto_spont_1.mp4":
+    crop: 0, 928, 0, 736
 bodyparts:
 - pupil_top
 - pupil_bottom
