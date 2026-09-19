@@ -80,3 +80,27 @@ with stable opening), grade blinks by absolute closure depth instead of a
 video-relative percentile, and treat low confidence as a tracking-loss
 flag rather than blink evidence - fully consistent with the advisor's
 "confidence as secondary signal" position.
+
+## Update 2026-09-19: pupil from three keypoints vs four (advisor request)
+
+`06_pupil_3pt_vs_4pt.png`, `scripts/pupil_3pt_sensitivity.py`. pupil_top is
+often hidden under the upper eyelid; how much do pupil size and location
+change if only left, right and bottom are used?
+
+- **Three points lose nothing** when height is derived from width with the
+  video's own visible height/width ratio (k = 0.68; human labels give 0.71):
+  versus the 4-point estimate, area differs by a median 2.3% and the center
+  by 2.3 px over 14,400 frames; against the HUMAN 4-point pupil on the 100
+  test frames, area error is 8.9% (4-point: 9.1%) and center error 12.3 px
+  (12.2 px).
+- **A circle through the three points does not work**: +50% area and a
+  center 49 px too high, because the visible pupil is not circular in this
+  view (height is ~70% of width).
+- **The 4-point area is contaminated by eyelid position.** Pupil height
+  correlates 0.89 with eye opening (width: 0.57): when the eye narrows the
+  lid covers the pupil's upper edge and the visible height shrinks without
+  any constriction. 4-point area drops 31% in partial blinks and 46% in deep
+  blinks; the width-based area drops 16% and 21%. The "pupil area dips
+  during blinks" reported earlier is therefore partly an occlusion artifact:
+  fine as a blink cue, misleading as pupillometry. Width-based size is the
+  more robust measure, though not fully immune under heavy occlusion.
