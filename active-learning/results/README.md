@@ -137,3 +137,32 @@ project, with the mean and confidence gains (previous best mean 15.07;
 selection-time confidence 73%) showing what the merged pool's diversity
 buys: fewer catastrophic frames and near-total calibration. This model
 (shuffle 60, best snapshot) is the deployment model for new videos.
+
+## Re-scored under the final-snapshot rule (2026-09-19)
+
+`convergence_final_snapshot.csv`, `02_convergence_final_snapshot.png`,
+`analysis-final-snapshot/scripts/rescore_final_snapshot.py`. Same 34 models,
+same frozen test set; only the snapshot used for scoring changes, from
+DeepLabCut's default (best validation mAP over all snapshots) to the final
+snapshot (epoch 100). The recipe decays the learning rate at epochs 80 and
+95; the default rule picked a pre-decay snapshot in 20 of 34 models (six
+times epoch 30).
+
+- **The early mean-error spikes were the snapshot rule.** uncertain rounds 2
+  and 3 scored 48.3 and 44.4 px overall RMSE with their mAP-best snapshots
+  (epochs 30 and 50) and score 18.6 and 18.1 px with their final snapshots.
+  Across rounds 1-11 the overall RMSE has SD 6.89 px under the default rule
+  and 1.04 px under the final-snapshot rule. When the default rule chose an
+  epoch < 80 the two rules differ by 3.8 px on average; when it chose >= 80,
+  by 0.1 px.
+- **The saturation result stands and is cleaner**: median frame RMSE stays
+  at 15.8-17.5 px from 80 to 300 labels (per-branch slopes +0.08, +0.05,
+  -0.21 px per 100 frames); the 90th percentile stays at 21-25 px.
+- **Detectors**: branch means over rounds 1-11 are jump 16.40, uncertain
+  16.75, fitting 17.03 px (SD ~0.3 each). With the snapshot noise removed a
+  small consistent ordering appears, but it is 0.3-0.6 px (under 4%), the
+  rounds within a branch are not independent, and each point is one seed -
+  practically negligible, not a basis for preferring a detector.
+- The 120-frame spike analysis (`analysis-120frame-spike/`) attributed the
+  spike to a "checkpoint lottery"; this re-scoring identifies the lottery's
+  mechanism exactly.
