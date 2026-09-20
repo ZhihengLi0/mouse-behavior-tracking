@@ -11,9 +11,10 @@
   test       = test50 of --unit, scored once per snapshot rule, never used for any decision.
 Human labels are used exactly as saved (no correction, no snapping).
 
-Recipe frozen in the earlier units and unchanged here: ResNet-50, batch 2, 100 epochs from scratch, LR milestones
-[80, 95], snapshot every 10 epochs, seed 42; headline = FINAL snapshot (epoch 100), robustness = best validation mAP
-among epochs >= 80. One metric: median over test frames of the per-frame RMSE over the labeled keypoints.
+Recipe: ResNet-50, batch 2, from scratch, seed 42, snapshot every 10 epochs - as in the earlier units - but 120 epochs
+with LR milestones [96, 114] (user decision 2026-09-20: with only 20-100 training images an epoch is 10-50 iterations,
+and the 100-epoch run of step 1 was still improving on validation). Headline = FINAL snapshot (epoch 120),
+robustness = best validation mAP among epochs >= 96. One metric: median over test frames of the per-frame RMSE over the labeled keypoints.
 Own DeepLabCut project (dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20) so old-standard labels never mix in.
 """
 import argparse
@@ -34,7 +35,8 @@ OLD_CONFIG = ROOT / "dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/config.yaml"
 PROJECT = ROOT / "dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20"
 CONFIG = PROJECT / "config.yaml"
 TASK, DATE, SCORER = "EyePupilEllipse", "Sep20", "Zhiheng"
-EPOCHS, BATCH, SAVE_EVERY = 100, 2, 10
+EPOCHS, BATCH, SAVE_EVERY = 120, 2, 10
+MILESTONES = [96, 114]            # the earlier [80, 95] of 100 epochs, scaled to 120 (same share of training at each learning rate)
 BPS = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right", "eyelid_top", "eyelid_bottom", "eye_nasal_corner", "eye_temporal_corner"]
 
 
@@ -194,13 +196,13 @@ def main():
         pc = mdir / "pytorch_config.yaml"
         c = yaml.safe_load(pc.read_text())
         c["train_settings"].update(batch_size=BATCH, epochs=EPOCHS, seed=a.seed)
-        c["runner"]["scheduler"]["params"]["milestones"] = [80, 95]
-        c["runner"]["snapshots"].update(save_epochs=SAVE_EVERY, max_snapshots=12)
+        c["runner"]["scheduler"]["params"]["milestones"] = MILESTONES
+        c["runner"]["snapshots"].update(save_epochs=SAVE_EVERY, max_snapshots=14)
         pc.write_text(yaml.safe_dump(c, sort_keys=False))
-        assert yaml.safe_load(pc.read_text())["runner"]["scheduler"]["params"]["milestones"] == [80, 95]
-        log("recipe patched: batch 2, 100 epochs, milestones [80, 95], snapshot every 10; training from scratch on mps")
+        assert yaml.safe_load(pc.read_text())["runner"]["scheduler"]["params"]["milestones"] == MILESTONES
+        log(f"recipe patched: batch {BATCH}, {EPOCHS} epochs, milestones {MILESTONES}, snapshot every {SAVE_EVERY}; training from scratch on mps")
         deeplabcut.train_network(str(CONFIG), shuffle=a.shuffle, trainingsetindex=tsi, epochs=EPOCHS, save_epochs=SAVE_EVERY,
-                                 max_snapshots_to_keep=12, batch_size=BATCH, device="mps", snapshot_path=None)
+                                 max_snapshots_to_keep=14, batch_size=BATCH, device="mps", snapshot_path=None)
         log("TRAINING DONE")
 
     snaps = sorted(p.name for p in mdir.glob("snapshot-*.pt"))
@@ -212,10 +214,10 @@ def main():
         return
     evaluate(a.unit, a.shuffle, tsi, f"{base}_final{tag}", n_new, find(EPOCHS), "final snapshot", a.seed)
     st = pd.read_csv(mdir / "learning_stats.csv")
-    have = [e_ for e_ in (80, 90, 100) if any(n in (f"snapshot-{e_:03d}.pt", f"snapshot-best-{e_:03d}.pt") for n in snaps)]
+    have = [e_ for e_ in (100, 110, 120) if any(n in (f"snapshot-{e_:03d}.pt", f"snapshot-best-{e_:03d}.pt") for n in snaps)]
     st = st[st["step"].isin(have) & st["metrics/test.mAP"].notna()]
     ep = int(st.loc[st["metrics/test.mAP"].idxmax(), "step"])
-    evaluate(a.unit, a.shuffle, tsi, f"{base}_mAP80plus{tag}", n_new, find(ep), "best validation mAP among epochs >= 80", a.seed)
+    evaluate(a.unit, a.shuffle, tsi, f"{base}_mAPlate{tag}", n_new, find(ep), f"best validation mAP among epochs >= {MILESTONES[0]}", a.seed)
 
 
 if __name__ == "__main__":

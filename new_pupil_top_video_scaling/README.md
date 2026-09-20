@@ -5,7 +5,7 @@ are the four endpoints of the ellipse fitted to the pupil, including the part hi
 Eyelids and eye corners keep the earlier strategy (lid points at the middle of each lid arc, corners at the
 corners; they only serve blink detection). Numbers from the earlier eras (`../old_pupil_top/`) are not comparable.
 
-Fixed choices carried over from the earlier work: ResNet-50, batch 2, 100 epochs from scratch, final snapshot,
+Fixed choices carried over from the earlier work: ResNet-50, batch 2, from scratch, final snapshot - now 120 epochs with LR milestones [96, 114] (2026-09-20) -,
 k-means (DoG fingerprints) for the first batch, jump rule + k-means for later batches, median per-frame RMSE over
 the 8 keypoints on a frozen test set.
 
