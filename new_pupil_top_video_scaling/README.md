@@ -20,3 +20,11 @@ first5minvedio/          video 1 (the 5-minute recording)
 
 Per video: 50 test frames (final 10%, at least 60 s), 20 validation frames (the 10% before), 2-s guard bands,
 training batches of 20 from the remaining pool.
+
+## Protocol notes
+
+- **2026-09-20, selector top-up (video 1, batch 3).** With a good model the jump rule flags few frames (389 of
+  10,574, in 76 distinct seconds), and the cluster medoids alone gave only 11 frames that are 1 s apart from each
+  other and from the 40 frames already labeled. The selector now tops a short batch up with further FLAGGED frames,
+  largest jump first, under the same 1-s spacing (and only if that is still not enough, from the 2,000 largest
+  jumps of the pool). Batch 3 = 11 medoids + 9 flagged frames; the threshold itself was not relaxed.

@@ -197,6 +197,16 @@ else:
         k += 10
         more, _ = medoids(feats, ids, k)
         picks += spaced([f for f in more if f not in picks], done | set(picks), 20 - len(picks))
+    n_medoid = len(picks)
+    if len(picks) < 20 and a.batch_no > 1:
+        # Amendment 2026-09-20 (video 1, batch 3): a good model flags few frames, bunched into a few seconds, and the
+        # cluster medoids alone cannot give 20 frames 1 s apart. Top up, still error-guided and still 1 s apart:
+        # (1) any flagged frame, largest jump first; (2) if still short, the 2,000 largest jumps of the pool.
+        for extra in (flagged[np.argsort(-jump[flagged])], np.argsort(-jump[:pool_hi])[:2000]):
+            picks += spaced([int(f) for f in extra if f not in picks], done | set(picks), 20 - len(picks))
+            if len(picks) >= 20:
+                break
+        print(f"top-up: {n_medoid} cluster medoids + {len(picks) - n_medoid} largest-jump frames")
     if len(picks) < 20:
         sys.exit(f"only {len(picks)} valid frames found - refusing a short batch")
     picks = sorted(picks[:20])
