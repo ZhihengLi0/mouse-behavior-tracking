@@ -43,6 +43,18 @@ For consistency the completed active-learning experiment is re-scored under
 the same rule (active-learning/results/convergence_final_snapshot.csv).
 The stopping rule is evaluated on the final-snapshot series only.
 
+Backfill (2026-09-19, report-only): steps 1-3 predate the ">= 80" column and
+step 4 never scored DLC's default pick, so `scripts/backfill_snapshot_rules.py`
+scored those four snapshots afterwards (epochs read from validation mAP, not
+from the test set). They appear as secondary marks in `03_scale_curve.png`
+and feed no decision. What they show: the median barely depends on the rule
+once epochs < 80 are excluded (15.0 / 14.2 / 10.0 / 10.1 px vs 13.8 / 12.0 /
+10.4 / 10.1 px), but the 90th percentile swings between neighbouring
+snapshots of the SAME run (step 2: 27.6 px at epoch 100 vs 120.8 px at epoch
+80; step 3: 97.6 px at epoch 100 vs 24.5 px at epoch 90). The step-3 tail
+spike is therefore snapshot-level noise on a 59-frame test set, not evidence
+that batch 3 hurt the model; tail numbers need the seed replicates.
+
 ## Per-video split rule (applies to any new video; fps and length read from the file)
 
 - **Test set**: 100 frames evenly spaced over the final 10% of the video

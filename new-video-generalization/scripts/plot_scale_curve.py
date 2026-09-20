@@ -17,7 +17,7 @@ is_seed2 = d["label"].str.contains("seed43")
 head = d[(d["snapshot_rule"].str.startswith("final") | d["snapshot_rule"].str.startswith("n/a")) & ~is_seed2].sort_values(x)
 rep = d[d["snapshot_rule"].str.startswith("final") & is_seed2]
 rob = d[d["snapshot_rule"].str.contains(">= 80")]
-legacy = d[d["snapshot_rule"].str.contains("->")]
+legacy = d[d["snapshot_rule"].str.startswith("best validation mAP") & ~d["snapshot_rule"].str.contains(">= 80")]
 BLUE, RED, GREEN, GRAY = "#2F6B9A", "#D1495B", "#2A9D8F", "#888888"
 
 fig, axes = plt.subplots(1, 3, figsize=(19, 5.8), constrained_layout=True)
@@ -29,7 +29,7 @@ for _, r in head.iterrows():
 if len(rep):
     ax.plot(rep[x], rep["median_frame_rmse_px"], "o", mfc="none", mec=BLUE, ms=10, mew=1.8, label="second seed (run-to-run noise)")
 if len(rob):
-    ax.plot(rob[x], rob["median_frame_rmse_px"], "s", color=GRAY, ms=5, label="best val mAP among epochs >= 80")
+    ax.plot(rob[x], rob["median_frame_rmse_px"], "s", color=GRAY, ms=7, zorder=5, label="best val mAP among epochs >= 80")
 if len(legacy):
     ax.plot(legacy[x], legacy["median_frame_rmse_px"], "x", color=RED, ms=10, mew=2.2,
             label="DLC default: best val mAP over ALL epochs")
@@ -41,6 +41,10 @@ ax = axes[1]
 ax.plot(head[x], head["p90_frame_rmse_px"], "o-", color=RED, lw=2.2, ms=8, label="90th percentile of frame RMSE")
 if len(rep):
     ax.plot(rep[x], rep["p90_frame_rmse_px"], "o", mfc="none", mec=RED, ms=10, mew=1.8, label="second seed")
+if len(rob):
+    ax.plot(rob[x], rob["p90_frame_rmse_px"], "s", color=GRAY, ms=7, zorder=5, label="90th pct, best val mAP among epochs >= 80")
+if len(legacy):
+    ax.plot(legacy[x], legacy["p90_frame_rmse_px"], "x", color=RED, ms=10, mew=2.2, label="90th pct, DLC default (all epochs)")
 ax.set_yscale("log"); ax.set_yticks([20, 50, 100, 200]); ax.set_yticklabels(["20", "50", "100", "200"])
 ax.set_xlabel("Pluto frames labeled for training"); ax.set_ylabel("px (log)"); ax.grid(alpha=0.3, which="both")
 ax2 = ax.twinx()

@@ -8,3 +8,7 @@ x060_step03_scratch,scratch,60,12.53,10.68,67.36,0.633,59,439,best validation mA
 x060_step03_final,scratch,60,10.41,9.48,44.19,0.831,59,439,final snapshot (100),97.56,0.136
 x080_step04_final,seed42,80,10.12,8.87,29.92,0.913,59,439,final snapshot (100),28.18,0.051
 x080_step04_mAP80plus,seed42,80,10.12,8.87,29.92,0.913,59,439,best validation mAP among epochs >= 80 (100),28.18,0.051
+x020_step01_mAP80plus,seed42,20,15.02,11.05,38.59,0.595,59,439,best validation mAP among epochs >= 80 (90),32.43,0.068
+x040_step02_mAP80plus,seed42,40,14.22,11.26,64.34,0.727,59,439,best validation mAP among epochs >= 80 (80),120.8,0.237
+x060_step03_mAP80plus,seed42,60,9.96,8.55,26.72,0.87,59,439,best validation mAP among epochs >= 80 (90),24.49,0.034
+x080_step04_mAPall,seed42,80,10.56,9.04,34.11,0.902,59,439,best validation mAP -> epoch 50 (best-50),31.4,0.068
