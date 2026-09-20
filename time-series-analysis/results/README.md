@@ -118,3 +118,22 @@ change if only left, right and bottom are used?
   (both use the left-right midpoint), so saccade analysis is unaffected.
   Blink frames should be flagged from eye opening first and excluded from
   position traces under either estimator.
+- **Ratio-free variant (2026-09-19): treat left/right as axis ENDPOINTS.**
+  The fixed ratio k = 0.68 is specific to this mouse and camera. If the
+  left and right labels are the endpoints of the horizontal axis, their mean
+  y is the center height and the bottom point gives the half-height, so
+  three points determine the ellipse with no constant to transfer
+  (`endpoint3` in `pupil_3pt_sensitivity.py`). On the 14,050 frames where all
+  four pupil points are confident it gives height/width 0.93, an area 35%
+  above the 4-point ellipse and a center 36 px higher. The reason is a
+  geometric inconsistency in the four labeled points themselves: the top
+  point lies 66 px above the left-right midline but the bottom point 138 px
+  below it (human labels: 75 vs 140 px, implied ratio 0.91). A complete
+  ellipse would be symmetric, and a tilt of the ellipse cannot produce this
+  asymmetry. Either the labeled "top" is the visible edge of a pupil whose
+  upper part is covered (then the pupil is nearly round, 0.91-0.93, and the
+  4-point ellipse underestimates it), or left/right are systematically
+  labeled above the true widest point. The numbers cannot tell these apart;
+  it has to be settled on images. Not yet measured: noise of this variant
+  (left/right y is poorly defined on a near-vertical edge and its error is
+  doubled in the height) and its behavior during blinks.

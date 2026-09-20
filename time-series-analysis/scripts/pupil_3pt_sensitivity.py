@@ -72,6 +72,13 @@ def ratio3(L, R, B, k):
     return np.c_[(L[:, 0] + R[:, 0]) / 2, B[:, 1] - h / 2], np.pi / 4 * w * h
 
 
+def endpoint3(L, R, B):
+    """No fixed ratio: treat left/right as the ENDPOINTS of the horizontal axis, so the center
+    height is their mean y, and the bottom point gives the half-height."""
+    w = np.abs(R[:, 0] - L[:, 0]); cy = (L[:, 1] + R[:, 1]) / 2; h = 2 * (B[:, 1] - cy)
+    return np.c_[(L[:, 0] + R[:, 0]) / 2, cy], np.pi / 4 * w * h, h / w
+
+
 # ---------------- A. the 4-minute clip ------------------------------------
 clip = flat(CLIP_H5)
 L, R, T, B = pts(clip)
@@ -95,6 +102,12 @@ for name, c3, a3 in [("3pt-circle", cc, ac), ("3pt-ratio ", cr, ar)]:
         print(f"  {name} vs 4pt | {lab} (n={m.sum():5d}): area diff median {np.nanmedian(da):+5.1f}% "
               f"(|diff| {np.nanmedian(np.abs(da)):4.1f}%), corr {r_:.3f}; center shift median {np.nanmedian(dc):4.1f} px")
 
+ce, ae, ke = endpoint3(L, R, B)
+m = good_top & lrb_ok
+print(f"  3pt-endpoint (no ratio) vs 4pt (n={m.sum()}): area diff median {np.nanmedian((ae[m]-a4[m])/a4[m]*100):+.1f}%, "
+      f"center y {np.nanmedian(ce[m,1]-c4[m,1]):+.1f} px (negative = higher), implied height/width {np.nanmedian(ke[m]):.3f}; "
+      f"top point is {np.nanmedian(ce[m,1]-T[m,1]):.0f} px above the L-R midline, bottom point {np.nanmedian(B[m,1]-ce[m,1]):.0f} px below")
+
 # ---------------- B. against human labels ---------------------------------
 gt, pr = flat(GT_H5), flat(PRED_TEST)
 pr = pr.loc[gt.index]
@@ -104,6 +117,9 @@ mL, mR, mT, mB = pts(pr)
 m4c, m4a, _, _ = four(mL, mR, mT, mB)
 mcc, mca = circle3(mL, mR, mB)
 mrc, mra = ratio3(mL, mR, mB, k)
+hce, hae, hke = endpoint3(gL, gR, gB)
+print(f"  human labels, endpoint geometry: top point {np.nanmedian(hce[:,1]-gT[:,1]):.0f} px above the L-R midline, bottom point "
+      f"{np.nanmedian(gB[:,1]-hce[:,1]):.0f} px below (a full ellipse would be symmetric); implied height/width {np.nanmedian(hke):.3f}")
 print(f"\ntest set: {len(gt)} human-labeled frames; reference = human 4-point pupil")
 rows = []
 for name, c, a_ in [("model 4pt", m4c, m4a), ("model 3pt-circle", mcc, mca), ("model 3pt-ratio", mrc, mra)]:
