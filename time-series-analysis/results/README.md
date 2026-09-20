@@ -193,3 +193,31 @@ Reading:
   is nearly round (0.91-0.93); if left/right are labeled systematically high
   the 4-point ellipse is right. L is also 32 px higher than R (a ~6 degree
   tilt that an axis-aligned ellipse ignores).
+
+## Update 2026-09-19 (c): blink handling for the pupil trace
+
+`07_pupil_trace_blink_filled.png`, `scripts/pupil_trace.py` (takes any
+prediction h5; `pupil_trace()` returns raw, interpolated and hold-last traces).
+
+Idea: compute the 3-point endpoint pupil normally when its points can be
+trusted; in blinks, do not compute it - bridge the gap from the trusted
+frames before and after.
+
+- **Confidence cannot be the trigger.** pupil_bottom likelihood is below 0.6
+  in only 16 of 14,400 frames, and stays ~0.85-1.0 inside blinks while the
+  lower lid pushes the point up. Measured area bias by eye opening (relative
+  to its own 5-s median): 99%+ -> +0.5%, 97-99% -> -2.0%, 95-97% -> -4.4%,
+  93-95% -> -6.9%, 90-93% -> -10.5%, 85-90% -> -19.8%, 70-80% -> -32.6%.
+- **Trigger used:** eye opening < 95% of its 5-s median, OR left/right/bottom
+  likelihood < 0.6; runs widened by 3 frames (50 ms) per side; linear
+  interpolation across the run; runs > 1 s are left empty.
+- **Result (old video, 4 min):** 1,287 frames (8.9%) replaced in 86 runs,
+  longest 0.90 s, none left empty. Inside those runs the area error vs the
+  5-s baseline goes from median -4.3% (down to -44% in real blinks, and
+  garbage values in a few collapsed frames) to -1.7% (worst -10%); correlation
+  of area with eye opening 0.49 -> 0.26 (width 0.35 -> 0.19). Hold-last (the
+  causal variant) differs from interpolation by a median 1.1% (p90 5.2%).
+- **Limits.** The 95% threshold was read off this one video, so it is not yet
+  a validated constant; the 5-s baseline cannot see a squint that lasts longer
+  than a few seconds; the trigger depends on the two eyelid points being
+  tracked; interpolation assumes the pupil changes little within < 1 s.
