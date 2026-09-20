@@ -1,0 +1,516 @@
+<title>Mouse Eye Tracking Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F5; --surface:#FFFFFF; --ink:#16201D; --muted:#5B6B66; --rule:#D3DCD8;
+  --teal:#1B7A6E; --teal-soft:#DBEDE9; --plum:#8C1F5C; --plum-soft:#F4E2EC; --amber:#B4650E; --amber-soft:#FBEBD3;
+  --red:#C2394B; --blue:#2C6A9B; --grey:#8A9792; --figure:#FFFFFF;
+  --serif:"Noto Serif SC","Songti SC","STSong",Georgia,serif;
+  --sans:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#101715; --surface:#18211E; --ink:#E4EBE8; --muted:#98A9A3; --rule:#2B3935;
+    --teal:#5FC7B8; --teal-soft:#15302B; --plum:#E78EC0; --plum-soft:#351B2A; --amber:#E8A552; --amber-soft:#33250F;
+    --red:#F07C8B; --blue:#7DB6E3; --grey:#7F8F8A; --figure:#FFFFFF;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101715; --surface:#18211E; --ink:#E4EBE8; --muted:#98A9A3; --rule:#2B3935;
+  --teal:#5FC7B8; --teal-soft:#15302B; --plum:#E78EC0; --plum-soft:#351B2A; --amber:#E8A552; --amber-soft:#33250F;
+  --red:#F07C8B; --blue:#7DB6E3; --grey:#7F8F8A; --figure:#FFFFFF;
+}
+:root[data-lang="zh"] [lang="en"], :root[data-lang="en"] [lang="zh"]{display:none}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.7;padding-inline:20px;padding-block:40px 80px}
+.page{max-width:74rem;margin-inline:auto;display:flex;flex-direction:column;gap:64px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4.6vw,44px);line-height:1.2;margin:0;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:700;font-size:clamp(22px,3vw,30px);line-height:1.3;margin:0;text-wrap:balance}
+h3{font-size:18px;line-height:1.45;font-weight:650;margin:0;text-wrap:balance}
+p{margin:0} b,strong{font-weight:650}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:17px;max-width:54rem}
+.muted{color:var(--muted)} .small{font-size:13.5px;line-height:1.6}
+
+.langbar{position:fixed;right:16px;top:calc(12px + env(safe-area-inset-top,0px));z-index:10;display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--surface)}
+.langbar button{all:unset;cursor:pointer;font-family:var(--mono);font-size:12.5px;padding:6px 12px;color:var(--muted)}
+.langbar button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.langbar button:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+
+header{display:flex;flex-direction:column;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:28px}
+.headline-stats{display:flex;flex-wrap:wrap;gap:10px 28px;font-family:var(--mono);font-size:13.5px;color:var(--muted)}
+.headline-stats b{color:var(--ink);font-size:20px;font-weight:500;margin-right:6px}
+
+/* generic flow of boxes with arrows */
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px 0}
+.flow .box{flex:1 1 140px;min-width:132px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;position:relative;margin-right:26px}
+.flow .box:last-child{margin-right:0}
+.flow .box:not(:last-child)::after{content:"→";position:absolute;right:-22px;top:50%;transform:translateY(-50%);font-family:var(--mono);color:var(--muted);font-size:17px}
+.flow .box .t{font-weight:650;font-size:14.5px;line-height:1.4}
+.flow .box .d{font-size:12.5px;color:var(--muted);line-height:1.5}
+.flow .box.key{background:var(--teal-soft);border-color:transparent}
+.flow .box.goal{background:var(--ink);color:var(--ground);border-color:transparent} .flow .box.goal .d{color:var(--ground);opacity:.75}
+
+/* decision chain */
+.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.step{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.step .no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.step .q{font-size:13.5px;color:var(--muted);line-height:1.5}
+.step .a{font-size:16.5px;font-weight:650;line-height:1.4}
+.step .carry{margin-top:auto;font-size:12.5px;line-height:1.5;padding-top:8px;border-top:1px dashed var(--rule);color:var(--teal)}
+.step .carry::before{content:"↳ "}
+.step.old{opacity:.8} .chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:999px;background:var(--amber-soft);color:var(--amber);margin-left:6px;vertical-align:1px}
+.chip.ok{background:var(--teal-soft);color:var(--teal)} .chip.plum{background:var(--plum-soft);color:var(--plum)}
+
+section{display:flex;flex-direction:column;gap:22px}
+.sec-head{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--rule);padding-top:22px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel .cap{font-size:13px;color:var(--muted);line-height:1.55}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:300px}
+svg text{font-family:var(--mono);font-size:11.5px;fill:var(--muted)}
+svg text.v{fill:var(--ink);font-size:12.5px} svg text.big{fill:var(--ink);font-size:14px;font-weight:500}
+svg .ax{stroke:var(--rule);stroke-width:1;fill:none} svg .grid{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4;fill:none}
+
+.imgframe{background:var(--figure);border:1px solid var(--rule);border-radius:8px;overflow:hidden;position:relative}
+.imgframe img{display:block;width:100%;height:auto}
+.imgframe.scroll{overflow-x:auto} .imgframe.scroll img{min-width:720px}
+.kp{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);font-size:11.5px;line-height:1.2;padding:2px 6px;border-radius:4px;background:rgba(10,16,14,.78);color:#fff;white-space:nowrap;pointer-events:none}
+.kp.p{background:rgba(190,45,75,.9)} .kp.l{background:rgba(25,120,150,.92)}
+.stack{display:flex;flex-direction:column;gap:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}
+
+/* decision tree for the event classifier */
+.tree{display:flex;flex-direction:column;gap:6px}
+.rule{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(120px,190px);align-items:center;gap:8px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:10px 14px}
+.rule .cond{font-size:14px;line-height:1.45} .rule .cond .mono{font-size:12.5px;color:var(--muted)}
+.rule .arr{font-family:var(--mono);color:var(--muted);text-align:center}
+.rule .cls{font-family:var(--mono);font-size:12.5px;font-weight:500;padding:5px 10px;border-radius:6px;text-align:center}
+.cls.blink{background:var(--plum-soft);color:var(--plum)} .cls.part{background:var(--amber-soft);color:var(--amber)}
+.cls.sacc{background:var(--teal-soft);color:var(--teal)} .cls.loss{background:var(--rule);color:var(--ink)} .cls.okc{border:1px solid var(--rule);color:var(--muted)}
+.formula{font-family:var(--mono);font-size:13px;line-height:1.9;background:var(--ground);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:nowrap}
+.formula b{color:var(--red);font-weight:500}
+
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.5}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12.5px;border-bottom:1.5px solid var(--ink)}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.best{color:var(--teal);font-weight:600}
+
+.issues{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.issue{border-left:3px solid var(--amber);background:var(--surface);border-radius:0 8px 8px 0;padding:12px 14px;font-size:13.5px;line-height:1.55;display:flex;flex-direction:column;gap:4px}
+.issue b{font-size:14px} .issue.fixed{border-left-color:var(--teal)}
+.tree-map{font-family:var(--mono);font-size:12.5px;line-height:1.85;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;overflow-x:auto;white-space:pre}
+.tree-map .c{color:var(--muted)} .tree-map .k{color:var(--teal)} .tree-map .w{color:var(--amber)}
+footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.7}
+@media (max-width:640px){.flow .box{margin-right:0;flex-basis:100%}.flow .box:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-19px;transform:translateX(50%)}.flow{gap:22px 0}.rule{grid-template-columns:1fr}.rule .arr{display:none}}
+</style>
+
+<div class="langbar" role="group" aria-label="Language">
+  <button id="lang-zh" type="button" aria-pressed="true">中文</button>
+  <button id="lang-en" type="button" aria-pressed="false">EN</button>
+</div>
+
+<div class="page">
+<header>
+  <div class="kicker">DeepLabCut · mouse eye · 2026-08 → 2026-09-19</div>
+  <h1><span lang="zh">小鼠眼睛追踪：从视频到可对齐脑信号的瞳孔与眨眼信号</span><span lang="en">Mouse eye tracking: from video to pupil and blink signals that can be aligned with brain activity</span></h1>
+  <p class="lead"><span lang="zh">这一页把项目至今的每一个决定、每一个算法和每一个未解决的问题放在一张图里。每张图的标题就是结论。</span><span lang="en">Every decision, every algorithm and every open issue of the project so far, on one page. Each figure's title is its conclusion.</span></p>
+  <div class="headline-stats">
+    <span><b id="hs-new">185 → 10.1 px</b><span lang="zh">新鼠新视频，只标 80 帧</span><span lang="en">new mouse, new video, 80 labels</span></span>
+    <span><b>~80</b><span lang="zh">帧标注后精度饱和（加到 300 帧不再变）</span><span lang="en">labels saturate accuracy (300 add nothing)</span></span>
+    <span><b>0</b><span lang="zh">个需要跨鼠迁移的常数（瞳孔算法）</span><span lang="en">constants to transfer between mice (pupil method)</span></span>
+  </div>
+</header>
+
+<!-- ============ WHAT THE SYSTEM DOES ============ -->
+<section>
+  <div class="sec-head"><div class="kicker"><span lang="zh">系统做什么</span><span lang="en">What the system does</span></div>
+  <h2><span lang="zh">一段眼睛视频进去，干净的瞳孔、眼动、眨眼时间序列出来</span><span lang="en">An eye video goes in; clean pupil, eye-movement and blink time series come out</span></h2></div>
+  <div class="flow">
+    <div class="box"><span class="t"><span lang="zh">眼睛视频</span><span lang="en">Eye video</span></span><span class="d">60 fps</span></div>
+    <div class="box key"><span class="t"><span lang="zh">8 个关键点</span><span lang="en">8 keypoints</span></span><span class="d">DeepLabCut · ResNet-50 · batch 2 · 100 epochs</span></div>
+    <div class="box"><span class="t"><span lang="zh">逐帧信号</span><span lang="en">Per-frame signals</span></span><span class="d"><span lang="zh">瞳孔中心、宽度、面积、睁眼度、置信度</span><span lang="en">pupil center, width, area, eye opening, confidence</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">事件识别</span><span lang="en">Event detection</span></span><span class="d"><span lang="zh">眨眼 · 半眨眼 · 眼动 · 追踪丢失</span><span lang="en">blink · partial blink · saccade · tracking loss</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">眨眼处理</span><span lang="en">Blink handling</span></span><span class="d"><span lang="zh">不可信帧用前后可信帧插值</span><span lang="en">untrusted frames bridged from trusted neighbours</span></span></div>
+    <div class="box goal"><span class="t"><span lang="zh">与脑信号对齐</span><span lang="en">Align with brain signals</span></span><span class="d"><span lang="zh">最终用途</span><span lang="en">the end use</span></span></div>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3><span lang="zh">模型在每一帧上找这 8 个点</span><span lang="en">The model finds these 8 points in every frame</span></h3>
+      <div class="imgframe" id="kp-frame"><img src="assets/keypoints.jpg" alt="Eye frame with the eight tracked keypoints"></div>
+      <div class="cap"><span lang="zh">红：4 个瞳孔点。蓝：上下眼睑与两个眼角。真实预测，未经修饰。</span><span lang="en">Red: four pupil points. Blue: both eyelids and both eye corners. Real predictions, untouched.</span></div>
+    </div>
+    <div class="panel">
+      <h3><span lang="zh">所有数字背后的同一条纪律：测试集只报告，不参与任何选择</span><span lang="en">One discipline behind every number: the test set only reports, it never chooses</span></h3>
+      <div class="chart" id="c-split"></div>
+      <div class="cap"><span lang="zh">按时间切块而不是随机抽：60 fps 下相邻帧几乎相同，随机划分会让训练帧和测试帧互为近似副本。新视频按 80/10/10 划分，段与段之间留 2 秒隔离带。</span><span lang="en">Blocks in time, not random draws: at 60 fps neighbouring frames are near-duplicates, so a random split leaks. New videos use 80/10/10 with 2-second guard bands between blocks.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DECISION CHAIN ============ -->
+<section>
+  <div class="sec-head"><div class="kicker"><span lang="zh">决策链</span><span lang="en">The decision chain</span></div>
+  <h2><span lang="zh">每一步回答一个问题，并把结论带到下一步</span><span lang="en">Each step answers one question and hands its conclusion to the next</span></h2></div>
+  <div class="chain">
+    <div class="step old"><span class="no">01 · scaling-curve <span class="chip"><span lang="zh">旧标注</span><span lang="en">old labels</span></span></span>
+      <span class="q"><span lang="zh">标得越多越准吗？</span><span lang="en">Do more labels mean less error?</span></span>
+      <span class="a"><span lang="zh">不。误差反而上升：38 → 42 → 56 px</span><span lang="en">No. Error rose: 38 → 42 → 56 px</span></span>
+      <span class="carry"><span lang="zh">标注质量和帧的多样性比数量重要 → 200 张标注全部重审，重建按时间切块的 80/20 划分</span><span lang="en">Label quality and frame diversity beat label count → all 200 labels re-reviewed, 80/20 temporal split rebuilt</span></span></div>
+    <div class="step"><span class="no">02 · batch-size-selection</span>
+      <span class="q"><span lang="zh">batch size 用多少？</span><span lang="en">Which batch size?</span></span>
+      <span class="a"><span lang="zh">batch 2：内部规则与外部测试第一次指向同一个答案</span><span lang="en">Batch 2: the internal rule and the external test agree for the first time</span></span>
+      <span class="carry"><span lang="zh">20 帧验证集能分辨 5 帧验证集分辨不了的差别</span><span lang="en">A 20-frame validation set resolves what a 5-frame one could not</span></span></div>
+    <div class="step"><span class="no">03 · model-selection</span>
+      <span class="q"><span lang="zh">用哪个网络？</span><span lang="en">Which backbone?</span></span>
+      <span class="a"><span lang="zh">ResNet-50：五个网络精度打平，预先声明的置信度规则把它分出来</span><span lang="en">ResNet-50: five backbones tie on accuracy; the pre-declared confidence tie-break separates it</span></span>
+      <span class="carry"><span lang="zh">也是最快的（1.7 小时）→ 适合每轮都要重训的主动学习</span><span lang="en">Also the fastest (1.7 h) → fits active learning, which retrains every round</span></span></div>
+    <div class="step"><span class="no">04 · active-learning</span>
+      <span class="q"><span lang="zh">哪种"找错帧"算法最省标注？</span><span lang="en">Which error-frame detector saves the most labels?</span></span>
+      <span class="a"><span lang="zh">三种无法区分；80 张之后再加 220 张，误差不动</span><span lang="en">The three are indistinguishable; 220 labels beyond the first 80 move nothing</span></span>
+      <span class="carry"><span lang="zh">剩下的误差住在少数眨眼/遮挡帧里，不是标注量能解决的</span><span lang="en">The remaining error lives in a few blink/occlusion frames that labels cannot fix</span></span></div>
+    <div class="step"><span class="no">05 · time-series-analysis</span>
+      <span class="q"><span lang="zh">不标注，能不能自动找到这些帧并说出是什么？</span><span lang="en">Without labels, can those frames be found and named?</span></span>
+      <span class="a"><span lang="zh">能：睁眼度、瞳孔位移、置信度三条曲线足以区分眨眼、眼动和追踪丢失</span><span lang="en">Yes: eye opening, pupil shift and confidence separate blinks, saccades and tracking loss</span></span>
+      <span class="carry"><span lang="zh">置信度只能当辅助信号：眨眼时模型依然很自信</span><span lang="en">Confidence is only an auxiliary signal: the model stays confident through blinks</span></span></div>
+    <div class="step"><span class="no">06 · pupil measurement</span>
+      <span class="q"><span lang="zh">上点常被眼睑挡住，瞳孔怎么量？</span><span lang="en">The top point is often hidden: how to measure the pupil?</span></span>
+      <span class="a"><span lang="zh">只用左、右、下三点；眨眼段不计算，用前后可信帧插值</span><span lang="en">Use left, right and bottom only; skip blinks and bridge them from trusted frames</span></span>
+      <span class="carry"><span lang="zh">没有任何需要换鼠重测的常数</span><span lang="en">No constant has to be re-measured for a new mouse</span></span></div>
+    <div class="step"><span class="no">07 · new-video-generalization <span class="chip plum"><span lang="zh">进行中</span><span lang="en">running</span></span></span>
+      <span class="q"><span lang="zh">换一只鼠、一段新视频，最少要标多少？</span><span lang="en">New mouse, new video: how few labels are enough?</span></span>
+      <span class="a"><span lang="zh">20 帧解决绝大部分；80 帧到 10.1 px</span><span lang="en">20 labels fix most of it; 80 labels reach 10.1 px</span></span>
+      <span class="carry"><span lang="zh">下一步：第二随机种子、100 帧、更多小鼠</span><span lang="en">Next: second seed, 100 labels, more mice</span></span></div>
+  </div>
+</section>
+
+<!-- ============ EARLY DECISIONS ============ -->
+<section>
+  <div class="sec-head"><div class="kicker">01 – 03 · <span lang="zh">训练配方是怎么定下来的</span><span lang="en">How the training recipe was fixed</span></div>
+  <h2><span lang="zh">先发现"多标没用"，再固定 batch 2 和 ResNet-50</span><span lang="en">First "more labels did not help", then batch 2 and ResNet-50 were fixed</span></h2></div>
+  <div class="grid3">
+    <div class="panel"><h3><span lang="zh">标注从 20 加到 100，测试误差不降反升</span><span lang="en">From 20 to 100 labels, test error went up, not down</span></h3>
+      <div class="chart" id="c-scaling"></div>
+      <div class="cap"><span lang="zh">旧标注标准下的结果，仅作记录。原因：新增帧集中在视频前 30 秒，且 pupil_left 出现 350–420 px 的离谱错误。</span><span lang="en">Old label standard, kept for the record. Cause: added frames clustered in the first 30 s, and pupil_left produced 350–420 px outliers.</span></div></div>
+    <div class="panel"><h3><span lang="zh">batch 2 的测试误差最低，可信点数也最多</span><span lang="en">Batch 2 has the lowest test error and the most confident points</span></h3>
+      <div class="chart" id="c-batch"></div>
+      <div class="cap"><span lang="zh">柱：外部测试误差。圆点：800 个测试点中置信度 ≥0.6 的数量。注意：每个 batch 只训了一次，2 与 16 只差 0.3 px。</span><span lang="en">Bars: external test error. Dots: test points (of 800) with confidence ≥0.6. Note: one run per batch size; 2 and 16 differ by only 0.3 px.</span></div></div>
+    <div class="panel"><h3><span lang="zh">五个网络验证损失只差 1.4%，但只有 ResNet-50 对自己的预测有把握</span><span lang="en">Five backbones differ by 1.4% in validation loss, but only ResNet-50 is confident in its predictions</span></h3>
+      <div class="chart" id="c-model"></div>
+      <div class="cap"><span lang="zh">柱：测试点中置信度 ≥0.6 的比例。数字：测试误差 / 训练小时。只看验证损失会选中 HRNet-W18——它在测试集上最差（47.9 px）。</span><span lang="en">Bars: share of test points with confidence ≥0.6. Numbers: test error / training hours. Validation loss alone would have crowned HRNet-W18, the worst on the test set (47.9 px).</span></div></div>
+  </div>
+  <p class="small muted"><span lang="zh">这三步的误差口径是"全部测试点合并的 RMSE"，与后面各节的"逐帧 RMSE 的中位数"不是同一个量，两边的数字不能直接比较。</span><span lang="en">These three steps report RMSE pooled over all test points; later sections report the median of per-frame RMSE. The two are different quantities and must not be compared.</span></p>
+</section>
+
+<!-- ============ ACTIVE LEARNING ============ -->
+<section>
+  <div class="sec-head"><div class="kicker">04 · active learning</div>
+  <h2><span lang="zh">三种找错帧算法无法区分；80 张之后再加 220 张，误差纹丝不动</span><span lang="en">Three detectors cannot be told apart; 220 labels beyond the first 80 change nothing</span></h2></div>
+  <div class="flow">
+    <div class="box"><span class="t"><span lang="zh">80 张种子标注</span><span lang="en">80 seed labels</span></span><span class="d"><span lang="zh">+20 张固定验证</span><span lang="en">+20 fixed validation</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">从头训练</span><span lang="en">Train from scratch</span></span><span class="d">ResNet-50 · 100 epochs</span></div>
+    <div class="box"><span class="t"><span lang="zh">预测前 4 分钟</span><span lang="en">Predict first 4 min</span></span><span class="d">14,400 <span lang="zh">帧</span><span lang="en">frames</span></span></div>
+    <div class="box key"><span class="t"><span lang="zh">检测器挑可疑帧</span><span lang="en">Detector nominates frames</span></span><span class="d">uncertain · jump · fitting</span></div>
+    <div class="box"><span class="t"><span lang="zh">k-means 取 20 帧</span><span lang="en">k-means picks 20</span></span><span class="d"><span lang="zh">人工修正 8 个点</span><span lang="en">human corrects 8 points</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">在测试集上打一次分</span><span lang="en">Score once on the test set</span></span><span class="d"><span lang="zh">回到第 2 步，共 11 轮</span><span lang="en">back to step 2, 11 rounds</span></span></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">三条线全程落在单次训练的噪声带里</span><span lang="en">All three curves stay inside the single-run noise band throughout</span></h3>
+      <div class="chart" id="c-al"></div>
+      <div class="cap"><span lang="zh">纵轴从 0 开始，避免放大微小差异。灰带：同一配置训练两次的差异（±2.4 px）。三条线的全程均值只差 0.3–0.6 px。</span><span lang="en">The y-axis starts at 0 so small differences are not magnified. Grey band: difference between two identical trainings (±2.4 px). Branch means differ by 0.3–0.6 px.</span></div></div>
+    <div class="panel"><h3><span lang="zh">同一次训练，选哪个快照能让结果差 8 倍——所以只报最终快照</span><span lang="en">Within one training run, the snapshot choice can change the result 8-fold, so only the final snapshot is reported</span></h3>
+      <div class="chart" id="c-snap"></div>
+      <div class="cap"><span lang="zh">DeepLabCut 默认按 20 帧验证集的 mAP 挑快照，会挑中学习率还没下降的半成品（epoch &lt; 80）。主动学习的 34 个模型里有 20 个被这样挑中。改为统一用第 100 个 epoch 后，测试误差的波动从 SD 6.9 降到 1.0 px。</span><span lang="en">DeepLabCut's default picks the snapshot by mAP on 20 validation frames and can land on an unfinished model (epoch &lt; 80, before the learning-rate decay). It did so for 20 of 34 active-learning models. Using epoch 100 everywhere cut the spread of test error from SD 6.9 to 1.0 px.</span></div></div>
+  </div>
+  <div class="issues">
+    <div class="issue fixed"><b><span lang="zh">已更正（v0.5.1）：第 6 轮的"误差下降"是假的</span><span lang="en">Corrected (v0.5.1): the round-6 "drop" was not real</span></b><span lang="zh">第 0–5 轮用逐帧 RMSE，第 6–11 轮误用了逐帧平均绝对误差（同一批数据上低约 1.7–2 px）。统一口径后全程持平，相关结论已撤回。</span><span lang="en">Rounds 0–5 used per-frame RMSE, rounds 6–11 mistakenly used per-frame mean absolute error (≈1.7–2 px lower on the same data). Under one definition the curve is flat; the related claims were retracted.</span></div>
+    <div class="issue fixed"><b><span lang="zh">收尾：合并全部 676 张标注训练 production_v1</span><span lang="en">Wrap-up: all 676 labels merged into production_v1</span></b><span lang="zh">测试集中位误差 16.0 px（基线 16.95），98% 的点置信度 ≥0.6。它是新视频实验的起点。</span><span lang="en">Median test error 16.0 px (baseline 16.95), 98% of points with confidence ≥0.6. It is the starting point of the new-video experiment.</span></div>
+  </div>
+</section>
+
+<!-- ============ EVENTS ============ -->
+<section>
+  <div class="sec-head"><div class="kicker">05 · <span lang="zh">时间序列分析</span><span lang="en">time-series analysis</span></div>
+  <h2><span lang="zh">不需要任何标注：三条曲线就能说出每个异常是眨眼、眼动还是追踪丢失</span><span lang="en">No labels needed: three traces name each anomaly as a blink, a saccade or a tracking loss</span></h2></div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">事件分类规则（按顺序判断）</span><span lang="en">Event rules, checked in this order</span></h3>
+      <div class="tree">
+        <div class="rule"><div class="cond"><span lang="zh">睁眼度低于自身 5 秒基线的 70%</span><span lang="en">Eye opening below 70% of its own 5-s baseline</span></div><div class="arr">→</div><div class="cls blink">BLINK</div></div>
+        <div class="rule"><div class="cond"><span lang="zh">睁眼度在基线的 70–85%</span><span lang="en">Eye opening at 70–85% of baseline</span></div><div class="arr">→</div><div class="cls part">PARTIAL BLINK</div></div>
+        <div class="rule"><div class="cond"><span lang="zh">瞳孔中心位移 &gt; 10 px 或速度 &gt; 4 px/帧，且眼睛睁开（≥90%）</span><span lang="en">Pupil centre shift &gt; 10 px or speed &gt; 4 px/frame, with the eye open (≥90%)</span></div><div class="arr">→</div><div class="cls sacc">SACCADE</div></div>
+        <div class="rule"><div class="cond"><span lang="zh">瞳孔点置信度 &lt; 0.6</span><span lang="en">Pupil-point confidence &lt; 0.6</span></div><div class="arr">→</div><div class="cls loss">TRACKING LOSS</div></div>
+        <div class="rule"><div class="cond"><span lang="zh">任一曲线偏离自身 1 秒滚动中位数超过 5 个 MAD</span><span lang="en">Any trace leaves its 1-s rolling median by more than 5 MADs</span></div><div class="arr">→</div><div class="cls okc"><span lang="zh">其他异常，人工看</span><span lang="en">other anomaly, review</span></div></div>
+      </div>
+      <div class="cap"><span lang="zh">相邻 0.25 秒内的标记合并为一个事件。超过 30% 的帧被标记时直接报"模型不适用于此视频"——Pluto 视频上未适应的旧模型正是这样被拦下的。</span><span lang="en">Flags within 0.25 s merge into one event. If more than 30% of frames are flagged the pipeline reports "model does not fit this video", which is how the unadapted model was caught on the Pluto video.</span></div></div>
+    <div class="panel"><h3><span lang="zh">一次眨眼：下眼睑上抬，瞳孔下点被一起推上去</span><span lang="en">One blink: the lower lid rises and pushes the pupil's bottom point up with it</span></h3>
+      <div class="stack">
+        <div class="imgframe"><img src="assets/blink_0.jpg" alt="Eye before the blink"><span class="kp" style="left:12px;top:14px;transform:none"><span lang="zh">眨眼前</span><span lang="en">before</span></span></div>
+        <div class="imgframe"><img src="assets/blink_1.jpg" alt="Eye at the deepest point of the blink"><span class="kp p" style="left:12px;top:14px;transform:none"><span lang="zh">最深处</span><span lang="en">deepest point</span></span></div>
+        <div class="imgframe"><img src="assets/blink_2.jpg" alt="Eye after the blink"><span class="kp" style="left:12px;top:14px;transform:none"><span lang="zh">眨眼后</span><span lang="en">after</span></span></div>
+      </div>
+      <div class="cap" id="cap-strip"></div></div>
+  </div>
+  <div class="panel"><h3><span lang="zh">一次眼动：瞳孔水平跳 23 px 并保持 1 秒，而睁眼度一动不动——所以它不是眨眼</span><span lang="en">One saccade: the pupil jumps 23 px sideways and holds for 1 s while eye opening stays flat, so it is not a blink</span></h3>
+    <div class="imgframe scroll"><img src="assets/saccade.jpg" alt="Saccade close-up: pupil x trace, eye opening trace and three frames"></div></div>
+</section>
+
+<!-- ============ PUPIL ============ -->
+<section>
+  <div class="sec-head"><div class="kicker">06 · <span lang="zh">瞳孔测量（现行算法）</span><span lang="en">pupil measurement (current method)</span></div>
+  <h2><span lang="zh">上点被眼睑挡住，所以不用它：左右两点定中心，下点定半高</span><span lang="en">The top point hides under the lid, so it is not used: left and right set the centre, bottom sets the half-height</span></h2></div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">红色椭圆是现行算法，量的是整个瞳孔；蓝色是已废弃的四点法，只量到露出来的部分</span><span lang="en">The red ellipse is the current method and measures the whole pupil; blue is the retired 4-point method and sees only the exposed part</span></h3>
+      <div class="imgframe"><img src="assets/pupil_geometry.jpg" alt="Eye frame with the 3-point endpoint ellipse and the 4-point ellipse overlaid"></div>
+      <div class="legend"><span><i style="border-color:#F04646"></i><span lang="zh">三点端点法（现行）</span><span lang="en">3-point endpoint (current)</span></span><span><i style="border-color:#3CA0EB"></i><span lang="zh">四点法（已废弃）</span><span lang="en">4-point (retired)</span></span></div>
+      <div class="formula">center_x = (L.x + R.x) / 2 &nbsp;&nbsp; center_y = <b>(L.y + R.y) / 2</b><br>width = |R.x − L.x| &nbsp;&nbsp; height = <b>2 × (B.y − center_y)</b><br>area = π/4 × width × height</div>
+      <div class="cap"><span lang="zh">证据：上点在左右连线上方 66 px，下点在下方 138 px（人工标注：75 / 140 px）。完整的椭圆应当上下对称，所以上点标到的是"露出来的上沿"。端点法得到的高宽比是 0.93，接近正圆。</span><span lang="en">Evidence: the top point sits 66 px above the left–right line, the bottom point 138 px below (human labels: 75 / 140 px). A complete ellipse is symmetric, so the top label marks the exposed edge. The endpoint method gives height/width 0.93, nearly round.</span></div></div>
+    <div class="panel"><h3><span lang="zh">眨眼时位置用端点法最稳，大小用宽度最稳</span><span lang="en">Through blinks, position is steadiest with the endpoint method and size is steadiest with width</span></h3>
+      <div class="tbl"><table>
+        <tr><th></th><th class="n"><span lang="zh">四点法</span><span lang="en">4-point</span></th><th class="n"><span lang="zh">三点端点法</span><span lang="en">3-pt endpoint</span></th><th class="n"><span lang="zh">只用宽度</span><span lang="en">width only</span></th></tr>
+        <tr><td><span lang="zh">眨眼时中心 y 偏移</span><span lang="en">centre-y shift in blinks</span></td><td class="n">6–8 px</td><td class="n best">0–2 px</td><td class="n">–</td></tr>
+        <tr><td><span lang="zh">半眨眼时"大小"假下降</span><span lang="en">false size drop, partial blink</span></td><td class="n">−32%</td><td class="n">−32%</td><td class="n best">−8%</td></tr>
+        <tr><td><span lang="zh">模型 vs 人工：大小误差</span><span lang="en">model vs human: size error</span></td><td class="n">9.1%</td><td class="n">6.7%</td><td class="n best">4.0%</td></tr>
+        <tr><td><span lang="zh">模型 vs 人工：中心误差</span><span lang="en">model vs human: centre error</span></td><td class="n">12.2 px</td><td class="n best">9.2 px</td><td class="n">–</td></tr>
+        <tr><td><span lang="zh">与睁眼度的相关性（越低越好）</span><span lang="en">correlation with eye opening (lower is better)</span></td><td class="n">0.90</td><td class="n">0.75</td><td class="n best">0.54</td></tr>
+        <tr><td><span lang="zh">需要换鼠重测的常数</span><span lang="en">constants to re-measure per mouse</span></td><td class="n">0</td><td class="n best">0</td><td class="n best">0</td></tr>
+      </table></div>
+      <div class="cap"><span lang="zh">端点法的面积在眨眼时照样下降：下眼睑把下点往上推，而高度公式把这个位移放大 2 倍。所以眨眼段需要下一步的处理。曾试过的"固定高宽比 0.68"已废弃：那个常数只适用于一只鼠，且本身是从被遮挡的上点学来的。</span><span lang="en">The endpoint area still falls in blinks: the lower lid pushes the bottom point up and the height formula doubles that shift, hence the blink handling below. The earlier fixed aspect ratio (0.68) was dropped: the constant fits one mouse only and was itself learned from the occluded top point.</span></div></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">置信度抓不住眨眼，睁眼度可以</span><span lang="en">Confidence cannot catch blinks; eye opening can</span></h3>
+      <div class="chart" id="c-bias"></div>
+      <div class="cap"><span lang="zh">柱：不同睁眼程度下面积的偏差。14,400 帧里下点置信度低于 0.6 的只有 16 帧——眨眼时模型照样自信，只是找到的是眼睑的边缘。偏差从睁眼度 95% 以下开始超过约 5%，所以阈值定在 95%。</span><span lang="en">Bars: area bias at each level of eye opening. Only 16 of 14,400 frames have bottom-point confidence below 0.6: in a blink the model is still confident, it has simply found the eyelid's edge. Bias passes ≈5% below 95% opening, hence the 95% threshold.</span></div></div>
+    <div class="panel"><h3><span lang="zh">眨眼段不计算，用前后可信帧连直线：假下降从 −44% 变成不到 −10%</span><span lang="en">Blinks are not computed but bridged from trusted frames: the false drop goes from −44% to under −10%</span></h3>
+      <div class="chart" id="c-fill"></div>
+      <div class="cap" id="cap-fill"></div></div>
+  </div>
+  <div class="flow">
+    <div class="box"><span class="t"><span lang="zh">每帧：L、R、B 三点</span><span lang="en">Each frame: L, R, B</span></span><span class="d"><span lang="zh">端点法算中心、宽、高、面积</span><span lang="en">endpoint formulas</span></span></div>
+    <div class="box key"><span class="t"><span lang="zh">这一帧可信吗？</span><span lang="en">Is the frame trusted?</span></span><span class="d"><span lang="zh">睁眼度 ≥ 基线 95% 且 L/R/B 置信度 ≥ 0.6</span><span lang="en">opening ≥ 95% of baseline and L/R/B confidence ≥ 0.6</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">不可信段两侧各扩 3 帧</span><span lang="en">Widen untrusted runs by 3 frames</span></span><span class="d">50 ms</span></div>
+    <div class="box"><span class="t"><span lang="zh">≤ 1 秒：线性插值</span><span lang="en">≤ 1 s: linear interpolation</span></span><span class="d"><span lang="zh">&gt; 1 秒：留空，不编造</span><span lang="en">&gt; 1 s: left empty, nothing invented</span></span></div>
+    <div class="box goal"><span class="t"><span lang="zh">干净的瞳孔曲线</span><span lang="en">Clean pupil trace</span></span><span class="d">pupil_trace.py</span></div>
+  </div>
+</section>
+
+<!-- ============ NEW VIDEO ============ -->
+<section>
+  <div class="sec-head"><div class="kicker">07 · <span lang="zh">新视频泛化</span><span lang="en">new-video generalization</span></div>
+  <h2><span lang="zh">换一只鼠，旧模型完全失效（185 px）；标 20 帧回到 14 px，标 80 帧到 10 px</span><span lang="en">On a new mouse the old model fails outright (185 px); 20 labels bring it to 14 px, 80 labels to 10 px</span></h2></div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">头 20 帧解决了绝大部分问题，之后每 20 帧的收益递减</span><span lang="en">The first 20 labels do most of the work; every further 20 adds less</span></h3>
+      <div class="chart" id="c-scale"></div>
+      <div class="cap" id="cap-scale"></div></div>
+    <div class="panel"><h3><span lang="zh">不需要标注也能看出模型在变好</span><span lang="en">The improvement is visible without any labels</span></h3>
+      <div class="chart" id="c-health"></div>
+      <div class="cap"><span lang="zh">绿：高置信度关键点的比例。紫：整个训练池里被 jump 规则判为可疑的帧的比例。两者与左图的真实误差同向变化，所以在没有测试集的新视频上可以用它们判断"标够了没有"。</span><span lang="en">Green: share of confident keypoints. Purple: share of pool frames flagged by the jump rule. Both move with the true error on the left, so on a video without a test set they can tell when labelling is enough.</span></div></div>
+  </div>
+  <div class="panel"><h3><span lang="zh">每批 20 帧怎么选：第 1 批按外观铺开，第 2 批起只在模型出错的帧里铺开</span><span lang="en">How each batch of 20 is chosen: batch 1 spreads over appearance, later batches spread over the frames where the model fails</span></h3>
+    <div class="flow">
+      <div class="box"><span class="t"><span lang="zh">第 1 批：训练池每 5 帧取 1</span><span lang="en">Batch 1: every 5th pool frame</span></span><span class="d">11,432 <span lang="zh">帧</span><span lang="en">frames</span></span></div>
+      <div class="box"><span class="t"><span lang="zh">第 2 批起：jump 规则标出的可疑帧</span><span lang="en">Batch ≥2: frames flagged by the jump rule</span></span><span class="d"><span lang="zh">相邻帧任一点位移 &gt; 眼宽的 3%</span><span lang="en">any point moves &gt; 3% of eye width between frames</span></span></div>
+      <div class="box key"><span class="t"><span lang="zh">边缘指纹 + k-means（k=20）</span><span lang="en">Edge fingerprint + k-means (k=20)</span></span><span class="d"><span lang="zh">32×24 高斯差分，768 维</span><span lang="en">32×24 difference of Gaussians, 768-d</span></span></div>
+      <div class="box"><span class="t"><span lang="zh">每类取最靠近中心的一帧</span><span lang="en">One frame nearest each centre</span></span><span class="d"><span lang="zh">彼此及与已标帧相隔 ≥ 1 秒</span><span lang="en">≥ 1 s from each other and from labelled frames</span></span></div>
+      <div class="box goal"><span class="t"><span lang="zh">20 帧 + 模型预标注</span><span lang="en">20 frames + model pre-labels</span></span><span class="d"><span lang="zh">人工修正</span><span lang="en">human corrects</span></span></div>
+    </div>
+    <div class="imgframe scroll"><img src="assets/picks_batch01.jpg" alt="The 20 frames selected for batch 1"></div>
+    <div class="cap"><span lang="zh">第 1 批实际选出的 20 帧：瞳孔大小、眼睑开合、注视方向、反光各不相同。在旧视频上验证：四种极端眼睛状态全部被覆盖的概率，随机抽 27%，本方法 100%。</span><span lang="en">The 20 frames actually chosen for batch 1: pupil size, lid position, gaze and glints all differ. Checked on the old video: probability of covering all four extreme eye states is 27% for random picks and 100% for this method.</span></div>
+  </div>
+</section>
+
+<!-- ============ OPEN ISSUES ============ -->
+<section>
+  <div class="sec-head"><div class="kicker"><span lang="zh">未解决的问题</span><span lang="en">Open issues</span></div>
+  <h2><span lang="zh">这些地方还不能下结论</span><span lang="en">Where no conclusion can be drawn yet</span></h2></div>
+  <div class="issues">
+    <div class="issue"><b><span lang="zh">尾部指标噪声很大</span><span lang="en">The tail metric is very noisy</span></b><span lang="zh">第 90 百分位误差在同一次训练的相邻快照间可从 24 px 跳到 98 px（测试集只有 59 帧）。第二随机种子的重复实验正在跑。</span><span lang="en">The 90th-percentile error swings from 24 to 98 px between neighbouring snapshots of one run (the test set has 59 frames). Second-seed replicates are running.</span></div>
+    <div class="issue"><b><span lang="zh">Pluto 测试集是 59 帧，不是计划的 100 帧</span><span lang="en">The Pluto test set has 59 frames, not the planned 100</span></b><span lang="zh">且标注是在未适应模型的预测上修正得到的，对"0 帧"那一点有轻微偏向。</span><span lang="en">Its labels were made by correcting the unadapted model's predictions, a slight bias in favour of the 0-label point.</span></div>
+    <div class="issue"><b><span lang="zh">jump + k-means 选帧没有对照组</span><span lang="en">Jump + k-means selection has no control arm</span></b><span lang="zh">第 1 批的选法验证过优于随机；第 2 批起的做法没有和"随机抽可疑帧"比较过，不能说它更好。</span><span lang="en">Batch-1 selection was shown to beat random; the later error-guided selection was never compared with random picks among flagged frames.</span></div>
+    <div class="issue"><b><span lang="zh">所有阈值都来自一段视频</span><span lang="en">Every threshold comes from one video</span></b><span lang="zh">95% 睁眼度、70/85% 眨眼深度、10 px 眼动位移，都是在旧视频上读出来的，需要在其他小鼠上校准，并改成与分辨率无关的比例。</span><span lang="en">95% opening, 70/85% blink depth and the 10 px saccade shift were read off the old video; they need calibration on other mice and a scale-free form.</span></div>
+    <div class="issue"><b><span lang="zh">端点法的前提未直接验证</span><span lang="en">The endpoint method's premise is not directly verified</span></b><span lang="zh">它假设左右点标在瞳孔真正最宽处。需要在瞳孔完全露出的帧上检查四点法与端点法是否一致。另外瞳孔有约 6° 倾斜，目前忽略。</span><span lang="en">It assumes left/right mark the pupil's true widest level. To check: on frames with a fully exposed pupil both methods should agree. A ≈6° tilt of the pupil is ignored for now.</span></div>
+    <div class="issue"><b><span lang="zh">一处模型标注错误待重跑</span><span lang="en">One mislabelled model, to be re-run</span></b><span lang="zh">瞳孔分析与选帧验证使用的"旧视频 4 分钟预测"来自 fitting 第 10 轮模型，而非文中所写的 production_v1（两者训练编号相同）。两个模型统计上打平，结论预计不变；GPU 空闲后用 production_v1 重跑确认。</span><span lang="en">The 4-minute predictions behind the pupil analyses and the selector check came from the fitting round-10 model, not production_v1 as written (they share a shuffle number). The two models are statistically tied; to be confirmed by a re-run once the GPU is free.</span></div>
+    <div class="issue"><b><span lang="zh">早期三步各只训了一次</span><span lang="en">The three early steps are single runs</span></b><span lang="zh">batch 2 与 16 只差 0.3 px，小于后来测得的 ±2.4 px 单次训练噪声。五个网络"统计打平"的 bootstrap 脚本没有保存下来。</span><span lang="en">Batch 2 and 16 differ by 0.3 px, less than the ±2.4 px single-run noise measured later. The bootstrap script behind the five-backbone tie was not kept.</span></div>
+    <div class="issue"><b><span lang="zh">只在一只新鼠上验证过</span><span lang="en">Validated on one new mouse only</span></b><span lang="zh">"标注需求随视频数下降"需要更多小鼠的数据。</span><span lang="en">"Labelling cost falls with every new video" needs data from more mice.</span></div>
+  </div>
+</section>
+
+<!-- ============ REPO MAP ============ -->
+<section>
+  <div class="sec-head"><div class="kicker"><span lang="zh">代码在哪里</span><span lang="en">Where the code lives</span></div>
+  <h2><span lang="zh">每个单元自带脚本和结果；旧版本都在 git 标签里，不在活动路径上</span><span lang="en">Each unit carries its scripts and results; old versions live in git tags, not on the active path</span></h2></div>
+<div class="tree-map"><span class="c"># github.com/ZhihengLi0/mouse-behavior-tracking</span>
+scaling-curve/              <span class="w">01  superseded, kept for the record</span>
+batch-size-selection/       02  → batch 2
+model-selection/            03  → ResNet-50
+active-learning/            04  → ~80 labels saturate · FROZEN_PARAMETERS.md · production_v1
+time-series-analysis/
+  scripts/eye_pipeline.py   <span class="k">05  one command: video → events.csv + review montage</span>
+  scripts/pupil_trace.py    <span class="k">06  current pupil method (endpoint + blink handling)</span>
+new-video-generalization/
+  FROZEN_PARAMETERS.md      <span class="k">07  split rule · selector · snapshot rule · stopping rule</span>
+  scripts/select_scale_frames.py · scale_step.py · run_step.sh
+report/                     <span class="k">this page: build_report.py reads every number from the result tables</span>
+docs/LABEL_MANIFEST.md      <span class="k">SHA-256 of every human label table</span>
+<span class="c"># local only, never in git: videos · labels · model weights · per-frame predictions · meeting notes</span>
+<span class="c"># tags: v0.1.0 … v0.5.1 · v0.6.0-pre-cleanup (state before the 2026-09-19 cleanup)</span></div>
+</section>
+
+<footer>
+  <span lang="zh">构建：python report/build_report.py · 数字来源：各单元 results/ 下的 CSV · 指标：逐帧 8 点 RMSE 的中位数（04 节起），最终快照（epoch 100）</span>
+  <span lang="en">Build: python report/build_report.py · numbers from the CSVs under each unit's results/ · metric: median per-frame RMSE over 8 keypoints (from section 04 on), final snapshot (epoch 100)</span>
+</footer>
+</div>
+
+<script>
+/*__DATA__*/
+(function(){
+  var root=document.documentElement, L='zh';
+  try{var s=localStorage.getItem('report-lang'); if(s==='en'||s==='zh') L=s;}catch(e){}
+  function setLang(l){root.setAttribute('data-lang',l); root.setAttribute('lang',l==='zh'?'zh-CN':'en');
+    document.getElementById('lang-zh').setAttribute('aria-pressed',String(l==='zh'));
+    document.getElementById('lang-en').setAttribute('aria-pressed',String(l==='en'));
+    try{localStorage.setItem('report-lang',l);}catch(e){}}
+  document.getElementById('lang-zh').addEventListener('click',function(){setLang('zh')});
+  document.getElementById('lang-en').addEventListener('click',function(){setLang('en')});
+  setLang(L);
+
+  var C={teal:'var(--teal)',plum:'var(--plum)',red:'var(--red)',blue:'var(--blue)',grey:'var(--grey)',amber:'var(--amber)',ink:'var(--ink)',rule:'var(--rule)'};
+  function bi(zh,en){return '<tspan lang="zh">'+zh+'</tspan><tspan lang="en">'+en+'</tspan>';}
+  function bih(zh,en){return '<span lang="zh">'+zh+'</span><span lang="en">'+en+'</span>';}
+  function put(id,w,h,inner){var el=document.getElementById(id); if(el) el.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" role="img" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';}
+  function fmt(v,d){return Number(v).toFixed(d==null?1:d);}
+
+  /* vertical bars: items [{l:label or [zh,en], v, hi, dot, note}] */
+  function bars(id,items,o){
+    var W=460,H=o.h||250,ml=44,mr=o.dotMax?44:14,mt=26,mb=o.mb||46,pw=W-ml-mr,ph=H-mt-mb,max=o.max,s='';
+    var ticks=o.ticks||[0,max/2,max];
+    ticks.forEach(function(t){var y=mt+ph-(t/max)*ph; s+='<line class="grid" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(ml-6)+'" y="'+(y+4)+'" text-anchor="end">'+t+'</text>';});
+    s+='<text x="'+ml+'" y="14">'+(o.unit?bi(o.unit[0],o.unit[1]):'')+'</text>';
+    var bw=pw/items.length;
+    items.forEach(function(it,i){
+      var x=ml+i*bw+bw*0.2,w=bw*0.6,hh=(Math.min(it.v,max)/max)*ph,y=mt+ph-hh;
+      s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="3" fill="'+(it.hi?C.teal:C.grey)+'" opacity="'+(it.hi?1:.55)+'"/>';
+      s+='<text class="v" x="'+(x+w/2)+'" y="'+(y-6)+'" text-anchor="middle">'+it.t+'</text>';
+      var lab=Array.isArray(it.l)?bi(it.l[0],it.l[1]):it.l;
+      s+='<text x="'+(x+w/2)+'" y="'+(H-mb+16)+'" text-anchor="middle">'+lab+'</text>';
+      if(it.note) s+='<text x="'+(x+w/2)+'" y="'+(H-mb+31)+'" text-anchor="middle">'+it.note+'</text>';
+      if(it.note2) s+='<text x="'+(x+w/2)+'" y="'+(H-mb+45)+'" text-anchor="middle">'+it.note2+'</text>';
+      if(o.dotMax!=null&&it.dot!=null){var dy=mt+ph-(it.dot/o.dotMax)*ph; s+='<circle cx="'+(x+w/2)+'" cy="'+dy+'" r="5" fill="'+C.plum+'" stroke="var(--surface)" stroke-width="1.5"/><text x="'+(x+w/2+9)+'" y="'+(dy+4)+'" style="fill:var(--plum);paint-order:stroke;stroke:var(--surface);stroke-width:4px;font-weight:500">'+it.dot+'</text>';}
+    });
+    s+='<line class="ax" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+(mt+ph)+'" y2="'+(mt+ph)+'"/>';
+    if(o.xlabel) s+='<text x="'+(ml+pw/2)+'" y="'+(H-4)+'" text-anchor="middle">'+bi(o.xlabel[0],o.xlabel[1])+'</text>';
+    put(id,W,H,s);
+  }
+
+  /* lines: series [{c,pts:[[x,y]],label:[zh,en],hollow,dash,nolines}] */
+  function lines(id,series,o){
+    var W=o.w||520,H=o.h||280,ml=46,mr=o.mr||18,mt=22,mb=44,pw=W-ml-mr,ph=H-mt-mb,s='';
+    var X=function(x){return ml+(x-o.x0)/(o.x1-o.x0)*pw;};
+    var Y=o.log?function(y){return mt+ph-(Math.log10(y)-Math.log10(o.y0))/(Math.log10(o.y1)-Math.log10(o.y0))*ph;}:function(y){return mt+ph-(y-o.y0)/(o.y1-o.y0)*ph;};
+    if(o.band) s+='<rect x="'+ml+'" width="'+pw+'" y="'+Y(o.band[1])+'" height="'+(Y(o.band[0])-Y(o.band[1]))+'" fill="'+C.grey+'" opacity=".18"/>';
+    if(o.shade) o.shade.forEach(function(r){s+='<rect x="'+X(r[0])+'" width="'+Math.max(X(r[1])-X(r[0]),1)+'" y="'+mt+'" height="'+ph+'" fill="'+C.amber+'" opacity=".18"/>';});
+    o.yt.forEach(function(t){var y=Y(t); s+='<line class="grid" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(ml-6)+'" y="'+(y+4)+'" text-anchor="end">'+(o.yfmt?o.yfmt(t):t)+'</text>';});
+    o.xt.forEach(function(t){s+='<text x="'+X(t)+'" y="'+(mt+ph+16)+'" text-anchor="middle">'+t+'</text>';});
+    s+='<line class="ax" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+(mt+ph)+'" y2="'+(mt+ph)+'"/>';
+    if(o.xlabel) s+='<text x="'+(ml+pw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+bi(o.xlabel[0],o.xlabel[1])+'</text>';
+    if(o.ylabel) s+='<text x="'+ml+'" y="12">'+bi(o.ylabel[0],o.ylabel[1])+'</text>';
+    series.forEach(function(se){
+      var seg=[],d='';
+      se.pts.forEach(function(p){ if(p[1]==null){ if(seg.length) d+='M'+seg.join('L'); seg=[]; } else seg.push(X(p[0]).toFixed(1)+','+Y(Math.max(p[1],o.clip||-1e9)).toFixed(1)); });
+      if(seg.length) d+='M'+seg.join('L');
+      if(!se.nolines) s+='<path d="'+d+'" fill="none" stroke="'+se.c+'" stroke-width="'+(se.sw||2.2)+'"'+(se.dash?' stroke-dasharray="5 4"':'')+' stroke-linejoin="round"/>';
+      if(se.marks!==false) se.pts.forEach(function(p){ if(p[1]==null) return;
+        if(se.cross){var x=X(p[0]),y=Y(p[1]); s+='<path d="M'+(x-5)+','+(y-5)+'L'+(x+5)+','+(y+5)+'M'+(x-5)+','+(y+5)+'L'+(x+5)+','+(y-5)+'" stroke="'+se.c+'" stroke-width="2.4" fill="none"/>';}
+        else s+='<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="'+(se.r||4.5)+'" fill="'+(se.hollow?'var(--surface)':se.c)+'" stroke="'+se.c+'" stroke-width="2"/>'; });
+      if(se.values) se.pts.forEach(function(p){ s+='<text class="v" x="'+(X(p[0])+8)+'" y="'+(Y(p[1])-8)+'">'+se.values(p)+'</text>'; });
+    });
+    var lx=ml+8+(o.legendX?pw*o.legendX:0), ly=mt+ph-8-(series.filter(function(z){return z.label;}).length-1)*16;
+    if(o.legendTop) ly=mt+10;
+    if(o.legendAt!=null) ly=mt+ph*o.legendAt;
+    series.forEach(function(se){ if(!se.label) return; s+='<line x1="'+lx+'" x2="'+(lx+18)+'" y1="'+(ly-4)+'" y2="'+(ly-4)+'" stroke="'+se.c+'" stroke-width="3"'+(se.dash?' stroke-dasharray="5 4"':'')+'/><text x="'+(lx+24)+'" y="'+ly+'">'+bi(se.label[0],se.label[1])+'</text>'; ly+=16; });
+    put(id,W,H,s);
+  }
+
+  /* ---- split diagram ---- */
+  (function(){
+    var W=520,s='',y=18,h=26;
+    function seg(x,w,fill,op){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="'+fill+'" opacity="'+(op||1)+'"/>';}
+    s+='<text x="0" y="12">'+bi('旧视频（5 分钟）','old video (5 min)')+'</text>';
+    s+=seg(0,412,C.grey,.4)+seg(0,70,C.teal)+seg(74,22,C.blue)+seg(416,104,C.plum);
+    s+='<text class="v" x="0" y="'+(y+h+16)+'">'+bi('80 训练','80 train')+'</text><text class="v" x="74" y="'+(y+h+16)+'">'+bi('20 验证','20 val')+'</text><text x="180" y="'+(y+h+16)+'">'+bi('前 4 分钟 = 挑帧的池子','first 4 min = pool for new frames')+'</text><text class="v" x="416" y="'+(y+h+16)+'">'+bi('100 测试','100 test')+'</text>';
+    y=96; s+='<text x="0" y="'+(y-6)+'">'+bi('新视频（任意长度）','new video (any length)')+'</text>';
+    s+=seg(0,408,C.grey,.4)+seg(416,48,C.blue)+seg(472,48,C.plum);
+    s+='<text class="v" x="0" y="'+(y+h+16)+'">'+bi('80% 训练池：每批从这里选 20 帧','80% pool: every batch of 20 comes from here')+'</text><text class="v" x="464" y="'+(y-6)+'" text-anchor="end">'+bi('10% 验证','10% val')+'</text><text class="v" x="520" y="'+(y+h+16)+'" text-anchor="end">'+bi('10% 测试','10% test')+'</text>';
+    s+='<text x="0" y="'+(y+h+50)+'">'+bi('紫色 = 只用来报告，从不参与选帧、调参或停止','purple = report only: never selects, tunes or stops anything')+'</text>';
+    put('c-split',520,180,s);
+  })();
+
+  /* ---- keypoint labels on the image ---- */
+  (function(){
+    var names={pupil_top:['瞳孔上','pupil top',46,0],pupil_bottom:['瞳孔下','pupil bottom',50,0],pupil_left:['瞳孔左','pupil left',0,22],pupil_right:['瞳孔右','pupil right',-14,-24],
+      eyelid_top:['上眼睑','upper lid',0,-22],eyelid_bottom:['下眼睑','lower lid',0,22],eye_nasal_corner:['鼻侧眼角','nasal corner',0,-22],eye_temporal_corner:['颞侧眼角','temporal corner',34,24]};
+    var host=document.getElementById('kp-frame'); if(!host||!DATA.keypoints_px) return;
+    Object.keys(names).forEach(function(k){var p=DATA.keypoints_px[k],n=names[k],el=document.createElement('span');
+      el.className='kp '+(k.indexOf('pupil')===0?'p':'l'); el.style.left='calc('+p[0]+'% + '+n[2]+'px)'; el.style.top='calc('+p[1]+'% + '+n[3]+'px)';
+      el.innerHTML=bih(n[0],n[1]); host.appendChild(el);});
+  })();
+
+  /* ---- early units ---- */
+  bars('c-scaling',DATA.scaling.map(function(r){return {l:String(r.n),v:r.rmse,t:fmt(r.rmse)+' px',hi:false};}),{max:60,ticks:[0,20,40,60],unit:['测试误差 (px)','test error (px)'],xlabel:['训练标注帧数','training labels']});
+  bars('c-batch',DATA.batch.map(function(r){return {l:'batch '+r.batch,v:r.rmse,t:fmt(r.rmse,2),hi:r.batch===2,dot:r.conf};}),{max:30,ticks:[0,10,20,30],unit:['测试误差 (px) · 紫点：可信点数 / 800','test error (px) · purple: confident points / 800'],dotMax:800,mb:30});
+  bars('c-model',DATA.model.map(function(r){return {l:r.model.replace('HRNet-','HR-').replace('CSPNeXt-S','CSPNeXt').replace('ResNet-50','ResNet50'),v:r.conf/8,t:Math.round(r.conf/8)+'%',hi:r.model==='ResNet-50',note:fmt(r.rmse)+' px',note2:r.hours+' h'};}),{max:80,ticks:[0,40,80],unit:['可信测试点比例 (%)','confident test points (%)'],mb:62,h:270});
+
+  /* ---- active learning ---- */
+  (function(){
+    var col={uncertain:C.blue,jump:C.plum,fitting:C.teal};
+    var ser=Object.keys(DATA.al).map(function(k){return {c:col[k],r:3.2,sw:2,label:[k,k],pts:DATA.al[k].map(function(p){return [p.n,p.rmse];})};});
+    var base=DATA.al.jump[0].rmse;
+    lines('c-al',ser,{x0:70,x1:310,y0:0,y1:25,yt:[0,5,10,15,20,25],xt:[80,120,160,200,240,280,300],band:[base-2.4,base+2.4],xlabel:['累计训练标注帧数','cumulative training labels'],ylabel:['测试误差中位数 (px)','median test error (px)']});
+  })();
+  (function(){
+    var fin=DATA.scale.filter(function(r){return r.n>0;}), def=DATA.scale_default_rule;
+    lines('c-snap',[
+      {c:C.red,cross:true,nolines:true,label:['DeepLabCut 默认：验证 mAP 最高的快照','DeepLabCut default: best validation mAP'],pts:def.map(function(r){return [r.n,r.rmse];}),values:function(p){return p[1]>50?fmt(p[1])+' px':'';}},
+      {c:C.teal,label:['最终快照（epoch 100）——现行规则','final snapshot (epoch 100), current rule'],pts:fin.map(function(r){return [r.n,r.rmse];})}
+    ],{x0:10,x1:90,y0:8,y1:130,log:true,yt:[10,20,50,100],xt:[20,40,60,80],xlabel:['Pluto 标注帧数（同一次训练，两种快照规则）','Pluto labels (same training run, two snapshot rules)'],ylabel:['测试误差中位数 (px, 对数)','median test error (px, log)'],legendAt:0.42});
+  })();
+
+  /* ---- pupil: bias by eye opening ---- */
+  bars('c-bias',[['≥99%',0.5],['97–99',-2.0],['95–97',-4.4],['93–95',-6.9],['90–93',-10.5],['85–90',-19.8],['70–80',-32.6]].map(function(r){return {l:r[0],v:Math.abs(r[1]),t:(r[1]>0?'+':'')+r[1]+'%',hi:Math.abs(r[1])<5};}),{max:40,ticks:[0,10,20,30,40],unit:['面积偏差的绝对值 (%) · 绿 = 可信','absolute area bias (%) · green = trusted'],xlabel:['睁眼度（相对自身 5 秒基线）','eye opening (vs own 5-s baseline)']});
+
+  /* ---- pupil: blink fill example ---- */
+  (function(){
+    var b=DATA.blink_example; if(!b) return;
+    var raw=b.t.map(function(t,i){return [t,b.raw[i]];}), fil=b.t.map(function(t,i){return [t,b.filled[i]];});
+    var shade=[],st=null; b.bad.forEach(function(v,i){ if(v&&st==null) st=b.t[i]; if(!v&&st!=null){shade.push([st,b.t[i]]);st=null;} }); if(st!=null) shade.push([st,b.t[b.t.length-1]]);
+    var vals=b.filled.filter(function(v){return v!=null;}), hi=Math.max.apply(null,vals)*1.12, lo=Math.min.apply(null,b.raw.filter(function(v){return v!=null&&v>0;}))*0.9;
+    lines('c-fill',[{c:C.grey,marks:false,sw:1.6,label:['逐帧直接计算','computed on every frame'],pts:raw},{c:C.red,marks:false,sw:2.6,label:['眨眼段插值后','after bridging the blink'],pts:fil}],
+      {x0:b.t[0],x1:b.t[b.t.length-1],y0:lo,y1:hi,clip:lo,yt:[Math.ceil(lo/10000)*10000,Math.round((lo+hi)/20000)*10000,Math.floor(hi/10000)*10000],yfmt:function(v){return (v/1000)+'k';},xt:[232,232.5,233,233.5,234,234.5],shade:shade,xlabel:['时间 (秒) · 橙色 = 判为不可信的帧','time (s) · orange = frames judged untrusted'],ylabel:['瞳孔面积 (px²)','pupil area (px²)']});
+    var st2=DATA.blink_stats;
+    document.getElementById('cap-fill').innerHTML=bih('旧视频 4 分钟共 '+st2.frames.toLocaleString('en-US')+' 帧：'+st2.untrusted.toLocaleString('en-US')+' 帧（'+fmt(st2.untrusted/st2.frames*100)+'%）被判为不可信，分成 '+st2.runs+' 段，最长 '+st2.longest_s+' 秒，全部可插值。面积与睁眼度的相关性从 0.49 降到 0.26。',
+      'Old video, 4 min, '+st2.frames.toLocaleString('en-US')+' frames: '+st2.untrusted.toLocaleString('en-US')+' frames ('+fmt(st2.untrusted/st2.frames*100)+'%) judged untrusted in '+st2.runs+' runs, longest '+st2.longest_s+' s, all bridged. Correlation of area with eye opening falls from 0.49 to 0.26.');
+    var tt=DATA.blink_strip_t||[];
+    document.getElementById('cap-strip').innerHTML=bih('同一次眨眼的前、中、后三帧（'+tt.join(' / ')+' 秒），点为模型预测。中间一帧里模型依然"自信"，但瞳孔下点已落在下眼睑边缘上。','The same blink before, during and after ('+tt.join(' / ')+' s); dots are model predictions. In the middle frame the model is still "confident", yet the bottom pupil point sits on the lower lid.');
+  })();
+
+  /* ---- new video ---- */
+  (function(){
+    var sc=DATA.scale, last=sc[sc.length-1];
+    document.getElementById('hs-new').textContent=fmt(sc[0].rmse,0)+' → '+fmt(last.rmse)+' px';
+    var ser=[{c:C.teal,label:['最终快照，随机种子 42','final snapshot, seed 42'],pts:sc.map(function(r){return [r.n,r.rmse];}),values:function(p){return fmt(p[1])+'';}}];
+    if(DATA.scale_seed2&&DATA.scale_seed2.length) ser.push({c:C.teal,hollow:true,nolines:true,label:['第二随机种子（训练本身的随机波动）','second seed (run-to-run noise)'],pts:DATA.scale_seed2.map(function(r){return [r.n,r.rmse];})});
+    lines('c-scale',ser,{x0:-6,x1:last.n+12,y0:8,y1:260,log:true,yt:[10,20,50,100,200],xt:sc.map(function(r){return r.n;}),xlabel:['在新视频上标注的帧数','labels made on the new video'],ylabel:['测试误差中位数 (px, 对数)','median test error (px, log)'],legendAt:0.3,legendX:0.45});
+    document.getElementById('cap-scale').innerHTML=bih('训练 = 676 张旧鼠标注 + N 张新鼠标注，每一步都从头训练；测试 = '+DATA.n_test+' 张封存的新鼠帧。误差超过 50 px 的"失败帧"比例：'+sc.map(function(r){return r.fail+'%';}).join(' → ')+'。',
+      'Training = 676 old-mouse labels + N new-mouse labels, from scratch at every step; test = '+DATA.n_test+' sealed new-mouse frames. Share of failed frames (error &gt; 50 px): '+sc.map(function(r){return r.fail+'%';}).join(' → ')+'.');
+    lines('c-health',[{c:C.teal,label:['高置信度关键点 (%)','confident keypoints (%)'],pts:sc.map(function(r){return [r.n,r.conf];}),values:function(p){return p[1]+'';}},
+      {c:C.plum,label:['被 jump 判为可疑的帧 (%)','frames flagged by the jump rule (%)'],pts:DATA.flagged.map(function(r){return [r.n,r.pct];}),values:function(p){return Math.round(p[1])+'';}}],
+      {x0:-6,x1:last.n+12,y0:0,y1:100,yt:[0,25,50,75,100],xt:sc.map(function(r){return r.n;}),xlabel:['在新视频上标注的帧数','labels made on the new video'],ylabel:['%','%'],legendTop:false});
+  })();
+})();
+</script>
