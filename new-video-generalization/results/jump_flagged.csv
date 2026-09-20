@@ -3,3 +3,4 @@ model_pluto_training_frames,selected_batch,jump_flagged_pool_frames,pool_frames,
 20,2,15064,57158,step 1 mAP-best epoch 70
 40,3,12254,57158,step 2 final epoch 100
 60,4,11051,57158,step 3 final epoch 100
+80,5,8555,57158,step 4 final epoch 100
