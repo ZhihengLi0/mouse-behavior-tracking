@@ -108,3 +108,13 @@ change if only left, right and bottom are used?
   during blinks" reported earlier is therefore partly an occlusion artifact:
   fine as a blink cue, misleading as pupillometry. Width-based size is the
   more robust measure, though not fully immune under heavy occlusion.
+- **Limitation of the 3-point estimate (noted 2026-09-19): vertical position
+  during blinks.** A blink closes the eye from both sides: the visible pupil
+  top moves down ~36 px and the bottom moves up ~44-49 px. The 4-point
+  center averages the two and barely moves (4-6 px); the 3-point center
+  depends on the bottom point alone and moves 29-37 px. So the two
+  estimators fail in opposite places: size is steadier from three points,
+  vertical position is steadier from four. Horizontal position is identical
+  (both use the left-right midpoint), so saccade analysis is unaffected.
+  Blink frames should be flagged from eye opening first and excluded from
+  position traces under either estimator.
