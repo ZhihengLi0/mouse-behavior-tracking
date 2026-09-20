@@ -87,8 +87,12 @@ flag rather than blink evidence - fully consistent with the advisor's
 often hidden under the upper eyelid; how much do pupil size and location
 change if only left, right and bottom are used?
 
-- **Three points lose nothing** when height is derived from width with the
-  video's own visible height/width ratio (k = 0.68; human labels give 0.71):
+- The pupil is modeled as an axis-aligned ELLIPSE throughout (advisor,
+  2026-09-12). Such an ellipse has four unknowns and three points give three
+  constraints, so one assumption is needed: a fixed aspect ratio (proposal)
+  or width = height, i.e. a circle (counter-example).
+- **Three points lose nothing** when the ellipse's aspect ratio is fixed at
+  the video's own visible height/width ratio (k = 0.68; human labels: 0.71):
   versus the 4-point estimate, area differs by a median 2.3% and the center
   by 2.3 px over 14,400 frames; against the HUMAN 4-point pupil on the 100
   test frames, area error is 8.9% (4-point: 9.1%) and center error 12.3 px

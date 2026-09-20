@@ -4,11 +4,15 @@ from THREE keypoints (left, right, bottom) versus all FOUR.
 
 pupil_top is often hidden under the upper eyelid and is the least reliable
 pupil point. Three estimators are compared:
-  4pt        center = (mid(L,R).x, mid(T,B).y); area = pi/4 * |R-L| * |B-T|
-  3pt-circle circle through L, R, B (circumcircle): center, area = pi r^2
-  3pt-ratio  width from L,R; height = k * width, k = the video's own median
-             height/width ratio measured on frames where pupil_top is
-             confident; center y = B.y - height/2
+The pupil is modeled as an axis-aligned ELLIPSE (advisor, 2026-09-12 meeting).
+Such an ellipse has 4 unknowns (center x, y, width, height); three points give
+only 3 constraints, so one assumption must be added:
+  4pt        ellipse from all four points: area = pi/4 * |R-L| * |B-T|
+  3pt-ratio  ellipse from L, R, B with the aspect ratio FIXED at k, the video's
+             own median height/width on frames where pupil_top is confident;
+             height = k * width, center y = B.y - height/2   <- the proposal
+  3pt-circle the other possible assumption, width = height (circle through
+             L, R, B). Included only as a counter-example: it fails.
 Two questions:
   A. On the old video's 4-minute clip (production model, 14,400 frames): how
      far apart are the estimators, overall and when pupil_top is unreliable?
@@ -116,32 +120,33 @@ fig = plt.figure(figsize=(18, 12))
 gs = fig.add_gridspec(3, 3, height_ratios=[1, 1, 1.1], hspace=0.38, wspace=0.25)
 sm = lambda v: pd.Series(v).rolling(15, center=True, min_periods=1).median().to_numpy()
 ax = fig.add_subplot(gs[0, :])
-ax.plot(t, sm(a4), lw=0.8, color="#2F6B9A", label="4 points")
-ax.plot(t, sm(ar), lw=0.8, color="#D1495B", alpha=0.85, label=f"3 points (L,R,B) + fixed ratio k={k:.2f}")
-ax.plot(t, sm(ac), lw=0.8, color="#2A9D8F", alpha=0.7, label="3 points, circle fit")
+ax.plot(t, sm(a4), lw=0.8, color="#2F6B9A", label="ellipse from 4 points")
+ax.plot(t, sm(ar), lw=0.8, color="#D1495B", alpha=0.85, label=f"ellipse from 3 points (L,R,B), aspect ratio fixed at k={k:.2f}")
+ax.plot(t, sm(ac), lw=0.8, color="#2A9D8F", alpha=0.7, label="circle through 3 points (counter-example)")
 ax.fill_between(t, 0, 1, where=~good_top, transform=ax.get_xaxis_transform(), color="gray", alpha=0.18,
                 label="pupil_top confidence < 0.6")
 ax.set_ylabel("pupil area (px$^2$)"); ax.legend(fontsize=9, ncol=4, loc="upper right")
 ax.set_title("Pupil area over the 4-minute clip: four keypoints vs three (left, right, bottom)", fontsize=12)
 ax = fig.add_subplot(gs[1, :], sharex=ax)
-ax.plot(t, sm(c4[:, 1]), lw=0.8, color="#2F6B9A", label="4 points")
-ax.plot(t, sm(cr[:, 1]), lw=0.8, color="#D1495B", alpha=0.85, label="3 points + fixed ratio")
-ax.plot(t, sm(cc[:, 1]), lw=0.8, color="#2A9D8F", alpha=0.7, label="3 points, circle fit")
+ax.plot(t, sm(c4[:, 1]), lw=0.8, color="#2F6B9A", label="ellipse from 4 points")
+ax.plot(t, sm(cr[:, 1]), lw=0.8, color="#D1495B", alpha=0.85, label="ellipse from 3 points, fixed aspect ratio")
+ax.plot(t, sm(cc[:, 1]), lw=0.8, color="#2A9D8F", alpha=0.7, label="circle through 3 points (counter-example)")
 ax.fill_between(t, 0, 1, where=~good_top, transform=ax.get_xaxis_transform(), color="gray", alpha=0.18)
 ax.set_ylabel("pupil center y (px)"); ax.set_xlabel("time (s)"); ax.legend(fontsize=9, ncol=3, loc="upper right")
 ax.set_title("Pupil vertical position (center x is identical by construction: all use the L-R midpoint)", fontsize=12)
 
 ax = fig.add_subplot(gs[2, 0])
 m = good_top & lrb_ok
-ax.scatter(a4[m][::5], ar[m][::5], s=3, alpha=0.3, color="#D1495B", label="ratio")
-ax.scatter(a4[m][::5], ac[m][::5], s=3, alpha=0.3, color="#2A9D8F", label="circle")
-lim = [np.nanpercentile(a4, 1), np.nanpercentile(a4, 99)]
-ax.plot(lim, lim, "k--", lw=1); ax.set_xlim(lim); ax.set_ylim(lim)
-ax.set_xlabel("4-point area"); ax.set_ylabel("3-point area"); ax.legend(fontsize=9)
-ax.set_title("Agreement when pupil_top is confident", fontsize=11)
+ax.scatter(a4[m][::5], ar[m][::5], s=3, alpha=0.3, color="#D1495B", label="ellipse, 3 pts + fixed ratio")
+ax.scatter(a4[m][::5], ac[m][::5], s=3, alpha=0.3, color="#2A9D8F", label="circle, 3 pts (counter-example)")
+lo = np.nanpercentile(a4, 1); hi = max(np.nanpercentile(a4, 99), np.nanpercentile(ac[m], 99))
+ax.plot([lo, hi], [lo, hi], "k--", lw=1, label="perfect agreement")
+ax.set_xlim(lo, np.nanpercentile(a4, 99)); ax.set_ylim(lo, hi)
+ax.set_xlabel("4-point ellipse area (px$^2$)"); ax.set_ylabel("3-point area (px$^2$)"); ax.legend(fontsize=8, loc="center right")
+ax.set_title("Agreement with the 4-point ellipse (pupil_top confident)", fontsize=11)
 
 ax = fig.add_subplot(gs[2, 1])
-names = [r[0].replace("model ", "") for r in rows]
+names = ["ellipse\n4 pts", "circle\n3 pts", "ellipse 3 pts\nfixed ratio"]
 x = np.arange(len(rows))
 ax.bar(x - 0.2, [r[1] for r in rows], 0.4, color="#2F6B9A", label="median")
 ax.bar(x + 0.2, [r[2] for r in rows], 0.4, color="#9ec3dd", label="90th pct")
