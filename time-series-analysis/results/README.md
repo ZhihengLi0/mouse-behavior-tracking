@@ -83,6 +83,11 @@ flag rather than blink evidence - fully consistent with the advisor's
 
 ## Update 2026-09-19: pupil from three keypoints vs four (advisor request)
 
+> **Superseded the same day.** The fixed-ratio variant (k = 0.68) described
+> below has been dropped in favor of the ratio-free ENDPOINT method; the
+> figure and script now show the endpoint method. The bullets below are kept
+> as the record of what was tried. Current result: next section.
+
 `06_pupil_3pt_vs_4pt.png`, `scripts/pupil_3pt_sensitivity.py`. pupil_top is
 often hidden under the upper eyelid; how much do pupil size and location
 change if only left, right and bottom are used?
@@ -137,3 +142,54 @@ change if only left, right and bottom are used?
   it has to be settled on images. Not yet measured: noise of this variant
   (left/right y is poorly defined on a near-vertical edge and its error is
   doubled in the height) and its behavior during blinks.
+
+## Update 2026-09-19 (b): 3-point ENDPOINT ellipse, no fixed ratio - current method
+
+`06_pupil_3pt_vs_4pt.png` (regenerated), `scripts/pupil_3pt_sensitivity.py`.
+
+Definition: left/right are the endpoints of the horizontal axis, so center x
+= their mid x, center y = their mean y, width = |R-L|; the bottom point
+gives the half-height, height = 2 * (B.y - center y). pupil_top is not used.
+No constant, so nothing has to be re-measured for a new mouse or camera.
+
+What it measures: the WHOLE pupil. The upper half is reconstructed by
+symmetry from the lower half, whereas the 4-point ellipse measures only the
+VISIBLE pupil. Which one is wanted is a scientific choice (advisor).
+
+Numbers (old video, production model; 14,050 frames with all four pupil
+points confident; blink rows gated on L/R/B confidence only):
+
+| | 4-pt ellipse | 3-pt endpoint | 3-pt circle | width only |
+|---|---|---|---|---|
+| height / width | 0.683 | 0.931 | 1 | - |
+| median area (px^2) | 47,809 | 64,720 (+35%) | 70,764 (+48%) | - |
+| median center y (px) | 486 | 449 (36 px higher) | 436 | - |
+| frame-to-frame size jitter, eye open | 0.40% | 0.49% | 0.54% | 0.26% |
+| center-y jitter, eye open | 0.29 px | 0.43 px | 0.53 px | - |
+| corr(size, eye opening) | +0.90 | +0.75 | +0.44 | +0.54 |
+| size change, partial blink (n=45) | -32% | -32% | -8% | -8% |
+| size change, deep blink (n=4) | -47% | -44% | -7% | -12% |
+| center-y shift, partial / deep blink | -8 / -6 px | 0 / +2 px | -27 / -41 px | - |
+| model vs human, same estimator: area error median (p90) | 9.1% (22.3%) | 6.7% (16.5%) | 8.8% (22.0%) | 4.0% (10.9%) |
+| model vs human, same estimator: center error median (p90) | 12.2 (20.0) px | 9.2 (16.1) px | 11.0 (22.2) px | - |
+
+Reading:
+- **Position: the endpoint method is the most blink-proof** (center y moves
+  0-2 px in blinks, 4-point 6-8 px, circle 27-41 px) and the model reproduces
+  the human value best (9.2 px vs 12.2 px). Cost: ~1.5x the jitter of the
+  4-point center, still under half a pixel.
+- **Size: the endpoint method does NOT fix blinks.** Its area falls as much
+  as the 4-point area (-32% / -44%), because the lower lid pushes the bottom
+  point up and that error is doubled in the height. Only width (and the
+  circle, which is dominated by width) is nearly unaffected (-8% / -12%).
+  Width is also the quantity the model reproduces best (4.0%) with the least
+  jitter. For pupil SIZE the recommendation remains width; blink frames
+  should be flagged from eye opening and excluded either way.
+- Deep-blink rows rest on 4 frames and are anecdotal.
+- Assumption to be confirmed on images: left/right are labeled at the
+  pupil's true widest level. The top point sits 66 px above the L-R midline
+  and the bottom 138 px below (human labels 75 / 140 px); if that asymmetry
+  is occlusion of the upper pupil the endpoint method is right and the pupil
+  is nearly round (0.91-0.93); if left/right are labeled systematically high
+  the 4-point ellipse is right. L is also 32 px higher than R (a ~6 degree
+  tilt that an axis-aligned ellipse ignores).
