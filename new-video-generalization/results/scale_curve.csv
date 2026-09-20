@@ -4,3 +4,5 @@ x020_step01_scratch,scratch,20,12.08,9.86,38.21,0.747,59,439,best validation mAP
 x040_step02_scratch,scratch,40,101.74,43.54,102.09,0.285,59,439,best validation mAP -> epoch 20 (undertrained; pupil_left fails on 53% of test frames),147.71,0.542
 x020_step01_final,scratch,20,13.83,,42.0,0.62,59,439,final snapshot (epoch 100),44.6,0.102
 x040_step02_final,scratch,40,12.04,,48.86,0.7,59,439,final snapshot (epoch 100),27.58,0.085
+x060_step03_scratch,scratch,60,12.53,10.68,67.36,0.633,59,439,best validation mAP (best-30),127.4,0.22
+x060_step03_final,scratch,60,10.41,9.48,44.19,0.831,59,439,final snapshot (100),97.56,0.136

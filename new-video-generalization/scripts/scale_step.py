@@ -38,6 +38,7 @@ TEST_GT = LABELS / "test_frozen" / "test59_labels.h5"
 TEST_FRAMES = LABELS / "test100"
 CURVE = UNIT / "results" / "scale_curve.csv"
 PROD_SHUFFLE, PROD_TSI = 60, 11
+VAL_SETS = ["val20", "val30_extra"]   # 50 Pluto validation frames (enlarged 2026-09-19)
 BPS = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right",
        "eyelid_top", "eyelid_bottom", "eye_nasal_corner", "eye_temporal_corner"]
 
@@ -118,7 +119,7 @@ def stage_pluto(step):
         shutil.rmtree(PLUTO_DIR)
     PLUTO_DIR.mkdir(parents=True)
     tabs, n_train = [], 0
-    for name in [f"batch{k:02d}" for k in range(1, step + 1)] + ["val20"]:
+    for name in [f"batch{k:02d}" for k in range(1, step + 1)] + VAL_SETS:
         d = LABELS / name
         t = pd.read_hdf(d / "CollectedData_Zhiheng.h5")
         imgs = [i[-1] if isinstance(i, tuple) else Path(i).name for i in t.index]
@@ -126,7 +127,7 @@ def stage_pluto(step):
         for i in imgs:
             shutil.copy(d / i, PLUTO_DIR / i)
         tabs.append(t)
-        if name != "val20":
+        if name not in VAL_SETS:
             n_train += len(t)
     table = pd.concat(tabs)               # batches first, val last - order is relied upon below
     table.to_hdf(PLUTO_DIR / "CollectedData_Zhiheng.h5", key="df_with_missing", mode="w")
@@ -144,6 +145,8 @@ def main():
     ap.add_argument("--step", type=int, default=1)
     ap.add_argument("--shuffle", type=int)
     ap.add_argument("--baseline", action="store_true")
+    ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--tag", default="")
     a = ap.parse_args()
 
     if a.baseline:
@@ -176,25 +179,38 @@ def main():
     assert len(comb) == n_seed + n_old + len(pl), (len(comb), n_seed, n_old, len(pl))
     assert all(names[i][0] == PLUTO for i in val_idx), "validation indices do not point at Pluto rows"
     val_imgs = {i[-1] for i in pl.index[n_new:]}
-    assert {names[i][1] for i in val_idx} == val_imgs, "validation rows are not the val20 frames"
+    assert {names[i][1] for i in val_idx} == val_imgs, "validation rows are not the Pluto validation frames"
     assert sum(names[i][0] == PLUTO for i in train_idx) == n_new, "Pluto training rows miscounted"
     assert not any(names[i][1] in old_val and names[i][0] == "face" for i in train_idx)
-    rtp.log("index check passed: val = Pluto val20, train includes exactly the Pluto batch rows")
+    rtp.log(f"index check passed: val = {len(val_idx)} Pluto validation frames, train includes exactly the Pluto batch rows")
     rtp.patch_model_config(pct, a.shuffle, rtp.BATCH)
+    cfgp = Path(glob.glob(str(rtp.PROJECT / "dlc-models-pytorch" / "iteration-0" / f"*trainset{pct}shuffle{a.shuffle}" /
+                              "train" / "pytorch_config.yaml"))[0])
+    mc = yaml.safe_load(cfgp.read_text())
+    mc["train_settings"]["seed"] = a.seed
+    cfgp.write_text(yaml.safe_dump(mc, sort_keys=False))
+    rtp.log(f"training seed = {a.seed}")
 
-    label = f"x{n_new:03d}_step{a.step:02d}_scratch"
     rtp.run([rtp.PYTHON, rtp.ROOT / "scripts/train_eye_model.py", "--shuffle", a.shuffle,
              "--batch-size", rtp.BATCH, "--epochs", rtp.EPOCHS, "--device", "mps",
              "--trainset-fraction", pct, "--trainingsetindex", tsi, "--save-epochs", 10,
              "--max-snapshots", 12, "--no-resume"])
-    # Score under BOTH snapshot rules until the rule is decided (2026-09-19: best-mAP on 20
-    # validation frames picked an undertrained epoch-20 snapshot at step 2).
-    evaluate(a.shuffle, tsi, label, "scratch", n_new)
-    tdir = glob.glob(str(rtp.PROJECT / "dlc-models-pytorch" / "iteration-0" / f"*shuffle{a.shuffle}" / "train"))[0]
+    # Snapshot rule (FROZEN_PARAMETERS.md): headline = FINAL snapshot; robustness = best validation
+    # mAP among epochs >= 80 (the LR decays at 80 and 95, earlier snapshots are unfinished models).
+    tdir = glob.glob(str(rtp.PROJECT / "dlc-models-pytorch" / "iteration-0" / f"*trainset{pct}shuffle{a.shuffle}" / "train"))[0]
     snaps = sorted(Path(x).name for x in glob.glob(tdir + "/snapshot-*.pt"))
-    fin = snaps.index(f"snapshot-{int(rtp.EPOCHS):03d}.pt")
-    evaluate(a.shuffle, tsi, label.replace("_scratch", "_final"), "scratch", n_new,
-             snapshot_index=fin, rule="final snapshot")
+    E = int(rtp.EPOCHS)
+    find = lambda ep: next(k for k, n in enumerate(snaps) if n in (f"snapshot-{ep:03d}.pt", f"snapshot-best-{ep:03d}.pt"))
+    fin = find(E)
+    tag = f"_{a.tag}" if a.tag else ""
+    base = f"x{n_new:03d}_step{a.step:02d}"
+    evaluate(a.shuffle, tsi, f"{base}_final{tag}", f"seed{a.seed}", n_new, snapshot_index=fin, rule="final snapshot")
+    st = pd.read_csv(tdir + "/learning_stats.csv")
+    have = [e_ for e_ in (80, 90, 100) if any(n in (f"snapshot-{e_:03d}.pt", f"snapshot-best-{e_:03d}.pt") for n in snaps)]
+    st = st[st["step"].isin(have) & st["metrics/test.mAP"].notna()]
+    ep = int(st.loc[st["metrics/test.mAP"].idxmax(), "step"])
+    evaluate(a.shuffle, tsi, f"{base}_mAP80plus{tag}", f"seed{a.seed}", n_new, snapshot_index=find(ep),
+             rule="best validation mAP among epochs >= 80")
     print(f"FINAL_INDEX={fin}")
     print(f"TSI={tsi}")
 
