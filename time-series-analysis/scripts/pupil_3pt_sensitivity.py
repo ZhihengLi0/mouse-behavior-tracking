@@ -127,6 +127,10 @@ ax.fill_between(t, 0, 1, where=~good_top, transform=ax.get_xaxis_transform(), co
                 label="pupil_top confidence < 0.6")
 ax.set_ylabel("pupil area (px$^2$)"); ax.legend(fontsize=9, ncol=4, loc="upper right")
 ax.set_title("Pupil area over the 4-minute clip: four keypoints vs three (left, right, bottom)", fontsize=12)
+m4, mr, mc = np.nanmedian(a4), np.nanmedian(ar), np.nanmedian(ac)
+ax.text(0.005, 0.04, f"median area:  4-pt ellipse {m4:,.0f} px$^2$   |   3-pt ellipse {mr:,.0f} px$^2$ ({(mr/m4-1)*100:+.1f}%)"
+        f"   |   3-pt circle {mc:,.0f} px$^2$ ({(mc/m4-1)*100:+.0f}%  = LARGER)", transform=ax.transAxes, fontsize=10.5,
+        bbox=dict(facecolor="white", edgecolor="0.6", alpha=0.9))
 ax = fig.add_subplot(gs[1, :], sharex=ax)
 ax.plot(t, sm(c4[:, 1]), lw=0.8, color="#2F6B9A", label="ellipse from 4 points")
 ax.plot(t, sm(cr[:, 1]), lw=0.8, color="#D1495B", alpha=0.85, label="ellipse from 3 points, fixed aspect ratio")
@@ -134,6 +138,10 @@ ax.plot(t, sm(cc[:, 1]), lw=0.8, color="#2A9D8F", alpha=0.7, label="circle throu
 ax.fill_between(t, 0, 1, where=~good_top, transform=ax.get_xaxis_transform(), color="gray", alpha=0.18)
 ax.set_ylabel("pupil center y (px)"); ax.set_xlabel("time (s)"); ax.legend(fontsize=9, ncol=3, loc="upper right")
 ax.set_title("Pupil vertical position (center x is identical by construction: all use the L-R midpoint)", fontsize=12)
+y4, yr, yc = np.nanmedian(c4[:, 1]), np.nanmedian(cr[:, 1]), np.nanmedian(cc[:, 1])
+ax.text(0.005, 0.04, f"median center y:  4-pt ellipse {y4:.0f} px   |   3-pt ellipse {yr:.0f} px ({yr-y4:+.0f} px)"
+        f"   |   3-pt circle {yc:.0f} px ({yc-y4:+.0f} px = HIGHER in the image)", transform=ax.transAxes, fontsize=10.5,
+        bbox=dict(facecolor="white", edgecolor="0.6", alpha=0.9))
 
 ax = fig.add_subplot(gs[2, 0])
 m = good_top & lrb_ok
@@ -142,21 +150,25 @@ ax.scatter(a4[m][::5], ac[m][::5], s=3, alpha=0.3, color="#2A9D8F", label="circl
 lo = np.nanpercentile(a4, 1); hi = max(np.nanpercentile(a4, 99), np.nanpercentile(ac[m], 99))
 ax.plot([lo, hi], [lo, hi], "k--", lw=1, label="perfect agreement")
 ax.set_xlim(lo, np.nanpercentile(a4, 99)); ax.set_ylim(lo, hi)
-ax.set_xlabel("4-point ellipse area (px$^2$)"); ax.set_ylabel("3-point area (px$^2$)"); ax.legend(fontsize=8, loc="center right")
+ax.set_xlabel("4-point ellipse area (px$^2$)"); ax.set_ylabel("3-point area (px$^2$)"); ax.legend(fontsize=7.5, loc="center right")
 ax.set_title("Agreement with the 4-point ellipse (pupil_top confident)", fontsize=11)
+ax.annotate("circle: ~50% LARGER\nthan the 4-pt ellipse", (0.03, 0.80), xycoords="axes fraction", fontsize=9.5, color="#1f7a6e")
+ax.annotate("3-pt ellipse: on the line\n(median diff 2.3%)", (0.45, 0.04), xycoords="axes fraction", fontsize=9.5, color="#b0303f")
 
 ax = fig.add_subplot(gs[2, 1])
 names = ["ellipse\n4 pts", "circle\n3 pts", "ellipse 3 pts\nfixed ratio"]
 x = np.arange(len(rows))
-ax.bar(x - 0.2, [r[1] for r in rows], 0.4, color="#2F6B9A", label="median")
-ax.bar(x + 0.2, [r[2] for r in rows], 0.4, color="#9ec3dd", label="90th pct")
-ax.set_xticks(x); ax.set_xticklabels(names, fontsize=9); ax.set_ylabel("area error vs human (%)"); ax.legend(fontsize=9)
+b1 = ax.bar(x - 0.2, [r[1] for r in rows], 0.4, color="#2F6B9A", label="median (typical frame)")
+b2 = ax.bar(x + 0.2, [r[2] for r in rows], 0.4, color="#9ec3dd", label="90th pct (worst 10% of frames start here)")
+ax.bar_label(b1, fmt="%.1f%%", fontsize=9); ax.bar_label(b2, fmt="%.1f%%", fontsize=9)
+ax.set_xticks(x); ax.set_xticklabels(names, fontsize=9); ax.set_ylabel("area error vs human (%)"); ax.legend(fontsize=7.5, loc="upper right"); ax.set_ylim(0, 78)
 ax.set_title("Pupil AREA error against human labels (100 test frames)", fontsize=11)
 
 ax = fig.add_subplot(gs[2, 2])
-ax.bar(x - 0.2, [r[3] for r in rows], 0.4, color="#2F6B9A", label="median")
-ax.bar(x + 0.2, [r[4] for r in rows], 0.4, color="#9ec3dd", label="90th pct")
-ax.set_xticks(x); ax.set_xticklabels(names, fontsize=9); ax.set_ylabel("center error vs human (px)"); ax.legend(fontsize=9)
+b1 = ax.bar(x - 0.2, [r[3] for r in rows], 0.4, color="#2F6B9A", label="median (typical frame)")
+b2 = ax.bar(x + 0.2, [r[4] for r in rows], 0.4, color="#9ec3dd", label="90th pct (worst 10% of frames start here)")
+ax.bar_label(b1, fmt="%.1f px", fontsize=9); ax.bar_label(b2, fmt="%.1f px", fontsize=9)
+ax.set_xticks(x); ax.set_xticklabels(names, fontsize=9); ax.set_ylabel("center error vs human (px)"); ax.legend(fontsize=7.5, loc="upper right"); ax.set_ylim(0, 68)
 ax.set_title("Pupil CENTER error against human labels", fontsize=11)
 fig.savefig(OUT / "06_pupil_3pt_vs_4pt.png", dpi=125, bbox_inches="tight")
 print("\nsaved", OUT / "06_pupil_3pt_vs_4pt.png")
