@@ -126,7 +126,7 @@ for r, (lab, y, yf, col) in enumerate(rows):
         axr.axhline(eps, color="#D1495B", lw=1, ls="--")
         axr.set_yscale("symlog", linthresh=eps); axr.set_ylim(0, max(np.nanpercentile(y[m], 99.9), eps * 4))
         axr.set_title(f"dashed = jump threshold {eps:.1f} px (3% of eye width); {n_flag:,} pool frames above it "
-                      f"({n_flag / (pool_end * fps):.0%}) = the candidates of the NEXT batch", fontsize=9, color="#D1495B", loc="left", pad=3)
+                      f"({n_flag / (pool_end * fps):.0%})" + (" = the frames this batch was drawn from" if a.batch_no > 1 else " (orientation only)"), fontsize=9, color="#D1495B", loc="left", pad=3)
     if "confidence" in lab:
         axr.axhline(0.6, color="0.4", lw=0.8, ls=":")
     for p in picks:
