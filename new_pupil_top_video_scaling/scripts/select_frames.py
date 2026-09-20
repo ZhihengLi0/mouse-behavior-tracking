@@ -215,5 +215,11 @@ for f in picks:
 cap.release()
 if state:
     np.savez_compressed(out / "kmeans_state.npz", **state)
+if a.pred_h5:                                             # batch >= 2: pre-labels = the new-standard model that flagged the frames
+    pred = pd.read_hdf(a.pred_h5)
+    ml = pred.iloc[[int(f) for f in picks]].copy()
+    ml.index = pd.MultiIndex.from_tuples([("labeled-data", name, i) for i in imgs])
+    ml.to_hdf(out / "machinelabels.h5", key="df_with_missing", mode="w")
+    ml.to_csv(out / "machinelabels.csv")
 print(f"{name}: {len(imgs)} frames | video {dur:.1f}s @ {fps:.0f}fps | pool [0,{pool_hi}) "
       f"val [{val_lo},{val_hi}) test [{test_lo},{n_frames}) | guard {guard} frames")
