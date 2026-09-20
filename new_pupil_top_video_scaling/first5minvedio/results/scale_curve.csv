@@ -9,3 +9,5 @@ x060_step03_final,first5minvedio,42,60,9.31,8.15,11.6,15.01,0.0,0.952,50,399,fin
 x060_step03_mAPlate,first5minvedio,42,60,10.03,8.55,28.67,14.99,0.02,0.927,50,399,best validation mAP among epochs >= 96 (100),13.88,4.58,9.95,4.57,7.83,6.74,6.83,6.5
 x080_step04_final,first5minvedio,42,80,10.09,8.56,10.73,12.8,0.0,0.962,50,399,final snapshot (120),15.39,4.11,10.14,4.74,9.89,6.8,7.56,7.12
 x080_step04_mAPlate,first5minvedio,42,80,9.93,8.46,23.78,14.05,0.02,0.967,50,399,best validation mAP among epochs >= 96 (100),14.49,4.01,9.85,4.52,9.29,7.51,6.2,6.57
+x100_step05_final,first5minvedio,42,100,9.98,8.37,10.68,13.53,0.0,0.972,50,399,final snapshot (120),13.78,3.81,10.01,4.04,9.07,6.16,7.27,7.65
+x100_step05_mAPlate,first5minvedio,42,100,9.83,8.33,10.51,13.35,0.0,0.952,50,399,best validation mAP among epochs >= 96 (100),14.09,4.15,9.12,4.28,9.0,6.25,6.13,7.55
