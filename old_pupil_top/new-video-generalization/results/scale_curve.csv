@@ -18,3 +18,5 @@ x040_step02_final_seed43,seed43,40,11.79,10.0,44.1,0.754,59,439,final snapshot (
 x040_step02_mAP80plus_seed43,seed43,40,11.83,9.75,40.8,0.825,59,439,best validation mAP among epochs >= 80 (90),31.16,0.085
 x060_step03_final_seed43,seed43,60,10.53,9.12,61.04,0.822,59,439,final snapshot (100),46.33,0.102
 x060_step03_mAP80plus_seed43,seed43,60,10.32,8.92,47.88,0.813,59,439,best validation mAP among epochs >= 80 (90),25.6,0.051
+x100_step05_final,seed42,100,10.72,9.06,33.28,0.866,59,439,final snapshot (100),26.06,0.068
+x100_step05_mAP80plus,seed42,100,10.72,9.06,33.28,0.866,59,439,best validation mAP among epochs >= 80 (100),26.06,0.068

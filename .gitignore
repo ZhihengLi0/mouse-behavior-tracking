@@ -41,9 +41,10 @@ meeting-notes/
 
 # Per-task units: label tables and demo videos stay local
 **/training-data/
-scaling-curve/demo_clips/
 **/logs/
 **/predictions/
-active-learning/branches/
-active-learning/frames/
-new-video-generalization/pipeline_*/
+# location-independent since the 2026-09-20 reorganisation (old_pupil_top/, new_pupil_top_video_scaling/)
+**/demo_clips/
+**/active-learning*/branches/
+**/active-learning*/frames/
+**/pipeline_*/
