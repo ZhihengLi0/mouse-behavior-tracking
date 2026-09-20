@@ -44,20 +44,25 @@ if __name__ == "__main__":
     ap.add_argument("folder")
     ap.add_argument("--shuffle", type=int, default=60)
     ap.add_argument("--tsi", type=int, default=11)
+    ap.add_argument("--snapshot-index", type=int, default=-1)
+    ap.add_argument("--new-standard-model", action="store_true",
+                    help="predict with a model of the NEW-standard project (EyePupilEllipse); its points are used as they are")
     a = ap.parse_args()
     folder = Path(a.folder).resolve()
     import deeplabcut
+    config = ROOT / "dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/config.yaml" if a.new_standard_model else CONFIG
 
     with tempfile.TemporaryDirectory() as tmp:
-        deeplabcut.analyze_images(str(CONFIG), [str(folder)], frame_type=".png", destfolder=tmp, shuffle=a.shuffle,
-                                  trainingsetindex=a.tsi, save_as_csv=False, plotting=False, pcutoff=0.0, device="cpu")
+        deeplabcut.analyze_images(str(config), [str(folder)], frame_type=".png", destfolder=tmp, shuffle=a.shuffle,
+                                  trainingsetindex=a.tsi, save_as_csv=False, plotting=False, pcutoff=0.0, device="cpu",
+                                  snapshot_index=a.snapshot_index)
         pred = pd.read_hdf(sorted(glob.glob(tmp + "/image_predictions_*.h5"))[-1])
     if pred.columns.nlevels == 4:                                  # single-animal project: drop the "individuals" level
         pred.columns = pred.columns.droplevel(1)
     names = [i[-1] if isinstance(i, tuple) else Path(str(i)).name for i in pred.index]
     pred.index = pd.MultiIndex.from_tuples([("labeled-data", folder.name, n) for n in names])
     pred = pred.sort_index()
-    ml = to_ellipse_standard(pred)
+    ml = pred if a.new_standard_model else to_ellipse_standard(pred)
     ml.to_hdf(folder / "machinelabels.h5", key="df_with_missing", mode="w")
     ml.to_csv(folder / "machinelabels.csv")
-    print(f"{folder.name}: {len(ml)} frames pre-labeled in the ellipse standard (model shuffle {a.shuffle}, tsi {a.tsi})")
+    print(f"{folder.name}: {len(ml)} frames pre-labeled ({'new-standard model, points as predicted' if a.new_standard_model else 'old model converted to ellipse endpoints'}; shuffle {a.shuffle}, tsi {a.tsi})")
