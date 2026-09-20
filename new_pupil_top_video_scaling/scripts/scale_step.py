@@ -149,6 +149,7 @@ def evaluate(unit, shuffle, tsi, label, n_new, snapshot_index, rule, seed):
 
 
 def main():
+    global EPOCHS, MILESTONES
     ap = argparse.ArgumentParser()
     ap.add_argument("--unit", required=True)
     ap.add_argument("--step", type=int, required=True)
@@ -157,9 +158,13 @@ def main():
     ap.add_argument("--tag", default="")
     ap.add_argument("--prior", nargs="*", default=[], help="earlier videos as name:last_batch")
     ap.add_argument("--eval-only", action="store_true")
+    ap.add_argument("--epochs", type=int, default=EPOCHS, help="side trials only; the frozen recipe is the default")
+    ap.add_argument("--no-eval", action="store_true", help="train only: epoch-count trials are judged on VALIDATION, never on the test set")
     a = ap.parse_args()
     import deeplabcut
 
+    if a.epochs != EPOCHS:
+        EPOCHS, MILESTONES = a.epochs, [round(0.8 * a.epochs), round(0.95 * a.epochs)]
     prior = [(p.split(":")[0], int(p.split(":")[1])) for p in a.prior]
     ensure_project([u for u, _ in prior] + [a.unit])
     train_names = {}
@@ -208,13 +213,16 @@ def main():
     snaps = sorted(p.name for p in mdir.glob("snapshot-*.pt"))
     find = lambda ep: next(k for k, n in enumerate(snaps) if n in (f"snapshot-{ep:03d}.pt", f"snapshot-best-{ep:03d}.pt"))
     print(f"TSI={tsi}\nFINAL_INDEX={find(EPOCHS)}", flush=True)
+    if a.no_eval:
+        log("--no-eval: test set not touched")
+        return
     test = HERE / a.unit / "training-data" / "labels" / "test50"
     if not glob.glob(str(test / "CollectedData_*.h5")):
         log("test50 is not labeled yet: skipping evaluation (rerun with --eval-only once it is)")
         return
     evaluate(a.unit, a.shuffle, tsi, f"{base}_final{tag}", n_new, find(EPOCHS), "final snapshot", a.seed)
     st = pd.read_csv(mdir / "learning_stats.csv")
-    have = [e_ for e_ in (100, 110, 120) if any(n in (f"snapshot-{e_:03d}.pt", f"snapshot-best-{e_:03d}.pt") for n in snaps)]
+    have = [e_ for e_ in range(10, EPOCHS + 1, 10) if e_ >= MILESTONES[0] and any(n in (f"snapshot-{e_:03d}.pt", f"snapshot-best-{e_:03d}.pt") for n in snaps)]
     st = st[st["step"].isin(have) & st["metrics/test.mAP"].notna()]
     ep = int(st.loc[st["metrics/test.mAP"].idxmax(), "step"])
     evaluate(a.unit, a.shuffle, tsi, f"{base}_mAPlate{tag}", n_new, find(ep), f"best validation mAP among epochs >= {MILESTONES[0]}", a.seed)
