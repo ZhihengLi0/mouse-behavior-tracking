@@ -76,7 +76,9 @@ _, S, Vt = np.linalg.svd(feats - mu, full_matrices=False)
 proj = (feats - mu) @ Vt[:2].T
 expl = (S[:2] ** 2 / (S ** 2).sum()).sum()
 sizes = np.bincount(labels, minlength=k)
-pos = np.array([int(np.where(fidx == p)[0][0]) for p in picks])
+in_cand = np.isin(picks, fidx)                      # top-up picks from outside the flagged set have no cluster
+outside = picks[~in_cand]
+pos = np.array([int(np.where(fidx == p)[0][0]) for p in picks[in_cand]], dtype=int)
 pick_cluster = labels[pos]
 cmap = plt.get_cmap("tab20", k)
 
@@ -100,7 +102,11 @@ ax.set_xlabel("frames in cluster"); ax.set_ylabel("cluster id"); ax.set_title("C
 # ---- shared time axis ------------------------------------------------------------------------
 axc = fig.add_subplot(gs[1, :])
 axc.scatter(fidx / fps, labels, c=labels, cmap=cmap, s=3, alpha=0.6, vmin=0, vmax=k - 1, rasterized=True)
-axc.scatter(picks / fps, pick_cluster, marker="*", s=200, c="black", zorder=5)
+axc.scatter(picks[in_cand] / fps, pick_cluster, marker="*", s=200, c="black", zorder=5)
+if len(outside):
+    axc.scatter(outside / fps, np.full(len(outside), k - 0.3), marker="v", s=90, c="#D1495B", zorder=5,
+                label=f"{len(outside)} top-up picks from the largest jumps below the threshold (no cluster)")
+    axc.legend(fontsize=8.5, loc="upper right")
 axc.set_yticks(range(0, k, 2)); axc.set_ylabel("cluster id")
 axc.set_title("Clusters over time (stars = picked frames). Everything below shares this time axis; "
               "thin vertical lines = the picked frames", fontsize=10.5)
