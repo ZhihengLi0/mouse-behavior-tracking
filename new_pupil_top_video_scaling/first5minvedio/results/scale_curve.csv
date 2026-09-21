@@ -1,3 +1,5 @@
 label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
 x020_step01_final,first5minvedio,42,20,12.93,10.47,32.23,23.94,0.04,0.689,50,399,final snapshot (120),12.51,4.85,4.56,5.1,13.04,5.04,18.7,12.57
 x020_step01_mAPlate,first5minvedio,42,20,12.93,10.47,32.23,23.94,0.04,0.689,50,399,best validation mAP among epochs >= 96 (120),12.51,4.85,4.56,5.1,13.04,5.04,18.7,12.57
+x040_step02_final,first5minvedio,42,40,13.0,10.66,21.32,18.64,0.02,0.81,50,399,final snapshot (120),12.28,4.65,7.91,4.57,12.48,5.13,16.44,11.67
+x040_step02_mAPlate,first5minvedio,42,40,12.6,10.74,37.39,19.15,0.02,0.764,50,399,best validation mAP among epochs >= 96 (100),12.09,4.29,7.4,4.6,12.89,5.6,17.78,11.61
