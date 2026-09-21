@@ -14,6 +14,7 @@ say(){ echo "[$(date '+%m-%d %H:%M')] $*" >> "$LOG"; }
 say "=== $UNIT step $STEP (shuffle $SHUF) ==="
 # NOEVAL=1 skips scoring (use while the test set is still being labeled; score later with scale_step.py --eval-only)
 if $PY scale_step.py --unit "$UNIT" --step $STEP --shuffle $SHUF ${PRIOR:+--prior $PRIOR} ${NOEVAL:+--no-eval} >> "$LOG" 2>&1; then
+  $PY plot_scale_curve.py --unit "$UNIT" >> "$LOG" 2>&1      # keep <unit>/results/scale_curve.png current after every step
   TSI=$(grep -a -o 'TSI=[0-9]*' "$LOG" | tail -1 | cut -d= -f2); FIN=$(grep -a -o 'FINAL_INDEX=[0-9]*' "$LOG" | tail -1 | cut -d= -f2)
   say "step done (tsi $TSI); predicting the whole video with the FINAL snapshot (index $FIN)"
   DEST="$HERE/$UNIT/training-data/predictions_step$(printf %02d $STEP)"; mkdir -p "$DEST"

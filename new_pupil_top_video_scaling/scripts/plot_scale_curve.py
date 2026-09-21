@@ -31,10 +31,11 @@ ax.set_ylim(0, max(16, head["median_frame_rmse_px"].max() * 1.4)); ax.set_xticks
 ax.set_xlabel("labels from this video"); ax.set_ylabel("median frame RMSE on the frozen test set (px)")
 ax.set_title("Typical-frame error (y axis from 0)"); ax.grid(alpha=0.3); ax.legend(fontsize=8.5, loc="lower left")
 ax = axes[1]
-for bp, c in (("pupil_top", RED), ("pupil_left", "#E08E45"), ("pupil_right", "#5B8E7D"), ("pupil_bottom", BLUE), ("eyelid_top", GRAY)):
-    ax.plot(head[x], head[f"median_{bp}_px"], "o-", color=c, lw=1.8, ms=6, label=bp)
+for bp, c, ls in (("pupil_top", RED, "-"), ("pupil_left", "#E08E45", "-"), ("pupil_right", "#5B8E7D", "-"), ("pupil_bottom", BLUE, "-"),
+                  ("eyelid_top", GRAY, "--"), ("eyelid_bottom", "#B0B0B0", "--"), ("eye_nasal_corner", PLUM, ":"), ("eye_temporal_corner", "#C77DB0", ":")):
+    ax.plot(head[x], head[f"median_{bp}_px"], "o", ls=ls, color=c, lw=1.8, ms=6, label=bp)
 ax.set_ylim(0, None); ax.set_xticks(head[x]); ax.set_xlabel("labels from this video"); ax.set_ylabel("median error of the keypoint (px)")
-ax.set_title("Which keypoints carry the error"); ax.grid(alpha=0.3); ax.legend(fontsize=8.5, ncol=2)
+ax.set_title("Which keypoints carry the error (solid = pupil, dashed = eyelids, dotted = eye corners)"); ax.grid(alpha=0.3); ax.legend(fontsize=8, ncol=2)
 ax = axes[2]
 ax.plot(head[x], head["frac_points_conf_ge_0.6"] * 100, "o-", color=GREEN, lw=2.2, ms=8, label="test keypoints with confidence >= 0.6 (%)")
 ax.plot(head[x], head["frac_frames_rmse_gt_50px"] * 100, "s--", color=RED, lw=1.6, ms=6, label="test frames with RMSE > 50 px (%)")
