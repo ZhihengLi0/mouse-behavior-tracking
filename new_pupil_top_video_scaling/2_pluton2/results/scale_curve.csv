@@ -1,0 +1,5 @@
+label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
+x020_step01_final,2_pluton2,42,20,7.73,5.52,30.94,26.37,0.08,0.851,50,397,final snapshot (best-120),18.26,1.46,3.72,2.71,5.58,1.29,3.16,5.21
+x020_step01_mAPlate,2_pluton2,42,20,7.73,5.52,30.94,26.37,0.08,0.851,50,397,best validation mAP among epochs >= 96 (best-120),18.26,1.46,3.72,2.71,5.58,1.29,3.16,5.21
+x000_step00_final,2_pluton2,42,0,9.99,5.12,36.06,46.27,0.1,0.748,50,397,final snapshot; 1_20251031_Pluto_spont_1 model applied unchanged (120),20.02,0.0,0.0,0.0,7.07,0.0,0.0,4.66
+x000_step00_mAPlate,2_pluton2,42,0,9.9,6.16,40.33,76.82,0.12,0.698,50,397,best validation mAP among epochs >= 96 on 1_20251031_Pluto_spont_1; model applied unchanged (best-110),21.45,0.82,1.29,1.1,9.51,0.54,1.38,4.77
