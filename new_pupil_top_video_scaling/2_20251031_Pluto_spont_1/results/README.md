@@ -1,7 +1,7 @@
-# Video 2: 20251031_Pluto_spont_1 (19.9 min, a different mouse)
+# Video 2: 2_20251031_Pluto_spont_1 (19.9 min, a different mouse)
 
 Scale curve within this video under the new pupil standard. Training = ALL 100 labels of video 1
-(`first5minvedio`, batches 01-05) + N labels of this video, from scratch; validation = this video's val20;
+(`1_first5minvedio`, batches 01-05) + N labels of this video, from scratch; validation = this video's val20;
 test = this video's 50 frozen test frames (`training-data/labels/test_frozen/test50_labels.h5`,
 sha256 `5411047aae9258bd…`; frozen 2026-09-22 after a read-only check, never edited since).
 Reference from the old label standard (not comparable in px): trained with 676 old-mouse labels, this video

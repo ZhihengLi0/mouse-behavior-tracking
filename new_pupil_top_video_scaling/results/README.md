@@ -12,9 +12,9 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 
 | video | mouse / length | labels of earlier videos in the training set | final-snapshot series (px, 0/20/40/60/80/100 labels) | plateau | error at plateau |
 |---|---|---|---|---|---|
-| 1 `first5minvedio` | mouse A, 5.0 min | 0 | – / 12.93 / 13.00 / 12.04 / 13.07 / 12.29 | **60 labels** | 12.04 px |
-| 2 `20251031_Pluto_spont_1` | mouse B, 19.9 min | 100 (all of video 1) | 208.2 / 10.37 / 12.17 / 11.35 / 11.59 / 10.94 | **20 labels** | 10.37 px |
-| 3 `pluton2` | mouse B, 19.9 min (2nd recording) | 200 (videos 1 + 2) | in progress | | |
+| 1 `1_first5minvedio` | mouse A, 5.0 min | 0 | – / 12.93 / 13.00 / 12.04 / 13.07 / 12.29 | **60 labels** | 12.04 px |
+| 2 `2_20251031_Pluto_spont_1` | mouse B, 19.9 min | 100 (all of video 1) | 208.2 / 10.37 / 12.17 / 11.35 / 11.59 / 10.94 | **20 labels** | 10.37 px |
+| 3 `3_pluton2` | mouse B, 19.9 min (2nd recording) | 200 (videos 1 + 2) | in progress | | |
 
 Notes
 - With 50 test frames the median moves by about 1 px between neighbouring steps from sampling alone, so the
