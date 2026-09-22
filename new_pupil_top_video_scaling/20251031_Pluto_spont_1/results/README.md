@@ -47,3 +47,33 @@ pre-label point was found in batch05; the corrected batch05 was trained as shuff
 Files: `scale_curve.csv/png`, `val_mAP_by_snapshot.csv`, `jump_flagged.csv`, `selection_040/060/080/100_frames.png`
 (how each batch was chosen: jump rule on the previous model's whole-video prediction, then k-means among the
 flagged frames).
+
+## Pupil-area and blink machinery under the new standard (2026-09-22, `scripts/compare_pupil_methods.py`)
+
+Question from the user: does the earlier machinery (3-point endpoint ellipse, blink handling of 2026-09-19) still
+fit the new label standard, or is there a more accurate variant now that `pupil_top` is a real ellipse endpoint?
+Model = step 5 (100 Pluto labels + 100 video-1 labels). Full table in `pupil_methods_comparison.csv`, figure
+`pupil_methods_comparison.png`.
+
+| quantity, model vs human on the 50 frozen test frames | old 3-point rule (top unused) | new 4-point rule (height = B.y - T.y) |
+|---|---|---|
+| pupil area, median / p90 abs. error | 6.9% / 29.5% | **6.0% / 21.1%** |
+| pupil height | 6.2% / 20.4% | **3.3% / 7.7%** |
+| pupil width (same in both) | 6.0% / 21.5% | |
+| eye opening (lid-to-lid distance) | 2.1% / 4.9% | |
+
+- On the same human labels the two rules differ by a median -1.2% (|diff| 3.2%, p90 7.6%): the labeled pupils
+  are vertically symmetric about the left-right line (top-to-centre / centre-to-bottom = 1.025), so the old rule
+  has no systematic bias under the new standard; it just ignores the information in `pupil_top` and doubles the
+  `pupil_bottom` error. On the whole video (36,152 trusted frames) the two areas correlate at 0.992, the old rule
+  reading a median 4.4% lower.
+- Recommendation: switch the area to the 4-point rule (width = |R.x - L.x|, height = |B.y - T.y|, area = pi/4 w h).
+  The remaining area error is dominated by the width, i.e. by `pupil_left` (median 12 px), the weakest keypoint.
+- Blink handling: the trigger of 2026-09-19 (eye opening < 95% of its 5-s median, or left/right/bottom confidence
+  < 0.6) marks 24,032 of 71,748 frames (33.5%, 899 runs, longest 6.9 s) as untrusted on this video with this
+  model; 9,528 frames are flagged by confidence alone, 2,386 by eye opening alone, 1,818 by both (the rest is the
+  3-frame widening). Adding a `pupil_top` confidence condition raises this to 49.6%. The confidence part of the
+  rule is therefore the limiting factor on this mouse: the model's confidence is lower than on the 5-minute video
+  (89% of test keypoints >= 0.6) although its keypoint error is not worse, so the 0.6 threshold discards many
+  usable frames. Re-tuning that threshold (or relying on eye opening + a lower cutoff) is a decision for the user;
+  nothing was changed in the pipeline.

@@ -1,0 +1,14 @@
+quantity,what,n,median_abs_rel_err_pct,p90_abs_rel_err_pct,median_signed_err_pct,median_abs_err_px
+area_3pt,"model vs human, frozen test frames",50,6.9,29.5,0.3,1384.0
+area_4pt,"model vs human, frozen test frames",50,6.0,21.1,4.8,1535.8
+width,"model vs human, frozen test frames",50,6.0,21.5,4.3,12.1
+height_3pt,"model vs human, frozen test frames",50,6.2,20.4,-5.0,10.0
+height_4pt,"model vs human, frozen test frames",50,3.3,7.7,2.1,4.7
+opening,"model vs human, frozen test frames",50,2.1,4.9,1.9,3.0
+area_3pt / area_4pt - 1,same human labels: old rule vs new rule,50,3.2,7.6,-1.2,
+top-to-centre / centre-to-bottom,human labels: vertical symmetry of the labeled pupil,50,,,2.5,4.0
+area_3pt / area_4pt - 1,"whole video, trusted frames",36152,4.6,11.6,-4.4,
+"corr(area_3pt, area_4pt)","whole video, trusted frames",36152,,,0.992,
+blink rule 2026-09-19 (opening<95% | L/R/B conf<0.6),whole video: untrusted frames / runs / longest run (s),24032,33.5,899.0,6.88,
++ pupil_top conf<0.6,whole video: untrusted frames / runs / longest run (s),35596,49.61,762.0,21.63,
+trigger overlap,frames flagged only by confidence / only by eye opening / by both,71748,9528.0,2386.0,1818.0,
