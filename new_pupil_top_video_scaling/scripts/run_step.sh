@@ -23,7 +23,8 @@ import deeplabcut
 deeplabcut.analyze_videos(r"$CONFIG", [r"$VIDEO"], shuffle=$SHUF, trainingsetindex=$TSI, snapshot_index=$FIN,
     device="mps", batch_size=32, destfolder=r"$DEST")
 PYEOF
-  H5=$(ls "$DEST"/*shuffle${SHUF}*snapshot_120*.h5 2>/dev/null | tail -1)
+  # the epoch-120 file is "snapshot_120" or, when epoch 120 is also the best validation epoch, "snapshot_best-120"
+  H5=$(ls "$DEST"/*shuffle${SHUF}*snapshot*120*.h5 2>/dev/null | tail -1)
   if [ -n "$H5" ]; then
     if $PY select_frames.py --unit "$UNIT" --video "$VIDEO" --stage batch --batch-no $NEXT --pred-h5 "$H5" >> "$LOG" 2>&1; then
       say "BATCH$(printf %02d $NEXT) READY"

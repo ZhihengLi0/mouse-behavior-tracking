@@ -50,7 +50,7 @@ else:
     ax.legend(fontsize=8.5, loc="center right")
 ax.set_title("Tail and label-free health signals")
 n = int(d["n_test_frames"].iloc[0])
-fig.suptitle(f"{a.unit}: labels needed on this video (new pupil standard, training from scratch on this video's labels only; "
-             f"test = {n} frozen frames, never used for any decision)", fontsize=12)
+fig.suptitle(f"{a.unit}: labels needed on this video (new pupil standard, training from scratch; the training set = this video's "
+             f"labels plus all labels of the earlier videos, see README; test = {n} frozen frames, never used for any decision)", fontsize=12)
 fig.savefig(R / "scale_curve.png", dpi=140)
 print(head[[x, "median_frame_rmse_px", "p90_frame_rmse_px", "frac_frames_rmse_gt_50px", "frac_points_conf_ge_0.6"]].to_string(index=False))
