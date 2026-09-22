@@ -173,6 +173,11 @@ def main():
     for u, last in prior:
         train_names[u], _ = stage(u, last, with_val=False)
     train_names[a.unit], val_names = stage(a.unit, a.step, with_val=True)
+    # labeled-data folders of videos that are not part of THIS run would be merged in by DeepLabCut as well;
+    # they are regenerated copies (stage() rebuilds them on every run), so drop them here
+    for d in (PROJECT / "labeled-data").iterdir():
+        if d.is_dir() and d.name not in train_names:
+            shutil.rmtree(d)
     n_new = len(train_names[a.unit])
 
     # the order of the merged table is whatever DeepLabCut produces: read it, then address rows by name
