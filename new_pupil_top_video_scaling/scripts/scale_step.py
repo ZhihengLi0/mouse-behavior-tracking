@@ -114,6 +114,8 @@ def evaluate(unit, shuffle, tsi, label, n_new, snapshot_index, rule, seed):
     gt = flat(human_table(test))
     out = HERE / unit / "training-data" / "eval" / label
     out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob("image_predictions_*"):      # a re-run with another snapshot must not pick up the earlier file
+        old.unlink()
     deeplabcut.analyze_images(str(CONFIG), [str(test)], frame_type=".png", destfolder=str(out), shuffle=shuffle,
                               trainingsetindex=tsi, save_as_csv=True, plotting=False, pcutoff=0.0, device="cpu",
                               snapshot_index=snapshot_index)

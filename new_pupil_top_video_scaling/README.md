@@ -9,6 +9,13 @@ Fixed choices carried over from the earlier work: ResNet-50, batch 2, from scrat
 k-means (DoG fingerprints) for the first batch, jump rule + k-means for later batches, median per-frame RMSE over
 the 8 keypoints on a frozen test set.
 
+Snapshot rules, fixed for every video (confirmed 2026-09-22): the headline number of a step is the FINAL snapshot
+(epoch 120); the secondary column is the snapshot with the best validation mAP after the first learning-rate drop
+(epochs >= 96, i.e. 100/110/120). The validation split never enters training; if its labels are corrected later,
+only the secondary column is recomputed (`scripts/recompute_mAPlate.py`), nothing is retrained.
+From the second video on, the curve starts at x = 0: the earlier videos' model applied unchanged
+(`scripts/score_prior_model.py`). Each later video is trained with ALL labels of the earlier videos plus its own.
+
 ```
 scripts/                 shared tools (select_frames.py, make_prelabels.py, label_set.sh, ...)
 results/                 ACROSS videos: x = number of videos, y = labels needed to reach the plateau

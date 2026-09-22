@@ -1,9 +1,13 @@
 label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
 x020_step01_final,20251031_Pluto_spont_1,42,20,10.37,9.27,31.46,21.58,0.04,0.593,50,400,final snapshot (120),9.64,5.44,13.04,4.15,7.78,5.56,6.71,9.48
-x020_step01_mAPlate,20251031_Pluto_spont_1,42,20,9.86,8.61,42.96,25.06,0.08,0.547,50,400,best validation mAP among epochs >= 96 (110),8.99,3.45,12.11,3.57,7.34,4.94,7.96,9.84
 x040_step02_final,20251031_Pluto_spont_1,42,40,12.17,9.72,14.74,20.31,0.0,0.748,50,400,final snapshot (120),9.74,5.31,12.32,4.12,7.54,5.07,14.26,11.5
-x040_step02_mAPlate,20251031_Pluto_spont_1,42,40,10.96,9.17,14.12,20.2,0.0,0.782,50,400,best validation mAP among epochs >= 96 (110),9.59,5.08,11.97,3.62,7.78,3.99,14.51,10.1
 x060_step03_final,20251031_Pluto_spont_1,42,60,11.35,9.58,21.09,19.66,0.02,0.745,50,400,final snapshot (120),12.71,4.96,12.26,3.73,6.75,4.24,12.45,11.06
-x060_step03_mAPlate,20251031_Pluto_spont_1,42,60,11.5,9.68,13.06,17.74,0.0,0.74,50,400,best validation mAP among epochs >= 96 (best-100),11.95,6.01,10.61,3.72,7.44,5.01,11.7,9.6
 x080_step04_final,20251031_Pluto_spont_1,42,80,11.59,9.5,14.11,19.78,0.0,0.815,50,400,final snapshot (best-120),10.89,5.43,12.6,3.33,7.48,5.74,12.11,11.32
-x080_step04_mAPlate,20251031_Pluto_spont_1,42,80,11.59,9.5,14.11,19.78,0.0,0.815,50,400,best validation mAP among epochs >= 96 (best-120),10.89,5.43,12.6,3.33,7.48,5.74,12.11,11.32
+x000_step00_final,20251031_Pluto_spont_1,42,0,208.23,118.72,205.53,257.91,0.98,0.193,50,400,final snapshot; first5minvedio model applied unchanged (120),334.26,0.0,69.87,0.0,333.4,0.0,33.51,56.4
+x000_step00_mAPlate,20251031_Pluto_spont_1,42,0,225.83,147.4,230.11,284.27,1.0,0.142,50,400,best validation mAP among epochs >= 96 on first5minvedio; model applied unchanged (100),343.81,3.05,396.89,2.59,343.32,2.29,35.83,57.1
+x100_step05_final,20251031_Pluto_spont_1,42,100,10.94,9.29,14.1,19.28,0.0,0.89,50,400,final snapshot (120),9.85,5.14,12.47,3.24,7.62,5.39,12.23,10.63
+x020_step01_mAPlate,20251031_Pluto_spont_1,42,20,9.86,8.61,42.96,25.06,0.08,0.547,50,400,best validation mAP among epochs >= 96 (110),8.99,3.45,12.11,3.57,7.34,4.94,7.96,9.84
+x040_step02_mAPlate,20251031_Pluto_spont_1,42,40,10.96,9.17,14.12,20.2,0.0,0.782,50,400,best validation mAP among epochs >= 96 (110),9.59,5.08,11.97,3.62,7.78,3.99,14.51,10.1
+x060_step03_mAPlate,20251031_Pluto_spont_1,42,60,11.5,9.68,13.06,17.74,0.0,0.74,50,400,best validation mAP among epochs >= 96 (best-100),11.95,6.01,10.61,3.72,7.44,5.01,11.7,9.6
+x100_step05_mAPlate,20251031_Pluto_spont_1,42,100,11.29,9.56,14.29,20.4,0.0,0.85,50,400,best validation mAP among epochs >= 96 (best-110),10.1,6.04,14.91,3.51,7.47,6.03,11.67,11.51
+x080_step04_mAPlate,20251031_Pluto_spont_1,42,80,11.98,9.91,28.18,26.65,0.06,0.782,50,400,best validation mAP among epochs >= 96 (100),10.63,5.7,12.69,3.48,7.63,5.79,10.64,11.5
