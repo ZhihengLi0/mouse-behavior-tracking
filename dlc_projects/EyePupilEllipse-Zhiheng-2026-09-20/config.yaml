@@ -14,6 +14,12 @@ video_sets:
     crop: 0, 928, 0, 736
   /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/pluton2.mp4:
     crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/0_first5minvedio.mp4:
+    crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/1_20251031_Pluto_spont_1.mp4:
+    crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/2_pluton2.mp4:
+    crop: 0, 928, 0, 736
 bodyparts:
 - pupil_top
 - pupil_bottom

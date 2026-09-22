@@ -19,11 +19,12 @@ From the second video on, the curve starts at x = 0: the earlier videos' model a
 ```
 scripts/                 shared tools (select_frames.py, make_prelabels.py, label_set.sh, ...)
 results/                 ACROSS videos: x = number of videos, y = labels needed to reach the plateau
-1_first5minvedio/        video 1 (the 5-minute recording); the video file itself sits in the unit folder (local only)
+0_first5minvedio/        video 0 (the 5-minute recording, mouse A); the video copy sits in the unit folder under the same name (<unit>/<unit>.mp4, local only)
   training-data/         local only: frames and labels (test50, val20, batch01, ...)
   results/               WITHIN this video: x = labels on this video (20, 40, 60, ...), y = test error
-2_20251031_Pluto_spont_1/ video 2 (mouse B, 19.9 min), same layout
-3_pluton2/               video 3 (mouse B, second recording), same layout; one folder per video, numbered in order
+1_20251031_Pluto_spont_1/ video 1 (mouse B, 19.9 min), same layout
+2_pluton2/               video 2 (mouse B, second recording), same layout
+3_pluto3/                video 3 (mouse B, third recording): video copy only, not started; one folder per video, indexed from 0
 ```
 
 Per video: 50 test frames (final 10%, at least 60 s), 20 validation frames (the 10% before), 2-s guard bands,
