@@ -3,3 +3,5 @@ x020_step01_final,3_pluto3,42,20,3.4,2.78,9.1,21.32,0.0,0.955,50,398,final snaps
 x020_step01_mAPlate,3_pluto3,42,20,3.36,2.72,7.98,12.68,0.0,0.942,50,398,best validation mAP among epochs >= 96 (100),2.69,2.97,2.64,2.09,1.76,3.01,1.56,2.11
 x000_step00_final,3_pluto3,42,0,4.43,3.63,11.41,23.23,0.0,0.887,50,398,final snapshot; 2_pluton2 model applied unchanged (best-120),4.41,2.97,3.36,1.65,1.6,4.18,1.69,1.93
 x000_step00_mAPlate,3_pluto3,42,0,4.43,3.63,11.41,23.23,0.0,0.887,50,398,best validation mAP among epochs >= 96 on 2_pluton2; model applied unchanged (best-120),4.41,2.97,3.36,1.65,1.6,4.18,1.69,1.93
+x040_step02_final,3_pluto3,42,40,3.87,3.22,8.91,15.83,0.0,0.952,50,398,final snapshot (120),5.46,2.63,2.42,1.63,2.04,2.42,1.85,1.95
+x040_step02_mAPlate,3_pluto3,42,40,3.94,3.36,8.97,15.86,0.0,0.95,50,398,best validation mAP among epochs >= 96 (110),6.37,3.11,2.56,1.64,1.6,3.12,2.96,1.96
