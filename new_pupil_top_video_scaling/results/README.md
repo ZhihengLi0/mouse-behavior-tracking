@@ -14,7 +14,7 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 |---|---|---|---|---|---|
 | 0 `0_first5minvedio` | mouse A, 5.0 min | 0 | – / 12.93 / 13.00 / 12.04 / 13.07 / 12.29 | **60 labels** | 12.04 px |
 | 1 `1_20251031_Pluto_spont_1` | mouse B, 19.9 min | 100 (all of video 0) | 208.2 / 10.37 / 12.17 / 11.35 / 11.59 / 10.94 | **20 labels** | 10.37 px |
-| 2 `2_pluton2` | mouse B, 19.9 min (2nd recording) | 200 (videos 0 + 1) | 9.99 / 7.73 / 7.57 / 7.83 / – / – | **20 labels** (rule fired at 60; user stopped this video at 60 labels on 2026-09-23, batch04 labeled but not trained) | 7.73 px |
+| 2 `2_pluton2` | mouse B, 19.9 min (2nd recording) | 200 (videos 0 + 1) | 9.99 / 7.73 / 7.57 / 7.83 / 7.56 / – | **20 labels** (rule fired at 60; user stopped selecting at 60 labels on 2026-09-23; batch04 was already labeled and was trained + scored, no further selection) | 7.73 px |
 | 3 `3_pluto3` | mouse B, 19.9 min (3rd recording) | 260 (videos 0 + 1 + 60 of video 2) | 4.43 / 3.40 / – / – / – / – | in progress | |
 
 Notes
