@@ -1,0 +1,5 @@
+label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
+x020_step01_final,3_pluto3,42,20,3.4,2.78,9.1,21.32,0.0,0.955,50,398,final snapshot (120),3.33,2.54,2.31,1.81,1.31,2.69,1.2,1.86
+x020_step01_mAPlate,3_pluto3,42,20,3.36,2.72,7.98,12.68,0.0,0.942,50,398,best validation mAP among epochs >= 96 (100),2.69,2.97,2.64,2.09,1.76,3.01,1.56,2.11
+x000_step00_final,3_pluto3,42,0,4.43,3.63,11.41,23.23,0.0,0.887,50,398,final snapshot; 2_pluton2 model applied unchanged (best-120),4.41,2.97,3.36,1.65,1.6,4.18,1.69,1.93
+x000_step00_mAPlate,3_pluto3,42,0,4.43,3.63,11.41,23.23,0.0,0.887,50,398,best validation mAP among epochs >= 96 on 2_pluton2; model applied unchanged (best-120),4.41,2.97,3.36,1.65,1.6,4.18,1.69,1.93

@@ -29,6 +29,8 @@ PYEOF
     if $PY select_frames.py --unit "$UNIT" --video "$VIDEO" --stage batch --batch-no $NEXT --pred-h5 "$H5" >> "$LOG" 2>&1; then
       say "BATCH$(printf %02d $NEXT) READY"
       $PY viz_selection_timeline.py --unit "$UNIT" --batch-no $NEXT >> "$LOG" 2>&1 && say "selection sheet drawn"
+      # the first batch is chosen without a model; its sheet needs this (first) prediction for the time-series half
+      if [ "$STEP" = "1" ]; then $PY viz_selection_timeline.py --unit "$UNIT" --batch-no 1 --pred-h5 "$H5" >> "$LOG" 2>&1 && say "batch01 sheet drawn"; fi
     else say "NEXT BATCH SELECTION FAILED"; fi
   else say "no predictions h5"; fi
 else say "STEP FAILED"; fi
