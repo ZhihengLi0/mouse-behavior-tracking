@@ -1,20 +1,12 @@
-# Config schema version. Do not edit manually.
 config_version: 0
-# Project definitions (do not edit)
 Task: EyePupilEllipse
 scorer: Zhiheng
 date: Sep20
 multianimalproject: false
-identity:
-
-# Project path (change when moving around)
-project_path: /Users/lizhiheng/Desktop/生物/new_pupil_top_video_scaling/../dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20
-pose_config_path:
-
-# Default DeepLabCut engine to use for shuffle creation (either pytorch or tensorflow)
+identity: null
+project_path: /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20
+pose_config_path: null
 engine: pytorch
-
-# Annotation data set configuration (and individual video cropping parameters)
 video_sets:
   /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/first5minvedio.mp4:
     crop: 0, 928, 0, 736
@@ -41,13 +33,9 @@ individuals:
 - individual_1
 uniquebodyparts: []
 multianimalbodyparts: []
-
-# Fraction of video to start/stop when extracting frames for labeling/refinement
 start: 0.0
 stop: 0.8
 numframes2pick: 20
-
-# Plotting configuration
 skeleton:
 - - pupil_top
   - pupil_bottom
@@ -62,8 +50,6 @@ pcutoff: 0.6
 dotsize: 17
 alphavalue: 0.7
 colormap: rainbow
-
-# Training,Evaluation and Analysis configuration
 TrainingFraction:
 - 0.5
 - 0.67
@@ -76,32 +62,24 @@ TrainingFraction:
 - 0.9
 - 0.91
 - 0.92
+- 0.93
 iteration: 0
 default_net_type: resnet_50
 default_augmenter: default
-default_track_method:
+default_track_method: null
 snapshotindex: -1
 detector_snapshotindex: -1
 batch_size: 8
 detector_batch_size: 1
-
-# Cropping Parameters (for analysis and outlier frame detection)
 cropping: false
-# if cropping is true for analysis, then set the values here:
 x1: 0
 x2: 640
 y1: 277
 y2: 624
-
-# Refinement configuration (parameters from annotation dataset configuration also relevant in this stage)
 corner2move2:
 - 50
 - 50
 move2corner: true
-
-# Conversion tables to fine-tune SuperAnimal weights
-SuperAnimalConversionTables:
-
-# These are very old parameters that are no longer used They are simply ignored.
-resnet:
-croppedtraining:
+SuperAnimalConversionTables: null
+resnet: null
+croppedtraining: null
