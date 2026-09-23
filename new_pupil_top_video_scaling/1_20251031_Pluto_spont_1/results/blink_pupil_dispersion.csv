@@ -1,0 +1,6 @@
+signal,direction,AUC_vs_eyelid_trigger,flagged_at_matched_count,overlap_with_eyelid_trigger,precision,recall,median_open,median_closing
+aspect,low,0.7,4285,1008,0.235,0.235,0.865,0.762
+centre_off,high,0.618,4285,745,0.174,0.174,0.058,0.081
+jump,high,0.637,4285,825,0.193,0.193,0.016,0.022
+min_conf,low,0.624,4285,965,0.225,0.225,0.697,0.629
+area_rel,low,0.792,4285,1381,0.322,0.322,1.002,0.92

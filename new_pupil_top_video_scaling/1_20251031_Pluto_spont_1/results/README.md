@@ -77,3 +77,28 @@ Model = step 5 (100 Pluto labels + 100 video-1 labels). Full table in `pupil_met
   (89% of test keypoints >= 0.6) although its keypoint error is not worse, so the 0.6 threshold discards many
   usable frames. Re-tuning that threshold (or relying on eye opening + a lower cutoff) is a decision for the user;
   nothing was changed in the pipeline.
+
+## Do the predicted pupil points betray a closed eye? (2026-09-22, `scripts/blink_pupil_dispersion.py`)
+
+User observation while labeling: on closed-eye frames the model's pupil points scatter or jump a lot, so the pupil
+geometry itself might detect blinks. Measured only; the pipeline is unchanged.
+
+Signals per frame from the predicted pupil points: `aspect` (height / width), `centre_off` (distance between the
+centre of top-bottom and the centre of left-right, in pupil widths), `jump` (largest frame-to-frame move of a pupil
+point, in pupil widths), `min_conf` (lowest confidence of the 4 pupil points), `area_rel` (4-pt area / 5-s median).
+
+1. Against the eyelid trigger on the whole video (71,748 frames, step-5 model; reference = eye opening < 95% of
+   its 5-s median, 4,285 frames): AUC 0.62-0.70 for the dispersion signals, 0.79 for `area_rel`; at a matched
+   number of flagged frames only 17-32% of them coincide with the eyelid trigger. Weak agreement - but the eyelid
+   trigger is itself a heuristic, not ground truth.
+2. Against the labeler (530 labeled frames of all units with pre-labels; 20 frames where the labeler left >= 1
+   pupil point empty = pupil not visible): `min_conf` AUC 0.84 (median 0.23 on closed vs 0.57 on open frames),
+   `centre_off` AUC 0.76 (0.25 vs 0.05 pupil widths), `aspect` 0.34 (useless), and the model's own lid distance
+   only 0.55. So on frames a human calls closed, the scatter of the pupil points and their low confidence are far
+   better indicators than the predicted eyelid distance. Caveats: n = 20, and these frames were themselves picked
+   by the jump rule, i.e. frames where the model was unstable.
+
+Reading: the hypothesis holds for the frames a human calls closed; the two triggers (lid distance vs pupil
+scatter/confidence) flag largely different frames, so combining them - or replacing the lid distance - is a
+decision for the user after the video-level counts are compared (`blink_pupil_dispersion.csv`,
+`blink_pupil_dispersion_labeled_frames.csv`, figure `blink_pupil_dispersion.png`).
