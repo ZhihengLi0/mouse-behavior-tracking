@@ -25,3 +25,24 @@ Notes
   The user therefore chose to keep selecting correction batches for video 2 beyond the plateau (batch 06).
 - The 0-label point of a video = the earlier videos' model applied unchanged (`scripts/score_prior_model.py`);
   video 1 has no earlier model, so no 0 point.
+
+## Cross-video back-test (2026-09-23)
+
+Every model of the sequence (19 final snapshots: video 0 steps 1-5, video 1 steps 1-7, video 2 steps 1-4,
+video 3 steps 1-3) scored on every video's 50 frozen test frames with `scripts/cross_video_eval.py`
+(`cross_video_matrix.csv`, `cross_video_curves.png`, `cross_video_matrix.png`). x = models in training order;
+left of a video's dotted line the video is not yet in the training set, so those points are its 0-label regime.
+
+| test set | mouse-A models only (video 0, 20-100 labels) | first model with own labels | later models (own labels + later videos) |
+|---|---|---|---|
+| video 0 (mouse A) | 12.0-13.1 px | – | 11.9-12.9 px; never degrades while 220 mouse-B labels are added |
+| video 1 (Pluto 1) | 187-302 px (different mouse: useless) | 10.4 px (20 labels) | 11.3-12.2 px, flat |
+| video 2 (Pluto 2) | 172-216 px | 20.3 -> 9.1 px with video-1 labels alone (0-label regime) | 7.0-7.8 px once its own labels enter |
+| video 3 (Pluto 3) | 178-291 px | 8.7 px with 20 video-1 labels; 107 px outlier at 40 video-1 labels; 4.4-5.4 px in the 0-label regime with video-2 labels | 3.4-3.9 px |
+
+Reading: (1) a mouse-A-only model does not transfer to mouse B at all; 20 labels of mouse B bring every
+mouse-B video to about 10 px. (2) Old videos do not get worse as later videos are added (video 0 and video 1
+rows are flat within the 1 px sampling noise). (3) Same-day videos transfer strongly: video 3 already sits at
+4-5 px before any of its own labels, driven by the video-1/video-2 labels. (4) Single models can be off by a
+lot in the 0-label regime (video 3 under the 40-label video-1 model: 107 px), so a 0-shot number from one
+model is not reliable on its own.
