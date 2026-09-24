@@ -1,0 +1,5 @@
+label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
+x000_step00_final,4_20251030_Pluto_spont_1,42,0,22.8,14.44,35.63,44.45,0.04,0.896,50,384,final snapshot; 3_20251031_pluto3 model applied unchanged (120),22.53,29.32,32.65,22.63,0.0,0.0,0.0,0.0
+x000_step00_mAPlate,4_20251030_Pluto_spont_1,42,0,22.3,14.62,27.16,41.92,0.02,0.867,50,384,best validation mAP among epochs >= 96 on 3_20251031_pluto3; model applied unchanged (100),22.01,29.41,32.5,22.12,1.31,1.05,1.88,1.88
+x020_step01_final,4_20251030_Pluto_spont_1,42,20,21.75,15.33,34.34,44.04,0.06,0.867,50,384,final snapshot (best-120),20.67,29.75,32.92,6.5,2.24,1.79,3.55,4.87
+x020_step01_mAPlate,4_20251030_Pluto_spont_1,42,20,21.75,15.33,34.34,44.04,0.06,0.867,50,384,best validation mAP among epochs >= 96 (best-120),20.67,29.75,32.92,6.5,2.24,1.79,3.55,4.87
