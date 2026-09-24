@@ -8,7 +8,7 @@ multianimalproject: false
 identity:
 
 # Project path (change when moving around)
-project_path: /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20
+project_path: /Users/lizhiheng/Desktop/生物/new_pupil_top_video_scaling/../dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20
 pose_config_path:
 
 # Default DeepLabCut engine to use for shuffle creation (either pytorch or tensorflow)
@@ -29,6 +29,12 @@ video_sets:
   /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/2_pluton2.mp4:
     crop: 0, 928, 0, 736
   /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/3_pluto3.mp4:
+    crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/2_20251031_pluton2.mp4:
+    crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/3_20251031_pluto3.mp4:
+    crop: 0, 928, 0, 736
+  /Users/lizhiheng/Desktop/生物/dlc_projects/EyePupilEllipse-Zhiheng-2026-09-20/videos/4_20251030_Pluto_spont_1.mp4:
     crop: 0, 928, 0, 736
 bodyparts:
 - pupil_top
@@ -80,6 +86,7 @@ TrainingFraction:
 - 0.92
 - 0.93
 - 0.94
+- 0.95
 iteration: 0
 default_net_type: resnet_50
 default_augmenter: default
