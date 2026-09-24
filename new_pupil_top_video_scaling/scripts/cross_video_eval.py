@@ -25,26 +25,57 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scale_step import BPS, CONFIG, EPOCHS, HERE, PROJECT, flat  # noqa: E402
 
 # (unit, mouse, date, [(step, shuffle, labels of this video)])   - chronological order of training
+# "auto:NN" = discover the finished steps of that video from its shuffles NN1..NN9 (step = last digit)
 VIDEOS = [
     ("0_first5minvedio", "mouse A", "5-min recording", [(1, 111, 20), (2, 112, 40), (3, 113, 60), (4, 114, 80), (5, 115, 100)]),
     ("1_20251031_Pluto_spont_1", "mouse B (Pluto)", "2025-10-31", [(1, 211, 20), (2, 212, 40), (3, 213, 60), (4, 214, 80), (5, 225, 100), (6, 216, 120), (7, 217, 140)]),
-    ("2_pluton2", "mouse B (Pluto)", "2025-10-31", [(1, 321, 20), (2, 322, 40), (3, 323, 60), (4, 324, 80)]),
-    ("3_pluto3", "mouse B (Pluto)", "2025-10-31", [(1, 411, 20), (2, 422, 40), (3, 423, 60)]),
+    ("2_20251031_pluton2", "mouse B (Pluto)", "2025-10-31", [(1, 321, 20), (2, 322, 40), (3, 323, 60), (4, 324, 80)]),
+    ("3_20251031_pluto3", "mouse B (Pluto)", "2025-10-31", [(1, 411, 20), (2, 422, 40), (3, 423, 60)]),
+    ("4_20251030_Pluto_spont_1", "mouse B (Pluto)", "2025-10-30", "auto:51"),
+    ("5_20251029_Pluto_spont_1", "mouse B (Pluto)", "2025-10-29", "auto:61"),
 ]
 # labels of a video that are carried into later videos (the "prior" used when the next video started)
-CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_pluton2": 60, "3_pluto3": 60}
+CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_pluton2": 60, "3_20251031_pluto3": 60}
+PALETTE = ["#2F6B9A", "#D1495B", "#2A9D8F", "#E08E45", "#7B4EA3", "#8C6D31", "#444444"]
+
+
+def steps_of(spec):
+    if not isinstance(spec, str):
+        return spec
+    base = int(spec.split(":")[1])
+    out = []
+    for k in range(1, 10):
+        try:
+            tsi_of(base * 10 + k)
+        except (StopIteration, ValueError, IndexError, FileNotFoundError):
+            continue
+        out.append((k, base * 10 + k, 20 * k))
+    return out
+
+
+def test_units():
+    """videos whose frozen test set exists (a new video joins as soon as its test50 has been labeled and frozen)"""
+    return [v[0] for v in VIDEOS if (HERE / v[0] / "training-data" / "labels" / "test_frozen" / "test50_labels.h5").exists()]
+
+
+def label_of(u):
+    i = int(u.split("_")[0])
+    return f"video {i} (5 min, mouse A)" if i == 0 else f"video {i} (Pluto, {next(v[2] for v in VIDEOS if v[0] == u)})"
+
+
 R = HERE / "results"
 OUT = R / "cross_video_matrix.csv"
 
 
 def models():
     rows, idx, carried = [], 0, 0
-    for u, mouse, date, steps in VIDEOS:
+    for u, mouse, date, spec in VIDEOS:
+        steps = steps_of(spec)
         for step, shuffle, n in steps:
             rows.append(dict(model_idx=idx, model_unit=u, mouse=mouse, date=date, step=step, shuffle=shuffle,
                              labels_this_video=n, total_labels=carried + n))
             idx += 1
-        carried += CARRIED[u]
+        carried += CARRIED.get(u, steps[-1][2] if steps else 0)
     return pd.DataFrame(rows)
 
 
@@ -79,16 +110,18 @@ def score(shuffle, tsi, final_idx, test_unit):
 
 
 def plot(m):
-    units = [v[0] for v in VIDEOS]
-    colors = {"0_first5minvedio": "#2F6B9A", "1_20251031_Pluto_spont_1": "#D1495B", "2_pluton2": "#2A9D8F", "3_pluto3": "#E08E45"}
-    short = {"0_first5minvedio": "video 0 (5 min, mouse A)", "1_20251031_Pluto_spont_1": "video 1 (Pluto 1, mouse B)",
-             "2_pluton2": "video 2 (Pluto 2, mouse B)", "3_pluto3": "video 3 (Pluto 3, mouse B)"}
+    units = test_units()
+    colors = {v[0]: PALETTE[i % len(PALETTE)] for i, v in enumerate(VIDEOS)}
+    short = {v[0]: label_of(v[0]) for v in VIDEOS}
     mods = models()
+    m = m[m.shuffle.isin(mods.shuffle)]
     fig, ax = plt.subplots(figsize=(19, 8), constrained_layout=True)
     for tu in units:
         s = m[m.test_unit == tu].sort_values("model_idx")
         ax.plot(s.model_idx, s.median_frame_rmse_px, "o-", color=colors[tu], lw=2, ms=6, label=f"test set of {short[tu]}")
         own = mods[mods.model_unit == tu].model_idx.min()
+        if not np.isfinite(own):
+            continue
         ax.axvline(own - 0.5, color=colors[tu], ls=":", lw=1)
         ax.annotate("own labels start", (own - 0.5, ax.get_ylim()[1] if False else 1.2), color=colors[tu], fontsize=8, rotation=90, va="bottom", ha="right")
     ax.set_yscale("log"); ax.set_ylabel("median frame RMSE on that video's 50 frozen test frames (px, log scale)")
@@ -96,8 +129,10 @@ def plot(m):
     ax.set_xticklabels([f"{r.labels_this_video}\n({r.total_labels})" for r in mods.itertuples()], fontsize=8)
     ax.set_xlabel("model, in training order: labels of its own video (total labels in its training set)")
     # video spans below the axis
-    for u, mouse, date, steps in VIDEOS:
+    for u, mouse, date, _ in VIDEOS:
         g = mods[mods.model_unit == u]
+        if g.empty:
+            continue
         x0, x1 = g.model_idx.min() - 0.5, g.model_idx.max() + 0.5
         ax.axvspan(x0, x1, color=colors[u], alpha=0.06)
         ax.text((x0 + x1) / 2, 1.02, f"{short[u]}\n{date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
@@ -130,7 +165,7 @@ if __name__ == "__main__":
         rows = []
         for r in mods.itertuples():
             tsi, final = tsi_of(r.shuffle)
-            for tu in [v[0] for v in VIDEOS]:
+            for tu in test_units():
                 if len(done) and ((done.shuffle == r.shuffle) & (done.test_unit == tu)).any():
                     continue
                 res = score(r.shuffle, tsi, final, tu)
