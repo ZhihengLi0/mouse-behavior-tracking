@@ -36,6 +36,8 @@ VIDEOS = [
 ]
 # labels of a video that are carried into later videos (the "prior" used when the next video started)
 CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_pluton2": 60, "3_20251031_pluto3": 60}
+# videos the labeler judged hard to read by eye (pupil boundary barely visible); marked in the figures
+POOR_QUALITY = {"4_20251030_Pluto_spont_1"}
 PALETTE = ["#2F6B9A", "#D1495B", "#2A9D8F", "#E08E45", "#7B4EA3", "#8C6D31", "#444444"]
 
 
@@ -60,7 +62,8 @@ def test_units():
 
 def label_of(u):
     i = int(u.split("_")[0])
-    return f"video {i} (5 min, mouse A)" if i == 0 else f"video {i} (Pluto, {next(v[2] for v in VIDEOS if v[0] == u)})"
+    lab = f"video {i} (5 min, mouse A)" if i == 0 else f"video {i} (Pluto, {next(v[2] for v in VIDEOS if v[0] == u)})"
+    return lab + (" [POOR QUALITY: pupil hard to see]" if u in POOR_QUALITY else "")
 
 
 R = HERE / "results"
@@ -135,7 +138,8 @@ def plot(m):
             continue
         x0, x1 = g.model_idx.min() - 0.5, g.model_idx.max() + 0.5
         ax.axvspan(x0, x1, color=colors[u], alpha=0.06)
-        ax.text((x0 + x1) / 2, 1.02, f"{short[u]}\n{date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
+        head = f"video {u.split('_')[0]}" + (" (POOR QUALITY)" if u in POOR_QUALITY else "")
+        ax.text((x0 + x1) / 2, 1.02, f"{head}\n{date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
     ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=9, loc="upper right")
     ax.set_title("Every model of the sequence, scored on every video's frozen test set (final snapshot, epoch 120)\n"
                  "left of a dotted line = that video not yet in the training set (its 0-label regime); labels are 20 per step", fontsize=11, pad=34)

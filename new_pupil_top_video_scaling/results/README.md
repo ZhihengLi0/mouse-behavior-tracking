@@ -69,3 +69,9 @@ pupil points are ellipse endpoints under the new standard). Median |area error| 
 - Per-frame point selection has headroom (oracle 2.5%), but model confidence does not find it (7.9%, worse than
   4-point) - consistent with kaiwen's distrust of confidence. Any learned weighting would have to beat 3.7%.
 - Recommendation: switch the production area to the 4-point rule; `pupil_trace.py` is unchanged until that is decided.
+
+## Video quality flags
+
+- Video 4 (`4_20251030_Pluto_spont_1`, 2025-10-30): **poor quality** - the pupil boundary is hard to see even by
+  eye (labeler, 2026-09-24). Its errors are not directly comparable with the clear 2025-10-31 videos; marked in the
+  cross-video figures.

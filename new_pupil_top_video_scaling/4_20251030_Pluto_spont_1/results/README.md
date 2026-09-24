@@ -4,6 +4,10 @@ First recording of a different day (the earlier mouse-B videos 1-3 are all from 
 Protocol as for every video: 50 frozen test frames (final 10%), 20 validation frames, batches of 20; batch01 by
 k-means, later batches by jump rule + k-means. The video copy is `4_20251030_Pluto_spont_1.mp4` (local only).
 
+> **Poor-quality video (labeler's judgement, 2026-09-24).** In this recording the pupil boundary is hard to see even
+> by eye (dark, low-contrast eye; the pupil/iris edge is often not visible), so the human labels themselves are less
+> certain than in videos 1-3. Keep this in mind when comparing its errors with the other videos.
+
 ## Result so far (median frame RMSE over the 50 frozen test frames; final snapshot = epoch 120)
 
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
