@@ -6,7 +6,7 @@
 | 0 (video-2 step-3 model, 60 labels, applied unchanged) | 4.43 px | 23.2 | 0% | 89% | – |
 | 20 | **3.40 px** | 21.3 | 0% | 96% | 3,679 (6.4%) |
 | 40 | 3.87 px | 15.8 | 0% | 95% | 3,328 (5.8%) |
-| 60 | 3.63 px | 10.2 | 0% | 96% | (predicting) |
+| 60 | 3.63 px | 10.2 | 0% | 96% | 3866 (6.8%) |
 
 Training set of step 1: 100 labels of video 0 + 100 of video 1 + 60 of video 2 + 20 of this video (280 frames).
 The test50 pre-labels came from the video-2 step-2 model (40 labels) and the labeler moved 50 of 398 points, so
