@@ -1,0 +1,14 @@
+quantity,value,note
+frames compared,14400,"first 4 minutes of the 5-minute video, both models"
+"corr(3-pt area old model, 3-pt area new model)",0.761,"frames trusted by both rules, n=12446"
+median new/old 3-pt area ratio,1.025,"same rule, same frames; differs from 1 only through the models"
+median |new/old - 1| (%),3.6,frame-wise disagreement of the two models
+"corr(3-pt area, 4-pt area) new model",0.934,trusted frames
+median 3-pt / 4-pt - 1 (%) new model,6.2,bias of the old rule on the new model's output
+"untrusted frames, old model, rule 2026-09-19",1287,"8.9% of frames, 86 runs"
+"untrusted frames, new model, rule 2026-09-19",1522,"10.6% of frames, 73 runs"
+"untrusted frames, new model, rule + any pupil conf < 0.6",1740,12.1% of frames
+frames flagged by both models,855,overlap of the two untrusted sets
+"labeled frames flagged untrusted: old model, rule 2026-09-19",22/120 with a labeled pupil,no labeled frame of video 0 has an empty pupil (mouse A never fully closed the eye in the labeled frames)
+"labeled frames flagged untrusted: new model, rule 2026-09-19",25/120 with a labeled pupil,no labeled frame of video 0 has an empty pupil (mouse A never fully closed the eye in the labeled frames)
+"labeled frames flagged untrusted: new model, rule + any pupil conf < 0.6",28/120 with a labeled pupil,no labeled frame of video 0 has an empty pupil (mouse A never fully closed the eye in the labeled frames)

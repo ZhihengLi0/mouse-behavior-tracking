@@ -46,3 +46,26 @@ rows are flat within the 1 px sampling noise). (3) Same-day videos transfer stro
 4-5 px before any of its own labels, driven by the video-1/video-2 labels. (4) Single models can be off by a
 lot in the 0-label regime (video 3 under the 40-label video-1 model: 107 px), so a 0-shot number from one
 model is not reliable on its own.
+
+## Pupil-area rules: which pupil points to use (2026-09-23, kaiwen's direction 3)
+
+`scripts/pupil_area_variants.py` -> `pupil_area_variants.csv/.png`, `pupil_area_labeler_prior.csv`. Frozen test frames
+of all four videos, last trained model of each video, truth = 4-point ellipse area from the human labels (all four
+pupil points are ellipse endpoints under the new standard). Median |area error| in %:
+
+| rule | video 0 (mouse A) | video 1 | video 2 | video 3 | pooled (196 frames) |
+|---|---|---|---|---|---|
+| current 3-point (pupil_top unused, `pupil_trace.py`) | 6.5 | 6.7 | 3.1 | 12.8 | 6.9 |
+| 4-point | 2.2 | 6.2 | 4.4 | 3.2 | **3.7** |
+| 3 of 4, drop bottom / left / right | 5.9 / 3.1 / 4.4 | 12.4 / 8.5 / 15.8 | 7.7 / 11.4 / 5.5 | 19.3 / 27.4 / 22.8 | 9.1 / 10.4 / 10.8 |
+| 3 of 4 chosen by the labeler prior | 6.5 | 6.7 | 3.1 | 12.8 | 6.9 |
+| 3 of 4, lowest model confidence dropped per frame | 5.4 | 7.1 | 4.5 | 25.5 | 7.9 |
+| oracle (best 3 of 4 per frame, lower bound) | 1.4 | 2.8 | 1.3 | 11.6 | 2.5 |
+
+- Labeler prior = the pupil point the labeler corrected most often in the pre-labeled training batches (moved > 2 px or
+  emptied). It is `pupil_top` in every video (20-40% of pre-labels corrected, vs 3-23% for the other points), so the
+  prior picks exactly the current rule. Dropping the hardest point does not help: using pupil_top still halves the
+  pooled error (6.9% -> 3.7%), and in video 3 the 3-point rule is biased by -10.5%.
+- Per-frame point selection has headroom (oracle 2.5%), but model confidence does not find it (7.9%, worse than
+  4-point) - consistent with kaiwen's distrust of confidence. Any learned weighting would have to beat 3.7%.
+- Recommendation: switch the production area to the 4-point rule; `pupil_trace.py` is unchanged until that is decided.
