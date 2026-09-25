@@ -87,6 +87,7 @@ TrainingFraction:
 - 0.93
 - 0.94
 - 0.95
+- 0.96
 iteration: 0
 default_net_type: resnet_50
 default_augmenter: default

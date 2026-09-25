@@ -18,6 +18,7 @@ k-means, later batches by jump rule + k-means. The video copy is `4_20251030_Plu
 | 60 | 17.16 px | 32.1 | 2% | 77% | 7,537 (13.2%) |
 | 80 | 16.40 px | 34.1 | 0% | 83% | 7,725 (13.5%) |
 | 100 | 15.38 px | 32.5 | 0% | 80% | (pending: step-5 whole-video prediction) |
+| 120 | 17.10 px | 33.4 | 2% | 84% | (pending: step-6 whole-video prediction) |
 
 Training set of step 1 (shuffle 511): 100 labels of video 0 + 100 of video 1 + 60 of video 2 + 60 of video 3 +
 20 of this video (340 frames); validation = the 20 val frames of this video.
@@ -28,3 +29,8 @@ Training set of step 1 (shuffle 511): 100 labels of video 0 + 100 of video 1 + 6
   the model under-sizes the pupil on this day (pre-label width median 157 px vs 215 px in the human test labels).
 - Anchoring: the test50 pre-labels came from the same model as the 0-label point (shuffle 423) and the labeler moved
   146 of 400 points, so the 0-label score is optimistic wherever the labeler agreed with that model.
+
+Plateau rule after step 6 (2026-09-25): the 120-label model (17.10 px) did not improve the running best of 15.38 px
+(100 labels), so this is the first step with <= 3% improvement; the rule fires only if step 7 (140 labels) also fails
+to improve it by more than 3%. With 50 test frames on a video whose pupil edge is hard to see, a 1-2 px swing between
+steps is within noise.

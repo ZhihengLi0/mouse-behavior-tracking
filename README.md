@@ -8,14 +8,14 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-25 13:50 CDT)
+## Status (last updated 2026-09-25 16:30 CDT)
 
 | what | state |
 |---|---|
 | Label standard | era 3 (since 2026-09-20): the pupil is an **ellipse**; its four points are the ellipse endpoints, including the part hidden under the lid |
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
-| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 100 labels = 15.38 px, still improving (6.2% over 80 labels); batch 6 (120 labels) selected, waiting for labeling |
+| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): best so far 15.38 px at 100 labels; 120 labels = 17.10 px (no improvement, first step toward the plateau rule); waiting for the decision on batch 7 |
 | Blink / area analysis | started 2026-09-25: per-video eye time series (4-point and 3-point area, eye opening, confidence) in `<video>/results/blink_area_analysis/`; the production blink rule flags 26-50% of mouse-B frames, far more than real blinks |
 | Test-set only | video 5 (2025-10-29), video 6 (2025-10-28) and video 7 (2025-10-27, test set being labeled): frozen test sets scored by every model so far |
 
@@ -29,7 +29,7 @@ Labels needed per video (plateau = two consecutive 20-label steps that improve t
 | 1 | Pluto, 2025-10-31 | 100 | 208 / 10.37 / 12.17 / 11.35 px | 20 labels, 10.4 px |
 | 2 | Pluto, 2025-10-31 | 200 | 9.99 / 7.73 / 7.57 / 7.83 px | 20 labels, 7.7 px |
 | 3 | Pluto, 2025-10-31 | 260 | 4.43 / 3.40 / 3.87 / 3.63 px | 20 labels, 3.4 px |
-| 4 | Pluto, 2025-10-30 (poor quality) | 320 | 22.80 / 21.75 / 18.19 / 17.16 / 16.40 / 15.38 px | not reached yet |
+| 4 | Pluto, 2025-10-30 (poor quality) | 320 | 22.80 / 21.75 / 18.19 / 17.16 / 16.40 / 15.38 px (120: 17.10) | not reached yet |
 
 What the numbers say:
 
