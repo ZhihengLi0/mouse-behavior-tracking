@@ -14,7 +14,7 @@ k-means, later batches by jump rule + k-means. The video copy is `4_20251030_Plu
 |---|---|---|---|---|---|
 | 0 (video-3 step-3 model, 320 labels, applied unchanged) | 22.80 px | 44.5 | 4% | 90% | – |
 | 20 | 21.75 px | 44.0 | 6% | 87% | 8,548 (15.0%) |
-| 40 | 18.19 px | 35.3 | 4% | 80% | (pending: step-2 whole-video prediction) |
+| 40 | 18.19 px | 35.3 | 4% | 80% | 10,536 (18.4%) |
 | 60 | 17.16 px | 32.1 | 2% | 77% | (pending: step-3 whole-video prediction) |
 
 Training set of step 1 (shuffle 511): 100 labels of video 0 + 100 of video 1 + 60 of video 2 + 60 of video 3 +
