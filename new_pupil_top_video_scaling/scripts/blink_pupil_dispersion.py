@@ -37,7 +37,7 @@ ap.add_argument("--unit", required=True)
 ap.add_argument("--pred-h5", required=True)
 ap.add_argument("--fps", type=float, default=60.0)
 a = ap.parse_args()
-R = HERE / a.unit / "results"
+R = HERE / a.unit / "results" / "blink_area_analysis"; R.mkdir(parents=True, exist_ok=True)
 d = pt.load(a.pred_h5)
 n = len(d); fps = a.fps; win = int(round(5 * fps))
 xy = lambda b: (d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float))

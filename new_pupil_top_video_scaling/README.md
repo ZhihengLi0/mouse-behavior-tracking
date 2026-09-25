@@ -22,9 +22,14 @@ results/                 ACROSS videos: x = number of videos, y = labels needed 
 0_first5minvedio/        video 0 (the 5-minute recording, mouse A); the video copy sits in the unit folder under the same name (<unit>/<unit>.mp4, local only)
   training-data/         local only: frames and labels (test50, val20, batch01, ...)
   results/               WITHIN this video: x = labels on this video (20, 40, 60, ...), y = test error
+    selection_sheets/    one sheet per selected batch: clusters + time series of the chosen frames
+    blink_area_analysis/ per-video time series (pupil area 4-point / 3-point, eye opening, confidence) and blink / area studies
 1_20251031_Pluto_spont_1/ video 1 (mouse B, 19.9 min), same layout
-2_pluton2/               video 2 (mouse B, second recording), same layout
-3_pluto3/                video 3 (mouse B, third recording): video copy only, not started; one folder per video, indexed from 0
+2_20251031_pluton2/      video 2 (mouse B, 2025-10-31, second recording), same layout
+3_20251031_pluto3/       video 3 (mouse B, 2025-10-31, third recording), same layout
+4_20251030_Pluto_spont_1/ video 4 (mouse B, 2025-10-30; poor image quality), same layout
+5_20251029_Pluto_spont_1/ video 5 (mouse B, 2025-10-29): frozen test set only (scored by every model)
+6_20251028_Pluto_spont_1/ video 6 (mouse B, 2025-10-28): frozen test set only (scored by every model)
 ```
 
 Per video: 50 test frames (final 10%, at least 60 s), 20 validation frames (the 10% before), 2-s guard bands,

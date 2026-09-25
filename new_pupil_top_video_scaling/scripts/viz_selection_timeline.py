@@ -156,7 +156,7 @@ how = "k-means over the whole training pool (no model yet)" if a.batch_no == 1 e
 fig.suptitle(f"{a.unit} / {name}: how the 20 frames were chosen - {how}\n"
              f"Time series below: {who}.\n"
              "Grey = computed on every frame, color = untrusted frames bridged (3-point endpoint pupil).", fontsize=12, y=0.925)
-out = UNIT / "results" / f"selection_{20 * a.batch_no:03d}_frames.png"      # named by the cumulative labels this batch brings the video to
+out = UNIT / "results" / "selection_sheets" / f"selection_{20 * a.batch_no:03d}_frames.png"; out.parent.mkdir(parents=True, exist_ok=True)      # named by the cumulative labels this batch brings the video to
 fig.savefig(out, dpi=110, bbox_inches="tight")
 print(f"{name}: {len(feats)} candidates, picks {picks.min() / fps:.0f}-{picks.max() / fps:.0f} s, jump eps {eps:.1f} px, "
       f"{n_flag} pool frames flagged -> {out.name}")

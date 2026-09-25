@@ -5,7 +5,7 @@ from this video (x = 20, 40, 60, ...). New pupil standard (ellipse endpoints).
 
 ## Old-era model vs new-standard model on the same frames (2026-09-23)
 
-`scripts/pupil_area_variants.py` part B -> `pupil_old_vs_new_model.csv/.png`. The old-era model (Aug 17 project,
+`scripts/pupil_area_variants.py` part B -> `blink_area_analysis/pupil_old_vs_new_model.csv/.png`. The old-era model (Aug 17 project,
 100 labels, snapshot best-100) predicted the first 4 minutes of this video (14,400 frames); the new-standard model of
 step 5 (100 labels) predicted the whole video. The 3-point area rule ignores pupil_top, so on these frames only the
 models differ, not the label standard. Corr(old, new 3-point area) 0.761 on the 12,446 frames both rules trust,

@@ -36,7 +36,7 @@ ap.add_argument("--test-pred", required=True, help="image_predictions_*.h5 of th
 ap.add_argument("--pred-h5", default=None, help="whole-video predictions of the same model (optional)")
 ap.add_argument("--fps", type=float, default=60.0)
 a = ap.parse_args()
-R = HERE / a.unit / "results"
+R = HERE / a.unit / "results" / "blink_area_analysis"; R.mkdir(parents=True, exist_ok=True)
 
 
 def geometry(d):

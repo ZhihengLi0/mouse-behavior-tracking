@@ -44,7 +44,7 @@ drives the secondary column, which was therefore recomputed with the corrected v
 unaffected. Step 5 was trained twice: the first run (shuffle 215) was stopped at epoch ~45 when one unmoved
 pre-label point was found in batch05; the corrected batch05 was trained as shuffle 225.
 
-Files: `scale_curve.csv/png`, `val_mAP_by_snapshot.csv`, `jump_flagged.csv`, `selection_040/060/080/100_frames.png`
+Files: `scale_curve.csv/png`, `val_mAP_by_snapshot.csv`, `jump_flagged.csv`, `selection_sheets/selection_*_frames.png`
 (how each batch was chosen: jump rule on the previous model's whole-video prediction, then k-means among the
 flagged frames).
 
@@ -52,8 +52,8 @@ flagged frames).
 
 Question from the user: does the earlier machinery (3-point endpoint ellipse, blink handling of 2026-09-19) still
 fit the new label standard, or is there a more accurate variant now that `pupil_top` is a real ellipse endpoint?
-Model = step 5 (100 Pluto labels + 100 video-1 labels). Full table in `pupil_methods_comparison.csv`, figure
-`pupil_methods_comparison.png`.
+Model = step 5 (100 Pluto labels + 100 video-1 labels). Full table in `blink_area_analysis/pupil_methods_comparison.csv`, figure
+`blink_area_analysis/pupil_methods_comparison.png`.
 
 | quantity, model vs human on the 50 frozen test frames | old 3-point rule (top unused) | new 4-point rule (height = B.y - T.y) |
 |---|---|---|
@@ -100,5 +100,5 @@ point, in pupil widths), `min_conf` (lowest confidence of the 4 pupil points), `
 
 Reading: the hypothesis holds for the frames a human calls closed; the two triggers (lid distance vs pupil
 scatter/confidence) flag largely different frames, so combining them - or replacing the lid distance - is a
-decision for the user after the video-level counts are compared (`blink_pupil_dispersion.csv`,
-`blink_pupil_dispersion_labeled_frames.csv`, figure `blink_pupil_dispersion.png`).
+decision for the user after the video-level counts are compared (`blink_area_analysis/blink_pupil_dispersion.csv`,
+`blink_area_analysis/blink_pupil_dispersion_labeled_frames.csv`, figure `blink_area_analysis/blink_pupil_dispersion.png`).

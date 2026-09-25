@@ -171,7 +171,7 @@ for name, bad in (("old model, rule 2026-09-19", I_o["bad"]), ("new model, rule 
                   "note": "no labeled frame of video 0 has an empty pupil (mouse A never fully closed the eye in the labeled frames)" if not len(closed)
                           else "empty pupil = labeler judged the eye closed"})
 outB = pd.DataFrame(rowsB)
-R0 = HERE / "0_first5minvedio" / "results"
+R0 = HERE / "0_first5minvedio" / "results" / "blink_area_analysis"
 outB.to_csv(R0 / "pupil_old_vs_new_model.csv", index=False)
 print(outB.to_string(index=False))
 
