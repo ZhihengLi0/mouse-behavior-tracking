@@ -116,14 +116,16 @@ def score(shuffle, tsi, final_idx, test_unit):
 
 def plot(m):
     units = test_units()
-    colors = {v[0]: PALETTE[i % len(PALETTE)] for i, v in enumerate(VIDEOS)}
+    # ordered colours: video 0 darkest -> newest video lightest (viridis, perceptually ordered), so the sequence reads as a trend
+    colors = {v[0]: plt.cm.viridis(0.85 * i / max(1, len(VIDEOS) - 1)) for i, v in enumerate(VIDEOS)}
+    markers = {v[0]: "osD^vPX*"[i % 8] for i, v in enumerate(VIDEOS)}
     short = {v[0]: label_of(v[0]) for v in VIDEOS}
     mods = models()
     m = m[m.shuffle.isin(mods.shuffle)]
     fig, ax = plt.subplots(figsize=(19, 8), constrained_layout=True)
     for tu in units:
         s = m[m.test_unit == tu].sort_values("model_idx")
-        ax.plot(s.model_idx, s.median_frame_rmse_px, "o-", color=colors[tu], lw=2, ms=6, label=f"test set of {short[tu]}")
+        ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=2, ms=7, mec="white", mew=0.8, label=f"test set of {short[tu]}")
         own = mods[mods.model_unit == tu].model_idx.min()
         if not np.isfinite(own):
             continue
