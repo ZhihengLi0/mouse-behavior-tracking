@@ -101,3 +101,36 @@ First observations (no conclusions drawn yet; the blink / area algorithm compari
   one pupil point (pupil_left) jumping between the pupil edge and another attractor.
 - On mouse B the pupil area rises and falls together with the eye opening; whether this is real (arousal) or the lid
   cutting the tracked ellipse needs to be separated before the area is trusted.
+
+## Blink and pupil-area rules across all videos (2026-09-25, `scripts/blink_area_consistency.py`)
+
+`blink_area_consistency.png` + `_area.csv`, `_blink.csv`, `_blink_frames.csv`, `_coupling.csv`.
+
+**Area (every frozen test set; truth = human 4-point ellipse area).** The 4-point rule is better on 7 of 8 videos
+(exception: video 2, 3.1% vs 4.4%). Its bias stays within -3% to +4% on every video, while the 3-point rule's bias
+swings from -13% to +6% depending on the video (on the human labels alone the 3-point area differs from the
+4-point area by -13% ... +3%): 3-point areas are not comparable across videos, 4-point areas are.
+(Videos 5-7: test pre-labels came from the scoring model's line, so their absolute errors are optimistic.)
+
+| video | 0 | 1 | 2 | 3 | 4 (poor) | 5* | 6* | 7* |
+|---|---|---|---|---|---|---|---|---|
+| 3-point, median abs error | 6.5% | 6.7% | 3.1% | 12.8% | 16.9% | 2.5% | 9.9% | 3.3% |
+| 4-point, median abs error | 2.2% | 6.2% | 4.4% | 3.2% | 13.5% | 1.9% | 1.6% | 0.2% |
+
+**Blink (human judgement = labeled frames whose four pupil points were left empty; only frames the predicting model
+never trained on; videos 0-4).** Only 16 closed-eye frames exist (2-6 per mouse-B video, none in video 0), so these
+numbers are indicative. The lowest pupil confidence separates every closed frame from the open ones in every video
+(AUC 1.00; closed frames all < 0.20). Eye opening relative to the video median (AUC 0.79-0.99) and the pupil-axis
+centre offset (0.75-1.00) are good but video-dependent; eye opening relative to its 5-s median (the production
+trigger) is inconsistent (0.52-1.00); pupil height/width does not work (AUC < 0.5).
+The production rule catches all 16 closed frames but also flags 26-75% of open labeled frames; its confidence
+threshold 0.6 alone flags 48% of open frames. A threshold of 0.2 would catch all 16 closed frames and flag 1.5% of
+open frames - chosen on these same frames, so it must be validated on new closed-eye labels before adoption.
+
+**Area vs eye opening.** On trusted frames the 4-point area correlates with the eye opening at r = 0.69-0.94 in every
+video: the lid coupling is a consistent property of the measured area and must be separated (real pupil change vs
+the lid cutting the ellipse) before areas are compared across states.
+
+Consistent conclusions: (1) use the 4-point area; (2) the current blink rule over-flags on mouse B, mainly through the
+0.6 confidence cut; (3) the lowest pupil confidence with a much lower cut (about 0.2) is the most consistent
+closed-eye signal found so far; (4) the area moves with the eye opening in every video. `pupil_trace.py` is unchanged.

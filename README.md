@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-25 16:30 CDT)
+## Status (last updated 2026-09-25 17:40 CDT)
 
 | what | state |
 |---|---|
@@ -16,7 +16,7 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
 | In progress | **video 4** (Pluto, 2025-10-30, poor image quality): best so far 15.38 px at 100 labels; 120 labels = 17.10 px (no improvement, first step toward the plateau rule); waiting for the decision on batch 7 |
-| Blink / area analysis | started 2026-09-25: per-video eye time series (4-point and 3-point area, eye opening, confidence) in `<video>/results/blink_area_analysis/`; the production blink rule flags 26-50% of mouse-B frames, far more than real blinks |
+| Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | video 5 (2025-10-29), video 6 (2025-10-28) and video 7 (2025-10-27, test set being labeled): frozen test sets scored by every model so far |
 
 ## Main results so far (era 3, `new_pupil_top_video_scaling/`)

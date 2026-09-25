@@ -1,0 +1,9 @@
+video,model_shuffle,anchored_prelabels,n,err_3pt_median_abs_pct,err_4pt_median_abs_pct,bias_3pt_median_pct,bias_4pt_median_pct,human_3pt_vs_4pt_median_pct,better
+0 (mouse A),115,False,49,6.5,2.2,6.4,0.5,3.0,4-point
+1 (10-31),217,False,50,6.7,6.2,0.1,4.1,-1.2,4-point
+2 (10-31),324,False,49,3.1,4.4,-0.5,-3.2,-0.7,3-point
+3 (10-31),423,False,48,12.8,3.2,-10.5,3.1,-13.0,4-point
+"4 (10-30, poor)",515,False,38,16.9,13.5,-3.9,-0.0,-6.1,4-point
+5 (10-29),515,True,49,2.5,1.9,-1.5,-0.8,-1.8,4-point
+6 (10-28),515,True,50,9.9,1.6,-9.9,-0.7,-9.4,4-point
+7 (10-27),515,True,50,3.3,0.2,3.1,-0.0,3.1,4-point
