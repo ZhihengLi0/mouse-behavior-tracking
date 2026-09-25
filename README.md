@@ -1,169 +1,93 @@
 # Mouse Eye Keypoint Tracking
 
-A reproducible DeepLabCut pipeline that tracks eight keypoints on a mouse eye
-(pupil top/bottom/left/right, upper/lower eyelid, nasal/temporal corner),
-derives pupil center/width and eye opening, and is built toward blink
-detection and label-efficient generalization to new videos.
+A reproducible DeepLabCut pipeline that tracks eight keypoints on a mouse eye (pupil top / bottom / left / right,
+upper / lower eyelid, nasal / temporal corner) and derives pupil size, eye opening and blinks, with the goal of
+aligning eye behaviour with brain recordings. The engineering question behind the current work: **on a new video,
+how many human labels are needed, and how few frames must a person correct, before the model is good enough?**
 
-The repository is organised as **four sequential projects**, each a
-self-contained unit with `scripts/`, `results/`, and (locally) the exact
-`training-data/` its numbers rest on:
+Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
+per-frame predictions stay local; git carries code, documentation and audited aggregate results.
+
+## Status (last updated 2026-09-24 21:30 CDT)
+
+| what | state |
+|---|---|
+| Label standard | era 3 (since 2026-09-20): the pupil is an **ellipse**; its four points are the ellipse endpoints, including the part hidden under the lid |
+| Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
+| Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
+| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 60 labels = 17.16 px, still improving; step 4 (80 labels) next |
+| Test-set only | video 5 (2025-10-29) and video 6 (2025-10-28): frozen test sets scored by every model so far |
+
+## Main results so far (era 3, `new_pupil_top_video_scaling/`)
+
+Labels needed per video (plateau = two consecutive 20-label steps that improve the best error by <= 3%):
+
+| video | recording | earlier labels in the training set | error: 0 / 20 / 40 / 60 own labels | plateau |
+|---|---|---|---|---|
+| 0 | mouse A, 5 min | 0 | – / 12.93 / 13.00 / 12.04 px | 60 labels, 12.0 px |
+| 1 | Pluto, 2025-10-31 | 100 | 208 / 10.37 / 12.17 / 11.35 px | 20 labels, 10.4 px |
+| 2 | Pluto, 2025-10-31 | 200 | 9.99 / 7.73 / 7.57 / 7.83 px | 20 labels, 7.7 px |
+| 3 | Pluto, 2025-10-31 | 260 | 4.43 / 3.40 / 3.87 / 3.63 px | 20 labels, 3.4 px |
+| 4 | Pluto, 2025-10-30 (poor quality) | 320 | 22.80 / 21.75 / 18.19 / 17.16 px | not reached yet |
+
+What the numbers say:
+
+- **A new mouse needs its own labels**: models trained only on mouse A score 170-350 px on mouse B; 20 mouse-B
+  labels bring it to about 10 px.
+- **Same day transfers, a new day does not**: video 3 was at 4.4 px before any of its own labels (thanks to the
+  other 2025-10-31 videos), while video 4 (one day earlier) starts at 22.8 px and needs 60+ of its own labels.
+- **Adding videos does not hurt old ones**: every model is back-tested on every frozen test set
+  (`new_pupil_top_video_scaling/results/cross_video_curves.png`); earlier videos stay flat as labels are added.
+- **Pupil area**: with the new ellipse labels the 4-point area (width x top-to-bottom height) halves the error of
+  the old 3-point rule (3.7% vs 6.9% on 196 test frames); per-frame point selection by model confidence does not
+  help. The production script still uses the 3-point rule until the switch is approved.
+- **Caveat - anchoring**: test sets are labeled by correcting a model's pre-labels, so the model that made the
+  pre-labels looks better than it is on that test set (clearest on videos 5 and 6).
+
+## Repository layout
 
 ```
-scaling-curve/           How does error scale with 20/50/100 labels?   [superseded]
-batch-size-selection/    Which batch size? -> batch 2                  [complete]
-model-selection/         Which backbone?   -> ResNet-50                [complete]
-active-learning/         Which frame-selection algorithm? -> none needed; ~80 labels saturate   [complete]
+new_pupil_top_video_scaling/   era 3 (current): one folder per video, indexed by how many earlier videos are in
+  0_first5minvedio/            the training set; each has results/ (tracked) and training-data/ (local only)
+  1_... 6_...                  videos 1-6 (mouse B)
+  results/                     across videos: labels-to-plateau table, cross-video back-test, pupil-area study
+  scripts/                     frame selection, pre-labels, training step, scoring, back-test, plots
+old_pupil_top/                 eras 1-2 (5-minute video, earlier label standards) - kept for the record
+dlc_projects/                  DeepLabCut workspaces (config tracked; labels and weights local)
+environment/                   conda environment and setup check
+docs/  report/  scripts/       shared notes, reports and older canonical tools
+CHANGELOG.md                   what each tagged version established
 ```
 
-Shared infrastructure stays at the root: `dlc_projects/` (the DeepLabCut
-workspace holding live labels and model weights), `local_data/` (the held-out
-test set and caches), `environment/` (conda env and setup), `scripts/` (the
-canonical tools each unit snapshots). Raw videos and papers live in their own
-folders and never enter git.
+## How one video is processed (era 3 protocol)
 
-## The data discipline behind every number
+1. **Split, model-free**: 50 test frames evenly spaced over the final 10% of the video (frozen, report only),
+   20 validation frames from the 10% before it, 2-s guard bands, everything earlier is the selection pool.
+2. **Batch 1**: 20 frames by k-means on image fingerprints (no model involved).
+3. **Each step**: pre-label with the newest model, a person corrects, train from scratch on all labels of the
+   earlier videos plus this video's labels so far, score on the frozen test set.
+4. **Batch 2 onward**: predict the whole video, flag frames where any keypoint jumps more than 3% of the eye width
+   between consecutive frames, pick 20 of them by k-means (at least 1 s apart from each other and from every
+   labeled frame).
+5. **Stop** when the plateau rule fires; then back-test the new models on every earlier test set.
 
-```
-face.mp4 (5 min, 60 fps)
-├── first 4 minutes ── training pool
-│     ├── 80 frames   train        (chronologically first; weights learn here)
-│     └── 20 frames   validation   (34-236 s; every SELECTION is made here)
-└── last minute ────── 100 frames  test (REPORT ONLY - never selects,
-                                    never tunes, never stops anything)
-```
+Every number in a README comes from one script with one formula; if a definition changes, the whole series is
+recomputed rather than mixed.
 
-Temporal block splits prevent near-duplicate leakage (adjacent frames at
-60 fps are near-identical); a verified 1.2 s gap separates train from
-validation. Selection rules are declared before results are seen. Each unit
-pins the exact label tables it used, because the label standard changed once
-(2026-09-10: all 200 labels re-reviewed; `pupil_top` moved ~20 px) - numbers
-on opposite sides of that boundary are never compared.
+## History
 
-## Step 1 - Scaling curve (superseded, kept for the record)
+- **Era 1-2 (2026-08 to 2026-09-19, `old_pupil_top/`)**, 5-minute video, earlier label standards: batch size ->
+  batch 2; backbone -> ResNet-50 (five backbones tied on accuracy, ResNet-50 won the pre-declared confidence
+  tie-break and trains fastest); active learning (uncertainty vs jump vs trajectory-fit detectors) was a clean
+  null - about 80 labels saturated that video and detector choice never mattered; a round-6 "improvement" was
+  retracted after an audit found a mid-series metric switch (v0.5.1).
+- **Era 3 (from 2026-09-20)**: new ellipse label standard, 120-epoch recipe, the per-video scaling experiment
+  above. Tags `v0.1.0` ... `v0.7.0-newstd-corner-v1` mark audited states; see `CHANGELOG.md`.
 
-ResNet-50 trained on 20 -> 50 -> 100 labels, judged on the fixed final-minute
-set. Error *rose* with more labels (38 -> 42 -> 56 px), driven by a cluster of
-catastrophic `pupil_left` failures - the first evidence that label quality and
-frame diversity dominate label count, and the first recorded disagreement
-between internal validation and the external test. Those findings triggered
-everything that followed. Figures are reconstructions (originals predate git);
-all numbers use the old label standard.
+## Next
 
-## Step 2 - Batch size selection -> batch 2
-
-HRNet-W32 at batch 2/4/8/16, reviewed labels, 80/20 block split, 100 epochs,
-LR milestones rescaled to [80, 95], snapshots every 10 epochs.
-
-The pre-declared internal rule (lowest validation loss) picked **batch 2** -
-and the untouched final-minute set independently ranked batch 2 lowest
-(21.07 px). **Internal and external agreed for the first time**, the direct
-evidence that the rebuilt 20-frame validation set resolves what the earlier
-5-frame one could not. Confidence calibration recovered from 59/800 points
-above likelihood 0.6 (old era) to 375/800.
-
-See `batch-size-selection/results/`: overview, learning curves (stars = the
-mAP-chosen snapshots), per-keypoint heatmaps, per-frame boxplots, and the
-dual-ruler mAP figure.
-
-## Step 3 - Model selection -> ResNet-50
-
-Five bottom-up backbones (ResNet-50, HRNet-W18/W32/W48, CSPNeXt-S) at batch 2
-on the identical split and labels. RTMPose-S excluded by design (top-down,
-SSDLite detector - not controlled).
-
-On accuracy the five are a statistical tie: validation losses span 1.4%, and a
-paired frame-level bootstrap (10,000 resamples) puts zero in every pairwise
-95% CI. The pre-declared tie-break - confidence on the validation frames -
-separates decisively: **ResNet-50 73%** vs 61% (W32) vs ~13% (rest). The
-report-only test set independently agrees (ResNet-50 lowest, 20.10 px), and it
-is also the fastest practical trainer (1.7 h vs 3.7 h for W32), which matters
-because active learning retrains every round.
-
-A cautionary figure worth opening: `model-selection/results/03_internal_mAP_curves.png`
-shows the loss rule and the mAP rule pointing at nearly the same epoch for
-four models - but for HRNet-W18 the loss minimum sits at an epoch whose mAP is
-64%, exactly why loss-only ranking had crowned the externally-worst model.
-
-## Step 4 - Active learning (running): the convergence curves
-
-Three branches compete under one frozen protocol
-(`active-learning/FROZEN_PARAMETERS.md`): identical seed labels, identical
-ResNet-50/batch-2/100-epoch training from scratch each round, k-means frame
-extraction - the **only** difference is the outlier detector that nominates
-candidate frames:
-
-| branch | suspicion logic | knob |
-|---|---|---|
-| `uncertain` | the model's own low confidence | p_bound = 0.6 |
-| `jump` | physically impossible frame-to-frame jumps | epsilon = 20 px |
-| `fitting` | deviation from an ARIMA-fitted trajectory | epsilon = 20 px |
-
-Each round: train on the branch's labels -> analyze the first four minutes ->
-detector + k-means select 20 unreviewed frames -> human corrects all eight
-keypoints -> retrain -> score ONCE on the final-minute set -> one point on
-that branch's curve. Five rounds take each branch 80 -> 180 training frames.
-
-The final deliverable is three convergence curves (x = cumulative reviewed
-training frames, y = external RMSE). Interpretation rules fixed in advance:
-a measured single-run noise band of ±2.4 px (two identical trainings differed
-by that much) gates any claim of a lead; the plateau is judged retrospectively
-after round 5, never used to stop early; RMSE is reported alongside the
-per-frame median because a handful of catastrophic frames (typically blinks)
-can dominate the mean - itself a finding that feeds the blink-detection goal.
-
-**Completed 2026-09-12, rounds 0-5.** The result is a clean null: median
-frame error stayed flat (16.3-17.5 px, inside the ±2.4 px noise band) for all
-three branches while labels grew 80 -> 180, and the three detectors are
-indistinguishable. Read as designed, the curves answer the lab's question:
-~80 consistent labels already saturate typical-frame accuracy on this video;
-the remaining error lives in an ~16-17 px floor of the same order as human
-relabeling noise plus a few blink/occlusion frames (the recurring
-160.5-160.7 s event) that no amount of keypoint labeling can fix - pointing
-the next effort at likelihood-gated blink detection. Full analysis:
-`active-learning/results/README.md`.
-
-## Next phase (defined at the 2026-09-12 lab meeting)
-
-The long-term engineering goal is fixed: on much larger videos, find and
-correct the model's error frames with minimal human effort, detect blinks, and
-add pupil area (ellipse fit; ~3 pupil points suffice) to the derived
-statistics - all in service of aligning behavior frames with brain signals.
-Two immediate tasks:
-
-1. **Extend the convergence experiment** a few more rounds to confirm the
-   plateau is real, keeping the frozen discipline: every round retrains from
-   scratch on the full cumulative set (never fine-tuning the previous
-   weights). Round-6 candidate frames are already selected.
-2. **Keypoint-vs-time series figures**: plot each keypoint's trajectory over
-   time, flag frames whose fitted-trajectory residual is large, and open those
-   frames to attribute *when* the model fails (blinks, occlusion) - then
-   correct or document the failure mode.
-
-Labeling amendment going forward (not retroactive): during blinks the eyelids
-usually remain visible, so `eyelid_top`/`eyelid_bottom` must be labeled on
-blink frames rather than left empty.
-
-**Outcome (2026-09-14, corrected 2026-09-18).** The extension ran rounds
-6-11 and ended by a pre-registered stopping rule. An audit later found the
-reported round-6 "drop" was an artifact of switching the per-frame error
-definition mid-series; under one definition the curve is flat from round 0
-to 11 (median frame RMSE 15.7-17.5 px). The supported conclusions: ~80
-labels saturate accuracy on this video and up to 300 move nothing; detector
-choice never mattered; the labeling amendment has no demonstrable effect on
-the external metric. See the correction notice in
-`active-learning/results/README.md`.
-
-## History and provenance
-
-- `CHANGELOG.md` - what each tagged version established: `v0.1.0` (old-label
-  batch sweep), `v0.2.0` (old-label architecture sweep and the
-  checkpoint-matrix analysis that invalidated it), `v0.3.0` (reviewed-label
-  batch sweep, first internal/external agreement).
-- Superseded-era published packages remain at their tags; the old-label tables
-  pinned in `scaling-curve/training-data/` are the only surviving copy of the
-  pre-review labels.
-- Setup: `environment/` (conda env, install guide, `check_setup.sh`).
-
-Raw videos, labels, model weights, logs, and per-frame predictions stay local
-by design; git carries code, documentation, and audited aggregate results.
+- Finish video 4 (steps until the plateau rule fires), then continue the one-video-per-day plan across the
+  remaining Pluto recordings, tracking the 0-label error of each new day and the error of every old video.
+- Decide on switching the pupil area to the 4-point rule; improve blink handling (pupil-point confidence and
+  axis-centre offset separate closed-eye frames much better than eyelid distance).
+- Estimate how many frames per video still need human correction, and how well the jump rule finds them.
