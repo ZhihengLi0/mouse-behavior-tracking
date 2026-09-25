@@ -30,6 +30,7 @@ results/                 ACROSS videos: x = number of videos, y = labels needed 
 4_20251030_Pluto_spont_1/ video 4 (mouse B, 2025-10-30; poor image quality), same layout
 5_20251029_Pluto_spont_1/ video 5 (mouse B, 2025-10-29): frozen test set only (scored by every model)
 6_20251028_Pluto_spont_1/ video 6 (mouse B, 2025-10-28): frozen test set only (scored by every model)
+7_20251027_Pluto_spont1/  video 7 (mouse B, 2025-10-27): frozen test set only (scored by every model)
 ```
 
 Per video: 50 test frames (final 10%, at least 60 s), 20 validation frames (the 10% before), 2-s guard bands,
