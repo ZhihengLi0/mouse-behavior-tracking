@@ -8,14 +8,14 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-25 00:45 CDT)
+## Status (last updated 2026-09-25 02:05 CDT)
 
 | what | state |
 |---|---|
 | Label standard | era 3 (since 2026-09-20): the pupil is an **ellipse**; its four points are the ellipse endpoints, including the part hidden under the lid |
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
-| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 80 labels = 16.40 px, still improving (4.4% over 60 labels); batch 5 (100 labels) is selected next |
+| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 80 labels = 16.40 px, still improving (4.4% over 60 labels); batch 5 (100 labels) selected, waiting for labeling |
 | Test-set only | video 5 (2025-10-29) and video 6 (2025-10-28): frozen test sets scored by every model so far |
 
 ## Main results so far (era 3, `new_pupil_top_video_scaling/`)
