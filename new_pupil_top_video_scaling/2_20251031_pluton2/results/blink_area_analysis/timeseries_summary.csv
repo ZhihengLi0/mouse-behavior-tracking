@@ -1,0 +1,2 @@
+unit,prediction,frames,minutes,median_area_4pt_px2,median_area_3pt_px2,median_area_3pt_over_4pt_minus_1_pct,corr_area_3pt_4pt_trusted,median_eye_opening_px,frac_untrusted_production_rule,untrusted_runs,frac_pupil_minconf_lt_0.6,frac_residual_area_4pt,frac_residual_eye_opening,frac_residual_centre_x,frac_residual_centre_y,frac_residual_any
+2_20251031_pluton2,2_pluton2DLC_Resnet50_EyePupilEllipseSep20shuffle323_snapshot_best-120.h5,71748,19.93,31996.0,32660.0,0.8,0.991,185.7,0.3076,944,0.1213,0.0666,0.0506,0.0743,0.0171,0.1251

@@ -1,0 +1,2 @@
+unit,prediction,frames,minutes,median_area_4pt_px2,median_area_3pt_px2,median_area_3pt_over_4pt_minus_1_pct,corr_area_3pt_4pt_trusted,median_eye_opening_px,frac_untrusted_production_rule,untrusted_runs,frac_pupil_minconf_lt_0.6,frac_residual_area_4pt,frac_residual_eye_opening,frac_residual_centre_x,frac_residual_centre_y,frac_residual_any
+0_first5minvedio,faceDLC_Resnet50_EyePupilEllipseSep20shuffle115_snapshot_120.h5,18014,5.0,63105.0,67193.0,6.2,0.945,288.1,0.109,92,0.0475,0.0366,0.0451,0.0176,0.0129,0.0603

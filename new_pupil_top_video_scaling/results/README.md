@@ -76,3 +76,28 @@ pupil points are ellipse endpoints under the new standard). Median |area error| 
 - Video 4 (`4_20251030_Pluto_spont_1`, 2025-10-30): **poor quality** - the pupil boundary is hard to see even by
   eye (labeler, 2026-09-24). Its errors are not directly comparable with the clear 2025-10-31 videos; marked in the
   cross-video figures.
+
+## Per-video eye time series (2026-09-25, `scripts/eye_timeseries.py`)
+
+Each video now has `results/blink_area_analysis/timeseries.png` + `timeseries_summary.csv`: pupil centre, pupil area
+(4-point rule, with the current 3-point rule in grey), eye opening, lowest pupil confidence, and rasters of the
+production blink rule (`pupil_trace.py`, unchanged) and of the earlier study's residual rule (> 5 MADs from a 1-s
+rolling median), on the newest whole-video prediction of each video. Videos 5 and 6 follow once their whole-video
+predictions (model 515) have run in GPU idle time.
+
+| video | model | median 4-pt area (px²) | 3-pt vs 4-pt (median, trusted frames) | corr 3-pt/4-pt | untrusted by the production rule | pupil conf < 0.6 | any residual flag |
+|---|---|---|---|---|---|---|---|
+| 0 (mouse A, 5 min) | step 5 (115) | 63,105 | +6.2% | 0.945 | 10.9% (92 runs) | 4.8% | 6.0% |
+| 1 (Pluto 10-31) | step 7 (217) | 27,028 | -3.3% | 0.987 | 26.1% (683 runs) | 17.4% | 10.2% |
+| 2 (Pluto 10-31) | step 3 (323) | 31,996 | +0.8% | 0.991 | 30.8% (944 runs) | 12.1% | 12.5% |
+| 3 (Pluto 10-31) | step 3 (423) | 26,022 | -2.9% | 0.993 | 37.8% (909 runs) | 17.0% | 13.8% |
+| 4 (Pluto 10-30, poor quality) | step 5 (515) | 28,591 | -1.1% | 0.988 | 50.5% (725 runs) | 46.9% | 14.6% |
+
+First observations (no conclusions drawn yet; the blink / area algorithm comparison is the next step):
+- The production blink rule marks 26-50% of every mouse-B video as untrusted, far more than real blinks: it was tuned
+  on video 0 (11%) and on mouse B it is driven by pupil confidence < 0.6 and by normal fluctuations of the eye opening.
+- The 3- and 4-point areas move together (corr 0.95-0.99); the 3-point rule is biased by -3% to +6% depending on the video.
+- Video 4: pupil centre x oscillates between two positions for long stretches (e.g. 14.6-15.6 min), the signature of
+  one pupil point (pupil_left) jumping between the pupil edge and another attractor.
+- On mouse B the pupil area rises and falls together with the eye opening; whether this is real (arousal) or the lid
+  cutting the tracked ellipse needs to be separated before the area is trusted.
