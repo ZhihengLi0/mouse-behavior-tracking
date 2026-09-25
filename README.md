@@ -8,34 +8,34 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-24 23:15 CDT)
+## Status (last updated 2026-09-25 00:45 CDT)
 
 | what | state |
 |---|---|
 | Label standard | era 3 (since 2026-09-20): the pupil is an **ellipse**; its four points are the ellipse endpoints, including the part hidden under the lid |
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
-| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 60 labels = 17.16 px, still improving; step 4 (80 labels) training since 23:14 |
+| In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 80 labels = 16.40 px, still improving (4.4% over 60 labels); batch 5 (100 labels) is selected next |
 | Test-set only | video 5 (2025-10-29) and video 6 (2025-10-28): frozen test sets scored by every model so far |
 
 ## Main results so far (era 3, `new_pupil_top_video_scaling/`)
 
 Labels needed per video (plateau = two consecutive 20-label steps that improve the best error by <= 3%):
 
-| video | recording | earlier labels in the training set | error: 0 / 20 / 40 / 60 own labels | plateau |
+| video | recording | earlier labels in the training set | error: 0 / 20 / 40 / 60 / 80 own labels | plateau |
 |---|---|---|---|---|
 | 0 | mouse A, 5 min | 0 | – / 12.93 / 13.00 / 12.04 px | 60 labels, 12.0 px |
 | 1 | Pluto, 2025-10-31 | 100 | 208 / 10.37 / 12.17 / 11.35 px | 20 labels, 10.4 px |
 | 2 | Pluto, 2025-10-31 | 200 | 9.99 / 7.73 / 7.57 / 7.83 px | 20 labels, 7.7 px |
 | 3 | Pluto, 2025-10-31 | 260 | 4.43 / 3.40 / 3.87 / 3.63 px | 20 labels, 3.4 px |
-| 4 | Pluto, 2025-10-30 (poor quality) | 320 | 22.80 / 21.75 / 18.19 / 17.16 px | not reached yet |
+| 4 | Pluto, 2025-10-30 (poor quality) | 320 | 22.80 / 21.75 / 18.19 / 17.16 / 16.40 px | not reached yet |
 
 What the numbers say:
 
 - **A new mouse needs its own labels**: models trained only on mouse A score 170-350 px on mouse B; 20 mouse-B
   labels bring it to about 10 px.
 - **Same day transfers, a new day does not**: video 3 was at 4.4 px before any of its own labels (thanks to the
-  other 2025-10-31 videos), while video 4 (one day earlier) starts at 22.8 px and needs 60+ of its own labels.
+  other 2025-10-31 videos), while video 4 (one day earlier) starts at 22.8 px and is still improving at 80 of its own labels.
 - **Adding videos does not hurt old ones**: every model is back-tested on every frozen test set
   (`new_pupil_top_video_scaling/results/cross_video_curves.png`); earlier videos stay flat as labels are added.
 - **Pupil area**: with the new ellipse labels the 4-point area (width x top-to-bottom height) halves the error of

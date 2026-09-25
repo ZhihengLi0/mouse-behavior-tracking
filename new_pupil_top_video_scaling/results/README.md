@@ -16,7 +16,7 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 | 1 `1_20251031_Pluto_spont_1` | mouse B, 19.9 min | 100 (all of video 0) | 208.2 / 10.37 / 12.17 / 11.35 / 11.59 / 10.94 | **20 labels** | 10.37 px |
 | 2 `2_20251031_pluton2` | mouse B, 19.9 min (2nd recording) | 200 (videos 0 + 1) | 9.99 / 7.73 / 7.57 / 7.83 / 7.56 / – | **20 labels** (rule fired at 60; user stopped selecting at 60 labels on 2026-09-23; batch04 was already labeled and was trained + scored, no further selection) | 7.73 px |
 | 3 `3_20251031_pluto3` | mouse B, 19.9 min (3rd recording) | 260 (videos 0 + 1 + 60 of video 2) | 4.43 / 3.40 / 3.87 / 3.63 / – / – | **20 labels** (rule fired at 60) | 3.40 px |
-| 4 `4_20251030_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-30 (poor image quality) | 320 (videos 0-3 as for video 3) | 22.80 / 21.75 / 18.19 / 17.16 / – / – | not reached (in progress) | – |
+| 4 `4_20251030_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-30 (poor image quality) | 320 (videos 0-3 as for video 3) | 22.80 / 21.75 / 18.19 / 17.16 / 16.40 / – | not reached (in progress) | – |
 
 Notes
 - With 50 test frames the median moves by about 1 px between neighbouring steps from sampling alone, so the
