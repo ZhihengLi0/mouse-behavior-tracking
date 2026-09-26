@@ -21,6 +21,7 @@ k-means, later batches by jump rule + k-means. The video copy is `4_20251030_Plu
 | 120 | 17.10 px | 33.4 | 2% | 84% | 6,984 (12.2%) |
 | 140 | 14.74 px | 34.6 | 0% | 89% | 6,208 (10.9%) |
 | 160 | 14.89 px | 35.6 | 0% | 88% | 5,799 (10.1%) |
+| 180 | 15.69 px | 34.4 | 0% | 86% | (pending: step-9 whole-video prediction) |
 
 Training set of step 1 (shuffle 511): 100 labels of video 0 + 100 of video 1 + 60 of video 2 + 60 of video 3 +
 20 of this video (340 frames); validation = the 20 val frames of this video.
@@ -41,3 +42,7 @@ After step 7 (2026-09-25): 140 labels = 14.74 px, 4.2% better than the previous 
 plateau rule restarts: the running best is now 14.74 px and the rule fires only after two further steps with <= 3% gain.
 
 After step 8: 160 labels = 14.89 px, no improvement over the running best (14.74 px at 140) - first step toward the plateau rule; step 9 (180 labels) decides.
+
+**Plateau rule fired after step 9 (2026-09-26):** neither 160 labels (14.89 px) nor 180 labels (15.69 px) improved the
+running best of 14.74 px by more than 3%, so the plateau point of this video is **140 labels (14.74 px)** - seven times
+the 20 labels the 2025-10-31 videos needed, on a recording whose pupil edge is hard to see even by eye.
