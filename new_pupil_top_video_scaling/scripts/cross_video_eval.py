@@ -48,7 +48,7 @@ def steps_of(spec):
         return spec
     base = int(spec.split(":")[1])
     out = []
-    for k in range(1, 10):
+    for k in range(1, 13):
         try:
             tsi_of(base * 10 + k)
         except (StopIteration, ValueError, IndexError, FileNotFoundError):
