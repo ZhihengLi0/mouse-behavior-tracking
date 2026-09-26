@@ -1,0 +1,2 @@
+unit,prediction,frames,minutes,median_area_4pt_px2,median_area_3pt_px2,median_area_3pt_over_4pt_minus_1_pct,corr_area_3pt_4pt_trusted,median_eye_opening_px,frac_untrusted_production_rule,untrusted_runs,frac_pupil_minconf_lt_0.6,frac_residual_area_4pt,frac_residual_eye_opening,frac_residual_centre_x,frac_residual_centre_y,frac_residual_any
+9_20251023_Pluto1,9_20251023_Pluto1DLC_Resnet50_EyePupilEllipseSep20shuffle518_snapshot_120.h5,71748,19.93,25851.0,27243.0,3.2,0.969,137.5,0.5271,774,0.9017,0.0684,0.0332,0.0907,0.0306,0.1255

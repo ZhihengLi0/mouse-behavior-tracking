@@ -82,16 +82,21 @@ pupil points are ellipse endpoints under the new standard). Median |area error| 
 Each video now has `results/blink_area_analysis/timeseries.png` + `timeseries_summary.csv`: pupil centre, pupil area
 (4-point rule, with the current 3-point rule in grey), eye opening, lowest pupil confidence, and rasters of the
 production blink rule (`pupil_trace.py`, unchanged) and of the earlier study's residual rule (> 5 MADs from a 1-s
-rolling median), on the newest whole-video prediction of each video. Videos 5 and 6 follow once their whole-video
-predictions (model 515) have run in GPU idle time.
+rolling median), on the newest whole-video prediction of each video (all 11 videos as of 2026-09-26).
 
-| video | model | median 4-pt area (px²) | 3-pt vs 4-pt (median, trusted frames) | corr 3-pt/4-pt | untrusted by the production rule | pupil conf < 0.6 | any residual flag |
+| video | model | median 4-pt area (px²) | 3-pt vs 4-pt | corr 3-pt/4-pt | untrusted (production rule) | pupil conf < 0.6 | any residual flag |
 |---|---|---|---|---|---|---|---|
-| 0 (mouse A, 5 min) | step 5 (115) | 63,105 | +6.2% | 0.945 | 10.9% (92 runs) | 4.8% | 6.0% |
-| 1 (Pluto 10-31) | step 7 (217) | 27,028 | -3.3% | 0.987 | 26.1% (683 runs) | 17.4% | 10.2% |
-| 2 (Pluto 10-31) | step 3 (323) | 31,996 | +0.8% | 0.991 | 30.8% (944 runs) | 12.1% | 12.5% |
-| 3 (Pluto 10-31) | step 3 (423) | 26,022 | -2.9% | 0.993 | 37.8% (909 runs) | 17.0% | 13.8% |
-| 4 (Pluto 10-30, poor quality) | step 5 (515) | 28,591 | -1.1% | 0.988 | 50.5% (725 runs) | 46.9% | 14.6% |
+| 0 `0_first5minvedio` | 115 | 63,105 | +6.2% | 0.945 | 10.9% (92 runs) | 4.8% | 6.0% |
+| 1 `1_20251031_Pluto_spont_1` | 217 | 27,028 | -3.3% | 0.987 | 26.1% (683 runs) | 17.4% | 10.2% |
+| 2 `2_20251031_pluton2` | 323 | 31,996 | +0.8% | 0.991 | 30.8% (944 runs) | 12.1% | 12.5% |
+| 3 `3_20251031_pluto3` | 423 | 26,022 | -2.9% | 0.993 | 37.8% (909 runs) | 17.0% | 13.8% |
+| 4 `4_20251030_Pluto_spont_1` | 515 | 28,591 | -1.1% | 0.988 | 50.5% (725 runs) | 46.9% | 14.6% |
+| 5 `5_20251029_Pluto_spont_1` | 515 | 40,141 | +1.7% | 0.986 | 11.7% (545 runs) | 92.8% | 5.3% |
+| 6 `6_20251028_Pluto_spont_1` | 515 | 37,751 | -3.2% | 0.925 | 44.8% (872 runs) | 99.2% | 19.7% |
+| 7 `7_20251027_Pluto_spont1` | 515 | 28,486 | +2.6% | 0.854 | 39.1% (910 runs) | 95.5% | 28.6% |
+| 8 `8_20251024_Pluto_spont1` | 518 | 38,447 | +3.4% | 0.961 | 56.7% (484 runs) | 90.1% | 14.2% |
+| 9 `9_20251023_Pluto1` | 518 | 25,851 | +3.2% | 0.969 | 52.7% (774 runs) | 90.2% | 12.6% |
+| 10 `10_20251022_Pluto1` | 518 | 14,704 | -12.6% | 0.990 | 70.4% (1115 runs) | 95.8% | 11.7% |
 
 First observations (no conclusions drawn yet; the blink / area algorithm comparison is the next step):
 - The production blink rule marks 26-50% of every mouse-B video as untrusted, far more than real blinks: it was tuned
