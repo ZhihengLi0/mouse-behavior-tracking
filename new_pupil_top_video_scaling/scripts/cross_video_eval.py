@@ -31,7 +31,7 @@ VIDEOS = [
     ("1_20251031_Pluto_spont_1", "mouse B (Pluto)", "2025-10-31", [(1, 211, 20), (2, 212, 40), (3, 213, 60), (4, 214, 80), (5, 225, 100), (6, 216, 120), (7, 217, 140)]),
     ("2_20251031_pluton2", "mouse B (Pluto)", "2025-10-31", [(1, 321, 20), (2, 322, 40), (3, 323, 60), (4, 324, 80)]),
     ("3_20251031_pluto3", "mouse B (Pluto)", "2025-10-31", [(1, 411, 20), (2, 422, 40), (3, 423, 60)]),
-    ("4_20251030_Pluto_spont_1", "mouse B (Pluto)", "2025-10-30", "auto:51"),
+    ("4_20251030_Pluto_spont_1", "mouse B (Pluto)", "2025-10-30", "auto:53"),   # restarted 2026-09-26 under labeling convention v2 (old run 511-519 archived)
     ("5_20251029_Pluto_spont_1", "mouse B (Pluto)", "2025-10-29", "auto:61"),
     ("6_20251028_Pluto_spont_1", "mouse B (Pluto)", "2025-10-28", "auto:71"),
     ("7_20251027_Pluto_spont1", "mouse B (Pluto)", "2025-10-27", "auto:81"),

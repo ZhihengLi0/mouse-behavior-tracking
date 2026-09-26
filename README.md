@@ -8,15 +8,15 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-26 16:05 CDT)
+## Status (last updated 2026-09-26 17:50 CDT)
 
 | what | state |
 |---|---|
 | Label standard | era 3 (since 2026-09-20): the pupil is an **ellipse**; its four points are the ellipse endpoints, including the part hidden under the lid |
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
-| In progress | **video 5** (Pluto, 2025-10-29): 0 labels (video-4 plateau model) = 7.16 px, 20 labels = 5.92 px; batch 2 being selected |
-| Finished | **video 4** (Pluto, 2025-10-30, poor image quality): plateau at 140 labels, 14.74 px |
+| In progress | **video 4 run 2** (Pluto, 2025-10-30): restarted under labeling convention v2 (double contour -> left edge); test50 being relabeled. Run 1 (v1): plateau 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`) |
+| Paused | video 5 (restarts after video 4 run 2; its first attempt under v1 is archived) |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
@@ -30,8 +30,7 @@ Labels needed per video (plateau = two consecutive 20-label steps that improve t
 | 1 | Pluto, 2025-10-31 | 100 | 208 / 10.37 / 12.17 / 11.35 px | 20 labels, 10.4 px |
 | 2 | Pluto, 2025-10-31 | 200 | 9.99 / 7.73 / 7.57 / 7.83 px | 20 labels, 7.7 px |
 | 3 | Pluto, 2025-10-31 | 260 | 4.43 / 3.40 / 3.87 / 3.63 px | 20 labels, 3.4 px |
-| 4 | Pluto, 2025-10-30 (poor quality) | 320 | 22.80 / 21.75 / 18.19 / 17.16 / 16.40 / 15.38 px (120: 17.10, 140: 14.74, 160: 14.89, 180: 15.69) | 140 labels, 14.7 px |
-| 5 | Pluto, 2025-10-29 | 460 | 7.16 / 5.92 px | in progress |
+| 4 | Pluto, 2025-10-30 (poor quality) | 320 | run 1 (convention v1, archived): 22.80 / 21.75 / 18.19 / 17.16 / 16.40 / 15.38 px ... 140: 14.74 | run 1: 140 labels; run 2 (v2) in progress |
 
 What the numbers say:
 
@@ -44,6 +43,7 @@ What the numbers say:
 - **Pupil area**: with the new ellipse labels the 4-point area (width x top-to-bottom height) halves the error of
   the old 3-point rule (3.7% vs 6.9% on 196 test frames); per-frame point selection by model confidence does not
   help. The production script still uses the 3-point rule until the switch is approved.
+- **Labeling convention v2 (2026-09-26)**: on double contours the LEFT edge is labeled; video 4 is being redone under v2 and the v1 test sets of videos 5-10 will be relabeled.
 - **Caveat - anchoring**: test sets are labeled by correcting a model's pre-labels, so the model that made the
   pre-labels looks better than it is on that test set (clearest on videos 5 and 6).
 

@@ -139,3 +139,11 @@ the lid cutting the ellipse) before areas are compared across states.
 Consistent conclusions: (1) use the 4-point area; (2) the current blink rule over-flags on mouse B, mainly through the
 0.6 confidence cut; (3) the lowest pupil confidence with a much lower cut (about 0.2) is the most consistent
 closed-eye signal found so far; (4) the area moves with the eye opening in every video. `pupil_trace.py` is unchanged.
+
+## Labeling convention v2 (2026-09-26)
+
+On videos where the pupil edge appears doubled (a second contour next to the real edge), points are now placed on the
+LEFT contour and pupil_top / pupil_bottom are shifted left accordingly. Video 4 restarts from 50/20/20 under v2 (run 1
+archived, tag `v0.8.0-video4-convention1`); video 5 restarts after it. Rows of the run-1 models (511-519, 611) and of
+the video 4/5 test sets were removed from `cross_video_matrix.csv` (copy of the old matrix in the tag). The test sets
+of videos 5-10 were labeled under v1 and are to be relabeled under v2 where the double contour occurs.
