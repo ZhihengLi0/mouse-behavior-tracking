@@ -20,7 +20,7 @@ k-means, later batches by jump rule + k-means. The video copy is `4_20251030_Plu
 | 100 | 15.38 px | 32.5 | 0% | 80% | 7,810 (13.7%) |
 | 120 | 17.10 px | 33.4 | 2% | 84% | 6,984 (12.2%) |
 | 140 | 14.74 px | 34.6 | 0% | 89% | 6,208 (10.9%) |
-| 160 | 14.89 px | 35.6 | 0% | 88% | (pending: step-8 whole-video prediction) |
+| 160 | 14.89 px | 35.6 | 0% | 88% | 5,799 (10.1%) |
 
 Training set of step 1 (shuffle 511): 100 labels of video 0 + 100 of video 1 + 60 of video 2 + 60 of video 3 +
 20 of this video (340 frames); validation = the 20 val frames of this video.
