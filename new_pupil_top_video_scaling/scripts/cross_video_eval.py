@@ -35,6 +35,9 @@ VIDEOS = [
     ("5_20251029_Pluto_spont_1", "mouse B (Pluto)", "2025-10-29", "auto:61"),
     ("6_20251028_Pluto_spont_1", "mouse B (Pluto)", "2025-10-28", "auto:71"),
     ("7_20251027_Pluto_spont1", "mouse B (Pluto)", "2025-10-27", "auto:81"),
+    ("8_20251024_Pluto_spont1", "mouse B (Pluto)", "2025-10-24", "auto:91"),
+    ("10_20251022_Pluto1", "mouse B (Pluto)", "2025-10-22", "auto:111"),
+    ("9_20251023_Pluto1", "mouse B (Pluto)", "2025-10-23", "auto:101"),
 ]
 # labels of a video that are carried into later videos (the "prior" used when the next video started)
 CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_pluton2": 60, "3_20251031_pluto3": 60}

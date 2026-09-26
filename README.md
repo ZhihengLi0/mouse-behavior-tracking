@@ -17,7 +17,7 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
 | In progress | **video 4** (Pluto, 2025-10-30, poor image quality): 140 labels = 14.74 px, new best (120 labels was 17.10 px); plateau not reached |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
-| Test-set only | video 5 (2025-10-29), video 6 (2025-10-28) and video 7 (2025-10-27, test set being labeled): frozen test sets scored by every model so far |
+| Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
 ## Main results so far (era 3, `new_pupil_top_video_scaling/`)
 
@@ -50,7 +50,7 @@ What the numbers say:
 ```
 new_pupil_top_video_scaling/   era 3 (current): one folder per video, indexed by how many earlier videos are in
   0_first5minvedio/            the training set; each has results/ (tracked) and training-data/ (local only)
-  1_... 7_...                  videos 1-7 (mouse B)
+  1_... 10_...                 videos 1-10 (mouse B)
     results/selection_sheets/  per video: the cluster + time-series sheet of every selected batch
     results/blink_area_analysis/ per video: eye time series and blink / pupil-area studies
   results/                     across videos: labels-to-plateau table, cross-video back-test, pupil-area study
