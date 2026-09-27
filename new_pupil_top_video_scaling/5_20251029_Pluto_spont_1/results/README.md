@@ -11,5 +11,6 @@ video's labels; shuffles 631, 632, ... The first attempt (convention v1, 0 label
 |---|---|---|---|---|---|
 | 0 (video-4 run-2 plateau model 532, applied unchanged) | 11.90 px | 128.1 | 12% | 65% | – |
 | 20 (shuffle 631) | 15.85 px | 20.2 | 0% | 90% | 4340 of 57158 (7.6%) |
+| 40 (shuffle 632) | 16.58 px | 22.0 | 0% | 91% | pending |
 
 Eye time series: to be redrawn with a convention-v2 model.
