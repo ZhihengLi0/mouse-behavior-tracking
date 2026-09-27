@@ -10,6 +10,6 @@ video's labels; shuffles 631, 632, ... The first attempt (convention v1, 0 label
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-4 run-2 plateau model 532, applied unchanged) | 11.90 px | 128.1 | 12% | 65% | – |
-| 20 (shuffle 631) | 15.85 px | 20.2 | 0% | 90% | pending |
+| 20 (shuffle 631) | 15.85 px | 20.2 | 0% | 90% | 4340 of 57158 (7.6%) |
 
 Eye time series: to be redrawn with a convention-v2 model.
