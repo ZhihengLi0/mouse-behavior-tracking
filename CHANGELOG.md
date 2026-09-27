@@ -8,6 +8,25 @@ Only aggregate tables, figures, reports, and code are versioned here. Videos,
 frames, labels, model weights, and predictions stay in ignored local
 directories.
 
+## Version tags (from v0.6.0 on)
+
+Each tag marks an audited state; `git checkout <tag>` restores the code, README and aggregate results of that moment.
+Important changes (a video finished, a protocol or label-convention change, a new analysis) get a tag when they happen.
+
+| tag | date | what it marks |
+|---|---|---|
+| `v0.9.0-convention2` | 2026-09-26 | Labeling convention v2 (double pupil contour -> left edge); video 4 restarted from 50/20/20 under v2, run 1 archived |
+| `v0.8.0-video4-convention1` | 2026-09-26 | Last state under convention v1: video 4 run 1 finished (plateau 140 labels, 14.74 px), video 5 step 1 (5.92 px) |
+| `v0.7.7-blink-area-consistency` | 2026-09-25 | Blink / pupil-area consistency across videos: 4-point area better on 7 of 8 test sets; lowest pupil confidence separates human closed-eye frames; area moves with eye opening |
+| `v0.7.6-layout-timeseries` | 2026-09-25 | Uniform per-video results layout (`selection_sheets/`, `blink_area_analysis/`) and per-video eye time series |
+| `v0.7.5-era3-readme` | 2026-09-24 | Top-level README rewritten for era 3; videos 4 (2025-10-30) and 5 (2025-10-29) added |
+| `v0.7.4-pupil-area-4pt` | 2026-09-23 | Pupil-area study: 4-point ellipse rule 3.7% vs 3-point 6.9% area error |
+| `v0.7.3-cross-video-backtest` | 2026-09-23 | First cross-video back-test (every model on every frozen test set) |
+| `v0.7.2-videos1-3-plateau` | 2026-09-23 | Videos 1-3 (Pluto 2025-10-31) finished, each plateaus at 20 labels |
+| `v0.7.1-video0-plateau` | 2026-09-20 | 5-minute video finished under the ellipse standard, plateau at 60 labels |
+| `v0.7.0-newstd-corner-v1` | 2026-09-20 | First new-standard video-1 run with the first temporal-corner definition (superseded) |
+| `v0.6.0-pre-cleanup` | 2026-09-19 | Snapshot before the 2026-09-19 cleanup (old label standard, 3-point pupil method) |
+
 ## v0.2.0 - 2026-09-10 - Architecture screening, and why it has to be redone
 
 Tag: `v0.2.0`

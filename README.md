@@ -61,7 +61,7 @@ old_pupil_top/                 eras 1-2 (5-minute video, earlier label standards
 dlc_projects/                  DeepLabCut workspaces (config tracked; labels and weights local)
 environment/                   conda environment and setup check
 docs/  report/  scripts/       shared notes, reports and older canonical tools
-CHANGELOG.md                   what each tagged version established
+CHANGELOG.md                   what each tagged version established (table of all tags)
 ```
 
 ## How one video is processed (era 3 protocol)
@@ -87,7 +87,8 @@ recomputed rather than mixed.
   null - about 80 labels saturated that video and detector choice never mattered; a round-6 "improvement" was
   retracted after an audit found a mid-series metric switch (v0.5.1).
 - **Era 3 (from 2026-09-20)**: new ellipse label standard, 120-epoch recipe, the per-video scaling experiment
-  above. Tags `v0.1.0` ... `v0.7.0-newstd-corner-v1` mark audited states; see `CHANGELOG.md`.
+  above. Tags `v0.1.0` ... `v0.9.0-convention2` mark audited states (every finished video, protocol or label
+  convention change, and new analysis gets a tag); see the table in `CHANGELOG.md`.
 
 ## Next
 
