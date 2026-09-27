@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.1-video4-run2-plateau` | 2026-09-27 | Video 4 run 2 (convention v2) finished: plateau at 40 labels, 15.01 px (run 1 under v1: 140 labels) |
 | `v0.9.0-convention2` | 2026-09-26 | Labeling convention v2 (double pupil contour -> left edge); video 4 restarted from 50/20/20 under v2, run 1 archived |
 | `v0.8.0-video4-convention1` | 2026-09-26 | Last state under convention v1: video 4 run 1 finished (plateau 140 labels, 14.74 px), video 5 step 1 (5.92 px) |
 | `v0.7.7-blink-area-consistency` | 2026-09-25 | Blink / pupil-area consistency across videos: 4-point area better on 7 of 8 test sets; lowest pupil confidence separates human closed-eye frames; area moves with eye opening |
