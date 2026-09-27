@@ -147,3 +147,15 @@ LEFT contour and pupil_top / pupil_bottom are shifted left accordingly. Video 4 
 archived, tag `v0.8.0-video4-convention1`); video 5 restarts after it. Rows of the run-1 models (511-519, 611) and of
 the video 4/5 test sets were removed from `cross_video_matrix.csv` (copy of the old matrix in the tag). The test sets
 of videos 5-10 were labeled under v1 and are to be relabeled under v2 where the double contour occurs.
+
+### Test-set relabeling under v2 (2026-09-26)
+
+Test sets of later videos are relabeled under v2 with the user's own v1 labels as pre-labels (so only double-contour
+points move and no model's predictions anchor the labels), then re-frozen and re-scored by every model.
+
+- Video 5 (2025-10-29): 12 of 400 points changed (9 pupil_top, 3 pupil_bottom; median move 8-16 px); pupil width
+  median unchanged (241 px). v1 and v2 agree on this video.
+- The first run-2 model of video 4 (shuffle 531, 20 v2 labels) scores **91.6 px** on video 5, versus 13-17 px for
+  every model of videos 2-3: the video-4 v2 labels (pupil width 92 px vs 215 px under v1) define a much smaller pupil
+  than the labels of the other videos, and the model carries that definition over. Whether the video-4 v2 pupil is the
+  true one is open (discussed with Kaiwen Sheng).
