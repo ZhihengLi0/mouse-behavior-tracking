@@ -155,7 +155,7 @@ points move and no model's predictions anchor the labels), then re-frozen and re
 
 - Video 5 (2025-10-29): 12 of 400 points changed (9 pupil_top, 3 pupil_bottom; median move 8-16 px); pupil width
   median unchanged (241 px). v1 and v2 agree on this video.
-- The first run-2 model of video 4 (shuffle 531, 20 v2 labels) scores **91.6 px** on video 5, versus 13-17 px for
-  every model of videos 2-3: the video-4 v2 labels (pupil width 92 px vs 215 px under v1) define a much smaller pupil
-  than the labels of the other videos, and the model carries that definition over. Whether the video-4 v2 pupil is the
-  true one is open (discussed with Kaiwen Sheng).
+- ~~The first run-2 model of video 4 (shuffle 531) scores 91.6 px on video 5 ... carries that definition over.~~ **Retracted 2026-09-27**: the next run-2 model (532, 40 v2 labels) scores 11.9 px on video 5 and 3.9-12.1 px on
+  videos 0-3, like every other model; 531's 91.6 px was a single-model failure of the kind seen before (e.g. 107 and
+  178 px), not evidence that the video-4 v2 labels bias other videos. Open question unchanged: the v2 labels of video 4
+  mark a much smaller pupil (width 92 vs 215 px) - which one is right is discussed with Kaiwen Sheng.
