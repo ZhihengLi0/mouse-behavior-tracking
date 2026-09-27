@@ -18,3 +18,8 @@ run 1) + this video's labels.
 | 20 | 24.64 px | 45.2 | 6% | 72% | 17672 |
 | 40 | 15.01 px | 24.1 | 2% | 90% | 7134 |
 | 60 | 16.82 px | 25.1 | 2% | 79% | 8050 |
+| 80 | 17.54 px | 44.7 | 8% | 86% | – |
+
+**Run 2 plateau (2026-09-27):** neither 60 labels (16.82 px) nor 80 labels (17.54 px) improved the running best of
+15.01 px by more than 3%, so the plateau point of run 2 (convention v2) is **40 labels, 15.01 px**. Run 1 (v1) needed
+140 labels for 14.74 px on a different (larger) pupil definition, so the two numbers are not directly comparable.
