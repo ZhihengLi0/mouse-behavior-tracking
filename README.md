@@ -8,14 +8,14 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-26 17:50 CDT)
+## Status (last updated 2026-09-26 20:45 CDT)
 
 | what | state |
 |---|---|
 | Label standard | era 3 (since 2026-09-20): the pupil is an **ellipse**; its four points are the ellipse endpoints, including the part hidden under the lid |
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
-| In progress | **video 4 run 2** (Pluto, 2025-10-30): restarted under labeling convention v2 (double contour -> left edge); test50 being relabeled. Run 1 (v1): plateau 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`) |
+| In progress | **video 4 run 2** (Pluto, 2025-10-30): restarted under labeling convention v2 (double contour -> left edge); 0 labels 32.11 px, 20 labels 24.64 px; the v2 labels mark a much smaller pupil (width 92 vs 215 px), being checked with Kaiwen. Run 1 (v1): plateau 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`) |
 | Paused | video 5 (restarts after video 4 run 2; its first attempt under v1 is archived) |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
