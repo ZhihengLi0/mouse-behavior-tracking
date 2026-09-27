@@ -48,3 +48,6 @@ meeting-notes/
 **/active-learning*/branches/
 **/active-learning*/frames/
 **/pipeline_*/
+
+# Archived model folders (large .pt files) stay local
+_archive_models_*/

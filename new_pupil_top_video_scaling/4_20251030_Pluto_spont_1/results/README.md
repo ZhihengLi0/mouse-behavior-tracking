@@ -15,4 +15,4 @@ run 1) + this video's labels.
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-3 step-3 model 423, applied unchanged) | 32.11 px | – | – | – | – |
-| 20 | 24.64 px | 45.2 | 6
+| 20 | 24.64 px | 45.2 | 6% | 72% | (pending) |
