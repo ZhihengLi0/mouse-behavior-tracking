@@ -82,7 +82,7 @@ pupil points are ellipse endpoints under the new standard). Median |area error| 
 Each video now has `results/blink_area_analysis/timeseries.png` + `timeseries_summary.csv`: pupil centre, pupil area
 (4-point rule, with the current 3-point rule in grey), eye opening, lowest pupil confidence, and rasters of the
 production blink rule (`pupil_trace.py`, unchanged) and of the earlier study's residual rule (> 5 MADs from a 1-s
-rolling median), on the newest whole-video prediction of each video (all 11 videos as of 2026-09-26).
+rolling median), on the newest whole-video prediction of each video. Videos 4-10 were drawn with the discarded convention-v1 branch models (515/518) and were removed on 2026-09-27 (kept at tag `v0.8.0-video4-convention1`); they are redrawn with convention-v2 models as the videos are processed.
 
 | video | model | median 4-pt area (px²) | 3-pt vs 4-pt | corr 3-pt/4-pt | untrusted (production rule) | pupil conf < 0.6 | any residual flag |
 |---|---|---|---|---|---|---|---|
@@ -90,13 +90,6 @@ rolling median), on the newest whole-video prediction of each video (all 11 vide
 | 1 `1_20251031_Pluto_spont_1` | 217 | 27,028 | -3.3% | 0.987 | 26.1% (683 runs) | 17.4% | 10.2% |
 | 2 `2_20251031_pluton2` | 323 | 31,996 | +0.8% | 0.991 | 30.8% (944 runs) | 12.1% | 12.5% |
 | 3 `3_20251031_pluto3` | 423 | 26,022 | -2.9% | 0.993 | 37.8% (909 runs) | 17.0% | 13.8% |
-| 4 `4_20251030_Pluto_spont_1` | 515 | 28,591 | -1.1% | 0.988 | 50.5% (725 runs) | 46.9% | 14.6% |
-| 5 `5_20251029_Pluto_spont_1` | 515 | 40,141 | +1.7% | 0.986 | 11.7% (545 runs) | 92.8% | 5.3% |
-| 6 `6_20251028_Pluto_spont_1` | 515 | 37,751 | -3.2% | 0.925 | 44.8% (872 runs) | 99.2% | 19.7% |
-| 7 `7_20251027_Pluto_spont1` | 515 | 28,486 | +2.6% | 0.854 | 39.1% (910 runs) | 95.5% | 28.6% |
-| 8 `8_20251024_Pluto_spont1` | 518 | 38,447 | +3.4% | 0.961 | 56.7% (484 runs) | 90.1% | 14.2% |
-| 9 `9_20251023_Pluto1` | 518 | 25,851 | +3.2% | 0.969 | 52.7% (774 runs) | 90.2% | 12.6% |
-| 10 `10_20251022_Pluto1` | 518 | 14,704 | -12.6% | 0.990 | 70.4% (1115 runs) | 95.8% | 11.7% |
 
 First observations (no conclusions drawn yet; the blink / area algorithm comparison is the next step):
 - The production blink rule marks 26-50% of every mouse-B video as untrusted, far more than real blinks: it was tuned
@@ -159,3 +152,11 @@ points move and no model's predictions anchor the labels), then re-frozen and re
   videos 0-3, like every other model; 531's 91.6 px was a single-model failure of the kind seen before (e.g. 107 and
   178 px), not evidence that the video-4 v2 labels bias other videos. Open question unchanged: the v2 labels of video 4
   mark a much smaller pupil (width 92 vs 215 px) - which one is right is discussed with Kaiwen Sheng.
+
+### v1 branch removed (2026-09-27)
+
+At the user's request the convention-v1 branch after video 3 was deleted locally to free space (about 12 GB):
+video-4 run-1 labels/predictions/models (shuffles 511-519), the first video-5 attempt (611), and whole-video
+predictions / time series of videos 4-10 made with those models. Everything that was published remains at tag
+`v0.8.0-video4-convention1`. Kept: the v1 test labels of videos 6-10 (pre-labels for their v2 relabel) and the
+video-4 zero-shot prediction of the pre-fork model 423.
