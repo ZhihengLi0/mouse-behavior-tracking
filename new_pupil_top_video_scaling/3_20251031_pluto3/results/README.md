@@ -18,3 +18,15 @@ Plateau rule (running best of the final-snapshot series, two consecutive steps w
 plateau point is **20 labels** - the third video in a row with a 20-label plateau, now at a 3-4 px floor. The tail
 kept improving (p90 21.3 -> 15.8 -> 10.2 px). With the 0-label point included in the series the conclusion is the
 same (0 -> 20 labels improved by 23%).
+
+**Fewer-labels study (2026-09-28)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: videos 0-2 only) -> `fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 4.43 px | 23.2 | 0% |
+| 5 (subset a / b) | 3.82 / 3.91 px | 22.9 / 15.4 | 0% / 0% |
+| 10 (subset a / b) | 3.81 / 3.48 px | 21.7 / 22.5 | 0% / 0% |
+| 20 | 3.40 px | 21.3 | 0% |
+
+On this video (third recording of the day, already 4.4 px with 0 labels) 5 labels are as good as 20.
