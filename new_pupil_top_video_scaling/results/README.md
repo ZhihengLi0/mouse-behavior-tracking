@@ -161,3 +161,26 @@ video-4 run-1 labels/predictions/models (shuffles 511-519), the first video-5 at
 predictions / time series of videos 4-10 made with those models. Everything that was published remains at tag
 `v0.8.0-video4-convention1`. Kept: the v1 test labels of videos 6-10 (pre-labels for their v2 relabel) and the
 video-4 zero-shot prediction of the pre-fork model 423.
+
+## Fewer-labels study (2026-09-27 / 28): are 5 or 10 labels enough?
+
+Step 1 of every video retrained with 5 or 10 of its 20 batch01 labels (two model-free subsets each,
+`scripts/make_label_subsets.py`; `scale_step.py --subset`). Everything else is exactly the step-1 training set of that
+time (earlier videos only, never later ones), same recipe, same frozen test set and scoring. Per-video figures:
+`<video>/results/fewer_labels.png`. Median frame RMSE (share of test frames > 50 px):
+
+| video | 0 labels | 5 labels (a / b) | 10 labels (a / b) | 20 labels |
+|---|---|---|---|---|
+| 0 (mouse A, no earlier video) | – | 78.5 / 81.5 (70% / 72%) | 20.5 / 20.8 (14% / 8%) | 12.93 (4%) |
+| 1 (first video of mouse B) | 208.2 (98%) | 96.0 / 41.4 (56% / 48%) | 20.2 / 16.1 (42% / 34%) | 10.37 (4%) |
+| 2 | 9.99 (10%) | 8.2 / 11.5 (10% / 18%) | 10.5 / 9.9 (22% / 12%) | 7.73 (8%) |
+| 3 | 4.43 (0%) | 3.8 / 3.9 (0% / 0%) | 3.8 / 3.5 (0% / 0%) | 3.40 (0%) |
+| 4 (poor quality, v2 labels) | 32.11 (22%) | 30.7 / 32.2 (10% / 14%) | 45.3 / 44.8 (42% / 32%) | 24.64 (6%) |
+| 5 (v2 labels) | 11.90 (12%) | 13.0 / 9.4 (0% / 4%) | 12.6 / 12.7 (0% / 4%) | 15.85 (0%) |
+
+- 5 labels were enough on 2 of 6 videos (3 and 5), both of which the earlier videos already covered well.
+- On the other 4, 5 and 10 labels fall short of 20: the first video of a mouse (0, 1) improves steadily with labels,
+  video 2 does not improve on 0 labels until 20, and on video 4 10 labels are worse than none (both subsets agree;
+  not explained yet).
+- Two subsets of the same size can differ a lot (video 1: 96 vs 41 px at 5 labels), so a single small batch is
+  unreliable. 20 labels was the smallest size that worked on every video.

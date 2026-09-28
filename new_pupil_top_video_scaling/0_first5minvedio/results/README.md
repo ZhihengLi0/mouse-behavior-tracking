@@ -14,3 +14,14 @@ model 1,287 (8.9%, 86 runs), new model 1,522 (10.6%, 73 runs), 855 in common. Th
 above its own 4-point area (bias of the old rule; corr 0.934). No labeled frame of this video has an empty pupil, so
 the blink trigger cannot be checked against closed-eye labels here; of the 120 labeled frames 22 (old) / 25 (new)
 are flagged untrusted (these frames were chosen by the jump rule, so they over-represent blinks).
+
+**Fewer-labels study (2026-09-28)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each; no
+earlier video, as at the time) -> `fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 5 (subset a / b) | 78.53 / 81.50 px | 273.8 / 144.6 | 70% / 72% |
+| 10 (subset a / b) | 20.48 / 20.84 px | 189.9 / 47.1 | 14% / 8% |
+| 20 | 12.93 px | 23.9 | 4% |
+
+Without any earlier video, 5 labels fail and 10 are not enough; 20 are needed.

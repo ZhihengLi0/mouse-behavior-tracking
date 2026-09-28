@@ -9,3 +9,11 @@ x080_step04_final,first5minvedio,42,80,13.07,10.79,16.43,19.25,0.02,0.895,50,399
 x080_step04_mAPlate,first5minvedio,42,80,13.53,10.92,14.32,19.4,0.0,0.855,50,399,best validation mAP among epochs >= 96 (100),12.64,3.85,8.84,5.28,11.81,5.34,16.89,14.05
 x100_step05_final,first5minvedio,42,100,12.29,9.98,14.58,17.8,0.0,0.932,50,399,final snapshot (120),12.05,4.16,8.97,4.58,11.13,5.3,17.46,10.74
 x100_step05_mAPlate,first5minvedio,42,100,12.28,9.84,14.54,16.27,0.02,0.922,50,399,best validation mAP among epochs >= 96 (100),11.89,4.09,7.66,4.41,11.14,5.87,17.33,9.62
+x005_step01_final_sub05a,0_first5minvedio,42,5,78.53,39.25,144.49,273.8,0.7,0.13,50,399,final snapshot (best-120),18.86,4.12,120.78,5.22,17.85,6.31,20.56,30.97
+x005_step01_mAPlate_sub05a,0_first5minvedio,42,5,78.53,39.25,144.49,273.8,0.7,0.13,50,399,best validation mAP among epochs >= 96 (best-120),18.86,4.12,120.78,5.22,17.85,6.31,20.56,30.97
+x005_step01_final_sub05b,0_first5minvedio,42,5,81.5,47.54,112.01,144.62,0.72,0.163,50,399,final snapshot (120),30.21,5.29,73.59,9.94,49.0,6.9,24.09,25.83
+x005_step01_mAPlate_sub05b,0_first5minvedio,42,5,76.07,47.31,124.36,217.67,0.68,0.228,50,399,best validation mAP among epochs >= 96 (best-110),31.24,5.6,77.69,9.38,33.37,6.68,27.26,17.7
+x010_step01_final_sub10a,0_first5minvedio,42,10,20.48,14.1,100.93,189.92,0.14,0.436,50,399,final snapshot (best-120),12.07,3.92,7.3,6.74,17.7,5.23,20.75,14.99
+x010_step01_mAPlate_sub10a,0_first5minvedio,42,10,20.48,14.1,100.93,189.92,0.14,0.436,50,399,best validation mAP among epochs >= 96 (best-120),12.07,3.92,7.3,6.74,17.7,5.23,20.75,14.99
+x010_step01_final_sub10b,0_first5minvedio,42,10,20.84,15.74,48.33,47.08,0.08,0.434,50,399,final snapshot (120),15.01,4.63,11.1,5.52,12.84,6.33,19.99,29.24
+x010_step01_mAPlate_sub10b,0_first5minvedio,42,10,18.18,14.11,53.32,51.48,0.12,0.429,50,399,best validation mAP among epochs >= 96 (best-110),15.32,4.53,9.95,6.61,12.04,6.64,19.85,17.72
