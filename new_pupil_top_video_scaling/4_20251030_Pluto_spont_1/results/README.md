@@ -22,3 +22,18 @@ run 1) + this video's labels.
 **Run 2 plateau (2026-09-27):** neither 60 labels (16.82 px) nor 80 labels (17.54 px) improved the running best of
 15.01 px by more than 3%, so the plateau point of run 2 (convention v2) is **40 labels, 15.01 px**. Run 1 (v1) needed
 140 labels for 14.74 px on a different (larger) pupil definition, so the two numbers are not directly comparable.
+
+**Fewer-labels study (2026-09-28)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: videos 0-3 only) -> `fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 32.11 px | 59.9 | 22% |
+| 5 (subset a / b) | 30.74 / 32.21 px | 50.1 / 52.0 | 10% / 14% |
+| 10 (subset a / b) | 45.31 / 44.75 px | 62.4 / 61.6 | 42% / 32% |
+| 20 | 24.64 px | 45.2 | 6% |
+| 40 | 15.01 px | 24.1 | 2% |
+
+On this poor-quality video 5 labels do not help and 10 labels are worse than none (both subsets agree), while 20 and
+40 labels improve. Not explained yet; one untested possibility is the conflict between the few v2 labels of this
+video (much smaller pupil) and the v1 labels of videos 0-3.
