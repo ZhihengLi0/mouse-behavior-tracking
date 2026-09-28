@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-28 07:45 CDT)
+## Status (last updated 2026-09-28 11:45 CDT)
 
 | what | state |
 |---|---|
@@ -17,7 +17,7 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
 | Finished | **video 4 run 2** (Pluto, 2025-10-30, convention v2): plateau at **40 labels, 15.01 px** (0/20/40/60/80 = 32.11/24.64/15.01/16.82/17.54 px). Run 1 (v1): 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`). Open: the v2 labels mark a much smaller pupil (width 92 vs 215 px) |
 | Finished | **video 5** (Pluto, 2025-10-29, convention v2): plateau at **20 labels, 15.85 px** (0/20/40 = 11.90/15.85/16.58 px; the 0-label model is > 50 px off on 12% of frames, 20 labels remove all of them) |
-| In progress | **fewer-labels study**: for videos 0-5, retrain step 1 with 5 or 10 of its 20 batch01 labels (two subsets each, training set otherwise exactly as at that time - earlier videos only) -> `<video>/results/fewer_labels.png`. Video 5 done: 5 labels = 13.04 / 9.42 px (p90 19.9 / 13.2), 10 labels = 12.56 / 12.73 px, vs 20 labels 15.85 px (p90 20.2). Video 4 done: 5 labels = 30.7 / 32.2 px (no gain over 0 labels, 32.1), 10 labels = 45.3 / 44.8 px (worse), vs 20 labels 24.6 px. Video 3 done: 5 labels = 3.82 / 3.91 px, 10 labels = 3.81 / 3.48 px, vs 20 labels 3.40 px; videos 2-0 running |
+| In progress | **fewer-labels study**: for videos 0-5, retrain step 1 with 5 or 10 of its 20 batch01 labels (two subsets each, training set otherwise exactly as at that time - earlier videos only) -> `<video>/results/fewer_labels.png`. Video 5 done: 5 labels = 13.04 / 9.42 px (p90 19.9 / 13.2), 10 labels = 12.56 / 12.73 px, vs 20 labels 15.85 px (p90 20.2). Video 4 done: 5 labels = 30.7 / 32.2 px (no gain over 0 labels, 32.1), 10 labels = 45.3 / 44.8 px (worse), vs 20 labels 24.6 px. Video 3 done: 5 labels = 3.82 / 3.91 px, 10 labels = 3.81 / 3.48 px, vs 20 labels 3.40 px. Video 2: 5 / 10 labels 8.2-11.5 px with 10-22% of frames > 50 px, vs 20 labels 7.73 px (8%). Video 1 (new mouse): 5 labels 41-96 px, 10 labels 16-20 px, 20 labels 10.4 px. Video 0 running |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 

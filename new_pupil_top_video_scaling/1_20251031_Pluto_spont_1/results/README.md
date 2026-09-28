@@ -102,3 +102,15 @@ Reading: the hypothesis holds for the frames a human calls closed; the two trigg
 scatter/confidence) flag largely different frames, so combining them - or replacing the lid distance - is a
 decision for the user after the video-level counts are compared (`blink_area_analysis/blink_pupil_dispersion.csv`,
 `blink_area_analysis/blink_pupil_dispersion_labeled_frames.csv`, figure `blink_area_analysis/blink_pupil_dispersion.png`).
+
+**Fewer-labels study (2026-09-28)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: video 0 only) -> `fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 208.23 px | 257.9 | 98% |
+| 5 (subset a / b) | 96.02 / 41.38 px | 123.4 / 221.9 | 56% / 48% |
+| 10 (subset a / b) | 20.17 / 16.12 px | 123.5 / 168.5 | 42% / 34% |
+| 20 | 10.37 px | 21.6 | 4% |
+
+First video of a new mouse: error falls steadily with 5, 10 and 20 labels; 20 are needed.

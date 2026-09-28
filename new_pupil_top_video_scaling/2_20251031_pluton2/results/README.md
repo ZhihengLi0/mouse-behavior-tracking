@@ -30,3 +30,15 @@ was trained and scored (no whole-video prediction, no batch05). Test set frozen 
 Per keypoint: `pupil_top` is the only point still improving (18.3 -> 14.0 -> 10.2 -> 14.0 px); every other point
 is at 1-5 px from the first step on. The test50 pre-labels came from the video-1 step-5 model and the labeler
 moved 126 of 397 points, so scores are anchored to that model where the labeler agreed with it.
+
+**Fewer-labels study (2026-09-28)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: videos 0-1 only) -> `fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 9.99 px | 46.3 | 10% |
+| 5 (subset a / b) | 8.22 / 11.50 px | 48.0 / 96.6 | 10% / 18% |
+| 10 (subset a / b) | 10.46 / 9.85 px | 85.2 / 78.4 | 22% / 12% |
+| 20 | 7.73 px | 26.4 | 8% |
+
+5 or 10 labels do not improve on 0 labels here (the tail even gets worse); 20 labels are needed.
