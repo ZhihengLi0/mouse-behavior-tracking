@@ -1,0 +1,8 @@
+label,run,training_frames_this_video,median_frame_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6
+x000_step00_final,regular step,0,11.9,128.14,0.12,0.649
+x005_step01_final_sub05a,sub05a,5,13.04,19.88,0.0,0.792
+x005_step01_final_sub05b,sub05b,5,9.42,13.18,0.04,0.779
+x010_step01_final_sub10a,sub10a,10,12.56,18.07,0.0,0.905
+x010_step01_final_sub10b,sub10b,10,12.73,19.65,0.04,0.802
+x020_step01_final,regular step,20,15.85,20.2,0.0,0.902
+x040_step02_final,regular step,40,16.58,22.02,0.0,0.91

@@ -18,6 +18,17 @@ video's labels; shuffles 631, 632, ... The first attempt (convention v1, 0 label
 improve further. The step-2 whole-video prediction was stopped (no batch03).
 
 Fewer-labels study: 5 and 10 of batch01's 20 labels (two subsets each, `scripts/make_label_subsets.py`,
-`scale_step.py --subset`), same training set otherwise -> `fewer_labels.png` / `fewer_labels.csv` when done.
+`scale_step.py --subset`), same training set otherwise -> `fewer_labels.png` / `fewer_labels.csv`:
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 11.90 px | 128.1 | 12% |
+| 5 (subset a / b) | 13.04 / 9.42 px | 19.9 / 13.2 | 0% / 4% |
+| 10 (subset a / b) | 12.56 / 12.73 px | 18.1 / 19.6 | 0% / 4% |
+| 20 | 15.85 px | 20.2 | 0% |
+| 40 | 16.58 px | 22.0 | 0% |
+
+On this video 5 labels already remove the 0-label failures as well as 20 do (p90 13-20 px vs 20 px); the median
+does not improve with more labels, and two subsets of the same size differ by up to 3.6 px.
 
 Eye time series: to be redrawn with a convention-v2 model.
