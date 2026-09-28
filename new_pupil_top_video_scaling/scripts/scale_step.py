@@ -74,8 +74,9 @@ def human_table(folder):
     return pd.read_hdf(f[0])
 
 
-def stage(unit, last_batch, with_val):
-    """Copy PNGs + the human labels of one unit into the DLC project, exactly as saved. Returns (train names, val names)."""
+def stage(unit, last_batch, with_val, keep=None):
+    """Copy PNGs + the human labels of one unit into the DLC project, exactly as saved. Returns (train names, val names).
+    keep: optional set of training-frame names (fewer-labels study); val20 is always kept whole."""
     lab = HERE / unit / "training-data" / "labels"
     dest = PROJECT / "labeled-data" / unit
     if dest.exists():
@@ -85,6 +86,8 @@ def stage(unit, last_batch, with_val):
     sets = [f"batch{b:02d}" for b in range(1, last_batch + 1)] + (["val20"] if with_val else [])
     for s in sets:
         t = human_table(lab / s)
+        if keep is not None and s != "val20":
+            t = t[[(i[-1] if isinstance(i, tuple) else Path(str(i)).name) in keep for i in t.index]]
         names = [i[-1] if isinstance(i, tuple) else Path(str(i)).name for i in t.index]
         t.index = pd.MultiIndex.from_tuples([("labeled-data", unit, n) for n in names])
         for n in names:
@@ -162,6 +165,7 @@ def main():
     ap.add_argument("--eval-only", action="store_true")
     ap.add_argument("--epochs", type=int, default=EPOCHS, help="side trials only; the frozen recipe is the default")
     ap.add_argument("--no-eval", action="store_true", help="train only: epoch-count trials are judged on VALIDATION, never on the test set")
+    ap.add_argument("--subset", default=None, help="fewer-labels study: file of this video's training-frame names to keep (use with --tag)")
     a = ap.parse_args()
     import deeplabcut
 
@@ -172,7 +176,10 @@ def main():
     train_names = {}
     for u, last in prior:
         train_names[u], _ = stage(u, last, with_val=False)
-    train_names[a.unit], val_names = stage(a.unit, a.step, with_val=True)
+    keep = set(Path(a.subset).read_text().split()) if a.subset else None
+    train_names[a.unit], val_names = stage(a.unit, a.step, with_val=True, keep=keep)
+    if keep is not None:
+        assert len(train_names[a.unit]) == len(keep), "subset names not all found in the labeled batches"
     # labeled-data folders of videos that are not part of THIS run would be merged in by DeepLabCut as well;
     # they are regenerated copies (stage() rebuilds them on every run), so drop them here
     for d in (PROJECT / "labeled-data").iterdir():

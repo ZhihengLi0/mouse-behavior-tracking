@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-27 18:45 CDT)
+## Status (last updated 2026-09-27 19:25 CDT)
 
 | what | state |
 |---|---|
@@ -16,7 +16,8 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Recipe (frozen) | ResNet-50, batch 2, trained from scratch, 120 epochs, LR drops at 96 / 114; headline = final snapshot, median per-frame RMSE over the 8 keypoints on 50 frozen test frames |
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
 | Finished | **video 4 run 2** (Pluto, 2025-10-30, convention v2): plateau at **40 labels, 15.01 px** (0/20/40/60/80 = 32.11/24.64/15.01/16.82/17.54 px). Run 1 (v1): 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`). Open: the v2 labels mark a much smaller pupil (width 92 vs 215 px) |
-| In progress | **video 5** (Pluto, 2025-10-29, convention v2): 0 labels (video-4 plateau model 532) = 11.90 px (p90 128, 12% of frames > 50 px); 20 labels = 15.85 px (p90 20.2, 0% > 50 px) - median worse, tail much better; 40 labels = 16.58 px (p90 22.0, 0% > 50 px). The median plateau rule fires at 0 labels, while the 0-label model fails badly on 12% of frames - decision pending, batch03 held |
+| Finished | **video 5** (Pluto, 2025-10-29, convention v2): plateau at **20 labels, 15.85 px** (0/20/40 = 11.90/15.85/16.58 px; the 0-label model is > 50 px off on 12% of frames, 20 labels remove all of them) |
+| In progress | **fewer-labels study**: for videos 0-5, retrain step 1 with 5 or 10 of its 20 batch01 labels (two subsets each, training set otherwise exactly as at that time - earlier videos only) -> `<video>/results/fewer_labels.png` |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
@@ -31,6 +32,7 @@ Labels needed per video (plateau = two consecutive 20-label steps that improve t
 | 2 | Pluto, 2025-10-31 | 200 | 9.99 / 7.73 / 7.57 / 7.83 px | 20 labels, 7.7 px |
 | 3 | Pluto, 2025-10-31 | 260 | 4.43 / 3.40 / 3.87 / 3.63 px | 20 labels, 3.4 px |
 | 4 | Pluto, 2025-10-30 (poor quality) | 320 | run 2 (v2): 32.11 / 24.64 / 15.01 / 16.82 / 17.54 px | 40 labels, 15.0 px (run 1 v1: 140 labels) |
+| 5 | Pluto, 2025-10-29 | 360 | 11.90 / 15.85 / 16.58 px (v2) | 20 labels, 15.9 px (0 labels: 12% of frames > 50 px) |
 
 What the numbers say:
 

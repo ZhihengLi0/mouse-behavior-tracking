@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.2-video5-plateau` | 2026-09-27 | Video 5 (2025-10-29, convention v2) finished at 20 labels, 15.85 px (0 labels: 11.90 px median but 12% of frames > 50 px; 40 labels 16.58 px); fewer-labels study (5 / 10 labels, videos 0-5) started |
 | `v0.9.1-video4-run2-plateau` | 2026-09-27 | Video 4 run 2 (convention v2) finished: plateau at 40 labels, 15.01 px (run 1 under v1: 140 labels) |
 | `v0.9.0-convention2` | 2026-09-26 | Labeling convention v2 (double pupil contour -> left edge); video 4 restarted from 50/20/20 under v2, run 1 archived |
 | `v0.8.0-video4-convention1` | 2026-09-26 | Last state under convention v1: video 4 run 1 finished (plateau 140 labels, 14.74 px), video 5 step 1 (5.92 px) |
