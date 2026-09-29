@@ -39,6 +39,16 @@ VIDEOS = [
     ("10_20251022_Pluto1", "mouse B (Pluto)", "2025-10-22", "auto:111"),
     ("9_20251023_Pluto1", "mouse B (Pluto)", "2025-10-23", "auto:101"),
 ]
+# fewer-labels study (2026-09-27/28): step-1 retrained with 5 or 10 of batch01's 20 labels, two model-free subsets each;
+# shown on the curves as open markers just before that video's 20-label step (user request 2026-09-29)
+SUBSETS = {
+    "5_20251029_Pluto_spont_1": [(951, 5, "5a"), (952, 5, "5b"), (953, 10, "10a"), (954, 10, "10b")],
+    "4_20251030_Pluto_spont_1": [(955, 5, "5a"), (956, 5, "5b"), (957, 10, "10a"), (958, 10, "10b")],
+    "3_20251031_Pluto_spont_2": [(959, 5, "5a"), (960, 5, "5b"), (961, 10, "10a"), (962, 10, "10b")],
+    "2_20251031_Pluto_spont_3": [(963, 5, "5a"), (964, 5, "5b"), (965, 10, "10a"), (966, 10, "10b")],
+    "1_20251031_Pluto_spont_1": [(967, 5, "5a"), (968, 5, "5b"), (969, 10, "10a"), (970, 10, "10b")],
+    "0_first5minvedio": [(971, 5, "5a"), (972, 5, "5b"), (973, 10, "10a"), (974, 10, "10b")],
+}
 # labels of a video that are carried into later videos (the "prior" used when the next video started)
 CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_Pluto_spont_3": 60, "3_20251031_Pluto_spont_2": 60}
 # videos the labeler judged hard to read by eye (pupil boundary barely visible); marked in the figures
@@ -79,9 +89,13 @@ def models():
     rows, idx, carried = [], 0, 0
     for u, mouse, date, spec in VIDEOS:
         steps = steps_of(spec)
+        for shuffle, n, tag in SUBSETS.get(u, []):          # fewer-labels models sit just before the video's step 1
+            rows.append(dict(model_idx=idx, model_unit=u, mouse=mouse, date=date, step=0, shuffle=shuffle,
+                             labels_this_video=n, total_labels=carried + n, subset=tag))
+            idx += 1
         for step, shuffle, n in steps:
             rows.append(dict(model_idx=idx, model_unit=u, mouse=mouse, date=date, step=step, shuffle=shuffle,
-                             labels_this_video=n, total_labels=carried + n))
+                             labels_this_video=n, total_labels=carried + n, subset=""))
             idx += 1
         carried += CARRIED.get(u, steps[-1][2] if steps else 0)
     return pd.DataFrame(rows)
@@ -124,20 +138,25 @@ def plot(m):
     markers = {v[0]: "osD^vPX*"[i % 8] for i, v in enumerate(VIDEOS)}
     short = {v[0]: label_of(v[0]) for v in VIDEOS}
     mods = models()
-    m = m[m.shuffle.isin(mods.shuffle)]
-    fig, ax = plt.subplots(figsize=(19, 8), constrained_layout=True)
+    # positions come from the current model sequence (the csv keeps a model_idx from the run that scored the row)
+    m = m[m.shuffle.isin(mods.shuffle)].drop(columns=["model_idx"], errors="ignore").merge(mods[["shuffle", "model_idx", "subset"]], on="shuffle")
+    m["subset"] = m["subset"].fillna("")
+    fig, ax = plt.subplots(figsize=(21, 8), constrained_layout=True)
     for tu in units:
-        s = m[m.test_unit == tu].sort_values("model_idx")
+        s = m[(m.test_unit == tu) & (m.subset == "")].sort_values("model_idx")
         ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=2, ms=7, mec="white", mew=0.8, label=f"test set of {short[tu]}")
-        own = mods[mods.model_unit == tu].model_idx.min()
+        sub = m[(m.test_unit == tu) & (m.subset != "")]
+        if len(sub):
+            ax.plot(sub.model_idx, sub.median_frame_rmse_px, marker=markers[tu], color=colors[tu], ls="none", ms=7, mfc="white", mew=1.2)
+        own = mods[(mods.model_unit == tu) & (mods.subset == "")].model_idx.min()
         if not np.isfinite(own):
             continue
         ax.axvline(own - 0.5, color=colors[tu], ls=":", lw=1)
         ax.annotate("own labels start", (own - 0.5, ax.get_ylim()[1] if False else 1.2), color=colors[tu], fontsize=8, rotation=90, va="bottom", ha="right")
     ax.set_yscale("log"); ax.set_ylabel("median frame RMSE on that video's 50 frozen test frames (px, log scale)")
     ax.set_xticks(mods.model_idx)
-    ax.set_xticklabels([f"{r.labels_this_video}\n({r.total_labels})" for r in mods.itertuples()], fontsize=8)
-    ax.set_xlabel("model, in training order: labels of its own video (total labels in its training set)")
+    ax.set_xticklabels([f"{r.subset or r.labels_this_video}\n({r.total_labels})" for r in mods.itertuples()], fontsize=7)
+    ax.set_xlabel("model, in training order: labels of its own video (total labels in its training set); 5a/5b/10a/10b = fewer-labels subsets of batch01 (open markers)")
     # video spans below the axis
     for u, mouse, date, _ in VIDEOS:
         g = mods[mods.model_unit == u]
@@ -149,7 +168,7 @@ def plot(m):
         ax.text((x0 + x1) / 2, 1.02, f"{head}\n{date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
     ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=9, loc="upper right")
     ax.set_title("Every model of the sequence, scored on every video's frozen test set (final snapshot, epoch 120)\n"
-                 "left of a dotted line = that video not yet in the training set (its 0-label regime); labels are 20 per step", fontsize=11, pad=34)
+                 "left of a dotted line = that video not yet in the training set (its 0-label regime); labels are 20 per step; open markers = 5 / 10-label subset models", fontsize=11, pad=34)
     fig.savefig(R / "cross_video_curves.png", dpi=130)
     # heatmap
     piv = m.pivot(index="test_unit", columns="model_idx", values="median_frame_rmse_px").reindex(units)
@@ -161,7 +180,7 @@ def plot(m):
             if np.isfinite(v):
                 ax.text(j, i, f"{v:.1f}" if v < 100 else f"{v:.0f}", ha="center", va="center", fontsize=7.5, color="w" if v > 6 else "k")
     ax.set_yticks(range(len(units))); ax.set_yticklabels([short[u] for u in units], fontsize=9)
-    ax.set_xticks(mods.model_idx); ax.set_xticklabels([f"{r.model_unit.split('_')[0]}:{r.labels_this_video}" for r in mods.itertuples()], fontsize=8, rotation=90)
+    ax.set_xticks(mods.model_idx); ax.set_xticklabels([f"{r.model_unit.split('_')[0]}:{r.subset or r.labels_this_video}" for r in mods.itertuples()], fontsize=7, rotation=90)
     ax.set_xlabel("model (video index : labels of that video)"); ax.set_title("median frame RMSE (px) of each model on each test set", fontsize=11)
     fig.colorbar(im, ax=ax, label="log10 px", fraction=0.02)
     fig.savefig(R / "cross_video_matrix.png", dpi=130)
