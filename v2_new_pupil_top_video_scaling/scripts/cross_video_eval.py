@@ -139,7 +139,7 @@ def plot(m):
     short = {v[0]: label_of(v[0]) for v in VIDEOS}
     mods = models()
     # positions come from the current model sequence (the csv keeps a model_idx from the run that scored the row)
-    m = m[m.shuffle.isin(mods.shuffle)].drop(columns=["model_idx"], errors="ignore").merge(mods[["shuffle", "model_idx", "subset"]], on="shuffle")
+    m = m[m.shuffle.isin(mods.shuffle)].drop(columns=["model_idx", "subset"], errors="ignore").merge(mods[["shuffle", "model_idx", "subset"]], on="shuffle")
     m["subset"] = m["subset"].fillna("")
     fig, ax = plt.subplots(figsize=(21, 8), constrained_layout=True)
     for tu in units:
