@@ -145,7 +145,7 @@ def plot(m):
     for tu in units:
         s = m[(m.test_unit == tu) & (m.subset == "")].sort_values("model_idx")
         ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=1.8, ms=3.5, label=f"test set of {short[tu]}")
-        sub = m[(m.test_unit == tu) & (m.subset != "")]
+        sub = m[(m.test_unit == tu) & (m.subset != "") & (m.model_unit == tu)]   # subset models: own test set only (less clutter)
         if len(sub):
             ax.plot(sub.model_idx, sub.median_frame_rmse_px, marker="o", color=colors[tu], ls="none", ms=5, mfc="white", mew=1.2)
         own = mods[(mods.model_unit == tu) & (mods.subset == "")].model_idx.min()
@@ -167,6 +167,31 @@ def plot(m):
         head = f"video {u.split('_')[0]}" + (" (POOR QUALITY)" if u in POOR_QUALITY else "")
         ax.text((x0 + x1) / 2, 1.02, f"{head}\n{date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
     ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=9, loc="upper right")
+    # per-video panels (user request 2026-09-29): each video's own test set vs its own labels, 5/10-label subsets as open circles
+    own = [u for u in units if (mods.model_unit == u).any()]
+    fig2, axs = plt.subplots(1, len(own), figsize=(3.6 * len(own), 4.2), constrained_layout=True)
+    for ax2, u in zip(np.atleast_1d(axs), own):
+        s = m[(m.test_unit == u) & (m.model_unit == u)]
+        reg = s[s.subset == ""].sort_values("labels_this_video"); sub = s[s.subset != ""]
+        # the 0-label point = the last model trained before this video's own labels (if scored on this test set)
+        prev = m[(m.test_unit == u) & (mods.set_index("shuffle").loc[m.shuffle, "model_idx"].values < mods[mods.model_unit == u].model_idx.min())]
+        if len(prev):
+            z = prev.sort_values("model_idx").iloc[-1]; ax2.plot([0], [z.median_frame_rmse_px], "o", color=colors[u], ms=5, mfc="white")
+            ax2.annotate(f"{z.median_frame_rmse_px:.0f}", (0, z.median_frame_rmse_px), textcoords="offset points", xytext=(4, 4), fontsize=7, color=colors[u])
+        ax2.plot(reg.labels_this_video, reg.median_frame_rmse_px, "o-", color=colors[u], ms=4, lw=1.8)
+        for tag, fc in (("a", colors[u]), ("b", "white")):
+            ss = sub[sub.subset.str.endswith(tag)]
+            ax2.plot(ss.labels_this_video, ss.median_frame_rmse_px, "o", color=colors[u], ms=5, mfc=fc, ls="none")
+        import matplotlib.ticker as mt
+        ax2.set_yscale("log"); ax2.set_yticks([3, 5, 10, 20, 50, 100, 200]); ax2.yaxis.set_major_formatter(mt.ScalarFormatter()); ax2.yaxis.set_minor_formatter(mt.NullFormatter())
+        xmax = max(20, int(reg.labels_this_video.max()) if len(reg) else 20); ax2.set_xlim(-3, xmax + 5)
+        ax2.set_xticks([t for t in (0, 5, 10, 20, 40, 60, 80, 100, 120, 140) if t <= xmax]); ax2.tick_params(labelsize=8)
+        ax2.set_ylim(2.5, 400)
+        ax2.set_title(f"video {u.split('_')[0]}" + (" (poor quality)" if u in POOR_QUALITY else ""), fontsize=10, color=colors[u]); ax2.grid(alpha=0.3, which="both")
+        ax2.set_xlabel("labels of this video", fontsize=8)
+    np.atleast_1d(axs)[0].set_ylabel("median frame RMSE, own test set (px, log)", fontsize=8)
+    fig2.suptitle("Each video's own curve: 0 labels = previous model unchanged; 5 / 10 = subset models (filled = subset a, open = subset b); 20, 40, ... = regular steps", fontsize=10)
+    fig2.savefig(R / "scale_curves_all_videos.png", dpi=130); plt.close(fig2)
     ax.set_title("Every model of the sequence, scored on every video's frozen test set (final snapshot, epoch 120)\n"
                  "left of a dotted line = that video not yet in the training set (its 0-label regime); labels are 20 per step; open markers = 5 / 10-label subset models", fontsize=11, pad=34)
     fig.savefig(R / "cross_video_curves.png", dpi=130)
