@@ -147,7 +147,11 @@ def plot(m):
         ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=1.8, ms=3.5, label=f"test set of {short[tu]}")
         sub = m[(m.test_unit == tu) & (m.subset != "") & (m.model_unit == tu)]   # subset models: own test set only (less clutter)
         if len(sub):
-            ax.plot(sub.model_idx, sub.median_frame_rmse_px, marker="o", color=colors[tu], ls="none", ms=5, mfc="white", mew=1.2)
+            # connect each subset series to the video's 20-label model: 5a -> 10a -> 20 (dotted), 5b -> 10b -> 20 (dashed)
+            first = s[s.model_unit == tu].sort_values("model_idx").iloc[:1]
+            for tag, ls in (("a", ":"), ("b", "--")):
+                ss = pd.concat([sub[sub.subset.str.endswith(tag)].sort_values("model_idx"), first])
+                ax.plot(ss.model_idx, ss.median_frame_rmse_px, marker="o", color=colors[tu], ls=ls, lw=1.2, ms=4.5, mfc="white", mew=1.1)
         own = mods[(mods.model_unit == tu) & (mods.subset == "")].model_idx.min()
         if not np.isfinite(own):
             continue
@@ -199,7 +203,7 @@ def plot(m):
     fig2.suptitle("Each video's own curve: 0 labels = previous model unchanged; 5 and 10 labels = the two model-free subsets of batch01 (a solid, b dashed); 20, 40, ... = regular steps", fontsize=10)
     fig2.savefig(R / "scale_curves_all_videos.png", dpi=130); plt.close(fig2)
     ax.set_title("Every model of the sequence, scored on every video's frozen test set (final snapshot, epoch 120)\n"
-                 "left of a dotted line = that video not yet in the training set (its 0-label regime); labels are 20 per step; open markers = 5 / 10-label subset models", fontsize=11, pad=34)
+                 "left of a dotted line = that video not yet in the training set (its 0-label regime); labels are 20 per step; open markers = 5 / 10-label subset models, joined to the 20-label model (dotted = subset a, dashed = subset b)", fontsize=11, pad=34)
     fig.savefig(R / "cross_video_curves.png", dpi=130)
     # heatmap
     piv = m.pivot(index="test_unit", columns="model_idx", values="median_frame_rmse_px").reindex(units)
