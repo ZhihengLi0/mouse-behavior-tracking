@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.6-video6-plateau` | 2026-09-29 | Video 6 (2025-10-28, v2 line) finished: plateau at 20 labels, 6.75 px (40: 8.46, 60: 10.68); pupil-definition decision recorded (light band = pupil) |
 | `v0.9.5-v3-guide-v0.1` | 2026-09-28 | v3 labelling guide v0.1 (`v3_pupil_vedio_scaling/docs/LABELING_GUIDE.md`): pupil = flat black core, ellipse extremes, anatomy-not-optics principle; AI procedure with numbers + human instructions with 12 figures; written from a continuous read of videos 0-15 |
 | `v0.9.4-v3-layout` | 2026-09-28 | Era folders renamed (v1_old_pupil_top, v2_new_pupil_top_video_scaling); v2 units 2/3 renamed to their lab-Drive sessions (2_20251031_Pluto_spont_3, 3_20251031_Pluto_spont_2; the old names pluton2/pluto3 had them swapped); v3_pupil_vedio_scaling started (one Pluto spont_1 video per day, moved from v2) |
 | `v0.9.3-fewer-labels` | 2026-09-28 | Fewer-labels study (videos 0-5): 5 labels enough only on videos 3 and 5; 20 labels the smallest batch that worked on every video |
