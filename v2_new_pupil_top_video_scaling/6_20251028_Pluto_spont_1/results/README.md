@@ -10,5 +10,8 @@ video's labels; shuffles 711, 712, ...
 |---|---|---|---|---|---|
 | 20 (shuffle 711) | 6.75 px | 11.2 | 0% | 83% | 6801 of 57158 (11.9%) |
 | 40 (shuffle 712) | 8.46 px | 11.8 | 0% | 90% | 4948 of 57158 (8.7%) |
+| 60 (shuffle 713) | 10.68 px | 14.9 | 2% | 82% | pending |
+
+**Plateau rule fired at step 3 (2026-09-29):** neither 40 labels (8.46 px) nor 60 labels (10.68 px) improved the running best of 6.75 px, so the plateau point is **20 labels, 6.75 px**; the batch04 popup is held pending the user's decision.
 
 Back-test of model 711 on the other frozen test sets: videos 1-5 = 12.01 / 6.78 / 3.21 / 14.80 / 13.65 px, video 7 = 5.36 px, video 8 = 20.76 px (`../results/cross_video_matrix.csv`).
