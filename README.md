@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-28 20:15 CDT)
+## Status (last updated 2026-09-28 22:05 CDT)
 
 | what | state |
 |---|---|
@@ -18,6 +18,7 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Finished | **video 4 run 2** (Pluto, 2025-10-30, convention v2): plateau at **40 labels, 15.01 px** (0/20/40/60/80 = 32.11/24.64/15.01/16.82/17.54 px). Run 1 (v1): 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`). Open: the v2 labels mark a much smaller pupil (width 92 vs 215 px) |
 | Finished | **video 5** (Pluto, 2025-10-29, convention v2): plateau at **20 labels, 15.85 px** (0/20/40 = 11.90/15.85/16.58 px; the 0-label model is > 50 px off on 12% of frames, 20 labels remove all of them) |
 | Finished | **fewer-labels study** (videos 0-5, step 1 retrained with 5 or 10 of its 20 labels, training set otherwise as at that time): 5 labels were enough only on videos 3 and 5; on videos 0, 1, 2 and 4, 5 or 10 labels fall short of 20 (video 4: 10 labels worse than none). 20 labels is the smallest batch that worked on every video; table in `v2_new_pupil_top_video_scaling/results/README.md` |
+| **v3 started** | `v3_pupil_vedio_scaling/`: one video per recording day (Pluto 8 days, Terra 8 days, plus the 5-min video), all on one pupil definition; labelling guide v0.1 written (`docs/LABELING_GUIDE.md`); next: video 0 test50 + first 5 labels, AI pre-labelled, human reviewed |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`v2_new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
