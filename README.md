@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-28 12:10 CDT)
+## Status (last updated 2026-09-28 20:15 CDT)
 
 | what | state |
 |---|---|
@@ -17,11 +17,11 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
 | Finished | **video 4 run 2** (Pluto, 2025-10-30, convention v2): plateau at **40 labels, 15.01 px** (0/20/40/60/80 = 32.11/24.64/15.01/16.82/17.54 px). Run 1 (v1): 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`). Open: the v2 labels mark a much smaller pupil (width 92 vs 215 px) |
 | Finished | **video 5** (Pluto, 2025-10-29, convention v2): plateau at **20 labels, 15.85 px** (0/20/40 = 11.90/15.85/16.58 px; the 0-label model is > 50 px off on 12% of frames, 20 labels remove all of them) |
-| Finished | **fewer-labels study** (videos 0-5, step 1 retrained with 5 or 10 of its 20 labels, training set otherwise as at that time): 5 labels were enough only on videos 3 and 5; on videos 0, 1, 2 and 4, 5 or 10 labels fall short of 20 (video 4: 10 labels worse than none). 20 labels is the smallest batch that worked on every video; table in `new_pupil_top_video_scaling/results/README.md` |
-| Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
+| Finished | **fewer-labels study** (videos 0-5, step 1 retrained with 5 or 10 of its 20 labels, training set otherwise as at that time): 5 labels were enough only on videos 3 and 5; on videos 0, 1, 2 and 4, 5 or 10 labels fall short of 20 (video 4: 10 labels worse than none). 20 labels is the smallest batch that worked on every video; table in `v2_new_pupil_top_video_scaling/results/README.md` |
+| Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`v2_new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
-## Main results so far (era 3, `new_pupil_top_video_scaling/`)
+## Main results so far (era 3, `v2_new_pupil_top_video_scaling/`)
 
 Labels needed per video (plateau = two consecutive 20-label steps that improve the best error by <= 3%):
 
@@ -41,7 +41,7 @@ What the numbers say:
 - **Same day transfers, a new day does not**: video 3 was at 4.4 px before any of its own labels (thanks to the
   other 2025-10-31 videos), while video 4 (one day earlier, poor image quality) starts at 22.8 px and needs 140 of its own labels to plateau at 14.7 px.
 - **Adding videos does not hurt old ones**: every model is back-tested on every frozen test set
-  (`new_pupil_top_video_scaling/results/cross_video_curves.png`); earlier videos stay flat as labels are added.
+  (`v2_new_pupil_top_video_scaling/results/cross_video_curves.png`); earlier videos stay flat as labels are added.
 - **Pupil area**: with the new ellipse labels the 4-point area (width x top-to-bottom height) halves the error of
   the old 3-point rule (3.7% vs 6.9% on 196 test frames); per-frame point selection by model confidence does not
   help. The production script still uses the 3-point rule until the switch is approved.
@@ -52,14 +52,17 @@ What the numbers say:
 ## Repository layout
 
 ```
-new_pupil_top_video_scaling/   era 3 (current): one folder per video, indexed by how many earlier videos are in
+v3_pupil_vedio_scaling/        v3 (from 2026-09-28): same per-video layout, one Pluto video per recording day
+  0_first5minvedio/            (spont_1 of each day, verified byte-for-byte against the lab Google Drive);
+  1_20251031 ... 8_20251022    the videos were moved here from v2 (no second copy)
+v2_new_pupil_top_video_scaling/   era 3 (current): one folder per video, indexed by how many earlier videos are in
   0_first5minvedio/            the training set; each has results/ (tracked) and training-data/ (local only)
   1_... 10_...                 videos 1-10 (mouse B)
     results/selection_sheets/  per video: the cluster + time-series sheet of every selected batch
     results/blink_area_analysis/ per video: eye time series and blink / pupil-area studies
   results/                     across videos: labels-to-plateau table, cross-video back-test, pupil-area study
   scripts/                     frame selection, pre-labels, training step, scoring, back-test, plots
-old_pupil_top/                 eras 1-2 (5-minute video, earlier label standards) - kept for the record
+v1_old_pupil_top/              eras 1-2 (5-minute video, earlier label standards) - kept for the record
 dlc_projects/                  DeepLabCut workspaces (config tracked; labels and weights local)
 environment/                   conda environment and setup check
 docs/  report/  scripts/       shared notes, reports and older canonical tools
@@ -83,7 +86,7 @@ recomputed rather than mixed.
 
 ## History
 
-- **Era 1-2 (2026-08 to 2026-09-19, `old_pupil_top/`)**, 5-minute video, earlier label standards: batch size ->
+- **Era 1-2 (2026-08 to 2026-09-19, `v1_old_pupil_top/`)**, 5-minute video, earlier label standards: batch size ->
   batch 2; backbone -> ResNet-50 (five backbones tied on accuracy, ResNet-50 won the pre-declared confidence
   tie-break and trains fastest); active learning (uncertainty vs jump vs trajectory-fit detectors) was a clean
   null - about 80 labels saturated that video and detector choice never mattered; a round-6 "improvement" was
