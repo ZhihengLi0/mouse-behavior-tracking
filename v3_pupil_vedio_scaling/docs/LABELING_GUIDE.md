@@ -3,6 +3,20 @@
 | version | date | change | basis |
 |---|---|---|---|
 | v0.1 | 2026-09-28 | first complete draft | full read of videos 0-15, v2 human labels, earlier analyses |
+| v0.2 | 2026-09-29 | **pupil definition reversed** (see the decision box below): the light band around the flat black core IS pupil; the core+4.5 rule of Parts A/B is withdrawn; the labeler's outer-edge placement is the reference | Kaiwen Sheng + Zhiheng Li, after the video-0 re-check (fur fringe, IR-LED lightening) |
+
+> **DECISION 2026-09-29 (supersedes Parts A, B.2-B.7 and D.1-D.3 below until they are rewritten).** The grey /
+> lighter band that surrounds the flat black core is **pupil**, not iris or halo: it is pupil seen through fur and
+> eyelashes hanging over the eye, and pupil lightened by the two infrared LEDs (their reflections sit at the lower-left
+> and right of the pupil, and the areas they illuminate look paler). The pupil boundary is therefore the **outer
+> boundary of the darkened region**, including the lightened parts, and the four pupil points are the extremes of the
+> ellipse through that outer boundary (pupil_top extrapolated under the lid; pupil_right at the far side of the
+> lightened zone next to the right LED reflection). The human labels of the v2 project follow this definition and are
+> the reference; the "flat black core" pre-labels made for v3 video 0 on 2026-09-28 are withdrawn. The AI procedure
+> (`scripts/label_procedure.py`) must be re-derived from the human labels before v3 labelling starts. Evidence for the
+> decision: the video-0 re-check (fur strands 5-10 px wide anchored at the lid ending exactly where the flat black
+> starts; the flat-black right edge fixed at x≈650 while the eye is still, i.e. an imposed boundary, not a margin) and
+> Kaiwen Sheng's assessment of the IR-LED lightening.
 
 **Principle 1 - label the anatomy, not the optics.** Every point marks a real structure of the eye (pupil margin, lid margin, fissure corner). Optical effects - the grey halo around the pupil, LED glints, reflections, shadows, image noise - are never labelled; where they hide a structure, the point is placed where the structure is (extrapolated from its visible shape and, if needed, from the neighbouring frames).
 
