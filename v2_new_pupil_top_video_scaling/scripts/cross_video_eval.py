@@ -135,7 +135,7 @@ def plot(m):
     units = test_units()
     # ordered colours: video 0 darkest -> newest video lightest (viridis, perceptually ordered), so the sequence reads as a trend
     colors = {v[0]: plt.cm.viridis(0.85 * i / max(1, len(VIDEOS) - 1)) for i, v in enumerate(VIDEOS)}
-    markers = {v[0]: "osD^vPX*"[i % 8] for i, v in enumerate(VIDEOS)}
+    markers = {v[0]: "o" for v in VIDEOS}   # one plain marker; the videos are told apart by colour only (user request 2026-09-29)
     short = {v[0]: label_of(v[0]) for v in VIDEOS}
     mods = models()
     # positions come from the current model sequence (the csv keeps a model_idx from the run that scored the row)
@@ -144,10 +144,10 @@ def plot(m):
     fig, ax = plt.subplots(figsize=(21, 8), constrained_layout=True)
     for tu in units:
         s = m[(m.test_unit == tu) & (m.subset == "")].sort_values("model_idx")
-        ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=2, ms=7, mec="white", mew=0.8, label=f"test set of {short[tu]}")
+        ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=1.8, ms=3.5, label=f"test set of {short[tu]}")
         sub = m[(m.test_unit == tu) & (m.subset != "")]
         if len(sub):
-            ax.plot(sub.model_idx, sub.median_frame_rmse_px, marker=markers[tu], color=colors[tu], ls="none", ms=7, mfc="white", mew=1.2)
+            ax.plot(sub.model_idx, sub.median_frame_rmse_px, marker="o", color=colors[tu], ls="none", ms=5, mfc="white", mew=1.2)
         own = mods[(mods.model_unit == tu) & (mods.subset == "")].model_idx.min()
         if not np.isfinite(own):
             continue
