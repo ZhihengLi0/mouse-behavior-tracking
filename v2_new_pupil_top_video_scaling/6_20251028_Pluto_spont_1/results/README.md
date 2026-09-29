@@ -9,5 +9,6 @@ video's labels; shuffles 711, 712, ...
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 20 (shuffle 711) | 6.75 px | 11.2 | 0% | 83% | 6801 of 57158 (11.9%) |
+| 40 (shuffle 712) | 8.46 px | 11.8 | 0% | 90% | pending |
 
 Back-test of model 711 on the other frozen test sets: videos 1-5 = 12.01 / 6.78 / 3.21 / 14.80 / 13.65 px, video 7 = 5.36 px, video 8 = 20.76 px (`../results/cross_video_matrix.csv`).
