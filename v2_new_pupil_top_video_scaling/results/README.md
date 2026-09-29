@@ -18,7 +18,8 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 | 3 `3_20251031_Pluto_spont_2` | mouse B, 19.9 min (10-31 session spont_2) | 260 (videos 0 + 1 + 60 of video 2) | 4.43 / 3.40 / 3.87 / 3.63 / – / – | **20 labels** (rule fired at 60) | 3.40 px |
 | 4 `4_20251030_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-30 (poor image quality) | 320 (videos 0-3) | run 2 (convention v2): 32.11 / 24.64 / 15.01 / 16.82 / 17.54 | **40 labels** (run 2; run 1 under v1: 140 labels) | 15.01 px |
 | 5 `5_20251029_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-29 | 360 (videos 0-3 + 40 of video 4 run 2) | convention v2: 11.90 / 15.85 / 16.58 / – / – / – | **20 labels** (user decision: the median rule fires at 0, but the 0-label model is > 50 px off on 12% of test frames; 20 labels remove all of them) | 15.85 px |
-| 6 `6_20251028_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-28 | 380 (videos 0-3 + 40 of video 4 + 20 of video 5) | convention v2: 9.36 / 6.75 / 8.46 / 10.68 | **20 labels** (rule fired at 60; user decision pending) | 6.75 px |
+| 6 `6_20251028_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-28 | 380 (videos 0-3 + 40 of video 4 + 20 of video 5) | convention v2: 9.36 / 6.75 / 8.46 / 10.68 | **20 labels** (rule fired at 60; user decision 2026-09-29) | 6.75 px |
+| 7 `7_20251027_Pluto_spont1` | mouse B, 19.9 min, 2025-10-27 | 400 (videos 0-3 + 40 of video 4 + 20 of video 5 + 20 of video 6) | convention v2: 5.36 / – | in progress | – |
 
 Notes
 - With 50 test frames the median moves by about 1 px between neighbouring steps from sampling alone, so the
