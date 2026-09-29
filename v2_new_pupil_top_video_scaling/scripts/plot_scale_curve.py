@@ -33,7 +33,16 @@ for (_, r), v in zip(head.iterrows(), yv):
     ax.annotate(f"{r['median_frame_rmse_px']:.1f}{off}", (r[x], v), textcoords="offset points", xytext=(6, 8 if not off else -14), color=BLUE)
 best = head["median_frame_rmse_px"].cummin().clip(upper=ytop * 0.97)
 ax.step(head[x], best, where="post", color=BLUE, lw=1, ls=":", label="running best (the stopping rule looks at this)")
-ax.set_ylim(0, ytop); ax.set_xticks(head[x])
+# fewer-labels study (2026-09-27/28): 5 / 10 labels as two model-free subsets of batch01 (labels x..._final_subNNa/b)
+sub = d[d["label"].str.contains(r"_final_sub\\d+[ab]$")].sort_values(x)
+if len(sub):
+    for tag, mk, fc in (("a", "D", "#E08E45"), ("b", "s", "white")):
+        ss = sub[sub["label"].str.endswith(tag)]
+        ax.plot(ss[x], ss["median_frame_rmse_px"].clip(upper=ytop * 0.97), mk, color="#E08E45", mfc=fc, ms=7, ls="none",
+                label=f"5 / 10 labels: subset {tag} of batch01 (fewer-labels study)")
+        for _, r in ss.iterrows():
+            ax.annotate(f"{r['median_frame_rmse_px']:.1f}", (r[x], min(r["median_frame_rmse_px"], ytop * 0.97)), textcoords="offset points", xytext=(5, -11), color="#E08E45", fontsize=8)
+ax.set_ylim(0, ytop); ax.set_xticks(sorted(set(head[x]) | set(sub[x])))
 ax.set_xlabel("labels from this video"); ax.set_ylabel("median frame RMSE on the frozen test set (px)")
 ax.set_title("Typical-frame error (y axis from 0)"); ax.grid(alpha=0.3); ax.legend(fontsize=8.5, loc="lower left")
 ax = axes[1]
