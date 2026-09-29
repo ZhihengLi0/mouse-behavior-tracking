@@ -37,8 +37,8 @@ from scale_step import HERE, flat, human_table  # noqa: E402
 ROOT = HERE.parent
 UNITS = [("0_first5minvedio", "x100_step05_final", "video 0 (5 min, mouse A)"),
          ("1_20251031_Pluto_spont_1", "x140_step07_final", "video 1 (Pluto 1, mouse B)"),
-         ("2_pluton2", "x080_step04_final", "video 2 (Pluto 2, mouse B)"),
-         ("3_pluto3", "x060_step03_final", "video 3 (Pluto 3, mouse B)")]
+         ("2_20251031_Pluto_spont_3", "x080_step04_final", "video 2 (Pluto 10-31 spont_3, mouse B)"),
+         ("3_20251031_Pluto_spont_2", "x060_step03_final", "video 3 (Pluto 10-31 spont_2, mouse B)")]
 PUPIL = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
 DROP_OF = {"pupil_top": "current", "pupil_bottom": "drop_B", "pupil_left": "drop_L", "pupil_right": "drop_R"}
 OLD_H5 = ROOT / "old_pupil_top/active-learning-jump-selection/training-data/face_first4minDLC_Resnet50_EyePupilBlinkAug17shuffle60_snapshot_best-100.h5"

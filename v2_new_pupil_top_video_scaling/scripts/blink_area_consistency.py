@@ -40,7 +40,7 @@ FPS = 60.0
 P4 = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
 # (unit, label, model shuffle for the test set, anchored?)
 VIDEOS = [("0_first5minvedio", "0 (mouse A)", 115, False), ("1_20251031_Pluto_spont_1", "1 (10-31)", 217, False),
-          ("2_20251031_pluton2", "2 (10-31)", 324, False), ("3_20251031_pluto3", "3 (10-31)", 423, False),
+          ("2_20251031_Pluto_spont_3", "2 (10-31)", 324, False), ("3_20251031_Pluto_spont_2", "3 (10-31)", 423, False),
           ("4_20251030_Pluto_spont_1", "4 (10-30, poor)", 515, False), ("5_20251029_Pluto_spont_1", "5 (10-29)", 515, True),
           ("6_20251028_Pluto_spont_1", "6 (10-28)", 515, True), ("7_20251027_Pluto_spont1", "7 (10-27)", 515, True)]
 

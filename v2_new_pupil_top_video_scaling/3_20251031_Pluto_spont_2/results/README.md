@@ -29,4 +29,4 @@ set otherwise as at the time: videos 0-2 only) -> `fewer_labels.png` / `fewer_la
 | 10 (subset a / b) | 3.81 / 3.48 px | 21.7 / 22.5 | 0% / 0% |
 | 20 | 3.40 px | 21.3 | 0% |
 
-On this video (third recording of the day, already 4.4 px with 0 labels) 5 labels are as good as 20.
+On this video (10-31 session spont_2, already 4.4 px with 0 labels) 5 labels are as good as 20.

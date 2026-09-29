@@ -1,11 +1,11 @@
-# Video 2: 2_pluton2 (19.9 min, second recording of the mouse of video 1)
+# Video 2: 2_20251031_Pluto_spont_3 (19.9 min, 2025-10-31 session spont_3 of the mouse of video 1 - lab Google Drive name; called "pluton2" and taken as the second recording until 2026-09-28)
 
 Scale curve within this video under the new pupil standard. Training = ALL 100 labels of video 0
 (`0_first5minvedio`) + ALL 100 labels of video 1 (`1_20251031_Pluto_spont_1`) + N labels of this video, from
 scratch; validation = this video's val20; test = this video's 50 frozen test frames. The x = 0 point is the
 video-1 step-5 model (shuffle 225) applied unchanged.
 
-Video file: `2_pluton2/2_pluton2.mp4` (a copy of `pluton2.mp4`, local only).
+Video file: `2_20251031_Pluto_spont_3/2_20251031_Pluto_spont_3.mp4` = lab Google Drive `20251031/Pluto_spont_3/face.mp4` (byte-identical; this unit was called `pluton2` until 2026-09-28, local only).
 
 Frame extraction (2026-09-22): test50 / val20 / batch01 by the same model-free protocol as videos 0 and 1
 (k-means on appearance fingerprints, medoid per cluster). Pre-labels for the labeler come from the video-2

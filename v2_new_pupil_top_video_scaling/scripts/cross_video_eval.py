@@ -29,8 +29,8 @@ from scale_step import BPS, CONFIG, EPOCHS, HERE, PROJECT, flat  # noqa: E402
 VIDEOS = [
     ("0_first5minvedio", "mouse A", "5-min recording", [(1, 111, 20), (2, 112, 40), (3, 113, 60), (4, 114, 80), (5, 115, 100)]),
     ("1_20251031_Pluto_spont_1", "mouse B (Pluto)", "2025-10-31", [(1, 211, 20), (2, 212, 40), (3, 213, 60), (4, 214, 80), (5, 225, 100), (6, 216, 120), (7, 217, 140)]),
-    ("2_20251031_pluton2", "mouse B (Pluto)", "2025-10-31", [(1, 321, 20), (2, 322, 40), (3, 323, 60), (4, 324, 80)]),
-    ("3_20251031_pluto3", "mouse B (Pluto)", "2025-10-31", [(1, 411, 20), (2, 422, 40), (3, 423, 60)]),
+    ("2_20251031_Pluto_spont_3", "mouse B (Pluto)", "2025-10-31", [(1, 321, 20), (2, 322, 40), (3, 323, 60), (4, 324, 80)]),
+    ("3_20251031_Pluto_spont_2", "mouse B (Pluto)", "2025-10-31", [(1, 411, 20), (2, 422, 40), (3, 423, 60)]),
     ("4_20251030_Pluto_spont_1", "mouse B (Pluto)", "2025-10-30", "auto:53"),   # restarted 2026-09-26 under labeling convention v2 (old run 511-519 archived)
     ("5_20251029_Pluto_spont_1", "mouse B (Pluto)", "2025-10-29", "auto:63"),   # convention v2 run (first attempt 611 archived)
     ("6_20251028_Pluto_spont_1", "mouse B (Pluto)", "2025-10-28", "auto:71"),
@@ -40,7 +40,7 @@ VIDEOS = [
     ("9_20251023_Pluto1", "mouse B (Pluto)", "2025-10-23", "auto:101"),
 ]
 # labels of a video that are carried into later videos (the "prior" used when the next video started)
-CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_pluton2": 60, "3_20251031_pluto3": 60}
+CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_Pluto_spont_3": 60, "3_20251031_Pluto_spont_2": 60}
 # videos the labeler judged hard to read by eye (pupil boundary barely visible); marked in the figures
 POOR_QUALITY = {"4_20251030_Pluto_spont_1"}
 PALETTE = ["#2F6B9A", "#D1495B", "#2A9D8F", "#E08E45", "#7B4EA3", "#8C6D31", "#444444"]

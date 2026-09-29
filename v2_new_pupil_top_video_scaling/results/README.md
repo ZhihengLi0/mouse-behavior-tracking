@@ -14,8 +14,8 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 |---|---|---|---|---|---|
 | 0 `0_first5minvedio` | mouse A, 5.0 min | 0 | – / 12.93 / 13.00 / 12.04 / 13.07 / 12.29 | **60 labels** | 12.04 px |
 | 1 `1_20251031_Pluto_spont_1` | mouse B, 19.9 min | 100 (all of video 0) | 208.2 / 10.37 / 12.17 / 11.35 / 11.59 / 10.94 | **20 labels** | 10.37 px |
-| 2 `2_20251031_pluton2` | mouse B, 19.9 min (2nd recording) | 200 (videos 0 + 1) | 9.99 / 7.73 / 7.57 / 7.83 / 7.56 / – | **20 labels** (rule fired at 60; user stopped selecting at 60 labels on 2026-09-23; batch04 was already labeled and was trained + scored, no further selection) | 7.73 px |
-| 3 `3_20251031_pluto3` | mouse B, 19.9 min (3rd recording) | 260 (videos 0 + 1 + 60 of video 2) | 4.43 / 3.40 / 3.87 / 3.63 / – / – | **20 labels** (rule fired at 60) | 3.40 px |
+| 2 `2_20251031_Pluto_spont_3` | mouse B, 19.9 min (10-31 session spont_3) | 200 (videos 0 + 1) | 9.99 / 7.73 / 7.57 / 7.83 / 7.56 / – | **20 labels** (rule fired at 60; user stopped selecting at 60 labels on 2026-09-23; batch04 was already labeled and was trained + scored, no further selection) | 7.73 px |
+| 3 `3_20251031_Pluto_spont_2` | mouse B, 19.9 min (10-31 session spont_2) | 260 (videos 0 + 1 + 60 of video 2) | 4.43 / 3.40 / 3.87 / 3.63 / – / – | **20 labels** (rule fired at 60) | 3.40 px |
 | 4 `4_20251030_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-30 (poor image quality) | 320 (videos 0-3) | run 2 (convention v2): 32.11 / 24.64 / 15.01 / 16.82 / 17.54 | **40 labels** (run 2; run 1 under v1: 140 labels) | 15.01 px |
 | 5 `5_20251029_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-29 | 360 (videos 0-3 + 40 of video 4 run 2) | convention v2: 11.90 / 15.85 / 16.58 / – / – / – | **20 labels** (user decision: the median rule fires at 0, but the 0-label model is > 50 px off on 12% of test frames; 20 labels remove all of them) | 15.85 px |
 
@@ -89,8 +89,8 @@ rolling median), on the newest whole-video prediction of each video. Videos 4-10
 |---|---|---|---|---|---|---|---|
 | 0 `0_first5minvedio` | 115 | 63,105 | +6.2% | 0.945 | 10.9% (92 runs) | 4.8% | 6.0% |
 | 1 `1_20251031_Pluto_spont_1` | 217 | 27,028 | -3.3% | 0.987 | 26.1% (683 runs) | 17.4% | 10.2% |
-| 2 `2_20251031_pluton2` | 323 | 31,996 | +0.8% | 0.991 | 30.8% (944 runs) | 12.1% | 12.5% |
-| 3 `3_20251031_pluto3` | 423 | 26,022 | -2.9% | 0.993 | 37.8% (909 runs) | 17.0% | 13.8% |
+| 2 `2_20251031_Pluto_spont_3` | 323 | 31,996 | +0.8% | 0.991 | 30.8% (944 runs) | 12.1% | 12.5% |
+| 3 `3_20251031_Pluto_spont_2` | 423 | 26,022 | -2.9% | 0.993 | 37.8% (909 runs) | 17.0% | 13.8% |
 
 First observations (no conclusions drawn yet; the blink / area algorithm comparison is the next step):
 - The production blink rule marks 26-50% of every mouse-B video as untrusted, far more than real blinks: it was tuned

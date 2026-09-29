@@ -25,8 +25,8 @@ results/                 ACROSS videos: x = number of videos, y = labels needed 
     selection_sheets/    one sheet per selected batch: clusters + time series of the chosen frames
     blink_area_analysis/ per-video time series (pupil area 4-point / 3-point, eye opening, confidence) and blink / area studies
 1_20251031_Pluto_spont_1/ video 1 (mouse B, 19.9 min), same layout
-2_20251031_pluton2/      video 2 (mouse B, 2025-10-31, second recording), same layout
-3_20251031_pluto3/       video 3 (mouse B, 2025-10-31, third recording), same layout
+2_20251031_Pluto_spont_3/      video 2 (mouse B, 2025-10-31, Drive session spont_3; formerly "pluton2"), same layout
+3_20251031_Pluto_spont_2/       video 3 (mouse B, 2025-10-31, Drive session spont_2; formerly "pluto3"), same layout
 4_20251030_Pluto_spont_1/ video 4 (mouse B, 2025-10-30; poor image quality), same layout
 5_20251029_Pluto_spont_1/ video 5 (mouse B, 2025-10-29): frozen test set only (scored by every model)
 6_20251028_Pluto_spont_1/ video 6 (mouse B, 2025-10-28): frozen test set only (scored by every model)
