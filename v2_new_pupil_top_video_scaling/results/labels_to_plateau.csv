@@ -1,0 +1,10 @@
+video,unit,mouse,date,labels_at_plateau,plateau_median_px,zero_label_px,status,note
+0,0_first5minvedio,mouse A,5-min,60,12.04,,final,rule fired at 100
+1,1_20251031_Pluto_spont_1,Pluto,2025-10-31,20,10.37,208.23,final,new mouse; rule fired at 60
+2,2_20251031_Pluto_spont_3,Pluto,2025-10-31,20,7.73,9.99,final,rule fired at 60
+3,3_20251031_Pluto_spont_2,Pluto,2025-10-31,20,3.40,4.43,final,rule fired at 60
+4,4_20251030_Pluto_spont_1,Pluto,2025-10-30,40,15.01,32.11,final,poor image quality; run 2 (convention v2); rule fired at 80
+5,5_20251029_Pluto_spont_1,Pluto,2025-10-29,20,15.85,11.90,final,median rule fired at 0 but 12% of frames were > 50 px off; user decision 20 labels
+6,6_20251028_Pluto_spont_1,Pluto,2025-10-28,20,6.75,9.36,final,rule fired at 60
+7,7_20251027_Pluto_spont1,Pluto,2025-10-27,0,5.36,5.36,final,rule fired at 40: the video-6 model already fits this day
+8,8_20251024_Pluto_spont1,Pluto,2025-10-24,20,25.34,27.46,in progress,best so far; step 3 pending

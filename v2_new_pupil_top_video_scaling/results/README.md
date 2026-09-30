@@ -22,6 +22,8 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 | 7 `7_20251027_Pluto_spont1` | mouse B, 19.9 min, 2025-10-27 | 400 (videos 0-3 + 40 of video 4 + 20 of video 5 + 20 of video 6) | convention v2: 5.36 / 5.86 / 5.84 | **0 labels** (rule fired at 40; user decision 2026-09-29) | 5.36 px |
 | 8 `8_20251024_Pluto_spont1` | mouse B, 19.9 min, 2025-10-24 | 400 (videos 0-3 + 40 of video 4 + 20 of video 5 + 20 of video 6) | convention v2: 27.46 / 25.34 / 30.03 | in progress (step 2 did not improve on 25.34; rule decides after step 3) | – |
 
+`labels_to_plateau.png` / `labels_to_plateau.csv` (2026-09-30): the plateau point of every video in the sequence as one figure - labels needed (left) and the error at the plateau vs the 0-label error (right); `scripts/plot_labels_to_plateau.py`. The csv is the table above in machine-readable form and is updated when a video finishes.
+
 Notes
 - With 50 test frames the median moves by about 1 px between neighbouring steps from sampling alone, so the
   3% rule is at the noise floor; differences of 1 px between steps of the same video are not meaningful.
