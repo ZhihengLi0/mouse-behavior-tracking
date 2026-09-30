@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-30 18:30 CDT)
+## Status (last updated 2026-09-30 18:40 CDT)
 
 | what | state |
 |---|---|
@@ -20,7 +20,8 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Finished | **fewer-labels study** (videos 0-5, step 1 retrained with 5 or 10 of its 20 labels, training set otherwise as at that time): 5 labels were enough only on videos 3 and 5; on videos 0, 1, 2 and 4, 5 or 10 labels fall short of 20 (video 4: 10 labels worse than none). 20 labels is the smallest batch that worked on every video; table in `v2_new_pupil_top_video_scaling/results/README.md` |
 | Finished | **video 6** (Pluto, 2025-10-28, v2 line continued): test set relabeled under v2 and frozen; 0 labels (video-5 model 631) = 9.36 px, 20 labels = 6.75 px (p90 11.2), 40 labels = 8.46 px, 60 labels = 10.68 px (p90 14.9): finished at **20 labels, 6.75 px** (rule fired at 60; user decision 2026-09-29). |
 | Finished | **video 7** (Pluto, 2025-10-27, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 5.36 px, 20 labels = 5.86 px, 40 labels = 5.84 px: finished at **0 labels, 5.36 px** - the video-6 model already fits this day (user decision 2026-09-29). |
-| Finished | **video 8** (Pluto, 2025-10-24, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 27.46 px, 20 labels = 25.34 px, 40 labels = 30.03 px (p90 ~50, 12-14% of frames > 50 px - a hard day, 3 days after video 7); 60 labels = 33.77 px: finished at **20 labels, 25.34 px** (rule fired at 60; 12-16% of frames > 50 px at every step - this day is hard). Next: video 9 (2025-10-23), test set being labeled (pre-labels from the video-6 model 711) Cross-video curves now also show the 5 / 10-label subset models (open markers) |
+| Finished | **video 8** (Pluto, 2025-10-24, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 27.46 px, 20 labels = 25.34 px, 40 labels = 30.03 px (p90 ~50, 12-14% of frames > 50 px - a hard day, 3 days after video 7); 60 labels = 33.77 px: finished at **20 labels, 25.34 px** (rule fired at 60; 12-16% of frames > 50 px at every step - this day is hard). |
+| In progress | **video 9** (Pluto, 2025-10-23, v2 line): test50 / val20 / batch01 labeled from model-711 pre-labels; 0 labels (model 711) = 23.41 px; step 1 (20 labels) training Cross-video curves now also show the 5 / 10-label subset models (open markers) |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`v2_new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
@@ -39,6 +40,7 @@ Labels needed per video (plateau = two consecutive 20-label steps that improve t
 | 6 | Pluto, 2025-10-28 | 380 | 9.36 / 6.75 / 8.46 / 10.68 px (v2) | 20 labels, 6.75 px (rule fired at 60) |
 | 7 | Pluto, 2025-10-27 | 400 | 5.36 / 5.86 / 5.84 px (v2) | 0 labels, 5.36 px (rule fired at 40) |
 | 8 | Pluto, 2025-10-24 | 400 | 27.46 / 25.34 / 30.03 / 33.77 px (v2) | 20 labels, 25.3 px (rule fired at 60) |
+| 9 | Pluto, 2025-10-23 | 420 | 23.41 px (v2, in progress) | – |
 
 What the numbers say:
 
