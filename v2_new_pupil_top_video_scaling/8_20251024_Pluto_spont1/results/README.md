@@ -9,4 +9,4 @@ model (711) and corrected. Training set of every step = videos 0-3 + video 4 run
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-6 20-label model 711, applied unchanged) | 27.46 px | 51.3 | 14% | 59% | – |
-| 20 (shuffle 911) | 25.34 px | 50.6 | 14% | 68% | pending |
+| 20 (shuffle 911) | 25.34 px | 50.6 | 14% | 68% | 9741 of 57158 (17.0%) |
