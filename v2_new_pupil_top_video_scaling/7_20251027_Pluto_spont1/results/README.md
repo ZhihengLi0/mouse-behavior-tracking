@@ -10,3 +10,4 @@ video's labels; shuffles 811, 812, ...
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-6 20-label model 711, applied unchanged) | 5.36 px | 8.9 | 0% | 81% | – |
+| 20 (shuffle 811) | 5.86 px | 7.6 | 0% | 100% | pending |
