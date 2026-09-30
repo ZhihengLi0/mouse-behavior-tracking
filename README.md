@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-09-30 17:45 CDT)
+## Status (last updated 2026-09-30 18:30 CDT)
 
 | what | state |
 |---|---|
@@ -21,7 +21,6 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Finished | **video 6** (Pluto, 2025-10-28, v2 line continued): test set relabeled under v2 and frozen; 0 labels (video-5 model 631) = 9.36 px, 20 labels = 6.75 px (p90 11.2), 40 labels = 8.46 px, 60 labels = 10.68 px (p90 14.9): finished at **20 labels, 6.75 px** (rule fired at 60; user decision 2026-09-29). |
 | Finished | **video 7** (Pluto, 2025-10-27, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 5.36 px, 20 labels = 5.86 px, 40 labels = 5.84 px: finished at **0 labels, 5.36 px** - the video-6 model already fits this day (user decision 2026-09-29). |
 | Finished | **video 8** (Pluto, 2025-10-24, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 27.46 px, 20 labels = 25.34 px, 40 labels = 30.03 px (p90 ~50, 12-14% of frames > 50 px - a hard day, 3 days after video 7); 60 labels = 33.77 px: finished at **20 labels, 25.34 px** (rule fired at 60; 12-16% of frames > 50 px at every step - this day is hard). Next: video 9 (2025-10-23), test set being labeled (pre-labels from the video-6 model 711) Cross-video curves now also show the 5 / 10-label subset models (open markers) |
-| v3 (paused) | `v3_pupil_vedio_scaling/`: videos linked; labelling guide v0.2 records the 2026-09-29 decision (Kaiwen Sheng): the light band around the black core is pupil (fur / eyelash occlusion, IR-LED lightening), so the labeler's outer-edge labels are the reference and the guide's core-based procedure is withdrawn; v3 resumes after the procedure is re-derived from the human labels |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`v2_new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Test-set only | videos 5-8 (2025-10-29 / 28 / 27 / 24): frozen test sets scored by every model so far; videos 9 (10-23) and 10 (10-22): test sets being labeled |
 
@@ -59,12 +58,9 @@ What the numbers say:
 ## Repository layout
 
 ```
-v3_pupil_vedio_scaling/        v3 (from 2026-09-28): same per-video layout, one Pluto video per recording day
-  0_first5minvedio/            (spont_1 of each day, verified byte-for-byte against the lab Google Drive);
-  1_20251031 ... 8_20251022    the videos were moved here from v2 (no second copy)
 v2_new_pupil_top_video_scaling/   era 3 (current): one folder per video, indexed by how many earlier videos are in
   0_first5minvedio/            the training set; each has results/ (tracked) and training-data/ (local only)
-  1_... 10_...                 videos 1-10 (mouse B)
+  1_... 10_...                 videos 1-10 (mouse B, Pluto); 11_... 18_... videos 11-18 (mouse C, Terra, 2025-10-17 -> 10-08)
     results/selection_sheets/  per video: the cluster + time-series sheet of every selected batch
     results/blink_area_analysis/ per video: eye time series and blink / pupil-area studies
   results/                     across videos: labels-to-plateau table, cross-video back-test, pupil-area study

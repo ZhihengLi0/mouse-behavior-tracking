@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.9-terra-into-v2` | 2026-09-30 | v3 folder removed (user decision; its labelling guide v0.2 stays in git history); the 8 Terra videos (mouse C, 2025-10-17 -> 10-08) join v2 as units 11-18, newest first |
 | `v0.9.8-video8-plateau` | 2026-09-30 | Video 8 (2025-10-24, v2 line) finished: plateau at 20 labels, 25.34 px (40: 30.03, 60: 33.77; 12-16% of frames > 50 px at every step); labels_to_plateau figure added |
 | `v0.9.7-video7-zero-labels` | 2026-09-29 | Video 7 (2025-10-27, v2 line) finished: the plateau rule fires at 0 labels - the video-6 model scores 5.36 px unchanged (20: 5.86, 40: 5.84); first video that needed no labels of its own |
 | `v0.9.6-video6-plateau` | 2026-09-29 | Video 6 (2025-10-28, v2 line) finished: plateau at 20 labels, 6.75 px (40: 8.46, 60: 10.68); pupil-definition decision recorded (light band = pupil) |

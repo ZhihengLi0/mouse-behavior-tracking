@@ -46,3 +46,5 @@ training batches of 20 from the remaining pool.
   other and from the 40 frames already labeled. The selector now tops a short batch up with further FLAGGED frames,
   largest jump first, under the same 1-s spacing (and only if that is still not enough, from the 2,000 largest
   jumps of the pool). Batch 3 = 11 medoids + 9 flagged frames; the threshold itself was not relaxed.
+
+Units 11-18 (added 2026-09-30): mouse C "Terra", one recording day each, newest first - `11_20251017_Terra_spont_1`, `12_20251016_Terra_spont_2`, `13_20251015_Terra_spont_1`, `14_20251014_Terra_spont_1`, `15_20251013_Terra_spont_1`, `16_20251010_Terra_spont_1`, `17_20251009_Terra_spont_1`, `18_20251008_Terra_spont_1` (names = the lab Google Drive session names; 10-16 has no spont_1). Same layout as the Pluto units; they start after video 10.

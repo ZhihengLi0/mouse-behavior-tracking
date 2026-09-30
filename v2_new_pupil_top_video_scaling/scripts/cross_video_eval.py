@@ -38,6 +38,15 @@ VIDEOS = [
     ("8_20251024_Pluto_spont1", "mouse B (Pluto)", "2025-10-24", "auto:91"),
     ("10_20251022_Pluto1", "mouse B (Pluto)", "2025-10-22", "auto:111"),
     ("9_20251023_Pluto1", "mouse B (Pluto)", "2025-10-23", "auto:101"),
+    # mouse C (Terra), one recording day each, newest first (moved from the v3 folder on 2026-09-30)
+    ("11_20251017_Terra_spont_1", "mouse C (Terra)", "2025-10-17", "auto:121"),
+    ("12_20251016_Terra_spont_2", "mouse C (Terra)", "2025-10-16", "auto:131"),
+    ("13_20251015_Terra_spont_1", "mouse C (Terra)", "2025-10-15", "auto:141"),
+    ("14_20251014_Terra_spont_1", "mouse C (Terra)", "2025-10-14", "auto:151"),
+    ("15_20251013_Terra_spont_1", "mouse C (Terra)", "2025-10-13", "auto:161"),
+    ("16_20251010_Terra_spont_1", "mouse C (Terra)", "2025-10-10", "auto:171"),
+    ("17_20251009_Terra_spont_1", "mouse C (Terra)", "2025-10-09", "auto:181"),
+    ("18_20251008_Terra_spont_1", "mouse C (Terra)", "2025-10-08", "auto:191"),
 ]
 # fewer-labels study (2026-09-27/28): step-1 retrained with 5 or 10 of batch01's 20 labels, two model-free subsets each;
 # shown on the curves as open markers just before that video's 20-label step (user request 2026-09-29)
@@ -77,7 +86,9 @@ def test_units():
 
 def label_of(u):
     i = int(u.split("_")[0])
-    lab = f"video {i} (5 min, mouse A)" if i == 0 else f"video {i} (Pluto, {next(v[2] for v in VIDEOS if v[0] == u)})"
+    v = next(v for v in VIDEOS if v[0] == u)
+    mouse = v[1].split("(")[-1].rstrip(")") if "(" in v[1] else v[1]
+    lab = f"video {i} (5 min, mouse A)" if i == 0 else f"video {i} ({mouse}, {v[2]})"
     return lab + (" [POOR QUALITY: pupil hard to see]" if u in POOR_QUALITY else "")
 
 
