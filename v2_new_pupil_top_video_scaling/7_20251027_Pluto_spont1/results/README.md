@@ -11,3 +11,6 @@ video's labels; shuffles 811, 812, ...
 |---|---|---|---|---|---|
 | 0 (video-6 20-label model 711, applied unchanged) | 5.36 px | 8.9 | 0% | 81% | – |
 | 20 (shuffle 811) | 5.86 px | 7.6 | 0% | 100% | 940 of 57158 (1.6%) |
+| 40 (shuffle 812) | 5.84 px | 8.2 | 0% | 100% | pending |
+
+**Plateau rule fired at step 2 (2026-09-29):** neither 20 labels (5.86 px) nor 40 labels (5.84 px) improved the 0-label score of 5.36 px by more than 3%, so by the rule this video needs no labels of its own (plateau point = 0 labels, 5.36 px); the batch03 popup is held pending the user's decision. batch02 note: one closed-eye frame (img022586) had a stray pupil_top and swapped corners; corrected on re-check and step 2 was retrained on the corrected batch.
