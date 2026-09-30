@@ -11,3 +11,6 @@ model (711) and corrected. Training set of every step = videos 0-3 + video 4 run
 | 0 (video-6 20-label model 711, applied unchanged) | 27.46 px | 51.3 | 14% | 59% | – |
 | 20 (shuffle 911) | 25.34 px | 50.6 | 14% | 68% | 9741 of 57158 (17.0%) |
 | 40 (shuffle 912) | 30.03 px | 50.4 | 12% | 89% | 8734 of 57158 (15.3%) |
+| 60 (shuffle 913) | 33.77 px | 52.0 | 16% | 84% | pending |
+
+**Plateau rule fired at step 3 (2026-09-30):** neither 40 labels (30.03 px) nor 60 labels (33.77 px) improved the running best of 25.34 px (20 labels); by the rule the plateau point is **20 labels, 25.34 px**. The batch04 popup is held pending the user's decision. This day stays hard: 12-16% of test frames are > 50 px off at every step.
