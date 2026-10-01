@@ -9,3 +9,4 @@ contributed none); shuffles 1011, 1012, ...
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-6 20-label model 711, applied unchanged) | 23.41 px | 41.4 | 8% | 36% | – |
+| 20 (shuffle 1011) | 10.39 px | 24.3 | 8% | 55% | pending |
