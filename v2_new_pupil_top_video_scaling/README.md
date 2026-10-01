@@ -14,7 +14,9 @@ Snapshot rules, fixed for every video (confirmed 2026-09-22): the headline numbe
 (epochs >= 96, i.e. 100/110/120). The validation split never enters training; if its labels are corrected later,
 only the secondary column is recomputed (`scripts/recompute_mAPlate.py`), nothing is retrained.
 From the second video on, the curve starts at x = 0: the earlier videos' model applied unchanged
-(`scripts/score_prior_model.py`). Each later video is trained with ALL labels of the earlier videos plus its own.
+(`scripts/score_prior_model.py`). Each later video is trained with the carried labels of the earlier videos plus its own
+(videos 0-3: the labels that existed when the next video started; from video 4 on: only the labels up to the plateau
+point - rule fixed 2026-10-01, table in `results/README.md`).
 
 ```
 scripts/                 shared tools (select_frames.py, make_prelabels.py, label_set.sh, ...)

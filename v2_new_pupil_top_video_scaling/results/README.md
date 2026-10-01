@@ -34,6 +34,31 @@ Notes
 - The 0-label point of a video = the earlier videos' model applied unchanged (`scripts/score_prior_model.py`);
   video 1 has no earlier model, so no 0 point.
 
+## Labels carried into later videos (rule fixed 2026-10-01)
+
+Fixed rule for every video from video 4 on and for all future videos: a video is finished when it reaches its
+plateau, the next video starts from there, and only the labels up to the plateau point go into the training sets of
+later videos. This mirrors real use, where labeling stops once the plateau is reached. Labels made beyond the plateau
+point stay on disk and are not used by later videos. Every model is trained from scratch on its whole training set.
+
+Videos 0-3 carry the labels that existed when the next video started, which is more than their plateau point
+(320 labels instead of 120). These 320 labels are the same in the training set of every later model, so the
+comparison between later videos is not affected.
+
+| video | labeled in total | plateau point | carried into later videos |
+|---|---|---|---|
+| 0 | 100 | 60 | 100 |
+| 1 | 140 | 20 | 100 |
+| 2 | 80 | 20 | 60 |
+| 3 | 60 | 20 | 60 |
+| 4 (run 2) | 80 | 40 | 40 |
+| 5 | 40 | 20 | 20 |
+| 6 | 60 | 20 | 20 |
+| 7 | 40 | 0 | 0 |
+| 8 | 60 | 20 | 20 |
+
+Sum carried into video 9: 420 labels (the "labels of earlier videos" column of the table at the top).
+
 ## Cross-video back-test (2026-09-23)
 
 Every model of the sequence (19 final snapshots: video 0 steps 1-5, video 1 steps 1-7, video 2 steps 1-4,

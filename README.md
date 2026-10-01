@@ -79,12 +79,37 @@ CHANGELOG.md                   what each tagged version established (table of al
 1. **Split, model-free**: 50 test frames evenly spaced over the final 10% of the video (frozen, report only),
    20 validation frames from the 10% before it, 2-s guard bands, everything earlier is the selection pool.
 2. **Batch 1**: 20 frames by k-means on image fingerprints (no model involved).
-3. **Each step**: pre-label with the newest model, a person corrects, train from scratch on all labels of the
-   earlier videos plus this video's labels so far, score on the frozen test set.
+3. **Each step**: pre-label with the newest model, a person corrects, train from scratch on the carried labels of
+   the earlier videos (table below) plus this video's labels so far, score on the frozen test set.
 4. **Batch 2 onward**: predict the whole video, flag frames where any keypoint jumps more than 3% of the eye width
    between consecutive frames, pick 20 of them by k-means (at least 1 s apart from each other and from every
    labeled frame).
 5. **Stop** when the plateau rule fires; then back-test the new models on every earlier test set.
+6. **Next video**: it starts from the plateau, and only this video's labels up to its plateau point are carried
+   into the training sets of later videos.
+
+### Labels carried into later videos (rule fixed 2026-10-01)
+
+Fixed rule for every video from video 4 on and for all future videos: a video is finished when it reaches its
+plateau, the next video starts from there, and only the labels up to the plateau point go into later training sets.
+This mirrors real use, where labeling stops once the plateau is reached. Labels made beyond the plateau point stay
+on disk and are not used by later videos.
+
+Videos 0-3 carry the labels that existed when the next video started, which is more than their plateau point
+(320 labels instead of 120). These 320 labels are the same in the training set of every later model, so the
+comparison between later videos is not affected.
+
+| video | labeled in total | plateau point | carried into later videos |
+|---|---|---|---|
+| 0 | 100 | 60 | 100 |
+| 1 | 140 | 20 | 100 |
+| 2 | 80 | 20 | 60 |
+| 3 | 60 | 20 | 60 |
+| 4 (run 2) | 80 | 40 | 40 |
+| 5 | 40 | 20 | 20 |
+| 6 | 60 | 20 | 20 |
+| 7 | 40 | 0 | 0 |
+| 8 | 60 | 20 | 20 |
 
 Every number in a README comes from one script with one formula; if a definition changes, the whole series is
 recomputed rather than mixed.

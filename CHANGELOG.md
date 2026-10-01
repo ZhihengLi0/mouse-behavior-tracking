@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.10-carry-rule` | 2026-10-01 | Rule fixed for which labels of a finished video go into later training sets: only the labels up to the plateau point (in force since video 4; videos 0-3 carry the 320 labels that existed when the next video started); documented in the READMEs with the per-video table |
 | `v0.9.9-terra-into-v2` | 2026-09-30 | v3 folder removed (user decision; its labelling guide v0.2 stays in git history); the 8 Terra videos (mouse C, 2025-10-17 -> 10-08) join v2 as units 11-18, newest first |
 | `v0.9.8-video8-plateau` | 2026-09-30 | Video 8 (2025-10-24, v2 line) finished: plateau at 20 labels, 25.34 px (40: 30.03, 60: 33.77; 12-16% of frames > 50 px at every step); labels_to_plateau figure added |
 | `v0.9.7-video7-zero-labels` | 2026-09-29 | Video 7 (2025-10-27, v2 line) finished: the plateau rule fires at 0 labels - the video-6 model scores 5.36 px unchanged (20: 5.86, 40: 5.84); first video that needed no labels of its own |
