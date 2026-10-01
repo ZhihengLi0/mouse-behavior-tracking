@@ -21,7 +21,7 @@ snapshot with the best validation mAP after the first learning-rate drop (epochs
 | 6 `6_20251028_Pluto_spont_1` | mouse B, 19.9 min, 2025-10-28 | 380 (videos 0-3 + 40 of video 4 + 20 of video 5) | convention v2: 9.36 / 6.75 / 8.46 / 10.68 | **20 labels** (rule fired at 60; user decision 2026-09-29) | 6.75 px |
 | 7 `7_20251027_Pluto_spont1` | mouse B, 19.9 min, 2025-10-27 | 400 (videos 0-3 + 40 of video 4 + 20 of video 5 + 20 of video 6) | convention v2: 5.36 / 5.86 / 5.84 | **0 labels** (rule fired at 40; user decision 2026-09-29) | 5.36 px |
 | 8 `8_20251024_Pluto_spont1` | mouse B, 19.9 min, 2025-10-24 | 400 (videos 0-3 + 40 of video 4 + 20 of video 5 + 20 of video 6) | convention v2: 27.46 / 25.34 / 30.03 / 33.77 | **20 labels** (rule fired at 60; user decision 2026-09-30) | 25.34 px |
-| 9 `9_20251023_Pluto1` | mouse B, 19.9 min, 2025-10-23 | 420 (videos 0-3 + 40 of video 4 + 20 each of videos 5, 6, 8) | convention v2: 23.41 / 10.39 / 8.55 / 8.67 | in progress (step 3 did not improve on 8.55; rule decides after step 4) | – |
+| 9 `9_20251023_Pluto1` | mouse B, 19.9 min, 2025-10-23 | 420 (videos 0-3 + 40 of video 4 + 20 each of videos 5, 6, 8) | convention v2: 23.41 / 10.39 / 8.55 / 8.67 / 8.20 | in progress (step 3 did not improve on 8.55; step 4 improved it by 4.1%, so the rule has not fired; step 5 next) | – |
 
 `labels_to_plateau.png` / `labels_to_plateau.csv` (2026-09-30): the plateau point of every video in the sequence as one figure - labels needed (left) and the error at the plateau vs the 0-label error (right); `scripts/plot_labels_to_plateau.py`. The csv is the table above in machine-readable form and is updated when a video finishes.
 

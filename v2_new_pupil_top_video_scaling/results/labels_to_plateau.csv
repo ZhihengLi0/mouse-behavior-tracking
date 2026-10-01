@@ -8,4 +8,4 @@ video,unit,mouse,date,labels_at_plateau,plateau_median_px,zero_label_px,status,n
 6,6_20251028_Pluto_spont_1,Pluto,2025-10-28,20,6.75,9.36,final,rule fired at 60
 7,7_20251027_Pluto_spont1,Pluto,2025-10-27,0,5.36,5.36,final,rule fired at 40: the video-6 model already fits this day
 8,8_20251024_Pluto_spont1,Pluto,2025-10-24,20,25.34,27.46,final,rule fired at 60; 12-16% of frames > 50 px at every step
-9,9_20251023_Pluto1,Pluto,2025-10-23,40,8.55,23.41,in progress,best so far; step 3 = 8.67 (no gain); step 4 decides
+9,9_20251023_Pluto1,Pluto,2025-10-23,80,8.20,23.41,in progress,best so far; step 3 = 8.67 (no gain); step 4 = 8.20 (4.1% better than 8.55; rule not fired)
