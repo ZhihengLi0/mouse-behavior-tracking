@@ -11,4 +11,4 @@ contributed none); shuffles 1011, 1012, ...
 | 0 (video-6 20-label model 711, applied unchanged) | 23.41 px | 41.4 | 8% | 36% | – |
 | 20 (shuffle 1011) | 10.39 px | 24.3 | 8% | 55% | 10359 of 57158 (18.1%) |
 | 40 (shuffle 1012) | 8.55 px | 19.6 | 0% | 86% | 6470 of 57158 (11.3%) |
-| 60 (shuffle 1013) | 8.67 px | 14.8 | 0% | 78% | pending |
+| 60 (shuffle 1013) | 8.67 px | 14.8 | 0% | 78% | 5790 of 57158 (10.1%) |
