@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Mouse Eye Tracking Map</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -107,6 +108,9 @@ td.best{color:var(--teal);font-weight:600}
 .issue b{font-size:14px} .issue.fixed{border-left-color:var(--teal)}
 .tree-map{font-family:var(--mono);font-size:12.5px;line-height:1.85;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;overflow-x:auto;white-space:pre}
 .tree-map .c{color:var(--muted)} .tree-map .k{color:var(--teal)} .tree-map .w{color:var(--amber)}
+a{color:var(--teal)} section{scroll-margin-top:calc(16px + env(safe-area-inset-top,0px))}
+.jump{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.chart.wide svg{min-width:920px}
 footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.7}
 @media (max-width:640px){.flow .box{margin-right:0;flex-basis:100%}.flow .box:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-19px;transform:translateX(50%)}.flow{gap:22px 0}.rule{grid-template-columns:1fr}.rule .arr{display:none}}
 </style>
@@ -118,13 +122,20 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
 
 <div class="page">
 <header>
-  <div class="kicker">DeepLabCut · mouse eye · 2026-08 → 2026-09-19</div>
+  <div class="kicker">DeepLabCut · mouse eye · 2026-08 → <span id="hs-built">2026-10-01</span></div>
   <h1><span lang="zh">小鼠眼睛追踪：从视频到可对齐脑信号的瞳孔与眨眼信号</span><span lang="en">Mouse eye tracking: from video to pupil and blink signals that can be aligned with brain activity</span></h1>
   <p class="lead"><span lang="zh">这一页把项目至今的每一个决定、每一个算法和每一个未解决的问题放在一张图里。每张图的标题就是结论。</span><span lang="en">Every decision, every algorithm and every open issue of the project so far, on one page. Each figure's title is its conclusion.</span></p>
   <div class="headline-stats">
-    <span><b id="hs-new">185 → 10.1 px</b><span lang="zh">新鼠新视频，只标 80 帧</span><span lang="en">new mouse, new video, 80 labels</span></span>
-    <span><b>~80</b><span lang="zh">帧标注后精度饱和（加到 300 帧不再变）</span><span lang="en">labels saturate accuracy (300 add nothing)</span></span>
-    <span><b>0</b><span lang="zh">个需要跨鼠迁移的常数（瞳孔算法）</span><span lang="en">constants to transfer between mice (pupil method)</span></span>
+    <span><b id="hs-mouse">208 → 10.4 px</b><span lang="zh">换一只老鼠，标 20 帧</span><span lang="en">new mouse, 20 labels</span></span>
+    <span><b id="hs-range">0–40</b><span lang="zh">帧：同一只老鼠之后每个视频到平台所需的标注</span><span lang="en">labels to the plateau for each later video of the same mouse</span></span>
+    <span><b>3.7% vs 6.9%</b><span lang="zh">瞳孔面积误差：四点法 vs 三点法</span><span lang="en">pupil-area error: 4-point vs 3-point rule</span></span>
+  </div>
+  <div class="jump"><span><span lang="zh">当前主线</span><span lang="en">current line</span> →</span>
+    <a href="#s08">08 <span lang="zh">标注标准</span><span lang="en">label standard</span></a>
+    <a href="#s09">09 <span lang="zh">每个视频要标多少</span><span lang="en">labels per video</span></a>
+    <a href="#s10">10 <span lang="zh">跨视频回测</span><span lang="en">cross-video back-test</span></a>
+    <a href="#s11">11 <span lang="zh">面积与眨眼</span><span lang="en">area and blinks</span></a>
+    <a href="#s-open"><span lang="zh">未解决的问题</span><span lang="en">open issues</span></a>
   </div>
 </header>
 
@@ -134,7 +145,7 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
   <h2><span lang="zh">一段眼睛视频进去，干净的瞳孔、眼动、眨眼时间序列出来</span><span lang="en">An eye video goes in; clean pupil, eye-movement and blink time series come out</span></h2></div>
   <div class="flow">
     <div class="box"><span class="t"><span lang="zh">眼睛视频</span><span lang="en">Eye video</span></span><span class="d">60 fps</span></div>
-    <div class="box key"><span class="t"><span lang="zh">8 个关键点</span><span lang="en">8 keypoints</span></span><span class="d">DeepLabCut · ResNet-50 · batch 2 · 100 epochs</span></div>
+    <div class="box key"><span class="t"><span lang="zh">8 个关键点</span><span lang="en">8 keypoints</span></span><span class="d">DeepLabCut · ResNet-50 · batch 2 · 120 epochs</span></div>
     <div class="box"><span class="t"><span lang="zh">逐帧信号</span><span lang="en">Per-frame signals</span></span><span class="d"><span lang="zh">瞳孔中心、宽度、面积、睁眼度、置信度</span><span lang="en">pupil center, width, area, eye opening, confidence</span></span></div>
     <div class="box"><span class="t"><span lang="zh">事件识别</span><span lang="en">Event detection</span></span><span class="d"><span lang="zh">眨眼 · 半眨眼 · 眼动 · 追踪丢失</span><span lang="en">blink · partial blink · saccade · tracking loss</span></span></div>
     <div class="box"><span class="t"><span lang="zh">眨眼处理</span><span lang="en">Blink handling</span></span><span class="d"><span lang="zh">不可信帧用前后可信帧插值</span><span lang="en">untrusted frames bridged from trusted neighbours</span></span></div>
@@ -149,7 +160,7 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
     <div class="panel">
       <h3><span lang="zh">所有数字背后的同一条纪律：测试集只报告，不参与任何选择</span><span lang="en">One discipline behind every number: the test set only reports, it never chooses</span></h3>
       <div class="chart" id="c-split"></div>
-      <div class="cap"><span lang="zh">按时间切块而不是随机抽：60 fps 下相邻帧几乎相同，随机划分会让训练帧和测试帧互为近似副本。新视频按 80/10/10 划分，段与段之间留 2 秒隔离带。</span><span lang="en">Blocks in time, not random draws: at 60 fps neighbouring frames are near-duplicates, so a random split leaks. New videos use 80/10/10 with 2-second guard bands between blocks.</span></div>
+      <div class="cap"><span lang="zh">按时间切块而不是随机抽：60 fps 下相邻帧几乎相同，随机划分会让训练帧和测试帧互为近似副本。新视频按 80/10/10 划分，段与段之间留 2 秒隔离带；测试段取 50 帧，验证段取 20 帧。</span><span lang="en">Blocks in time, not random draws: at 60 fps neighbouring frames are near-duplicates, so a random split leaks. New videos use 80/10/10 with 2-second guard bands between blocks; 50 test frames and 20 validation frames are taken from their blocks.</span></div>
     </div>
   </div>
 </section>
@@ -179,14 +190,30 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
       <span class="q"><span lang="zh">不标注，能不能自动找到这些帧并说出是什么？</span><span lang="en">Without labels, can those frames be found and named?</span></span>
       <span class="a"><span lang="zh">能：睁眼度、瞳孔位移、置信度三条曲线足以区分眨眼、眼动和追踪丢失</span><span lang="en">Yes: eye opening, pupil shift and confidence separate blinks, saccades and tracking loss</span></span>
       <span class="carry"><span lang="zh">置信度只能当辅助信号：眨眼时模型依然很自信</span><span lang="en">Confidence is only an auxiliary signal: the model stays confident through blinks</span></span></div>
-    <div class="step"><span class="no">06 · pupil measurement</span>
+    <div class="step"><span class="no">06 · pupil measurement <span class="chip"><span lang="zh">旧标注</span><span lang="en">old labels</span></span></span>
       <span class="q"><span lang="zh">上点常被眼睑挡住，瞳孔怎么量？</span><span lang="en">The top point is often hidden: how to measure the pupil?</span></span>
       <span class="a"><span lang="zh">只用左、右、下三点；眨眼段不计算，用前后可信帧插值</span><span lang="en">Use left, right and bottom only; skip blinks and bridge them from trusted frames</span></span>
-      <span class="carry"><span lang="zh">没有任何需要换鼠重测的常数</span><span lang="en">No constant has to be re-measured for a new mouse</span></span></div>
-    <div class="step"><span class="no">07 · new-video-generalization <span class="chip plum"><span lang="zh">进行中</span><span lang="en">running</span></span></span>
+      <span class="carry"><span lang="zh">眨眼段插值仍在用；面积在新标注标准下改看 11</span><span lang="en">Blink bridging is still in use; for area under the new label standard see 11</span></span></div>
+    <div class="step"><span class="no">07 · new-video-generalization <span class="chip"><span lang="zh">旧标注</span><span lang="en">old labels</span></span></span>
       <span class="q"><span lang="zh">换一只鼠、一段新视频，最少要标多少？</span><span lang="en">New mouse, new video: how few labels are enough?</span></span>
       <span class="a"><span lang="zh">20 帧解决绝大部分；80 帧到 10.1 px</span><span lang="en">20 labels fix most of it; 80 labels reach 10.1 px</span></span>
-      <span class="carry"><span lang="zh">下一步：第二随机种子、100 帧、更多小鼠</span><span lang="en">Next: second seed, 100 labels, more mice</span></span></div>
+      <span class="carry"><span lang="zh">上点的标法被发现不可靠 → 改标注标准，全部在新标准下重做（08、09）</span><span lang="en">The top-point labels proved unreliable → new label standard, everything redone under it (08, 09)</span></span></div>
+    <div class="step"><span class="no">08 · label standard <span class="chip ok">2026-09-20</span></span>
+      <span class="q"><span lang="zh">瞳孔的四个点到底标在哪？</span><span lang="en">Where exactly do the four pupil points go?</span></span>
+      <span class="a"><span lang="zh">瞳孔按椭圆标：四个点是椭圆端点，被眼睑挡住的部分也算</span><span lang="en">The pupil is an ellipse: four points are its endpoints, hidden part included</span></span>
+      <span class="carry"><span lang="zh">旧标注下的数字不再可比</span><span lang="en">Numbers under the old labels are no longer comparable</span></span></div>
+    <div class="step"><span class="no">09 · per-video scaling <span class="chip plum"><span lang="zh">进行中</span><span lang="en">running</span></span></span>
+      <span class="q"><span lang="zh">每个新视频最少要标多少？</span><span lang="en">How few labels does each new video need?</span></span>
+      <span class="a"><span lang="zh">换老鼠先标 20 帧；同一只老鼠之后每个视频 0–40 帧</span><span lang="en">A new mouse needs 20 first; each later video of that mouse needs 0–40</span></span>
+      <span class="carry"><span lang="zh">到平台就进入下一个视频，只带到平台点为止的标注</span><span lang="en">At the plateau the next video starts, carrying only the labels up to the plateau point</span></span></div>
+    <div class="step"><span class="no">10 · cross-video back-test</span>
+      <span class="q"><span lang="zh">加入新视频会不会把旧视频带坏？</span><span lang="en">Do new videos hurt the old ones?</span></span>
+      <span class="a"><span lang="zh">不会：每个模型都在所有封存测试集上回测，旧视频保持平稳</span><span lang="en">No: every model is back-tested on every frozen test set and old videos stay flat</span></span>
+      <span class="carry"><span lang="zh">同一天的视频直接可用；换一天要看 0 标签误差</span><span lang="en">Same-day videos transfer directly; a new day has to be checked at 0 labels</span></span></div>
+    <div class="step"><span class="no">11 · area and blinks</span>
+      <span class="q"><span lang="zh">新标准下面积和眨眼怎么算？</span><span lang="en">How to compute area and blinks under the new standard?</span></span>
+      <span class="a"><span lang="zh">四点法面积更准；现行眨眼规则在新老鼠上标记过多</span><span lang="en">The 4-point area is more accurate; the current blink rule over-flags on the new mouse</span></span>
+      <span class="carry"><span lang="zh">生产脚本仍用三点法，切换待批准</span><span lang="en">The production script still uses the 3-point rule until the switch is approved</span></span></div>
   </div>
 </section>
 
@@ -264,6 +291,7 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
 <section>
   <div class="sec-head"><div class="kicker">06 · <span lang="zh">瞳孔测量（现行算法）</span><span lang="en">pupil measurement (current method)</span></div>
   <h2><span lang="zh">上点被眼睑挡住，所以不用它：左右两点定中心，下点定半高</span><span lang="en">The top point hides under the lid, so it is not used: left and right set the centre, bottom sets the half-height</span></h2></div>
+  <div class="issues"><div class="issue"><b><span lang="zh">本节是旧标注标准下的结论</span><span lang="en">This section holds under the old label standard</span></b><span lang="zh">当时上点标的是露出来的上沿。2026-09-20 起上点改标椭圆端点，新标准下四点法面积更准（第 11 节）。眨眼段插值的做法仍在使用。</span><span lang="en">The top point then marked the exposed edge. Since 2026-09-20 it marks the ellipse endpoint, and under that standard the 4-point area is more accurate (section 11). Blink bridging is still in use.</span></div></div>
   <div class="grid2">
     <div class="panel"><h3><span lang="zh">红色椭圆是现行算法，量的是整个瞳孔；蓝色是已废弃的四点法，只量到露出来的部分</span><span lang="en">The red ellipse is the current method and measures the whole pupil; blue is the retired 4-point method and sees only the exposed part</span></h3>
       <div class="imgframe"><img src="assets/pupil_geometry.jpg" alt="Eye frame with the 3-point endpoint ellipse and the 4-point ellipse overlaid"></div>
@@ -303,6 +331,7 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
 <section>
   <div class="sec-head"><div class="kicker">07 · <span lang="zh">新视频泛化</span><span lang="en">new-video generalization</span></div>
   <h2><span lang="zh">换一只鼠，旧模型完全失效（185 px）；标 20 帧回到 14 px，标 80 帧到 10 px</span><span lang="en">On a new mouse the old model fails outright (185 px); 20 labels bring it to 14 px, 80 labels to 10 px</span></h2></div>
+  <div class="issues"><div class="issue"><b><span lang="zh">本节是旧标注标准下的第一次新视频实验</span><span lang="en">This section is the first new-video experiment, under the old label standard</span></b><span lang="zh">训练 = 676 张旧鼠标注 + Pluto 标注。新标准下的完整实验（10 个视频）见第 09 节。</span><span lang="en">Training = 676 old-mouse labels + Pluto labels. The full experiment under the new standard (10 videos) is section 09.</span></div></div>
   <div class="grid2">
     <div class="panel"><h3><span lang="zh">头 20 帧解决了绝大部分问题，之后每 20 帧的收益递减</span><span lang="en">The first 20 labels do most of the work; every further 20 adds less</span></h3>
       <div class="chart" id="c-scale"></div>
@@ -324,46 +353,129 @@ footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono)
   </div>
 </section>
 
+<!-- ============ 08 LABEL STANDARD ============ -->
+<section id="s08">
+  <div class="sec-head"><div class="kicker">08 · <span lang="zh">标注标准（2026-09-20 起）</span><span lang="en">label standard (since 2026-09-20)</span></div>
+  <h2><span lang="zh">瞳孔按椭圆标：四个点是椭圆的四个端点，被眼睑挡住的部分也算在内</span><span lang="en">The pupil is labeled as an ellipse: the four points are its endpoints, including the part hidden under the lid</span></h2></div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">四个红点落在同一个椭圆上；上点在上眼睑点之上，标的是整个瞳孔</span><span lang="en">The four red points lie on one ellipse; the top point sits above the upper-lid point, so the whole pupil is labeled</span></h3>
+      <div class="imgframe" id="ls-frame"><img src="assets/label_standard.jpg" alt="Eye frame with the eight human labels and the ellipse through the four pupil points"></div>
+      <div class="cap"><span lang="zh">视频 0 第 1 批的一帧，人工标注，对比度已拉高。红：4 个瞳孔点和穿过它们的椭圆。蓝：上下眼睑与两个眼角。</span><span lang="en">One frame of video 0, batch 1, human labels, contrast stretched. Red: the four pupil points and the ellipse through them. Blue: both eyelids and both eye corners.</span></div></div>
+    <div class="panel"><h3><span lang="zh">每个点标在哪</span><span lang="en">Where each point goes</span></h3>
+      <div class="tbl"><table><tr><td><span lang="zh">瞳孔上 / 下 / 左 / 右</span><span lang="en">pupil top / bottom / left / right</span></td><td><span lang="zh">瞳孔拟合椭圆的四个端点；被上眼睑挡住的部分按椭圆补全；允许轻微倾斜</span><span lang="en">the four endpoints of the ellipse fitted to the pupil; the part under the upper lid is completed by the ellipse; a slight tilt is accepted</span></td></tr><tr><td><span lang="zh">上 / 下眼睑</span><span lang="en">upper / lower eyelid</span></td><td><span lang="zh">各自弧线的中点；两点的距离就是睁眼度</span><span lang="en">the middle of each lid arc; their distance is the eye opening</span></td></tr><tr><td><span lang="zh">颞侧眼角</span><span lang="en">temporal corner</span></td><td><span lang="zh">外层那条始终可见的线，按解剖结构而不是反光</span><span lang="en">on the outer line that is always visible: anatomy, not the glint</span></td></tr><tr><td><span lang="zh">鼻侧眼角</span><span lang="en">nasal corner</span></td><td><span lang="zh">上下眼睑延长线的交点，取没有阴影的外侧</span><span lang="en">where the extended lid lines meet, on the outer side without the shadow</span></td></tr><tr><td><span lang="zh">双重轮廓 <span class="chip">2026-09-26</span></span><span lang="en">double contour <span class="chip">2026-09-26</span></span></td><td><span lang="zh">取左边那条轮廓，上、下点随之左移</span><span lang="en">take the left contour; top and bottom shift left with it</span></td></tr><tr><td><span lang="zh">黑核外的浅色带 <span class="chip">2026-09-29</span></span><span lang="en">lighter band around the dark core <span class="chip">2026-09-29</span></span></td><td><span lang="zh">算作瞳孔：毛发遮挡和红外灯照射会让边缘变浅</span><span lang="en">counts as pupil: fur and the infrared lamps lighten the edge</span></td></tr><tr><td><span lang="zh">形状看起来不规则</span><span lang="en">shape looks irregular</span></td><td><span lang="zh">仍按椭圆近似；看不清的一侧可由另外三点的椭圆补出</span><span lang="en">still approximated by an ellipse; an unclear side may be placed from the ellipse through the other three points</span></td></tr><tr><td><span lang="zh">肉眼也无法判断</span><span lang="en">unreadable even by eye</span></td><td><span lang="zh">留空不标；闭眼帧瞳孔点留空，眼睑照常标</span><span lang="en">left empty; in closed-eye frames the pupil points stay empty and the eyelids are still labeled</span></td></tr></table></div>
+      <div class="cap"><span lang="zh">流程：模型先给出预标注，人逐点修正后保存，没有任何点被自动接受。同一种情况始终用同一种标法，比单帧的精确更重要。</span><span lang="en">Workflow: the model proposes pre-labels, a person corrects every point and saves; nothing is accepted automatically. Labeling the same situation the same way matters more than precision on one frame.</span></div></div>
+  </div>
+  <div class="panel"><h3><span lang="zh">同一标准下的 20 帧</span><span lang="en">Twenty frames under the same standard</span></h3>
+    <div class="imgframe scroll"><img src="assets/labels_batch01.jpg" alt="Twenty labeled frames of video 0, batch 1"></div>
+    <div class="cap"><span lang="zh">视频 0 第 1 批的全部 20 帧。黄：瞳孔上点；蓝：瞳孔左、右、下；绿：上下眼睑；粉：鼻侧眼角；红圈：颞侧眼角。</span><span lang="en">All 20 frames of video 0, batch 1. Yellow: pupil top; blue: pupil left, right, bottom; green: eyelids; pink: nasal corner; red circle: temporal corner.</span></div></div>
+</section>
+
+<!-- ============ 09 PER-VIDEO SCALING ============ -->
+<section id="s09">
+  <div class="sec-head"><div class="kicker">09 · <span lang="zh">每个视频要标多少</span><span lang="en">labels needed per video</span> <span class="chip plum"><span lang="zh">进行中</span><span lang="en">running</span></span></div>
+  <h2><span lang="zh">换一只老鼠要先标 20 帧；同一只老鼠之后的每个视频，0–40 帧就到平台</span><span lang="en">A new mouse needs its first 20 labels; every later video of the same mouse reaches its plateau with 0–40</span></h2></div>
+  <div class="flow">
+    <div class="box"><span class="t"><span lang="zh">切分，不用模型</span><span lang="en">Split, model-free</span></span><span class="d"><span lang="zh">最后 10% 取 50 帧测试并封存 · 前一段取 20 帧验证 · 其余是选帧池</span><span lang="en">50 test frames from the final 10%, frozen · 20 validation frames before it · the rest is the pool</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">第 1 批 20 帧</span><span lang="en">Batch 1: 20 frames</span></span><span class="d"><span lang="zh">外观指纹 + k-means</span><span lang="en">appearance fingerprints + k-means</span></span></div>
+    <div class="box key"><span class="t"><span lang="zh">预标注 → 人工修正</span><span lang="en">Pre-label → human corrects</span></span><span class="d"><span lang="zh">最新模型给出预标注</span><span lang="en">pre-labels from the newest model</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">重新训练</span><span lang="en">Train again</span></span><span class="d"><span lang="zh">旧视频带入的标注 + 本视频已有标注 · 每步都从 ImageNet 预训练权重开始 · 120 epochs</span><span lang="en">carried labels of earlier videos + this video's labels · every step starts from ImageNet-pretrained weights · 120 epochs</span></span></div>
+    <div class="box"><span class="t"><span lang="zh">打分，选下一批</span><span lang="en">Score, pick the next batch</span></span><span class="d"><span lang="zh">封存测试集上的中位帧 RMSE · jump 规则 + k-means 选 20 帧</span><span lang="en">median frame RMSE on the frozen test set · jump rule + k-means pick 20 frames</span></span></div>
+    <div class="box goal"><span class="t"><span lang="zh">到平台 → 下一个视频</span><span lang="en">Plateau → next video</span></span><span class="d"><span lang="zh">连续两步改善 ≤ 3% · 只带到平台点为止的标注</span><span lang="en">two steps in a row improve ≤ 3% · only labels up to the plateau point are carried</span></span></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">每个视频到平台所需的标注帧数</span><span lang="en">Labels each video needed to reach its plateau</span></h3>
+      <div class="chart" id="c-plateau"></div>
+      <div class="cap"><span lang="zh">规则：最好成绩连续两步（每步 20 帧）都没有再改善 3% 以上即到平台，平台点取最后一次有效改善的那一步。灰色 = 进行中，取目前最好的一步。视频 5 的 20 帧是人工决定：0 帧时中位数已经够低，但 12% 的帧误差超过 50 px，标 20 帧后全部消失。</span><span lang="en">Rule: the plateau is reached when two consecutive 20-label steps fail to improve the best score by more than 3%; the plateau point is the last step that did. Grey = in progress, best step so far. Video 5's 20 labels are a human decision: at 0 labels the median was already low, but 12% of frames were off by more than 50 px, and 20 labels removed all of them.</span></div></div>
+    <div class="panel"><h3><span lang="zh">到平台时的误差，和一帧不标时的误差</span><span lang="en">Error at the plateau, and error before any label</span></h3>
+      <div class="chart" id="c-zero"></div>
+      <div class="cap"><span lang="zh">灰色虚线：把上一个模型原样用在新视频上（0 标签）。视频 1 是第一次换老鼠（208 px）。视频 4 画质差，视频 8 这一天全程偏高。纵轴为对数。</span><span lang="en">Grey dashed: the previous model applied unchanged (0 labels). Video 1 is the first video of a new mouse (208 px). Video 4 has poor image quality; video 8 stays high at every step. Log scale.</span></div></div>
+  </div>
+  <div class="panel"><h3><span lang="zh">每个视频自己的曲线：头 20 帧起主要作用，之后基本持平</span><span lang="en">Each video's own curve: the first 20 labels do most of the work, then it stays flat</span></h3>
+    <div class="chart wide" id="c-curves"></div>
+    <div class="cap"><span lang="zh">纵轴：测试误差中位数 px（对数）。横轴：本视频的标注帧数。大圆点 = 平台点，空心点 = 0 标签，紫色空心 = 5 / 10 帧子集。视频 9 还在进行，没有平台点。50 帧测试集的中位数在相邻两步之间本身就有约 1 px 的抽样波动，所以同一个视频里 1 px 以内的差别没有意义，3% 的门槛贴着噪声。</span><span lang="en">Vertical: median test error in px (log). Horizontal: labels of the video itself. Large dot = plateau point, open dot = 0 labels, open purple = 5 / 10-label subsets. Video 9 is still running and has no plateau point. With 50 test frames the median moves by about 1 px between neighbouring steps from sampling alone, so differences within 1 px inside one video are not meaningful and the 3% threshold sits at the noise floor.</span></div></div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">带入后续视频的标注</span><span lang="en">Labels carried into later videos</span></h3>
+      <div class="tbl"><table><thead><tr><th><span lang="zh">视频</span><span lang="en">video</span></th><th class="n"><span lang="zh">共标注</span><span lang="en">labeled</span></th><th class="n"><span lang="zh">平台点</span><span lang="en">plateau point</span></th><th class="n"><span lang="zh">带入后续训练</span><span lang="en">carried forward</span></th></tr></thead><tbody id="t-carry"></tbody></table></div>
+      <div class="cap"><span lang="zh">规则（视频 4 起，2026-10-01 定为固定规则）：一个视频到平台后就进入下一个视频，只把到平台点为止的标注带进后面的训练集。这样做是为了模拟真实使用：实际中到平台就停止标注。平台之后多标的帧留在本地，不参与后面的训练。视频 0–3 带的是下一个视频开始时已有的标注，共 320 个（按平台点是 120 个）。这 320 个标注在之后每个模型的训练集里都相同，所以后续视频之间的比较不受影响。</span><span lang="en">Rule (in force since video 4, fixed on 2026-10-01): when a video reaches its plateau the next video starts, and only its labels up to the plateau point go into later training sets. This mirrors real use, where labeling stops at the plateau. Labels made beyond the plateau stay on disk and are not used later. Videos 0–3 carry the labels that existed when the next video started, 320 in total (120 by their plateau points). These 320 labels are the same in the training set of every later model, so the comparison between later videos is not affected.</span></div></div>
+    <div class="panel"><h3><span lang="zh">只标 5 帧或 10 帧：6 个视频里只有 2 个够</span><span lang="en">Only 5 or 10 labels: enough on 2 of 6 videos</span></h3>
+      <div class="tbl"><table><thead><tr><th><span lang="zh">视频</span><span lang="en">video</span></th><th class="n">0</th><th class="n">5 (a / b)</th><th class="n">10 (a / b)</th><th class="n">20</th></tr></thead><tbody id="t-few"></tbody></table></div>
+      <div class="cap"><span lang="zh">单位 px。把第 1 步改用第 1 批 20 帧里的 5 帧或 10 帧重训（a、b 两组子集），其余训练集与当时相同。5 帧只在视频 3 和 5 上够用；视频 4 上 10 帧比不标还差；同样大小的两组子集可以差很多（视频 1：96 对 41 px）。20 帧是在每个视频上都有效的最小批量。</span><span lang="en">In px. Step 1 retrained with 5 or 10 of batch 1's 20 labels (two subsets, a and b), the rest of the training set as it was. Five labels were enough only on videos 3 and 5; on video 4 ten labels were worse than none; two subsets of the same size can differ a lot (video 1: 96 vs 41 px). Twenty is the smallest batch that worked on every video.</span></div></div>
+  </div>
+</section>
+
+<!-- ============ 10 CROSS-VIDEO BACK-TEST ============ -->
+<section id="s10">
+  <div class="sec-head"><div class="kicker">10 · <span lang="zh">跨视频回测</span><span lang="en">cross-video back-test</span></div>
+  <h2><span lang="zh">加入新视频不会让旧视频变差；同一天的视频直接可用，换一天要重新看</span><span lang="en">Adding videos does not hurt the old ones; same-day videos transfer directly, a new day has to be checked</span></h2></div>
+  <div class="panel"><h3><span lang="zh">每个模型在每个视频的封存测试集上的误差</span><span lang="en">Every model scored on every video's frozen test set</span></h3>
+    <div class="imgframe scroll"><img src="assets/cross_video_curves.jpg" alt="Cross-video back-test curves: every model on every frozen test set"></div>
+    <div class="cap"><span lang="zh">横轴：模型，按训练顺序。纵轴：中位误差（对数）。每条线是一个视频的测试集；虚线左侧表示该视频还没进训练集（0 标签区）。空心点是 5 / 10 帧子集模型。</span><span lang="en">Horizontal: models in training order. Vertical: median error (log). Each line is one video's test set; left of its dotted line the video is not yet in the training set (its 0-label regime). Open markers are the 5 / 10-label subset models.</span></div></div>
+  <div class="panel"><h3><span lang="zh">同一批数字的矩阵视图</span><span lang="en">The same numbers as a matrix</span></h3>
+    <div class="imgframe scroll"><img src="assets/cross_video_matrix.jpg" alt="Matrix of median error: models by test sets"></div></div>
+  <div class="issues">
+    <div class="issue fixed"><b><span lang="zh">换老鼠不能直接用</span><span lang="en">A new mouse does not transfer</span></b><span lang="zh">只用鼠 A 训练的模型在鼠 B 上误差 170–350 px；加入 20 帧鼠 B 的标注后降到约 10 px。</span><span lang="en">Models trained on mouse A only score 170–350 px on mouse B; 20 mouse-B labels bring that to about 10 px.</span></div>
+    <div class="issue fixed"><b><span lang="zh">旧视频不退步</span><span lang="en">Old videos do not get worse</span></b><span lang="zh">随着后面的视频不断加入，前面视频的测试误差保持在约 1 px 的抽样波动之内。</span><span lang="en">As later videos are added, the test error of earlier videos stays within the roughly 1 px sampling noise.</span></div>
+    <div class="issue"><b><span lang="zh">单个模型的 0 标签成绩不可靠</span><span lang="en">A 0-label score from a single model is unreliable</span></b><span lang="zh">个别模型在没见过的视频上会大错（出现过 107 和 178 px），所以 0 标签误差要看一串模型，不能只看一个。</span><span lang="en">Single models can fail badly on an unseen video (107 and 178 px have occurred), so the 0-label error has to be read from several models, not one.</span></div>
+  </div>
+</section>
+
+<!-- ============ 11 AREA AND BLINKS ============ -->
+<section id="s11">
+  <div class="sec-head"><div class="kicker">11 · <span lang="zh">新标准下的瞳孔面积与眨眼</span><span lang="en">pupil area and blinks under the new standard</span></div>
+  <h2><span lang="zh">四点法面积更准；现行眨眼规则在新老鼠上标记过多</span><span lang="en">The 4-point area is more accurate; the current blink rule flags far too much on the new mouse</span></h2></div>
+  <div class="grid2">
+    <div class="panel"><h3><span lang="zh">8 个测试集里 7 个，四点法的面积误差更小</span><span lang="en">On 7 of 8 test sets the 4-point area has the smaller error</span></h3>
+      <div class="chart" id="c-area"></div>
+      <div class="formula">width = |R.x − L.x| &nbsp;&nbsp; height = <b>|B.y − T.y|</b> &nbsp;&nbsp; area = π/4 × width × height</div>
+      <div class="cap"><span lang="zh">面积误差的中位数，真值 = 人工四点椭圆面积。三点法不用上点。带 * 的视频，测试集预标注来自同一条模型线，绝对误差偏乐观。前四个视频合计 196 帧：四点法 3.7%，三点法 6.9%。生产脚本 pupil_trace.py 目前仍是三点法，切换待批准。</span><span lang="en">Median area error; truth = the human 4-point ellipse area. The 3-point rule leaves the top point out. For videos marked *, test pre-labels came from the same model line, so absolute errors are optimistic. Pooled over the first four videos (196 frames): 4-point 3.7%, 3-point 6.9%. The production script pupil_trace.py still uses the 3-point rule until the switch is approved.</span></div></div>
+    <div class="panel"><h3><span lang="zh">哪个信号能认出人判断为闭眼的帧</span><span lang="en">Which signal recognises the frames a person calls closed</span></h3>
+      <div class="tbl"><table><thead><tr><th><span lang="zh">信号</span><span lang="en">signal</span></th><th class="n">AUC</th></tr></thead><tbody id="t-blink"></tbody></table></div>
+      <div class="cap" id="cap-blink3"></div></div>
+  </div>
+</section>
+
 <!-- ============ OPEN ISSUES ============ -->
-<section>
+<section id="s-open">
   <div class="sec-head"><div class="kicker"><span lang="zh">未解决的问题</span><span lang="en">Open issues</span></div>
   <h2><span lang="zh">这些地方还不能下结论</span><span lang="en">Where no conclusion can be drawn yet</span></h2></div>
   <div class="issues">
-    <div class="issue"><b><span lang="zh">尾部指标噪声很大</span><span lang="en">The tail metric is very noisy</span></b><span lang="zh">第 90 百分位误差在同一次训练的相邻快照间可从 24 px 跳到 98 px（测试集只有 59 帧）。第二随机种子的重复实验正在跑。</span><span lang="en">The 90th-percentile error swings from 24 to 98 px between neighbouring snapshots of one run (the test set has 59 frames). Second-seed replicates are running.</span></div>
-    <div class="issue"><b><span lang="zh">Pluto 测试集是 59 帧，不是计划的 100 帧</span><span lang="en">The Pluto test set has 59 frames, not the planned 100</span></b><span lang="zh">且标注是在未适应模型的预测上修正得到的，对"0 帧"那一点有轻微偏向。</span><span lang="en">Its labels were made by correcting the unadapted model's predictions, a slight bias in favour of the 0-label point.</span></div>
-    <div class="issue"><b><span lang="zh">jump + k-means 选帧没有对照组</span><span lang="en">Jump + k-means selection has no control arm</span></b><span lang="zh">第 1 批的选法验证过优于随机；第 2 批起的做法没有和"随机抽可疑帧"比较过，不能说它更好。</span><span lang="en">Batch-1 selection was shown to beat random; the later error-guided selection was never compared with random picks among flagged frames.</span></div>
-    <div class="issue"><b><span lang="zh">所有阈值都来自一段视频</span><span lang="en">Every threshold comes from one video</span></b><span lang="zh">95% 睁眼度、70/85% 眨眼深度、10 px 眼动位移，都是在旧视频上读出来的，需要在其他小鼠上校准，并改成与分辨率无关的比例。</span><span lang="en">95% opening, 70/85% blink depth and the 10 px saccade shift were read off the old video; they need calibration on other mice and a scale-free form.</span></div>
-    <div class="issue"><b><span lang="zh">端点法的前提未直接验证</span><span lang="en">The endpoint method's premise is not directly verified</span></b><span lang="zh">它假设左右点标在瞳孔真正最宽处。需要在瞳孔完全露出的帧上检查四点法与端点法是否一致。另外瞳孔有约 6° 倾斜，目前忽略。</span><span lang="en">It assumes left/right mark the pupil's true widest level. To check: on frames with a fully exposed pupil both methods should agree. A ≈6° tilt of the pupil is ignored for now.</span></div>
-    <div class="issue"><b><span lang="zh">一处模型标注错误待重跑</span><span lang="en">One mislabelled model, to be re-run</span></b><span lang="zh">瞳孔分析与选帧验证使用的"旧视频 4 分钟预测"来自 fitting 第 10 轮模型，而非文中所写的 production_v1（两者训练编号相同）。两个模型统计上打平，结论预计不变；GPU 空闲后用 production_v1 重跑确认。</span><span lang="en">The 4-minute predictions behind the pupil analyses and the selector check came from the fitting round-10 model, not production_v1 as written (they share a shuffle number). The two models are statistically tied; to be confirmed by a re-run once the GPU is free.</span></div>
-    <div class="issue"><b><span lang="zh">早期三步各只训了一次</span><span lang="en">The three early steps are single runs</span></b><span lang="zh">batch 2 与 16 只差 0.3 px，小于后来测得的 ±2.4 px 单次训练噪声。五个网络"统计打平"的 bootstrap 脚本没有保存下来。</span><span lang="en">Batch 2 and 16 differ by 0.3 px, less than the ±2.4 px single-run noise measured later. The bootstrap script behind the five-backbone tie was not kept.</span></div>
-    <div class="issue"><b><span lang="zh">只在一只新鼠上验证过</span><span lang="en">Validated on one new mouse only</span></b><span lang="zh">"标注需求随视频数下降"需要更多小鼠的数据。</span><span lang="en">"Labelling cost falls with every new video" needs data from more mice.</span></div>
+    <div class="issue"><b><span lang="zh">3% 的平台门槛贴着噪声</span><span lang="en">The 3% plateau threshold sits at the noise floor</span></b><span lang="zh">50 帧测试集的中位数在相邻两步之间有约 1 px 的抽样波动，平台点因此可能前后差一档（20 帧）。</span><span lang="en">With 50 test frames the median moves by about 1 px between neighbouring steps, so a plateau point can be off by one step (20 labels).</span></div>
+    <div class="issue"><b><span lang="zh">每一步只训练了一次</span><span lang="en">Every step is a single training run</span></b><span lang="zh">第三阶段所有模型都只用了一个随机种子；最初协议里规则触发后用第二种子复核的做法没有执行。</span><span lang="en">All era-3 models use one random seed; the second-seed confirmation of the original protocol was not run.</span></div>
+    <div class="issue"><b><span lang="zh">测试集标注受预标注影响</span><span lang="en">Test labels are anchored to the pre-labels</span></b><span lang="zh">测试帧是在模型预标注上修正得到的，标注者认为正确的点没有动，所以给出预标注的那个模型在该测试集上会显得偏好（视频 5、6 最明显）。</span><span lang="en">Test frames were labeled by correcting a model's pre-labels and points judged correct were left untouched, so the pre-labeling model looks better than it is on that test set (clearest on videos 5 and 6).</span></div>
+    <div class="issue"><b><span lang="zh">jump 规则找错帧的准确度还没测</span><span lang="en">How well the jump rule finds wrong frames is not measured</span></b><span lang="zh">每个视频用模型后还有多少帧需要人工修正、jump 标出的帧里有多少真是错的、漏掉多少，都还没有数字。</span><span lang="en">How many frames per video still need correction, how many flagged frames are truly wrong and how many wrong frames are missed: no numbers yet.</span></div>
+    <div class="issue"><b><span lang="zh">眨眼规则需要重定阈值</span><span lang="en">The blink rule needs new thresholds</span></b><span lang="zh">现行规则是在视频 0 上调的。闭眼标注目前只有 16 帧；0.2 的置信度阈值是在这同一批帧上挑的，采用前要用新标注验证。</span><span lang="en">The current rule was tuned on video 0. Only 16 closed-eye labels exist, and the 0.2 confidence cut was chosen on those same frames; it needs new labels before adoption.</span></div>
+    <div class="issue"><b><span lang="zh">面积和睁眼度一起变化</span><span lang="en">Area moves with eye opening</span></b><span lang="zh">每个视频里四点面积都与睁眼度相关。是瞳孔真的在变，还是眼睑挡住了椭圆，需要先分开，才能比较不同状态下的面积。</span><span lang="en">In every video the 4-point area correlates with eye opening. Real pupil change and the lid cutting the ellipse have to be separated before areas are compared across states.</span></div>
+    <div class="issue"><b><span lang="zh">视频 4 的瞳孔定义</span><span lang="en">The pupil definition on video 4</span></b><span lang="zh">这段视频画质差。约定 v2 下标出的瞳孔明显更小（宽 92 对 215 px），哪一个对还没有定论。</span><span lang="en">This video has poor image quality. Under convention v2 its labels mark a much smaller pupil (width 92 vs 215 px); which is right is still open.</span></div>
+    <div class="issue"><b><span lang="zh">只在一只新老鼠上验证过</span><span lang="en">Validated on one new mouse only</span></b><span lang="zh">第三只老鼠（Terra，8 个视频）还没开始；“标注需求随视频数下降”需要它来确认。</span><span lang="en">The third mouse (Terra, 8 videos) has not started; it is needed to confirm that labeling cost falls with every new video.</span></div>
+    <div class="issue"><b><span lang="zh">jump + k-means 选帧没有对照组</span><span lang="en">Jump + k-means selection has no control arm</span></b><span lang="zh">第 1 批的选法验证过优于随机；第 2 批起的做法没有和“随机抽可疑帧”比较过，不能说它更好。</span><span lang="en">Batch-1 selection was shown to beat random; the later error-guided selection was never compared with random picks among flagged frames.</span></div>
+    <div class="issue"><b><span lang="zh">事件阈值都来自一段视频</span><span lang="en">Event thresholds come from one video</span></b><span lang="zh">95% 睁眼度、70/85% 眨眼深度、10 px 眼动位移，都是在最早的 5 分钟视频上读出来的，需要在其他小鼠上校准，并改成与分辨率无关的比例。</span><span lang="en">95% opening, 70/85% blink depth and the 10 px saccade shift were read off the first 5-minute video; they need calibration on other mice and a scale-free form.</span></div>
+    <div class="issue"><b><span lang="zh">早期三步各只训了一次</span><span lang="en">The three early steps are single runs</span></b><span lang="zh">batch 2 与 16 只差 0.3 px，小于后来测得的 ±2.4 px 单次训练噪声。五个网络“统计打平”的 bootstrap 脚本没有保存下来。</span><span lang="en">Batch 2 and 16 differ by 0.3 px, less than the ±2.4 px single-run noise measured later. The bootstrap script behind the five-backbone tie was not kept.</span></div>
   </div>
 </section>
 
 <!-- ============ REPO MAP ============ -->
 <section>
   <div class="sec-head"><div class="kicker"><span lang="zh">代码在哪里</span><span lang="en">Where the code lives</span></div>
-  <h2><span lang="zh">每个单元自带脚本和结果；旧版本都在 git 标签里，不在活动路径上</span><span lang="en">Each unit carries its scripts and results; old versions live in git tags, not on the active path</span></h2></div>
+  <h2><span lang="zh">当前主线一个视频一个文件夹；之前各阶段保留备查，每个重要状态都有 git 标签</span><span lang="en">The current line has one folder per video; earlier stages are kept for the record and every important state has a git tag</span></h2></div>
 <div class="tree-map"><span class="c"># github.com/ZhihengLi0/mouse-behavior-tracking</span>
-scaling-curve/              <span class="w">01  superseded, kept for the record</span>
-batch-size-selection/       02  → batch 2
-model-selection/            03  → ResNet-50
-active-learning/            04  → ~80 labels saturate · FROZEN_PARAMETERS.md · production_v1
-time-series-analysis/
-  scripts/eye_pipeline.py   <span class="k">05  one command: video → events.csv + review montage</span>
-  scripts/pupil_trace.py    <span class="k">06  current pupil method (endpoint + blink handling)</span>
-new-video-generalization/
-  FROZEN_PARAMETERS.md      <span class="k">07  split rule · selector · snapshot rule · stopping rule</span>
-  scripts/select_scale_frames.py · scale_step.py · run_step.sh
-report/                     <span class="k">this page: build_report.py reads every number from the result tables</span>
-docs/LABEL_MANIFEST.md      <span class="k">SHA-256 of every human label table</span>
-<span class="c"># local only, never in git: videos · labels · model weights · per-frame predictions · meeting notes</span>
-<span class="c"># tags: v0.1.0 … v0.5.1 · v0.6.0-pre-cleanup (state before the 2026-09-19 cleanup)</span></div>
+v2_new_pupil_top_video_scaling/      <span class="k">08–11  current line: ellipse label standard, one folder per video</span>
+  0_first5minvedio/ … 9_…/           per video: results/ (tables, curves, selection sheets)
+  10_… · 11_… – 18_…/                next: the last Pluto video, then 8 Terra videos (mouse C)
+  results/                           labels_to_plateau · cross-video back-test · area and blink studies
+  scripts/select_frames.py · scale_step.py · run_step.sh · cross_video_eval.py
+v1_old_pupil_top/                    <span class="w">01–07  earlier label standards, kept for the record</span>
+  scaling-curve/ · batch-size-selection/ · model-selection/ · active-learning-jump-selection/
+  time-series-analysis/scripts/pupil_trace.py      <span class="k">blink bridging, still in use</span>
+  new-video-generalization/FROZEN_PARAMETERS.md    split rule · selector · snapshot rule · stopping rule
+report/                              <span class="k">this page: build_report.py reads every number from the result tables</span>
+CHANGELOG.md                         one row per tag
+<span class="c"># local only, never in git: videos · frames · labels · model weights · per-frame predictions</span>
+<span class="c"># tags: v0.1.0 … v0.9.10-carry-rule (every finished video and every protocol change)</span></div>
 </section>
 
 <footer>
-  <span lang="zh">构建：python report/build_report.py · 数字来源：各单元 results/ 下的 CSV · 指标：逐帧 8 点 RMSE 的中位数（04 节起），最终快照（epoch 100）</span>
-  <span lang="en">Build: python report/build_report.py · numbers from the CSVs under each unit's results/ · metric: median per-frame RMSE over 8 keypoints (from section 04 on), final snapshot (epoch 100)</span>
+  <span lang="zh">构建：python report/build_report.py · 数字来源：各单元 results/ 下的 CSV · 指标：逐帧 8 点 RMSE 的中位数（04 节起），最终快照（04–07 节 epoch 100，08 节起 epoch 120）</span>
+  <span lang="en">Build: python report/build_report.py · numbers from the CSVs under each unit's results/ · metric: median per-frame RMSE over 8 keypoints (from section 04 on), final snapshot (epoch 100 in sections 04–07, epoch 120 from section 08 on)</span>
 </footer>
 </div>
 
@@ -441,12 +553,12 @@ docs/LABEL_MANIFEST.md      <span class="k">SHA-256 of every human label table</
   (function(){
     var W=520,s='',y=18,h=26;
     function seg(x,w,fill,op){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="'+fill+'" opacity="'+(op||1)+'"/>';}
-    s+='<text x="0" y="12">'+bi('旧视频（5 分钟）','old video (5 min)')+'</text>';
+    s+='<text x="0" y="12">'+bi('第一、二阶段：5 分钟视频','eras 1-2: the 5-minute video')+'</text>';
     s+=seg(0,412,C.grey,.4)+seg(0,70,C.teal)+seg(74,22,C.blue)+seg(416,104,C.plum);
     s+='<text class="v" x="0" y="'+(y+h+16)+'">'+bi('80 训练','80 train')+'</text><text class="v" x="74" y="'+(y+h+16)+'">'+bi('20 验证','20 val')+'</text><text x="180" y="'+(y+h+16)+'">'+bi('前 4 分钟 = 挑帧的池子','first 4 min = pool for new frames')+'</text><text class="v" x="416" y="'+(y+h+16)+'">'+bi('100 测试','100 test')+'</text>';
-    y=96; s+='<text x="0" y="'+(y-6)+'">'+bi('新视频（任意长度）','new video (any length)')+'</text>';
+    y=96; s+='<text x="0" y="'+(y-6)+'">'+bi('现在：每个视频（任意长度）','now: every video (any length)')+'</text>';
     s+=seg(0,408,C.grey,.4)+seg(416,48,C.blue)+seg(472,48,C.plum);
-    s+='<text class="v" x="0" y="'+(y+h+16)+'">'+bi('80% 训练池：每批从这里选 20 帧','80% pool: every batch of 20 comes from here')+'</text><text class="v" x="464" y="'+(y-6)+'" text-anchor="end">'+bi('10% 验证','10% val')+'</text><text class="v" x="520" y="'+(y+h+16)+'" text-anchor="end">'+bi('10% 测试','10% test')+'</text>';
+    s+='<text class="v" x="0" y="'+(y+h+16)+'">'+bi('80% 训练池：每批从这里选 20 帧','80% pool: every batch of 20 comes from here')+'</text><text class="v" x="464" y="'+(y-6)+'" text-anchor="end">'+bi('20 验证','20 val')+'</text><text class="v" x="520" y="'+(y+h+16)+'" text-anchor="end">'+bi('50 测试','50 test')+'</text>';
     s+='<text x="0" y="'+(y+h+50)+'">'+bi('紫色 = 只用来报告，从不参与选帧、调参或停止','purple = report only: never selects, tunes or stops anything')+'</text>';
     put('c-split',520,180,s);
   })();
@@ -502,7 +614,6 @@ docs/LABEL_MANIFEST.md      <span class="k">SHA-256 of every human label table</
   /* ---- new video ---- */
   (function(){
     var sc=DATA.scale, last=sc[sc.length-1];
-    document.getElementById('hs-new').textContent=fmt(sc[0].rmse,0)+' → '+fmt(last.rmse)+' px';
     var ser=[{c:C.teal,label:['最终快照，随机种子 42','final snapshot, seed 42'],pts:sc.map(function(r){return [r.n,r.rmse];}),values:function(p){return fmt(p[1])+'';}}];
     if(DATA.scale_seed2&&DATA.scale_seed2.length) ser.push({c:C.teal,hollow:true,nolines:true,label:['第二随机种子（训练本身的随机波动）','second seed (run-to-run noise)'],pts:DATA.scale_seed2.map(function(r){return [r.n,r.rmse];})});
     lines('c-scale',ser,{x0:-6,x1:last.n+12,y0:8,y1:260,log:true,yt:[10,20,50,100,200],xt:sc.map(function(r){return r.n;}),xlabel:['在新视频上标注的帧数','labels made on the new video'],ylabel:['测试误差中位数 (px, 对数)','median test error (px, log)'],legendAt:0.3,legendX:0.45});
@@ -511,6 +622,98 @@ docs/LABEL_MANIFEST.md      <span class="k">SHA-256 of every human label table</
     lines('c-health',[{c:C.teal,label:['高置信度关键点 (%)','confident keypoints (%)'],pts:sc.map(function(r){return [r.n,r.conf];}),values:function(p){return p[1]+'';}},
       {c:C.plum,label:['被 jump 判为可疑的帧 (%)','frames flagged by the jump rule (%)'],pts:DATA.flagged.map(function(r){return [r.n,r.pct];}),values:function(p){return Math.round(p[1])+'';}}],
       {x0:-6,x1:last.n+12,y0:0,y1:100,yt:[0,25,50,75,100],xt:sc.map(function(r){return r.n;}),xlabel:['在新视频上标注的帧数','labels made on the new video'],ylabel:['%','%'],legendTop:false});
+  })();
+  /* ---- era 3: label standard, per-video scaling, area, blinks ---- */
+  (function(){
+    var V=DATA.videos; if(!V) return;
+    var hb=document.getElementById('hs-built'); if(hb&&DATA.built) hb.textContent=DATA.built;
+    var v1=V.filter(function(v){return v.video===1;})[0];
+    if(v1&&v1.zero!=null&&v1.steps.length) document.getElementById('hs-mouse').textContent=fmt(v1.zero,0)+' → '+fmt(v1.steps[0].rmse)+' px';
+    var same=V.filter(function(v){return v.video>=2&&v.final;}).map(function(v){return v.plateau_n;});
+    if(same.length) document.getElementById('hs-range').textContent=Math.min.apply(null,same)+'–'+Math.max.apply(null,same);
+    function day(v){return v.video===0?bi('鼠 A','mouse A'):v.date.slice(5);}
+
+    /* labels on the label-standard frame */
+    (function(){
+      var names={pupil_top:['瞳孔上','pupil top',0,-22],pupil_bottom:['瞳孔下','pupil bottom',-58,-4],pupil_left:['瞳孔左','pupil left',-46,0],pupil_right:['瞳孔右','pupil right',-4,-24],
+        eyelid_top:['上眼睑','upper lid',52,10],eyelid_bottom:['下眼睑','lower lid',0,22],eye_nasal_corner:['鼻侧眼角','nasal corner',0,-22],eye_temporal_corner:['颞侧眼角','temporal corner',0,24]};
+      var host=document.getElementById('ls-frame'); if(!host||!DATA.label_px) return;
+      Object.keys(names).forEach(function(k){var p=DATA.label_px[k],n=names[k],el=document.createElement('span');
+        el.className='kp '+(k.indexOf('pupil')===0?'p':'l'); el.style.left='calc('+p[0]+'% + '+n[2]+'px)'; el.style.top='calc('+p[1]+'% + '+n[3]+'px)';
+        el.innerHTML=bih(n[0],n[1]); host.appendChild(el);});
+    })();
+
+    bars('c-plateau',V.map(function(v){return {l:'v'+v.video,v:v.plateau_n,t:String(v.plateau_n),hi:v.final,note:day(v)};}),
+      {max:80,ticks:[0,20,40,60,80],unit:['本视频标注帧数','labels of the video itself'],mb:40});
+
+    lines('c-zero',[
+      {c:C.grey,dash:true,r:3.6,label:['0 标签：上一个模型原样使用','0 labels: previous model unchanged'],pts:V.map(function(v){return [v.video,v.zero];})},
+      {c:C.teal,label:['到平台时','at the plateau'],pts:V.filter(function(v){return v.final;}).map(function(v){return [v.video,v.plateau_px];}),values:function(p){return fmt(p[1]);}},
+      {c:C.teal,hollow:true,nolines:true,label:['进行中（目前最好）','in progress (best so far)'],pts:V.filter(function(v){return !v.final;}).map(function(v){return [v.video,v.plateau_px];}),values:function(p){return fmt(p[1]);}}
+    ],{x0:-0.5,x1:V.length-0.3,y0:3,y1:260,log:true,yt:[5,10,20,50,100,200],xt:V.map(function(v){return v.video;}),xlabel:['视频编号','video'],ylabel:['测试误差中位数 (px, 对数)','median test error (px, log)'],legendTop:true,legendX:0.34});
+
+    /* small multiples: one panel per video */
+    (function(){
+      var cols=5,pw=176,ph=118,gx=24,gy=62,ml=40,mt=24,rows=Math.ceil(V.length/cols),W=ml+cols*(pw+gx),H=mt+rows*(ph+gy)-34,s='';
+      var y0=Math.log10(3),y1=Math.log10(260);
+      function Y(v,oy){return oy+ph-(Math.log10(Math.min(Math.max(v,3),260))-y0)/(y1-y0)*ph;}
+      V.forEach(function(v,i){
+        var ox=ml+(i%cols)*(pw+gx), oy=mt+Math.floor(i/cols)*(ph+gy), xmax=Math.max(60,v.labeled);
+        function X(n){return ox+10+n/xmax*(pw-20);}
+        s+='<text class="v" x="'+ox+'" y="'+(oy-11)+'">'+bi('视频 '+v.video,'video '+v.video)+' · '+day(v)+'</text>';
+        [5,10,20,50,100,200].forEach(function(t){var y=Y(t,oy); s+='<line class="grid" x1="'+ox+'" x2="'+(ox+pw)+'" y1="'+y+'" y2="'+y+'"/>'; if(i%cols===0) s+='<text x="'+(ox-6)+'" y="'+(y+4)+'" text-anchor="end">'+t+'</text>';});
+        s+='<line class="ax" x1="'+ox+'" x2="'+(ox+pw)+'" y1="'+(oy+ph)+'" y2="'+(oy+ph)+'"/>';
+        var ticks=[0,20,40,60,80,100,120,140].filter(function(t){return t<=xmax;}); if(ticks.length>5) ticks=ticks.filter(function(t){return t%40===0;});
+        ticks.forEach(function(t){s+='<text x="'+X(t)+'" y="'+(oy+ph+15)+'" text-anchor="middle">'+t+'</text>';});
+        var pts=(v.zero!=null?[[0,v.zero]]:[]).concat(v.steps.map(function(p){return [p.n,p.rmse];}));
+        s+='<path d="M'+pts.map(function(p){return X(p[0]).toFixed(1)+','+Y(p[1],oy).toFixed(1);}).join('L')+'" fill="none" stroke="'+C.teal+'" stroke-width="2" stroke-linejoin="round"/>';
+        v.subsets.forEach(function(q){s+='<circle cx="'+X(q.n)+'" cy="'+Y(q.rmse,oy)+'" r="3.2" fill="var(--surface)" stroke="'+C.plum+'" stroke-width="1.6"/>';});
+        pts.forEach(function(p){var big=v.final&&p[0]===v.plateau_n; s+='<circle cx="'+X(p[0])+'" cy="'+Y(p[1],oy)+'" r="'+(big?5.6:3.4)+'" fill="'+(p[0]===0&&!big?'var(--surface)':C.teal)+'" stroke="'+C.teal+'" stroke-width="2"/>';});
+        var pp=pts.filter(function(p){return p[0]===v.plateau_n;})[0];
+        if(pp&&v.final) s+='<text class="v" x="'+(X(pp[0])+9)+'" y="'+(Y(pp[1],oy)-9)+'">'+fmt(pp[1])+'</text>';
+      });
+      put('c-curves',W,H,s);
+    })();
+
+    /* carried-labels table and fewer-labels table */
+    (function(){
+      var h='';
+      V.forEach(function(v){h+='<tr><td>'+bih('视频 '+v.video,'video '+v.video)+' · '+(v.video===0?bih('鼠 A','mouse A'):v.date.slice(5))+'</td><td class="n">'+v.labeled+'</td><td class="n">'+(v.final?v.plateau_n:'–')+'</td><td class="n'+(v.final&&v.carried===v.plateau_n?' best':'')+'">'+(v.carried==null?bih('进行中','running'):v.carried)+'</td></tr>';});
+      var sum=V.reduce(function(a,v){return a+(v.carried||0);},0);
+      h+='<tr><td><b>'+bih('合计（已完成的视频）','total (finished videos)')+'</b></td><td class="n"></td><td class="n"></td><td class="n"><b>'+sum+'</b></td></tr>';
+      document.getElementById('t-carry').innerHTML=h;
+      var f='';
+      V.filter(function(v){return v.subsets.length;}).forEach(function(v){
+        var g={}; v.subsets.forEach(function(q){g[q.tag]=q.rmse;});
+        f+='<tr><td>'+bih('视频 '+v.video,'video '+v.video)+'</td><td class="n">'+(v.zero==null?'–':fmt(v.zero))+'</td><td class="n">'+fmt(g['05a'])+' / '+fmt(g['05b'])+'</td><td class="n">'+fmt(g['10a'])+' / '+fmt(g['10b'])+'</td><td class="n">'+fmt(v.steps[0].rmse)+'</td></tr>';});
+      document.getElementById('t-few').innerHTML=f;
+    })();
+
+    /* area: 3-point vs 4-point per test set */
+    (function(){
+      var A=DATA.area; if(!A) return;
+      var W=520,H=262,ml=36,mr=10,mt=30,mb=36,pw=W-ml-mr,ph=H-mt-mb,max=20,s='';
+      [0,5,10,15,20].forEach(function(t){var y=mt+ph-t/max*ph; s+='<line class="grid" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(ml-6)+'" y="'+(y+4)+'" text-anchor="end">'+t+'</text>';});
+      s+='<text x="'+ml+'" y="13">'+bi('面积误差中位数 (%)','median area error (%)')+'</text>';
+      s+='<rect x="'+(W-232)+'" y="5" width="12" height="10" rx="2" fill="'+C.grey+'" opacity=".6"/><text x="'+(W-216)+'" y="14">'+bi('三点法','3-point')+'</text><rect x="'+(W-122)+'" y="5" width="12" height="10" rx="2" fill="'+C.teal+'"/><text x="'+(W-106)+'" y="14">'+bi('四点法','4-point')+'</text>';
+      var bw=pw/A.length;
+      A.forEach(function(r,i){var x=ml+i*bw+bw*0.08,w=bw*0.4;
+        [[r.e3,C.grey,.6],[r.e4,C.teal,1]].forEach(function(z,k){var hh=Math.min(z[0],max)/max*ph,xx=x+k*(w+3),y=mt+ph-hh;
+          s+='<rect x="'+xx+'" y="'+y+'" width="'+w+'" height="'+Math.max(hh,1)+'" rx="2" fill="'+z[1]+'" opacity="'+z[2]+'"/><text class="v" x="'+(xx+w/2)+'" y="'+(y-5)+'" text-anchor="middle" style="font-size:10px">'+fmt(z[0])+'</text>';});
+        s+='<text x="'+(x+w+1.5)+'" y="'+(H-mb+16)+'" text-anchor="middle">v'+r.video.split(' ')[0]+(r.anchored?'*':'')+'</text>';});
+      s+='<line class="ax" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+(mt+ph)+'" y2="'+(mt+ph)+'"/>';
+      put('c-area',W,H,s);
+    })();
+
+    /* blink signals */
+    (function(){
+      var B=DATA.blink3; if(!B) return;
+      var rows=[['min_conf','四个瞳孔点里最低的置信度','lowest confidence of the four pupil points'],['open_rel','睁眼度 ÷ 全片中位数','eye opening ÷ its median over the video'],['centre_off','两条瞳孔轴中心的偏移','offset between the centres of the two pupil axes'],['lid_rel','睁眼度 ÷ 自身 5 秒中位数（现行触发条件）','eye opening ÷ its own 5-s median (the current trigger)'],['aspect','瞳孔高宽比','pupil height ÷ width']];
+      document.getElementById('t-blink').innerHTML=rows.map(function(r){var a=B.auc[r[0]]; return '<tr><td>'+bih(r[1],r[2])+'</td><td class="n'+(a>=0.99?' best':'')+'">'+fmt(a,2)+'</td></tr>';}).join('');
+      var fa=Math.round(B.false_alarm*100), hit=Math.round(B.hit*100), c=DATA.coupling||[];
+      document.getElementById('cap-blink3').innerHTML=bih('人的判断 = 标注时四个瞳孔点全部留空的帧：共 '+B.closed+' 个闭眼帧、'+B.open+' 个睁眼帧（视频 0–4，只用模型没训练过的帧）。AUC 为 1 表示完全分得开，0.5 等于瞎猜。现行规则抓住了 '+hit+'% 的闭眼帧，但同时把 '+fa+'% 的睁眼帧判为不可信。最低置信度低于 0.2 可以分开全部闭眼帧，但这个阈值是在同一批帧上挑的，采用前要用新的闭眼标注验证。四点面积与睁眼度在每个视频里都相关（r = '+c.join('–')+'）。',
+        'A person\'s judgement = labeled frames whose four pupil points were all left empty: '+B.closed+' closed and '+B.open+' open frames (videos 0–4, only frames the model never trained on). AUC 1 means perfect separation, 0.5 is chance. The current rule catches '+hit+'% of the closed frames but also marks '+fa+'% of the open frames as untrusted. A lowest confidence below 0.2 separates every closed frame, but that cut was chosen on these same frames and needs new closed-eye labels before adoption. The 4-point area correlates with eye opening in every video (r = '+c.join('–')+').');
+    })();
   })();
 })();
 </script>
