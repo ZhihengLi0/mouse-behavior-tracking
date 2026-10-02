@@ -11,3 +11,4 @@ batch01: 73 of 160), then the test set was frozen. Training set of every step = 
 |---|---|---|---|---|---|
 | 0 (video-9 80-label model 1014, applied unchanged) | 18.13 px | 32.0 | 8% | 60% | – |
 | 20 (shuffle 1111) | 11.83 px | 27.7 | 2% | 72% | 9003 of 57158 (15.8%) |
+| 40 (shuffle 1112) | 10.32 px | 26.1 | 4% | 92% | pending |
