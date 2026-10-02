@@ -58,6 +58,11 @@ SUBSETS = {
     "1_20251031_Pluto_spont_1": [(967, 5, "5a"), (968, 5, "5b"), (969, 10, "10a"), (970, 10, "10b")],
     "0_first5minvedio": [(971, 5, "5a"), (972, 5, "5b"), (973, 10, "10a"), (974, 10, "10b")],
 }
+# 2026-10-01: the study is extended to every later video (6, 7, ...); their subset models use shuffles 2000 + 10 * video + 1..4
+for _u, *_ in VIDEOS:
+    _n = int(_u.split("_")[0])
+    if _n >= 6:
+        SUBSETS[_u] = [(2000 + 10 * _n + 1, 5, "5a"), (2000 + 10 * _n + 2, 5, "5b"), (2000 + 10 * _n + 3, 10, "10a"), (2000 + 10 * _n + 4, 10, "10b")]
 # labels of a video that are carried into later videos (the "prior" used when the next video started):
 # videos 0-3 = the labels that existed when the next video started; from video 4 on = the labels up to the plateau point
 # (rule fixed 2026-10-01), read from results/labels_to_plateau.csv for every finished video
@@ -105,6 +110,10 @@ def models():
     for u, mouse, date, spec in VIDEOS:
         steps = steps_of(spec)
         for shuffle, n, tag in SUBSETS.get(u, []):          # fewer-labels models sit just before the video's step 1
+            try:
+                tsi_of(shuffle)
+            except (StopIteration, ValueError, IndexError, FileNotFoundError):
+                continue                                     # not trained (or not finished) yet
             rows.append(dict(model_idx=idx, model_unit=u, mouse=mouse, date=date, step=0, shuffle=shuffle,
                              labels_this_video=n, total_labels=carried + n, subset=tag))
             idx += 1
