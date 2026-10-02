@@ -58,8 +58,12 @@ SUBSETS = {
     "1_20251031_Pluto_spont_1": [(967, 5, "5a"), (968, 5, "5b"), (969, 10, "10a"), (970, 10, "10b")],
     "0_first5minvedio": [(971, 5, "5a"), (972, 5, "5b"), (973, 10, "10a"), (974, 10, "10b")],
 }
-# labels of a video that are carried into later videos (the "prior" used when the next video started)
+# labels of a video that are carried into later videos (the "prior" used when the next video started):
+# videos 0-3 = the labels that existed when the next video started; from video 4 on = the labels up to the plateau point
+# (rule fixed 2026-10-01), read from results/labels_to_plateau.csv for every finished video
 CARRIED = {"0_first5minvedio": 100, "1_20251031_Pluto_spont_1": 100, "2_20251031_Pluto_spont_3": 60, "3_20251031_Pluto_spont_2": 60}
+_plateau = pd.read_csv(HERE / "results" / "labels_to_plateau.csv")
+CARRIED.update({r.unit: int(r.labels_at_plateau) for r in _plateau.itertuples() if r.status == "final" and r.unit not in CARRIED})
 # videos the labeler judged hard to read by eye (pupil boundary barely visible); marked in the figures
 POOR_QUALITY = {"4_20251030_Pluto_spont_1"}
 PALETTE = ["#2F6B9A", "#D1495B", "#2A9D8F", "#E08E45", "#7B4EA3", "#8C6D31", "#444444"]
