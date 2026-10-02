@@ -10,3 +10,4 @@ batch01: 73 of 160), then the test set was frozen. Training set of every step = 
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-9 80-label model 1014, applied unchanged) | 18.13 px | 32.0 | 8% | 60% | – |
+| 20 (shuffle 1111) | 11.83 px | 27.7 | 2% | 72% | pending |
