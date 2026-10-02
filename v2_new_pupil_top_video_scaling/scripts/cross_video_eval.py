@@ -36,8 +36,8 @@ VIDEOS = [
     ("6_20251028_Pluto_spont_1", "mouse B (Pluto)", "2025-10-28", "auto:71"),
     ("7_20251027_Pluto_spont1", "mouse B (Pluto)", "2025-10-27", "auto:81"),
     ("8_20251024_Pluto_spont1", "mouse B (Pluto)", "2025-10-24", "auto:91"),
-    ("10_20251022_Pluto1", "mouse B (Pluto)", "2025-10-22", "auto:111"),
     ("9_20251023_Pluto1", "mouse B (Pluto)", "2025-10-23", "auto:101"),
+    ("10_20251022_Pluto1", "mouse B (Pluto)", "2025-10-22", "auto:111"),
     # mouse C (Terra), one recording day each, newest first (moved from the v3 folder on 2026-09-30)
     ("11_20251017_Terra_spont_1", "mouse C (Terra)", "2025-10-17", "auto:121"),
     ("12_20251016_Terra_spont_2", "mouse C (Terra)", "2025-10-16", "auto:131"),
