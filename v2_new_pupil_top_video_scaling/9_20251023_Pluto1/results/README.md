@@ -16,4 +16,6 @@ contributed none); shuffles 1011, 1012, ...
 | 100 (shuffle 1015) | 9.39 px | 15.5 | 0% | 83% | 5175 of 57158 (9.1%) |
 | 120 (shuffle 1016) | 8.63 px | 15.8 | 0% | 90% | pending |
 
-**Plateau rule fired at step 6 (2026-10-01):** neither 100 labels (9.39 px) nor 120 labels (8.63 px) improved the running best of 8.20 px (80 labels) by more than 3%, so by the rule the plateau point is **80 labels, 8.20 px**. The batch07 popup is held pending the user's decision. From 40 to 120 labels the median stays between 8.2 and 9.4 px.
+**Plateau rule fired at step 6 (2026-10-01):** neither 100 labels (9.39 px) nor 120 labels (8.63 px) improved the running best of 8.20 px (80 labels) by more than 3%, so by the rule the plateau point is **80 labels, 8.20 px**. From 40 to 120 labels the median stays between 8.2 and 9.4 px.
+
+**Finished at 80 labels, 8.20 px (user decision 2026-10-01).** Batches 01-04 (80 labels) are carried into later videos; batches 05-06 stay on disk and are not used by later videos. No batch07 was labeled.
