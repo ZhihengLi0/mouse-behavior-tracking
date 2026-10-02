@@ -19,3 +19,17 @@ contributed none); shuffles 1011, 1012, ...
 **Plateau rule fired at step 6 (2026-10-01):** neither 100 labels (9.39 px) nor 120 labels (8.63 px) improved the running best of 8.20 px (80 labels) by more than 3%, so by the rule the plateau point is **80 labels, 8.20 px**. From 40 to 120 labels the median stays between 8.2 and 9.4 px.
 
 **Finished at 80 labels, 8.20 px (user decision 2026-10-01).** Batches 01-04 (80 labels) are carried into later videos; batches 05-06 stay on disk and are not used by later videos. Batch07 was selected (sheet `selection_sheets/selection_140_frames.png`) but not labeled.
+
+**Fewer-labels study (2026-10-02)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: videos 0-3 + 40 of video 4 + 20 each of videos 5, 6 and 8; shuffles 2091-2094) ->
+`fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 23.41 px | 41.4 | 8% |
+| 5 (subset a / b) | 11.74 / 12.62 px | 23.2 / 20.9 | 6% / 8% |
+| 10 (subset a / b) | 11.55 / 11.07 px | 19.1 / 23.8 | 0% / 0% |
+| 20 | 10.39 px | 24.3 | 8% |
+
+On this video 5 labels already halve the error (23.4 -> about 12 px); 10 and 20 labels add about 1 px more each
+(11.1-11.6 and 10.4 px), and the two subsets of each size agree within 1 px.
