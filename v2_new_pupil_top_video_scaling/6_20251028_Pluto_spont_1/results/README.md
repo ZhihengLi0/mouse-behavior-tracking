@@ -15,3 +15,17 @@ video's labels; shuffles 711, 712, ...
 **Plateau rule fired at step 3 (2026-09-29):** neither 40 labels (8.46 px) nor 60 labels (10.68 px) improved the running best of 6.75 px, so the plateau point is **20 labels, 6.75 px**; the batch04 popup is held pending the user's decision.
 
 Back-test of model 711 on the other frozen test sets: videos 1-5 = 12.01 / 6.78 / 3.21 / 14.80 / 13.65 px, video 7 = 5.36 px, video 8 = 20.76 px (`../results/cross_video_matrix.csv`).
+
+**Fewer-labels study (2026-10-03)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: videos 0-3 + 40 of video 4 + 20 of video 5; shuffles 2061-2064) ->
+`fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 9.36 px | 22.3 | 0% |
+| 5 (subset a / b) | 6.73 / 12.84 px | 12.9 / 27.1 | 0% / 2% |
+| 10 (subset a / b) | 7.63 / 10.11 px | 10.7 / 14.5 | 0% / 2% |
+| 20 | 6.75 px | 11.2 | 0% |
+
+On this video the two subsets of each size disagree: subset a reaches the 20-label level with 5 labels (6.73 px),
+subset b is worse than no labels at both sizes (12.84 and 10.11 px against 9.36 px).
