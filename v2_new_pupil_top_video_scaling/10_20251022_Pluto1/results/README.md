@@ -13,6 +13,6 @@ batch01: 73 of 160), then the test set was frozen. Training set of every step = 
 | 20 (shuffle 1111) | 11.83 px | 27.7 | 2% | 72% | 9003 of 57158 (15.8%) |
 | 40 (shuffle 1112) | 10.32 px | 26.1 | 4% | 92% | 6808 of 57158 (11.9%) |
 | 60 (shuffle 1113) | 10.49 px | 27.2 | 8% | 84% | 5961 of 57158 (10.4%) |
-| 80 (shuffle 1114) | 10.76 px | 188.7 | 12% | 90% | pending |
+| 80 (shuffle 1114) | 10.76 px | 188.7 | 12% | 90% | 5214 of 57158 (9.1%) |
 
 The plateau rule fired at 80 labels: steps 3 and 4 (10.49, 10.76 px) did not improve the running best of 10.32 px (40 labels). Plateau point: 40 labels, 10.32 px; awaiting user decision (2026-10-03).
