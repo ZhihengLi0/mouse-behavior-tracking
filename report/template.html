@@ -261,7 +261,7 @@ code{font-family:var(--mono);font-size:.9em}
 <section id="s9">
   <h2><span class="no">9</span><span lang="zh">主线：每个新视频要标多少帧</span><span lang="en">Main line: labels needed per new video</span></h2>
   <div class="text" lang="zh">
-    <p><span class="tag">做了什么</span>把视频一个一个加进来：视频 0 是第一只老鼠的 5 分钟视频，视频 1–10 是 Pluto 的 20 分钟视频，一天一个，从 2025-10-31 往前到 10-22（视频 1、2、3 是同一天）。每个视频的流程相同：</p>
+    <p><span class="tag">做了什么</span>把视频一个一个加进来：视频 0 是第一只老鼠的 5 分钟视频，视频 1–10 是 Pluto 的 20 分钟视频，一天一个，从 2025-10-31 往前到 10-22（视频 1、2、3 是同一天）；视频 11 起是第三只老鼠 Terra，同样一天一个，从 2025-10-17 往前。每个视频的流程相同：</p>
     <ol>
       <li>在视频最后 10% 里均匀取 50 帧作测试集，人工标好后冻结。</li>
       <li>先用上一个模型直接预测这个视频，得到"0 帧"的误差。</li>
@@ -271,7 +271,7 @@ code{font-family:var(--mono);font-size:.9em}
     </ol>
   </div>
   <div class="text" lang="en">
-    <p><span class="tag">What was done</span>Videos are added one at a time: video 0 is the 5-minute video of the first mouse, videos 1–10 are 20-minute videos of Pluto, one recording day each, going back from 2025-10-31 to 10-22 (videos 1, 2, 3 are the same day). Every video follows the same steps:</p>
+    <p><span class="tag">What was done</span>Videos are added one at a time: video 0 is the 5-minute video of the first mouse, videos 1–10 are 20-minute videos of Pluto, one recording day each, going back from 2025-10-31 to 10-22 (videos 1, 2, 3 are the same day); from video 11 on the videos are of a third mouse, Terra, again one day each, going back from 2025-10-17. Every video follows the same steps:</p>
     <ol>
       <li>50 frames evenly spaced over the final 10% of the video become the test set; they are labeled and frozen.</li>
       <li>The previous model is applied unchanged to get the "0 labels" error.</li>
@@ -417,7 +417,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>预标带来的偏向。</b>测试集是人在模型预标的基础上改出来的，做预标的那个模型在这组测试集上会显得比实际好（视频 5、6 最明显）。</li>
       <li><b>跳动规则找错帧找得准不准</b>还没有量过：被标出的帧里有多少真的错，没被标出的帧里漏了多少。</li>
       <li><b>视频 8</b> 的误差一直在 25 px 以上，原因未明。<b>视频 4</b> 画面质量差。</li>
-      <li><b>第三只老鼠（Terra，视频 11–18）</b>还没有开始，"新老鼠需要 20 帧"目前只在一只新老鼠上验证过。</li>
+      <li><b>第三只老鼠（Terra，视频 11–18）</b>刚开始做第一个视频（数字见第 9 步的表）；在它做完之前，“新老鼠需要 20 帧”只在一只新老鼠上验证过。</li>
       <li><b>面积和眨眼</b>：是否换成四点法、眨眼规则怎么改，待定。</li>
     </ul>
   </div>
@@ -427,7 +427,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>Anchoring by pre-labels.</b> Test sets are made by correcting a model's pre-labels, so the model that made them looks better than it is on that test set (clearest on videos 5 and 6).</li>
       <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
       <li><b>Video 8</b> stays above 25 px for an unknown reason. <b>Video 4</b> has poor image quality.</li>
-      <li><b>The third mouse (Terra, videos 11–18)</b> has not started; "a new mouse needs 20 labels" rests on one new mouse so far.</li>
+      <li><b>The third mouse (Terra, videos 11–18)</b> has just started with its first video (numbers in the table of step 9); until it is finished, "a new mouse needs 20 labels" rests on one new mouse.</li>
       <li><b>Area and blinks</b>: the switch to the 4-point rule and the redesign of the blink rule are undecided.</li>
     </ul>
   </div>

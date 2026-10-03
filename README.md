@@ -8,7 +8,7 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
-## Status (last updated 2026-10-03 11:25 CDT)
+## Status (last updated 2026-10-03 13:00 CDT)
 
 | what | state |
 |---|---|
@@ -24,7 +24,7 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Finished | **video 9** (Pluto, 2025-10-23, v2 line): test50 / val20 / batch01 labeled from model-711 pre-labels; 0 labels (model 711) = 23.41 px, 20 labels = 10.39 px, 40 labels = 8.55 px, 60 labels = 8.67 px (p90 14.8; no gain on the median), 80 labels = 8.20 px (p90 14.8; 4.1% better than 8.55), 100 labels = 9.39 px (p90 15.5), 120 labels = 8.63 px (p90 15.8): the plateau rule fired at 120 (two steps without a gain on 8.20), finished at **80 labels, 8.20 px** (user decision 2026-10-01). Cross-video curves now also show the 5 / 10-label subset models (open markers) |
 | Blink / area analysis | per-video time series in `<video>/results/blink_area_analysis/`; across videos (`v2_new_pupil_top_video_scaling/results/blink_area_consistency.png`): 4-point area better on 7 of 8 test sets; lowest pupil confidence < ~0.2 separates all 16 human closed-eye frames (the production 0.6 cut flags ~half of open frames); area correlates with eye opening in every video |
 | Finished | **video 10** (Pluto, 2025-10-22, the last Pluto video of the sequence): test50 / val20 / batch01 pre-labeled with the video-9 80-label model (1014) and corrected by the labeler (test50: 234 of 400 points moved), test set frozen; 0 labels (model 1014) = 18.13 px (p90 32.0, 8% of frames > 50 px), 20 labels = 11.83 px (p90 27.7, 2% > 50 px), 40 labels = 10.32 px (p90 26.1, 92% of keypoints with confidence >= 0.6), 60 labels = 10.49 px (p90 27.2, 8% > 50 px; no gain over 10.32), 80 labels = 10.76 px (p90 188.7, 12% > 50 px; no gain): the plateau rule fired at 80 (two steps without a gain on 10.32), finished at **40 labels, 10.32 px** (user decision 2026-10-03) |
-| In progress | **video 11** (Terra = mouse C, 2025-10-17, the first video of a new mouse): test50 / val20 / batch01 pre-labeled with the video-10 40-label model (1112) and corrected by the labeler (test50: 249 of 400 points moved), test set frozen; 0 labels (model 1112) = 25.96 px (p90 80.1, 16% of frames > 50 px); step 1 (20 labels) training. Training set of every step = 540 carried labels of videos 0-10 + this video's labels; shuffles 1211, 1212, ... |
+| In progress | **video 11** (Terra = mouse C, 2025-10-17, the first video of a new mouse): test50 / val20 / batch01 pre-labeled with the video-10 40-label model (1112) and corrected by the labeler (test50: 249 of 400 points moved), test set frozen; 0 labels (model 1112) = 25.96 px (p90 80.1, 16% of frames > 50 px), 20 labels = 9.24 px (p90 166.4, 20% of frames > 50 px, 86% of keypoints with confidence >= 0.6); batch02 being selected. Training set of every step = 540 carried labels of videos 0-10 + this video's labels; shuffles 1211, 1212, ... |
 | Next | Terra units 12-18, one recording day each, newest first |
 
 ## Main results so far (era 3, `v2_new_pupil_top_video_scaling/`)
@@ -44,7 +44,7 @@ Labels needed per video (plateau = two consecutive 20-label steps that improve t
 | 8 | Pluto, 2025-10-24 | 400 | 27.46 / 25.34 / 30.03 / 33.77 px (v2) | 20 labels, 25.3 px (rule fired at 60) |
 | 9 | Pluto, 2025-10-23 | 420 | 23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 px, 120 labels: 8.63 px (v2) | 80 labels, 8.2 px (rule fired at 120) |
 | 10 | Pluto, 2025-10-22 | 500 | 18.13 / 11.83 / 10.32 / 10.49 / 10.76 px (v2) | 40 labels, 10.3 px (rule fired at 80) |
-| 11 | Terra (mouse C), 2025-10-17 | 540 | 25.96 px at 0 labels (v2, in progress) | – |
+| 11 | Terra (mouse C), 2025-10-17 | 540 | 25.96 / 9.24 px (v2, in progress) | – |
 
 What the numbers say:
 
