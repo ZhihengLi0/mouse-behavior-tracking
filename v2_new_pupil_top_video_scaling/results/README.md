@@ -212,6 +212,7 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | 5 (v2 labels) | 11.90 (12%) | 13.0 / 9.4 (0% / 4%) | 12.6 / 12.7 (0% / 4%) | 15.85 (0%) |
 | 8 (v2 labels; added 2026-10-02) | 27.46 (14%) | 31.1 / 31.5 (30% / 28%) | 23.5 / 22.4 (12% / 6%) | 25.34 (14%) |
 | 9 (v2 labels; added 2026-10-02) | 23.41 (8%) | 11.7 / 12.6 (6% / 8%) | 11.6 / 11.1 (0% / 0%) | 10.39 (8%) |
+| 10 (v2 labels; added 2026-10-03) | 18.13 (8%) | 15.0 / 12.5 (4% / 2%) | 11.7 / 13.1 (8% / 2%) | 11.83 (2%) |
 
 - 5 labels were enough on 2 of 6 videos (3 and 5), both of which the earlier videos already covered well.
 - On the other 4, 5 and 10 labels fall short of 20: the first video of a mouse (0, 1) improves steadily with labels,

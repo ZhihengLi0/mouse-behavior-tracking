@@ -16,3 +16,17 @@ batch01: 73 of 160), then the test set was frozen. Training set of every step = 
 | 80 (shuffle 1114) | 10.76 px | 188.7 | 12% | 90% | 5214 of 57158 (9.1%) |
 
 The plateau rule fired at 80 labels: steps 3 and 4 (10.49, 10.76 px) did not improve the running best of 10.32 px (40 labels). Plateau point: 40 labels, 10.32 px; awaiting user decision (2026-10-03).
+
+**Fewer-labels study (2026-10-02 / 03)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: the 500 carried labels of videos 0-9; shuffles 2101-2104) ->
+`fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 18.13 px | 32.0 | 8% |
+| 5 (subset a / b) | 15.01 / 12.50 px | 26.2 / 26.4 | 4% / 2% |
+| 10 (subset a / b) | 11.70 / 13.08 px | 39.9 / 29.5 | 8% / 2% |
+| 20 | 11.83 px | 27.7 | 2% |
+
+On this video 5 labels give 12.5-15.0 px and 10 labels 11.7-13.1 px, against 18.1 px with none and 11.8 px with 20;
+the two subsets of each size differ by 1.4-2.5 px.
