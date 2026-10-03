@@ -67,25 +67,31 @@ code{font-family:var(--mono);font-size:.9em}
 
   <div class="text" lang="zh">
     <p><b>任务。</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
-    <p><b>核心问题。</b>拿到一个新视频，人要标多少帧，模型才够用？</p>
-    <p><b>目前的答案。</b></p>
+    <p><b>核心问题。</b>拿到一个新视频，人要标多少帧，模型才够用？为了回答它，按顺序解决了下面几个问题。</p>
+    <p><b>目前的答案（按做的先后顺序）。</b></p>
     <ol>
-      <li>换一只新老鼠，旧模型完全不能用（误差约 200 px）；标 20 帧就回到约 10 px。</li>
-      <li>同一只老鼠之后的每个视频，标 0–40 帧就到平台（已完成的 8 个里有 1 个需要 80 帧）。</li>
-      <li>加入新视频的标注，不会让旧视频变差。</li>
-      <li>在同一个视频上，超过约 80 帧后再多标没有用；用哪种算法挑帧也没有差别。</li>
+      <li><b>标得越多越好吗？</b>不一定。第一次实验里，从 20 帧加到 100 帧，误差反而变大；原因是标注前后不一致、验证集太小。重新审核标注后才继续。</li>
+      <li><b>batch size 用多少？</b>用 2。</li>
+      <li><b>用哪个模型？</b>用 ResNet-50。</li>
+      <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，加到 300 帧误差不变；用哪种算法挑帧也没有差别。</li>
+      <li><b>换一只新老鼠怎么办？</b>旧模型完全不能用（误差约 200 px）；标 20 帧就回到约 10 px。</li>
+      <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台（已完成的 8 个里有 1 个需要 80 帧）。</li>
+      <li><b>加入新视频会不会让旧视频变差？</b>不会。</li>
     </ol>
     <p><b>进度。</b>{{STATUS_ZH}}</p>
   </div>
   <div class="text" lang="en">
     <p><b>Task.</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
-    <p><b>Main question.</b> On a new video, how many frames must a person label before the model is good enough?</p>
-    <p><b>Answers so far.</b></p>
+    <p><b>Main question.</b> On a new video, how many frames must a person label before the model is good enough? To answer it, the questions below were settled in order.</p>
+    <p><b>Answers so far (in the order the work was done).</b></p>
     <ol>
-      <li>On a new mouse the old model is useless (error about 200 px); 20 labels bring it back to about 10 px.</li>
-      <li>Every later video of the same mouse reaches its plateau with 0–40 labels (1 of the 8 finished ones needed 80).</li>
-      <li>Adding labels of new videos does not make old videos worse.</li>
-      <li>Within one video, labels beyond about 80 do not help, and the algorithm used to pick the frames makes no difference.</li>
+      <li><b>Do more labels always help?</b> No. In the first experiment the error rose from 20 to 100 labels, because the labels were inconsistent and the validation set was too small. Work continued only after the labels were re-reviewed.</li>
+      <li><b>Which batch size?</b> 2.</li>
+      <li><b>Which model?</b> ResNet-50.</li>
+      <li><b>How many labels are enough within one video?</b> About 80 saturate it; 300 give the same error, and the algorithm used to pick the frames makes no difference.</li>
+      <li><b>What about a new mouse?</b> The old model is useless (error about 200 px); 20 labels bring it back to about 10 px.</li>
+      <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau (1 of the 8 finished ones needed 80).</li>
+      <li><b>Do new videos make old ones worse?</b> No.</li>
     </ol>
     <p><b>Status.</b> {{STATUS_EN}}</p>
   </div>
