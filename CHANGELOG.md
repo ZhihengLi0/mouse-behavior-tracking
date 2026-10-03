@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.12-video10-plateau` | 2026-10-03 | Video 10 (2025-10-22, v2 line, last Pluto video) finished: plateau at 40 labels, 10.32 px (0 / 20 / 40 / 60 / 80 = 18.13 / 11.83 / 10.32 / 10.49 / 10.76 px; rule fired at 80); 40 labels carried into video 11 (540 in total); fewer-labels study extended to videos 6, 8, 9, 10; summary page (`report/`) rewritten as a plain step-by-step record |
 | `v0.9.11-video9-plateau` | 2026-10-01 | Video 9 (2025-10-23, v2 line) finished: plateau at 80 labels, 8.20 px (0 / 20 / 40 / 60 / 80 / 100 / 120 = 23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63 px; rule fired at 120); 80 labels carried into video 10; summary page (`report/`) extended to era 3 |
 | `v0.9.10-carry-rule` | 2026-10-01 | Rule fixed for which labels of a finished video go into later training sets: only the labels up to the plateau point (in force since video 4; videos 0-3 carry the 320 labels that existed when the next video started); documented in the READMEs with the per-video table |
 | `v0.9.9-terra-into-v2` | 2026-09-30 | v3 folder removed (user decision; its labelling guide v0.2 stays in git history); the 8 Terra videos (mouse C, 2025-10-17 -> 10-08) join v2 as units 11-18, newest first |
