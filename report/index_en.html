@@ -1,0 +1,933 @@
+<meta charset="utf-8">
+<title>Mouse Eye Tracking Map</title>
+<style>
+/* Layout: one plain column. Each numbered item = what was done, the result figure(s), how to read them, the conclusion. */
+:root{
+  --ground:#FBFBFA; --surface:#FFFFFF; --ink:#1B1F23; --muted:#5A636B; --rule:#D9DEE2;
+  --accent:#2C6A9B; --accent-soft:#E8F0F6; --figure:#FFFFFF; --alert:#C0392B;
+  --sans:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14171A; --surface:#1C2024; --ink:#E6E9EC; --muted:#9BA5AE; --rule:#30373D;
+    --accent:#7DB6E3; --accent-soft:#1C2A36; --figure:#FFFFFF; --alert:#FF7B6B; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14171A; --surface:#1C2024; --ink:#E6E9EC; --muted:#9BA5AE; --rule:#30373D;
+  --accent:#7DB6E3; --accent-soft:#1C2A36; --figure:#FFFFFF; --alert:#FF7B6B; color-scheme:dark;
+}
+:root[data-lang="zh"] [lang="en"], :root[data-lang="en"] [lang="zh"]{display:none}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75;padding-inline:20px;padding-block:36px 80px}
+.page{max-width:68rem;margin-inline:auto;display:flex;flex-direction:column;gap:52px}
+.text{max-width:46rem}
+div.text,nav.text{display:flex;flex-direction:column;gap:12px}
+h3{font-size:17px;line-height:1.5;font-weight:700;margin:14px 0 0;text-wrap:balance}
+h1{font-size:clamp(24px,3.6vw,32px);line-height:1.3;font-weight:700;margin:0;text-wrap:balance}
+h2{font-size:clamp(19px,2.6vw,23px);line-height:1.4;font-weight:700;margin:0;text-wrap:balance}
+h2 .no{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:.5em}
+p{margin:0} b,strong{font-weight:650}
+ul,ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
+a{color:var(--accent)}
+.muted{color:var(--muted)} .small{font-size:14px;line-height:1.65}
+header,section{display:flex;flex-direction:column;gap:16px}
+section{border-top:1px solid var(--rule);padding-top:28px}
+.tag{font-weight:650;color:var(--accent);white-space:nowrap}
+.hl{color:var(--alert);font-weight:650}
+[lang="en"] .tag{margin-right:.35em}
+.concl{background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;max-width:46rem}
+div.concl{display:flex;flex-direction:column;gap:8px}
+.concl ul{margin-top:6px}
+figure{margin:0;display:flex;flex-direction:column;gap:8px}
+.page>*,header>*,section>*,figure>*{min-width:0;max-width:100%}
+.text,.concl{max-width:min(46rem,100%)}
+.figbox{background:var(--figure);border:1px solid var(--rule);padding:8px;max-width:100%}
+.figbox img{display:block;width:100%;height:auto}
+.figbox.scroll{overflow-x:auto}
+.figbox.scroll img{max-width:none}
+.strip{display:flex;gap:14px;align-items:flex-start}
+.strip .item{flex:0 0 auto;width:min(960px,82vw)}
+.figbox.scroll .strip img{width:100%;max-width:100%}
+.strip.tall .item{width:min(600px,80vw)}
+.strip .cap{font-size:13px;line-height:1.5;margin-top:6px;color:var(--muted,#555)}
+.figbox.narrow{max-width:34rem}
+figcaption{font-size:14.5px;line-height:1.65;color:var(--ink);max-width:52rem}
+.tablebox{overflow-x:auto;max-width:100%}
+table.info{max-width:52rem;font-size:14.5px;line-height:1.6}
+table.info th{white-space:nowrap;width:1%}
+table{border-collapse:collapse;font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums;background:var(--surface)}
+th,td{border:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+th{font-weight:650;background:var(--accent-soft)}
+nav ol{gap:2px;font-size:15px}
+code{font-family:var(--mono);font-size:.9em}
+math{font-size:1.12em}
+math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-width:100%}
+.langbar{position:fixed;right:16px;top:calc(12px + env(safe-area-inset-top,0px));z-index:10;display:flex;border:1px solid var(--rule);background:var(--surface)}
+.langbar button{all:unset;cursor:pointer;font-size:13px;padding:5px 12px;color:var(--muted)}
+.langbar button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.langbar button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+</style>
+
+
+
+<div class="page">
+
+<header>
+  <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:04 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+
+  
+  <div class="text" lang="en">
+    <p><b>Task:</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
+    <p><b>Main question:</b> On a new video, how many frames must a person label before the model is good enough?</p>
+    <p>The work has two phases, separated by the day the keypoint definitions were made explicit (2026-09-20). Phase 1 used the earlier definitions; only three choices that do not depend on the definitions are kept from it: batch size, model and error-correction algorithm. All other conclusions come from phase 2, which starts again from the same 5-minute video under the explicit definitions. Error numbers of the two phases cannot be compared directly.</p>
+    <h3>Conclusions of phase 1 (steps 1–3)</h3>
+    <p>Premise: pupil top is placed at the highest point of the visible pupil, the part not hidden by the eyelid.</p>
+    <ol>
+      <li><b>Which batch size?</b> 2, chosen by the internal validation loss; on the test set the four batch sizes differ little (step 1).</li>
+      <li><b>Which model?</b> ResNet-50 (step 2).</li>
+      <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
+    </ol>
+    <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
+    <p>On 2026-09-20 the placement of each of the 8 points was made explicit (point-by-point comparison in step 4). Three things changed: pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; and the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. The definitions of pupil bottom and of the two eyelid points did not change. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions. The three choices of phase 1 were themselves made under one set of definitions: all training and test frames of that video were labeled in the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms are fair.</p>
+    <h3>Conclusions of phase 2 (steps 4–9)</h3>
+    <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
+    <ol>
+      <li><b>How many labels are enough within one video?</b> It saturates within about 80 labels: the same 5-minute video, relabeled under the keypoint definitions made explicit on 2026-09-20 and redone, gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 5). In phase 1 the same video showed no decrease from 80 to 300 labels either (step 3).</li>
+      <li><b>What about a new mouse?</b> It needs its own labels, and 20 of them reach about 10 px. Second mouse (the model had seen one mouse): 208 px at 0 labels, 10.4 px at 20. Third mouse (the model had seen two mice): 26 px at 0 labels, 9.2 px at 20. The second time the mouse changed, the starting error without any labels was far smaller (step 5).</li>
+      <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau; 1 of the 9 finished ones needed 80 (step 5).</li>
+      <li><b>20 labels already come close to saturation; could the first batch be cut to 5 or 10?</b> They cannot replace 20: 5 labels are enough on only 3 of the 12 videos and 10 labels on 4, one cannot tell in advance which, and the result depends on which frames happen to be taken. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
+      <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
+      <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.9 px; the other 7 points 3.9–5.8 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
+      <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
+      <li><b>How to find the frames in which the pupil cannot be seen?</b> Mean confidence of the four pupil points below 0.527: 27 of the 28 frames in which the labeler left all four pupil points empty are found, and 4.1% of the frames with all four labeled are flagged; the earlier rule flags 55.7%. An empty frame is not the same as a blink; blinks have no definition or truth yet (step 9).</li>
+    </ol>
+    <p><b>Status:</b> 12 videos finished (videos 0–11).</p>
+  </div>
+
+  
+  <div class="text" lang="en">
+    <h3>How the metrics are computed</h3>
+    <p>Each video has a set of human-labeled test frames that are never used for training or for any choice. For every test frame the model gives the coordinates of the 8 points, in pixels of the original video frame (928 × 736, no rescaling). Every predicted point enters the calculation, none is dropped for low confidence; points the person did not label (for example the pupil points of a closed-eye frame) are left out.</p>
+    <ol>
+      <li><b>Error of one point:</b> for point k of frame i, with prediction <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mo>(</mo><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>,</mo><msub><mover><mi>y</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>)</mo></math> and human label <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>,</mo><msub><mi>y</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>)</mo></math>, the error is the straight-line distance between the two: <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>e</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><msqrt><msup><mrow><mo>(</mo><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mo>(</mo><msub><mover><mi>y</mi><mo>^</mo></mover><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>−</mo><msub><mi>y</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math></li>
+      <li><b>Median frame RMSE (the main metric from step 3 on):</b> first the root mean square of the point errors within each frame, <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi mathvariant='normal'>RMSE</mi><mi>i</mi></msub><mo>=</mo><msqrt><mfrac><mn>1</mn><msub><mi>K</mi><mi>i</mi></msub></mfrac><munder><mo>∑</mo><mi>k</mi></munder><msubsup><mi>e</mi><mrow><mi>i</mi><mi>k</mi></mrow><mn>2</mn></msubsup></msqrt></math>where <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>K</mi><mi>i</mi></msub></math> is the number of labeled points in that frame (at most 8); then the median of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi mathvariant='normal'>RMSE</mi><mi>i</mi></msub></math> over all test frames.</li>
+      <li><b>RMSE over all keypoints (used in steps 1 and 2):</b> one root mean square over the errors of all points of all test frames, <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi mathvariant='normal'>RMSE</mi><mo>=</mo><msqrt><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>,</mo><mi>k</mi></mrow></munder><msubsup><mi>e</mi><mrow><mi>i</mi><mi>k</mi></mrow><mn>2</mn></msubsup></msqrt></math>where N is the total number of labeled points (100 frames × 8 points, at most 800). A few points that are far off pull it up, which is why the median frame RMSE was used later.</li>
+      <li><b>The other numbers:</b> "90th percentile" is the 90th percentile of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi mathvariant='normal'>RMSE</mi><mi>i</mi></msub></math>; "test frames above 50 px" is the share of frames with <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi mathvariant='normal'>RMSE</mi><mi>i</mi></msub></math> &gt; 50; "points with confidence ≥ 0.6" is the share of labeled points whose model confidence is at least 0.6.</li>
+    </ol>
+    <p>Lower is better. For scale: the eye is about 320–390 px wide, so 10 px is about 3% of the eye width. The scoring scripts are in the repository: <code>v1_old_pupil_top/batch-size-selection/scripts/evaluate_eye_test_set.py</code> and the script of the same name under <code>model-selection/scripts/</code> for steps 1 and 2, <code>active-learning-jump-selection/scripts/round_train_pipeline.py</code> for step 3, and <code>v2_new_pupil_top_video_scaling/scripts/scale_step.py</code> from step 5 on; every score is written to the csv tables of the <code>results/</code> folders. The video, data, model and metric of every step are listed in the "Basic information" table at its start.</p>
+    <p><b>Training recipe (chosen in steps 1 and 2, used in both phases):</b> ResNet-50, batch 2. Every model is trained anew from ImageNet-pretrained weights; it never continues from one of our earlier models.</p>
+  </div>
+
+  <nav class="text">
+    <p><b><span lang="en">Contents</span></b></p>
+    <ol>
+      <li><a href="#s1"><span lang="en">Batch size</span></a></li>
+      <li><a href="#s2"><span lang="en">Backbone</span></a></li>
+      <li><a href="#s3"><span lang="en">Error-correction algorithm: jump</span></a></li>
+      <li><a href="#s4"><span lang="en">Keypoint definitions made explicit</span></a></li>
+      <li><a href="#s5"><span lang="en">Main line: labels needed per new video</span></a></li>
+      <li><a href="#s6"><span lang="en">Asked afterwards: would a first batch of 5 or 10 labels be enough</span></a></li>
+      <li><a href="#s7"><span lang="en">Do new videos hurt old ones</span></a></li>
+      <li><a href="#s8"><span lang="en">Error and confidence of each keypoint</span></a></li>
+      <li><a href="#s9"><span lang="en">Pupil area and blinks: four-point rule; frames without a visible pupil found by mean confidence</span></a></li>
+      <li><a href="#s10"><span lang="en">Where there is no conclusion yet</span></a></li>
+      <li><a href="#s11"><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
+    </ol>
+  </nav>
+</header>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="no">1</span><span lang="en">Batch size: batch 2</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Video</span></th><td><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">Phase 1 (pupil top at the highest point of the visible pupil).</span></td></tr>
+    <tr><th><span lang="en">Training data</span></th><td><span lang="en">100 hand-labeled frames from the first 4 minutes: the first 20 picked by clustering image appearance (k-means), the other 80 added in time order. Sorted by time, the earliest 80 (0–33 s) are the training set.</span></td></tr>
+    <tr><th><span lang="en">Validation data</span></th><td><span lang="en">The latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the batch size.</span></td></tr>
+    <tr><th><span lang="en">Test data</span></th><td><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
+    <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">HRNet-W32 (the model in use at that time), trained for 100 epochs from ImageNet-pretrained weights on CPU; learning rate drops at epochs 80 and 95; one run per batch size; the snapshot with the best internal validation mAP is scored.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 used this metric at the time; Figure 1-2 also gives the median frame RMSE.</span></td></tr>
+  </tbody></table></div>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>With the reviewed labels (first 80 frames train, last 20 validate), one run each at batch 2, 4, 8, 16 (100 epochs). The selection rule was fixed before looking at results: lowest internal validation loss. The final-minute test frames are report-only.</p>
+  <figure>
+    <div class="figbox"><img src="assets/fig_batch_size.jpg" alt="Batch size sweep overview"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 1-1, how to read:</span>Top right: internal validation loss, lowest at batch 2 (star). Top left: test error, the blue line is also lowest at batch 2 (21.07 px). Bottom right: both together, batch 2 sits in the lower-left corner, so the two signals agree. Bottom left: share of points with confidence ≥ 0.6 falls as the batch grows.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox"><img src="assets/fig_batch_two_metrics.jpg" alt="Batch sizes scored with both metrics"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 1-2, how to read:</span>The same four runs scored with both metrics (added 2026-10-04, no retraining). Left: the metric used at the time, RMSE over all keypoints. Middle: the metric of the later steps, median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
+  </figure>
+  
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batch 2. The internal validation set and the independent test set pick the same batch, which shows the enlarged validation set can be trusted. One run per batch; the differences between batches are small (21.1–23.6 px). Re-scored with the metric of the later steps (median frame RMSE): the four batches lie between 18.5 and 20.1 px, batch 4 is the lowest (18.5 px) and batch 2 gives 19.7 px, 1.3 px apart; batch 4 and batch 8 each have 1–2 frames above 50 px, batch 2 has none. The selection rule is the internal validation loss and does not look at the test set, so the choice of batch 2 stands; but by median frame RMSE the test set does not show batch 2 as the best, and the four batches cannot really be told apart.</p>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="no">2</span><span lang="en">Backbone: ResNet-50</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Video</span></th><td><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">Phase 1 (pupil top at the highest point of the visible pupil).</span></td></tr>
+    <tr><th><span lang="en">Training data</span></th><td><span lang="en">Same as step 1: the earliest 80 frames.</span></td></tr>
+    <tr><th><span lang="en">Validation data</span></th><td><span lang="en">Same as step 1: the latest 20 frames. Used to choose the model.</span></td></tr>
+    <tr><th><span lang="en">Test data</span></th><td><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
+    <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">Five models (ResNet-50, HRNet-W18, HRNet-W32, HRNet-W48, CSPNeXt-S), batch 2, 100 epochs each on CPU, other settings as in step 1, one run each.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Same as step 1: RMSE over all keypoints at the time; Figure 2-2 also gives the median frame RMSE.</span></td></tr>
+  </tbody></table></div>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>Same data and settings (batch 2, 100 epochs), five backbones: ResNet-50, HRNet-W18 / W32 / W48, CSPNeXt-S.</p>
+  <figure>
+    <div class="figbox"><img src="assets/fig_model_selection.jpg" alt="Model selection overview"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 2-1, how to read:</span>Top left: test error, ResNet-50 lowest (20.1 px), HRNet-W32 close (21.1 px). Top right: internal validation loss, the five models differ by only 1.4% and cannot be separated. Bottom left: points with confidence ≥ 0.6, ResNet-50 has the most (514 of 800). Bottom right: training time vs error, ResNet-50 takes 1.7 h and sits in the lower-left corner (low error, short time; only CSPNeXt-S, with a much higher error, is faster).</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox"><img src="assets/fig_model_two_metrics.jpg" alt="Models scored with both metrics"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 2-2, how to read:</span>The same five models scored with both metrics (added 2026-10-04, no retraining). Left: RMSE over all keypoints, from 20.1 to 47.9 px, a large spread. Middle: median frame RMSE on the same y scale; the five models give 18.4 / 19.7 / 19.2 / 19.6 / 20.5 px, only about 2 px apart. Right: share of test frames with frame RMSE above 50 px: 15% for HRNet-W18, 2% for CSPNeXt-S, none for ResNet-50 and HRNet-W32. The spread in the left panel comes mainly from these far-off frames.</figcaption>
+  </figure>
+  
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Taking everything together, ResNet-50. (1) Lowest test error: 20.1 px. (2) The validation losses of the five models are close, within 1.4%. (3) Best use of confidence: 514 of 800 points have confidence ≥ 0.6, against 75–375 for the other models; this helps when confidence is used later to detect blinks and tracking loss. (4) Low training cost: 1.7 h, against 3.7 h for HRNet-W32, the model with a similar error. All later experiments use ResNet-50 with batch 2. Re-scored with the median frame RMSE, ResNet-50 is still the lowest (18.4 px), but the five models are only about 2 px apart. The comparison of the two metrics shows that the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. This is why the median frame RMSE is the main metric from step 3 on, with the share of frames above 50 px reported separately.</p>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="no">3</span><span lang="en">Error-correction algorithm: jump (active learning)</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Video</span></th><td><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">Phase 1.</span></td></tr>
+    <tr><th><span lang="en">Training data</span></th><td><span lang="en">Starts from the 80 frames of step 1. Each round the model predicts all 14,400 frames of the first 4 minutes, the detector flags suspicious frames, 20 of them are picked by clustering image appearance, all 8 points are corrected by hand and the frames are added to the training set. The three detectors accumulate independently; after 11 rounds each branch has 300 frames.</span></td></tr>
+    <tr><th><span lang="en">Validation data</span></th><td><span lang="en">The 20 frames of step 1, never changed.</span></td></tr>
+    <tr><th><span lang="en">Test data</span></th><td><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
+    <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">ResNet-50, batch 2, 100 epochs, learning rate drops at epochs 80 and 95, trained on the Apple GPU (MPS). Every round is trained anew from ImageNet-pretrained weights. Each point in the figure is the snapshot with the best internal validation mAP, from a single run.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Median frame RMSE: the RMSE over the 8 points of each frame, then the median over the 100 frames.</span></td></tr>
+  </tbody></table></div>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>The aim is to choose an error-correction algorithm: once a model is trained, an algorithm searches the video for frames where the model is probably wrong, a person corrects only those frames, and the model is retrained. This procedure is called active learning. Three algorithms were compared to see whose picks reduce the error most. Procedure: starting from 80 labels, each round the algorithm picks frames, a person corrects 20 of them, they are added and the model is retrained. Three detectors ran as three branches: low confidence (uncertain), keypoints jumping between consecutive frames (jump), deviation from a smooth trajectory (fitting). 11 rounds, each branch from 80 to 300 labels.</p>
+  <figure>
+    <div class="figbox"><img src="assets/fig_active_learning.jpg" alt="Active learning convergence, rounds 0-11"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 3-1, how to read:</span>x = cumulative training frames, the three colours are the three detectors. Every round in the figure is scored with the same formula. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en">
+    <p><span class="tag">Conclusion:</span>This step has two conclusions: jump is chosen as the error-correction algorithm, and on this video about 80 labels saturate.</p>
+    <ol>
+      <li><b>jump is the error-correction algorithm and picks the frames in all later experiments.</b> In this experiment jump has the lowest error: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds. The lead is about 0.6 px, smaller than the variation when one setting is trained again (0.3–2 px), so we regard the three error-correction algorithms as close, with jump slightly ahead.</li>
+      <li><b>On this video about 80 labels saturate.</b> From 80 to 300 labels the median error of all three branches stays between 15.7 and 17.5 px, with no decrease.
+        <ul>
+          <li>This result uses the keypoint definitions from before 2026-09-20.</li>
+          <li>After the definitions were made explicit on 2026-09-20, the same video was relabeled and the experiment repeated, with the same conclusion: the error stays between 12 and 13 px at 20, 40, 60, 80 and 100 labels and does not fall with the number of labels (step 5, video 0). What was made explicit is described in step 4; mainly, pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", and the two corners became the crossing of the continued eyelid margins.</li>
+          <li>The error values under the two sets of definitions cannot be compared directly; what agrees is that the video saturates within about 80 labels.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="no">4</span><span lang="en">Keypoint definitions made explicit (from 2026-09-20): pupil as an ellipse, corners at the crossing of the eyelid margins</span></h2>
+  
+  <div class="text" lang="en">
+    <p><span class="tag">What was done:</span>Where each of the 8 points is placed was written down, and all earlier videos were relabeled accordingly. From this step on every model and number uses these definitions. The full definitions, example figures and the common mistakes are in the folder <code>keypoint_definitions/</code> of the repository. The points are described one group at a time below, each followed by its figure.</p>
+  </div>
+  <figure>
+    <div class="figbox"><img src="assets/kp_all_keypoints.jpg" alt="All eight keypoints on three mice"></div>
+    
+    <figcaption lang="en"><b>Fig. 4-1.</b> <span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.<br><span class="muted">Source: left, first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001; middle, Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frame 68086; right, Terra, video 11 (<code>11_20251017_Terra_spont_1</code>), frame 68086. All from the test set of the video; the points are human labels.</span></figcaption>
+  </figure>
+  
+  <div class="text" lang="en">
+    <ul>
+      <li><b>Pupil top, bottom, left, right (Fig. 4-2):</b> the pupil is treated as an ellipse and the four points are the ends of its two axes. Parts hidden by the upper eyelid or by fur are completed with the ellipse, so the pupil-top point often lies above the upper-eyelid point, that is, at a position covered by the lid. In Fig. 4-2 the red dots are the present positions; the yellow crosses are the positions before 2026-09-20: at the topmost, bottommost, leftmost and rightmost visible points of the pupil, without fitting an ellipse. The pupil boundary is the outer edge of the darkened region; where the edge looks doubled the left contour is used (2026-09-26); the brighter band around the dark core counts as pupil (2026-09-29).</li>
+    </ul>
+  </div>
+  <figure>
+    <div class="figbox"><img src="assets/kp_construction_pupil.jpg" alt="How the pupil points are constructed"></div>
+    
+    <figcaption lang="en"><b>Fig. 4-2.</b> <span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: no ellipse was fitted on purpose and the four points were placed at the topmost, bottommost, leftmost and rightmost visible points of the pupil, so they are not necessarily the ends of an ellipse and do not necessarily lie on its two axes.<br><span class="muted">Source: all three panels are Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frames 20855, 5160 and 4835 from left to right, taken from the first training batch. Red dots are the labels made under the definitions of 2026-09-20, yellow crosses the labels of the same frames before that.</span></figcaption>
+  </figure>
+  
+  <div class="text" lang="en">
+    <ul>
+      <li><b>Upper and lower eyelid (Fig. 4-1 above):</b> the line between the eyelid skin and the eyeball is the eyelid margin. The upper-eyelid point is the midpoint of the upper margin, the lower-eyelid point the midpoint of the lower margin.</li>
+    </ul>
+  </div>
+  
+  <div class="text" lang="en">
+    <ul>
+      <li><b>Left corner (nasal, medial canthus; Fig. 4-3, second row):</b> there is a shadow at this corner; it gets narrower downwards and continues to near the lower eyelid. The <b>outer</b> border of the shadow is taken as the lower-left margin (solid red); it and the upper margin are each continued (dashed red), and the crossing of the two continuations (red circle) is the left corner; the cyan dot is the labeled position. Not used (dotted yellow line and yellow cross): following the <b>inner</b> border of the shadow, which puts the crossing inside the shadow. The hatched area is the shadow between the two constructions.</li>
+      <li><b>Right corner (temporal, lateral canthus; Fig. 4-3, third row):</b> there are several bright reflections on this side, with a stretch of shadow below them. The lower margin is continued upwards along the <b>outer</b> line (dashed red), around the right of the reflections, and the point where it meets the upper margin (red circle) is the right corner; the cyan dot is the labeled position. Why the outer side: in the discussion with Kaiwen on 2026-09-20 we concluded that fur does not reflect, so the bright reflections on the right are still inside the eye and the corner must lie outside them. Not used (dotted yellow line and yellow cross): following the <b>inner</b> edge of the reflection and of the shadow below it, which puts the crossing on the inner line next to the reflection. The corner is not placed on a reflection either.</li>
+    </ul>
+  </div>
+  <figure>
+    <div class="figbox" style="max-width:58rem"><img src="assets/kp_construction_corners.jpg" alt="How the two corners are constructed"></div>
+    
+    <figcaption lang="en"><b>Fig. 4-3.</b> <span class="tag">How to read:</span>How the two corners are obtained, drawn after the hand sketch used in the discussion of 2026-09-20. The three rows are the whole eye, the left corner and the right corner; in each row the left image is the frame without any line and the right image is the same frame with the construction. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner, cyan = the labeled point. Dotted yellow lines and yellow crosses show the construction that was compared in the discussion and not adopted: along the inner border of the shadow at the left corner, and along the inner edge of the reflection and of the shadow below it at the right corner; both yellow lines run down to near the lower-eyelid point. The hatched area is the shadow at the left corner.<br><span class="muted">Source: all three rows are the first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001, from the test set. Cyan dots are human labels; the red and yellow lines are construction lines drawn on the image.</span></figcaption>
+  </figure>
+  
+  <div class="text" lang="en">
+    <ul>
+      <li><b>Points that cannot be seen:</b> the same for all 8 points: a point is labeled when it can be seen clearly and left empty when its position cannot be judged accurately.</li>
+    </ul>
+  </div>
+  <h3><span lang="en">Earlier and present definitions, point by point</span></h3>
+  
+  <div class="text" lang="en">
+    <p><b>Where the numbers come from:</b> all are comparisons between human labels; no model is involved. Two comparisons are used.</p>
+    <ul>
+      <li><b>Position (column "median coordinates"):</b> two sets of human-labeled test frames from the final minute of the same video (the 5-minute video of the first mouse): 100 frames labeled before 2026-09-20 and the present 50 frames. Camera and eye position did not change, so the median coordinates of a point over each set show where that point was placed. Coordinates are pixels of the original frame, x to the right, y downwards.</li>
+      <li><b>Shift on the same frame (last column):</b> where a frame has two versions of labels, the distance between the two is taken and then the median over the frames. The four pupil points use 40 frames of the Pluto 2025-10-31 video (earlier labels vs the labels redone as an ellipse). The corners and eyelids use 90 frames of the 5-minute video of the first mouse (test set 50, validation set 20, first batch 20), with the two versions of labels: corners on the inner side and on the outer side.</li>
+    </ul>
+  </div>
+  <div class="tablebox">
+    <table>
+      <thead><tr>
+        <th><span lang="en">point</span></th>
+        <th><span lang="en">definition before 2026-09-20</span></th>
+        <th><span lang="en">present definition</span></th>
+        <th><span lang="en">median coordinates: before → now</span></th>
+        <th><span lang="en">median shift on the same frame</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span lang="en">pupil top</span></td>
+          <td><span lang="en">highest point of the visible pupil, stopping at the eyelid; about 25 px below the upper-eyelid point</span></td>
+          <td><span lang="en">top of the pupil ellipse, estimated from the ellipse where hidden; about 11 px above the upper-eyelid point</span></td>
+          <td>y 368 → 319<span lang="en"> (49 px up)</span></td><td>52 px</td></tr>
+        <tr><td><span lang="en">pupil left, right</span></td>
+          <td><span lang="en">leftmost and rightmost visible points of the pupil, no ellipse fitted; left about 37 px higher than right</span></td>
+          <td><span lang="en">the two ends of the horizontal axis of the ellipse; left and right at the same height (0 px apart)</span></td>
+          <td><span lang="en">left</span> y 425 → 447<span lang="en">, right</span> y 462 → 448</td><td><span lang="en">about 14 px</span></td></tr>
+        <tr><td><span lang="en">pupil bottom</span></td>
+          <td><span lang="en">lowest point of the visible pupil</span></td>
+          <td><span lang="en">bottom of the ellipse (the lower edge is usually visible, so the position hardly changes)</span></td>
+          <td>y 585 → 586</td><td><span lang="en">about 14 px</span></td></tr>
+        <tr><td><span lang="en">left (nasal) corner</span></td>
+          <td><span lang="en">inner side of the shadow</span></td>
+          <td><span lang="en">outer side of the shadow: crossing of the two continued eyelid margins. Reason: after the discussion the shadow was attributed to fur covering the eye, so the corner is more plausibly on its outer side</span></td>
+          <td>x 410 → 370<span lang="en"> (40 px outwards)</span></td><td>40 px</td></tr>
+        <tr><td><span lang="en">right (temporal) corner</span></td>
+          <td><span lang="en">inner side of the reflections</span></td>
+          <td><span lang="en">outer side of the reflections: where the lower margin, continued upwards along the outer line, meets the upper margin. Reason: fur does not reflect, so the reflections are still inside the eye</span></td>
+          <td>x 808 → 857<span lang="en"> (49 px outwards)</span></td><td>56 px</td></tr>
+        <tr><td><span lang="en">upper eyelid</span></td>
+          <td><span lang="en">midpoint of the upper eyelid margin</span></td>
+          <td><span lang="en">same definition; slightly higher after the corners moved</span></td>
+          <td>y 345 → 336<span lang="en"> (9 px up)</span></td><td><span lang="en">17 px (62 of 90 frames moved)</span></td></tr>
+        <tr><td><span lang="en">lower eyelid</span></td>
+          <td><span lang="en">midpoint of the lower eyelid margin</span></td>
+          <td><span lang="en">same definition</span></td>
+          <td>y 624 → 615<span lang="en"> (different frames; 9 px apart)</span></td><td>0 px</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="text" lang="en">
+    <p><b>Were the earlier definitions applied consistently:</b> yes. All human labels made on this video before 2026-09-20 follow one placement; the check per label set is below (<code>keypoint_definitions/results/definition_by_label_set.csv</code>, script <code>scripts/definition_check.py</code>):</p>
+  </div>
+  <div class="tablebox">
+    <table>
+      <thead><tr>
+        <th><span lang="en">label set</span></th>
+        <th><span lang="en">frames</span></th>
+        <th><span lang="en">left corner x</span></th>
+        <th><span lang="en">right corner x</span></th>
+        <th><span lang="en">pupil top above upper-eyelid point (px)</span></th>
+        <th><span lang="en">pupil left higher than right (px)</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span lang="en">before: training frames (steps 1, 2)</span></td><td>100</td><td>417</td><td>795</td><td>−26</td><td>27</td></tr>
+        <tr><td><span lang="en">before: step 3, jump rounds</span></td><td>220</td><td>404</td><td>795</td><td>−27</td><td>33</td></tr>
+        <tr><td><span lang="en">before: step 3, uncertain rounds</span></td><td>220</td><td>410</td><td>795</td><td>−25</td><td>34</td></tr>
+        <tr><td><span lang="en">before: step 3, fitting rounds</span></td><td>220</td><td>419</td><td>795</td><td>−27</td><td>34</td></tr>
+        <tr><td><span lang="en">before: test frames (steps 1–3)</span></td><td>100</td><td>410</td><td>808</td><td>−25</td><td>37</td></tr>
+        <tr><td><span lang="en">present: test frames of video 0</span></td><td>50</td><td>370</td><td>857</td><td>+11</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="text small muted" lang="en">Each number is the median over the frames of the label set. A negative value means pupil top lies below the upper-eyelid point. The five earlier label sets agree with one another (left corner x 404–419, right corner x 795–808, pupil top 25–27 px below the upper-eyelid point) and differ clearly from the present placement.</p>
+  
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The largest changes are pupil top and the two corners: the top point moved from the highest visible point to the top of the ellipse, and the corners from the inner to the outer side. Pupil left and right became the ends of the horizontal axis of the ellipse; pupil bottom and the two eyelid points keep their definitions. The earlier definitions were used consistently in steps 1–3, the present ones are used consistently from step 5 on. The four eyelid and corner points only serve to detect blinks, so a stable position that can be found in every frame is preferred. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again. Error numbers of steps 1–3 cannot be compared directly with those from step 5 on.</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="no">5</span><span lang="en">Main line: labels needed per new video</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Video</span></th><td><span lang="en">Video 0: the 5-minute video of the first mouse. Videos 1–10: 19.9-minute videos of Pluto; videos 1, 2, 3 are three recordings of the same day (2025-10-31), videos 4–10 one per recording day. From video 11: 19.9-minute videos of Terra, one per recording day. All at 60 fps.</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">Phase 2 (the definitions of step 4).</span></td></tr>
+    <tr><th><span lang="en">Training data</span></th><td><span lang="en">The labels carried from earlier videos (table below) plus this video's own labels. Its own labels are picked from the first 80% of the video: the first 20 by clustering image appearance, each later batch of 20 by clustering among the frames with large jumps; the model pre-labels each batch and a person corrects every frame.</span></td></tr>
+    <tr><th><span lang="en">Validation data</span></th><td><span lang="en">20 frames from the part between 80% and 90% of the video, with 2-second guards on both sides.</span></td></tr>
+    <tr><th><span lang="en">Test data</span></th><td><span lang="en">50 frames evenly spaced in time over the final 10% of the video, labeled by hand and frozen. Used only to report the score.</span></td></tr>
+    <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">ResNet-50, batch 2, 120 epochs, learning rate drops at epochs 96 and 114, trained on MPS, scored on CPU. Every step is trained anew from ImageNet-pretrained weights, a single run. The final snapshot (epoch 120) is scored.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Median frame RMSE (8 points) on the 50 test frames of that video.</span></td></tr>
+  </tbody></table></div>
+  
+  <div class="text" lang="en">
+    <p><span class="tag">What was done:</span>Videos are added one at a time, in this order.</p>
+    <ul>
+      <li><b>Video 0:</b> the 5-minute video of the first mouse.</li>
+      <li><b>Videos 1, 2, 3:</b> the second mouse, Pluto; three recordings of the same day (2025-10-31), 19.9 minutes each.</li>
+      <li><b>Videos 4–10:</b> Pluto, one recording per recording day, from the most recent backwards: 10-30, 10-29, 10-28, 10-27, 10-24, 10-23, 10-22 (there is no video of 10-26 or 10-25 in our set).</li>
+      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18, not done yet).</li>
+    </ul>
+    <p>Every video follows the same steps:</p>
+    <ol>
+      <li>50 frames evenly spaced over the final 10% of the video become the test set; they are labeled and frozen.</li>
+      <li>The previous model is applied unchanged to get the "0 labels" error.</li>
+      <li>Each step adds 20 labels of this video (picked by the algorithm of section 5.1 and Figure 5-1 below; the model pre-labels each batch and a person corrects every frame), retrains together with the labels carried from earlier videos, and scores on the test set.</li>
+      <li><b>Plateau rule</b>: stop when two consecutive steps each fail to improve the best error by more than 3%. The plateau point is the last step that did improve it. When the rule fires, a person confirms whether the video is finished. So far all 12 videos stopped when the rule fired, so all of them meet the definition of the plateau; for 11 of them the plateau point is the step the rule gives, and <b>only for video 5 was the plateau point given further consideration</b>. On video 5 the median error at 20 labels (15.85 px) and at 40 labels (16.58 px) is no better than at 0 labels (11.90 px), so the rule fired at 40; this meets the definition of the plateau, and by the rule the plateau point is 0 labels. But we took into account that the 0-label model is off by more than 50 px on 6 of the 50 test frames (12%), which are gross errors; with 20 labels there are 0 such frames, so all gross errors are removed; with 40 labels there are still 0, so the effect holds and nothing further is gained. The plateau point is therefore taken as 20 labels, and these 20 labels are what later videos carry.</li>
+      <li>The next video starts, carrying only this video's labels <span class="hl">up to the plateau point</span> (not every frame labeled on this video goes into the training of later videos: frames labeled after the plateau point are left out). This mirrors real use, where labeling stops at the plateau.</li>
+    </ol>
+  </div>
+  <h3><span lang="en">5.1 How each batch of 20 frames is picked (algorithm)</span></h3>
+  
+  <div class="text" lang="en">
+    <p>Script: <code>v2_new_pupil_top_video_scaling/scripts/select_frames.py</code>. All numbers below are fixed parameters of the script; following them gives the same frames.</p>
+    <p><b>(a) The video is first split into three segments</b></p>
+    <ol>
+      <li>Test segment: the final 10% of the video (at least 60 s). 50 frames evenly spaced in time are the test frames.</li>
+      <li>Validation segment: the 10% before it (at least 60 s). 20 evenly spaced frames are the validation frames.</li>
+      <li>Pool: all frames before the validation segment (about the first 80%; 57158 frames for a 19.9-min video). Training frames are picked from the pool only. 2 s are removed on both sides of the validation segment so that the three segments share no near-identical neighbouring frames.</li>
+    </ol>
+    <p><b>(b) Batch 1: clustering by image appearance (no model)</b></p>
+    <ol>
+      <li>Every 5th frame of the pool is taken.</li>
+      <li>An "appearance fingerprint" is computed for each frame: greyscale, downscaled to 128 × 96; a Gaussian blur with sigma 1 px minus a Gaussian blur with sigma 6 px (keeps edges and shape, removes slow lighting changes); downscaled to 32 × 24 and flattened to 768 numbers; mean subtracted and divided by the standard deviation.</li>
+      <li>k-means on the fingerprints with 20 clusters (scikit-learn <code>KMeans</code>, <code>n_clusters=20, n_init=10, max_iter=300, random_state=42</code>).</li>
+      <li>From each cluster the frame closest to the cluster centre (Euclidean distance) is taken, 20 frames in total, starting with the largest cluster.</li>
+      <li>Spacing: picked frames must be at least 1 s apart from each other and from every frame labeled earlier; frames that violate this are skipped. If fewer than 20 remain, the number of clusters is raised to 30, 40, … (at most 80) and the new centre frames fill the batch.</li>
+    </ol>
+    <p><b>(c) From batch 2 on: candidates by the jump rule, then clustering by appearance</b></p>
+    <ol>
+      <li>The model of the previous step predicts every frame of the whole video.</li>
+      <li>Threshold: eye width = distance from the nasal to the temporal corner in each frame, median over the video; threshold = 3% of the median eye width (about 12–15 px).</li>
+      <li>Jump: for each frame, the distance each of the 8 points moved from the previous frame; the largest of the 8.</li>
+      <li>Pool frames whose jump exceeds the threshold are the candidates (the frames flagged by the jump rule). More than 12000 candidates are thinned evenly to about 12000; with fewer than 40, the 2000 frames with the largest jumps are used instead.</li>
+      <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart, more clusters if short.</li>
+      <li>If there are still fewer than 20 (this happens when the model is already good and the few candidates are bunched within a few seconds), the batch is filled from the candidates in order of decreasing jump, still 1 s apart.</li>
+    </ol>
+    <p>Every batch is therefore "one frame per cluster": the jump rule decides where to look (frames on which the model is unstable), and the clustering makes sure the 20 picked frames look different from each other instead of being 20 nearly identical frames.</p>
+  </div>
+  <figure>
+    <div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video00.jpg" alt="Video 0: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video01.jpg" alt="Video 1: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video02.jpg" alt="Video 2: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 2 (Pluto, 2025-10-31): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video03.jpg" alt="Video 3: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 3 (Pluto, 2025-10-31): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video04.jpg" alt="Video 4: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 4 (Pluto, 2025-10-30): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video05.jpg" alt="Video 5: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 5 (Pluto, 2025-10-29): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video06.jpg" alt="Video 6: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 6 (Pluto, 2025-10-28): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video07.jpg" alt="Video 7: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 7 (Pluto, 2025-10-27): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video08.jpg" alt="Video 8: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 8 (Pluto, 2025-10-24): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video09.jpg" alt="Video 9: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video10.jpg" alt="Video 10: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video11.jpg" alt="Video 11: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17): batch 2</span></div></div>
+    </div></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>One selection sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Each sheet, from top to bottom: (1) scatter plot at the top left: one dot per candidate frame, placed by the first two principal components of its fingerprint and coloured by cluster; black stars are the 20 picked frames. Bars at the top right: frames per cluster. (2) Second row: when the frames of each cluster occur in the video; stars are the picks. (3) The next rows are traces predicted by the model against time, with a thin vertical line at each of the 20 picks: pupil centre x and y, eye opening, pupil area, lowest pupil confidence. (4) Bottom row: the largest jump in each frame; the red dashed line is the threshold and frames above it are candidates. <b>What to see:</b> the stars are spread over all regions of the scatter plot with one frame in every cluster, so the 20 picks cover the different appearances among the candidates instead of concentrating on one; the vertical lines are also spread over the whole duration instead of bunching at one moment. The sheets of every batch of every video are in the appendix at the end of the page.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 5-2, how to read:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60, video 1 (first video of the new mouse) 20, most later videos 20, video 7 none, video 9 80; the hatched bar is the video still in progress. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox scroll"><div class="strip">
+      <div class="item"><img src="assets/scale_video00.jpg" alt="Video 0: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min): plateau at 60 labels, 12.04 px</span></div></div>
+      <div class="item"><img src="assets/scale_video01.jpg" alt="Video 1: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31): plateau at 20 labels, 10.37 px</span></div></div>
+      <div class="item"><img src="assets/scale_video02.jpg" alt="Video 2: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 2 (Pluto, 2025-10-31): plateau at 20 labels, 7.73 px</span></div></div>
+      <div class="item"><img src="assets/scale_video03.jpg" alt="Video 3: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 3 (Pluto, 2025-10-31): plateau at 20 labels, 3.40 px</span></div></div>
+      <div class="item"><img src="assets/scale_video04.jpg" alt="Video 4: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 4 (Pluto, 2025-10-30): plateau at 40 labels, 15.01 px</span></div></div>
+      <div class="item"><img src="assets/scale_video05.jpg" alt="Video 5: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 5 (Pluto, 2025-10-29): plateau at 20 labels, 15.85 px</span></div></div>
+      <div class="item"><img src="assets/scale_video06.jpg" alt="Video 6: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 6 (Pluto, 2025-10-28): plateau at 20 labels, 6.75 px</span></div></div>
+      <div class="item"><img src="assets/scale_video07.jpg" alt="Video 7: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 7 (Pluto, 2025-10-27): plateau at 0 labels, 5.36 px</span></div></div>
+      <div class="item"><img src="assets/scale_video08.jpg" alt="Video 8: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 8 (Pluto, 2025-10-24): plateau at 20 labels, 25.34 px</span></div></div>
+      <div class="item"><img src="assets/scale_video09.jpg" alt="Video 9: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23): plateau at 80 labels, 8.20 px</span></div></div>
+      <div class="item"><img src="assets/scale_video10.jpg" alt="Video 10: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22): plateau at 40 labels, 10.32 px</span></div></div>
+      <div class="item"><img src="assets/scale_video11.jpg" alt="Video 11: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17): plateau at 40 labels, 8.86 px</span></div></div>
+    </div></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 5-3, how to read:</span>The curves of every video in one row, from video 0 to the newest; scroll sideways. Under each figure: video, mouse, date and plateau point. How to read the three panels, with video 9 as the example. Left: x = this video's own labels, y = error; 10.4 px at 20 labels, 8.6 px at 40, 8.2 px at 80, then two steps without a gain (9.4, 8.6 px), so the rule fired at 120 and the plateau point is 80. Middle: error of each of the 8 points; pupil bottom (blue) is the hardest. Right: label-free signals; the purple line is the share of video frames flagged by the jump rule, falling from 18% to 9% as labels are added.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox scroll"><img src="assets/all_view_main.jpg" alt="All videos, main line" style="width:2400px"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 5-4, how to read:</span>All videos in one figure, with the main line emphasized (wide; scroll sideways). From left to right each tinted block is one video, in training order; above it: video, date and carried labels. Inside a block x = that video's own labels and y = error (log scale). The bold coloured line is that video's own test set: the open circle is 0 labels (the previous model applied unchanged), then one point every 20 labels. What to see: most videos drop close to their plateau in the single step from 0 to 20 labels and stay flat afterwards. Grey lines are the test sets of the other videos, named at the right end.</figcaption>
+  </figure>
+  
+  <p class="text" lang="en">The full numbers of every video (generated from the result tables):</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr>
+        <th><span lang="en">video</span></th>
+        <th><span lang="en">mouse / date</span></th>
+        <th><span lang="en">labels carried in from earlier videos</span></th>
+        <th><span lang="en">error (px) at 0 / 20 / 40 / … own labels</span></th>
+        <th><span lang="en">plateau</span></th>
+        <th><span lang="en">labeled in total</span></th>
+        <th><span lang="en">carried into later videos</span></th>
+      </tr></thead>
+      <tbody>
+<tr><td>0</td><td>mouse A<br>5-min</td><td>0</td><td>– / 12.93 / 13.00 / 12.04 / 13.07 / 12.29</td><td><span lang="en"><b>60 labels, 12.04 px</b></span></td><td>100</td><td>100</td></tr>
+<tr><td>1</td><td>Pluto<br>2025-10-31</td><td>100</td><td>208.23 / 10.37 / 12.17 / 11.35 / 11.59 / 10.94 / 11.70 / 12.09</td><td><span lang="en"><b>20 labels, 10.37 px</b></span></td><td>140</td><td>100</td></tr>
+<tr><td>2</td><td>Pluto<br>2025-10-31</td><td>200</td><td>9.99 / 7.73 / 7.57 / 7.83 / 7.56</td><td><span lang="en"><b>20 labels, 7.73 px</b></span></td><td>80</td><td>60</td></tr>
+<tr><td>3</td><td>Pluto<br>2025-10-31</td><td>260</td><td>4.43 / 3.40 / 3.87 / 3.63</td><td><span lang="en"><b>20 labels, 3.40 px</b></span></td><td>60</td><td>60</td></tr>
+<tr><td>4</td><td>Pluto<br>2025-10-30</td><td>320</td><td>32.11 / 24.64 / 15.01 / 16.82 / 17.54</td><td><span lang="en"><b>40 labels, 15.01 px</b></span></td><td>80</td><td>40</td></tr>
+<tr><td>5</td><td>Pluto<br>2025-10-29</td><td>360</td><td>11.90 / 15.85 / 16.58</td><td><span lang="en"><b>20 labels, 15.85 px</b></span></td><td>40</td><td>20</td></tr>
+<tr><td>6</td><td>Pluto<br>2025-10-28</td><td>380</td><td>9.36 / 6.75 / 8.46 / 10.68</td><td><span lang="en"><b>20 labels, 6.75 px</b></span></td><td>60</td><td>20</td></tr>
+<tr><td>7</td><td>Pluto<br>2025-10-27</td><td>400</td><td>5.36 / 5.86 / 5.84</td><td><span lang="en"><b>0 labels, 5.36 px</b></span></td><td>40</td><td>0</td></tr>
+<tr><td>8</td><td>Pluto<br>2025-10-24</td><td>400</td><td>27.46 / 25.34 / 30.03 / 33.77</td><td><span lang="en"><b>20 labels, 25.34 px</b></span></td><td>60</td><td>20</td></tr>
+<tr><td>9</td><td>Pluto<br>2025-10-23</td><td>420</td><td>23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63</td><td><span lang="en"><b>80 labels, 8.20 px</b></span></td><td>120</td><td>80</td></tr>
+<tr><td>10</td><td>Pluto<br>2025-10-22</td><td>500</td><td>18.13 / 11.83 / 10.32 / 10.49 / 10.76</td><td><span lang="en"><b>40 labels, 10.32 px</b></span></td><td>80</td><td>40</td></tr>
+<tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86 / 8.77 / 8.65</td><td><span lang="en"><b>40 labels, 8.86 px</b></span></td><td>80</td><td>40</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="text small" lang="en">
+    <p><b>Notes on the table:</b> </p>
+    <ul>
+      <li>Videos 0–3 carry all labels that existed when the next video started (320 in total), more than their plateau points (120 in total). From video 4 on only the labels up to the plateau point are carried. These 320 labels are the same in the training set of every later model, so comparisons between later videos are not affected.</li>
+      <li>Videos 4, 5 and 8 have larger errors (15.0, 15.9 and 25.3 px at the plateau point). The labeler's judgement: these three videos are blurry, the pupil edge and the point positions are hard to identify even by eye, so the human labels themselves are less certain and the errors are not comparable with the other videos.</li>
+      <li>Video 5: the median error at 0 labels is already low, but 12% of test frames are off by more than 50 px; 20 labels remove all of them, so the plateau point is recorded as 20.</li>
+      <li>Video 8 stays above 25 px at every step with 12–16% of test frames above 50 px; the cause is not known yet.</li>
+    </ul>
+  </div>
+  
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The starting point on a new mouse is improving: 208 px at 0 labels on the second mouse (the model had seen one mouse and 100 labels), 26 px on the third (two mice and 540 labels); on the third mouse, however, neighbouring models score between 17 and 33 px at 0 labels, so a single number is not stable. The first video of a new mouse needs 20 labels; later videos of the same mouse mostly reach the plateau with 20, at least 0 and at most 80. The error at the plateau is mostly between 3 and 16 px (video 8 excepted).</p>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="no">6</span><span lang="en">A question asked after the experiments: would a first batch of 5 or 10 labels be enough</span></h2>
+  
+  <p class="text" lang="en">— We found that 20 labels per video generally bring the error close to saturation. Can the number of labels be reduced further? What is the result, is it enough, can it replace 20 labels, and why?</p>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Video</span></th><td><span lang="en">The same videos as in step 5.</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">Phase 2 (the definitions of step 4).</span></td></tr>
+    <tr><th><span lang="en">Training data</span></th><td><span lang="en">The training set of that video's step 1, with the video's own 20 labels replaced by 5 or 10 of them. The subsets are picked by image appearance (the 20 clusters of the first batch are merged into 5 or 10 groups and one frame is taken from each) and depend on no model; two subsets (a, b) per size.</span></td></tr>
+    <tr><th><span lang="en">Test data</span></th><td><span lang="en">Same as step 5: the 50 test frames of that video.</span></td></tr>
+    <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">Same as step 5.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Same as step 5.</span></td></tr>
+  </tbody></table></div>
+  
+  
+  
+  <div class="text" lang="en">
+    <p><b>How exactly the 5 and 10 labels are taken (algorithm).</b> Script: <code>v2_new_pupil_top_video_scaling/scripts/make_label_subsets.py</code>. It uses only the 20 labeled frames of the first batch and the clustering saved at the time; no model and no new labeling.</p>
+    <ol>
+      <li>The 20 frames of the first batch come from 20 appearance clusters (batch-1 algorithm of section 5.1 in step 5); each cluster has a centre (a 768-number fingerprint) and a number of frames.</li>
+      <li>The 20 cluster centres are clustered again by k-means into 5 groups (for 5 labels) or 10 groups (for 10 labels), each centre weighted by the number of frames in its cluster (scikit-learn <code>KMeans</code>, <code>n_clusters=5 or 10, n_init=20, random_state=0</code>).</li>
+      <li>Each of the 20 labeled frames is assigned by its fingerprint to the nearest group.</li>
+      <li>Subset a: from each group, the labeled frame closest to the group centre. Subset b: from each group, the second closest (the same frame again when the group holds only one labeled frame).</li>
+      <li>If groups returned the same frame and fewer than 5 or 10 distinct frames result, the subset is filled from the unused labeled frames in order of increasing distance to any group centre.</li>
+      <li>This gives four lists: 5a, 5b, 10a, 10b. In training, the video's own 20 labels are replaced by the 5 or 10 listed frames; the carried labels of the earlier videos, the validation frames (20), the test frames (50), the model and the training settings are exactly those of that video's step 1 (<code>scale_step.py --step 1 --subset list-file</code>).</li>
+    </ol>
+    <p>So the 5 and 10 labels are also "one frame per kind of appearance", only with a coarser grouping; a and b are two different sets of frames under the same grouping (the closest and the second closest frame of each group) In all 12 videos 5a and 5b have no frame in common, and 10a and 10b share 2–4 frames.</p>
+  </div>
+  
+  <p class="text" lang="en"><span class="tag">Why this step was done afterwards:</span>On the main line the first batch of every video has 20 labels. Figure 5-4 shows that for most videos these 20 labels bring the error directly close to the plateau. So after the videos of the main line were finished we went back to step 1 of each video and asked: what would the result have been with a first batch of only 5 or 10 labels?</p>
+  <p class="text" lang="en"><span class="tag">What was done:</span>5 or 10 of the 20 labels of each video's first batch were taken, everything else exactly as in that video's step 1, then retrained and scored; no new labeling is needed. With so few frames the result depends strongly on which frames happen to be taken, so to guard against chance two different subsets were taken for each size and trained separately: 5a, 5b and 10a, 10b. The shaded band in the figure is the range between the two results.</p>
+  <p class="text" lang="en"><span class="hl">To be clear: the 5- and 10-label models were run afterwards only to look at the result; they were trained and scored, and were not used for jump selection or followed by more labeling. On the main line the jump rule is first used after the model of the first 20 labels. The results of this step therefore only answer "how large should the first batch be"; they do not represent a procedure of "5 labels first, then jump-selected labels".</span></p>
+  <figure>
+    <div class="figbox scroll"><img src="assets/all_view_fewer.jpg" alt="All videos, first batch of 5 or 10 labels" style="width:2400px"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 6-1, how to read:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. In each block the open circles are, from left to right: 0 labels, the two 5-label subsets (5a, 5b, at the same x), the two 10-label subsets (10a, 10b), joined to the 20-label point. The band is the range between the two subsets: a narrow band means the two results agree, a wide band means that another choice of frames gives a very different result (e.g. 5 labels on video 1 or on video 6). The thin coloured line is the regular procedure of 20 labels per step. The figure is wide; scroll sideways.</figcaption>
+  </figure>
+  <div class="tablebox">
+    <table>
+      <thead><tr>
+        <th><span lang="en">video</span></th>
+        <th><span lang="en">0 labels</span></th>
+        <th><span lang="en">5 labels (a / b)</span></th>
+        <th><span lang="en">10 labels (a / b)</span></th>
+        <th><span lang="en">20 labels</span></th>
+      </tr></thead>
+      <tbody>
+<tr><td>0</td><td>–</td><td>78.53 / 81.50</td><td>20.48 / 20.84</td><td>12.93</td></tr>
+<tr><td>1</td><td>208.23</td><td>96.02 / 41.38</td><td>20.17 / 16.12</td><td>10.37</td></tr>
+<tr><td>2</td><td>9.99</td><td>8.22 / 11.50</td><td>10.46 / 9.85</td><td>7.73</td></tr>
+<tr><td>3</td><td>4.43</td><td>3.82 / 3.91</td><td>3.81 / 3.48</td><td>3.40</td></tr>
+<tr><td>4</td><td>32.11</td><td>30.74 / 32.21</td><td>45.31 / 44.75</td><td>24.64</td></tr>
+<tr><td>5</td><td>11.90</td><td>13.04 / 9.42</td><td>12.56 / 12.73</td><td>15.85</td></tr>
+<tr><td>6</td><td>9.36</td><td>6.73 / 12.84</td><td>7.63 / 10.11</td><td>6.75</td></tr>
+<tr><td>7</td><td>5.36</td><td>6.38 / 6.07</td><td>5.83 / 5.83</td><td>5.86</td></tr>
+<tr><td>8</td><td>27.46</td><td>31.05 / 31.48</td><td>23.48 / 22.42</td><td>25.34</td></tr>
+<tr><td>9</td><td>23.41</td><td>11.74 / 12.62</td><td>11.55 / 11.07</td><td>10.39</td></tr>
+<tr><td>10</td><td>18.13</td><td>15.01 / 12.50</td><td>11.70 / 13.08</td><td>11.83</td></tr>
+<tr><td>11</td><td>25.96</td><td>9.69 / 9.97</td><td>9.54 / 8.87</td><td>9.24</td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="text small muted" lang="en">Median frame RMSE in px. "–" = no such point or not trained yet. The runs for video 6 onward are added whenever the main line is idle.</p>
+  <figure>
+    <div class="figbox scroll"><div class="strip">
+      <div class="item"><img src="assets/fewer_video00.jpg" alt="fewer video 0" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min)</span></div></div>
+      <div class="item"><img src="assets/fewer_video01.jpg" alt="fewer video 1" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/fewer_video02.jpg" alt="fewer video 2" loading="lazy"><div class="cap"><span lang="en">Video 2 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/fewer_video03.jpg" alt="fewer video 3" loading="lazy"><div class="cap"><span lang="en">Video 3 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/fewer_video04.jpg" alt="fewer video 4" loading="lazy"><div class="cap"><span lang="en">Video 4 (Pluto, 2025-10-30)</span></div></div>
+      <div class="item"><img src="assets/fewer_video05.jpg" alt="fewer video 5" loading="lazy"><div class="cap"><span lang="en">Video 5 (Pluto, 2025-10-29)</span></div></div>
+      <div class="item"><img src="assets/fewer_video06.jpg" alt="fewer video 6" loading="lazy"><div class="cap"><span lang="en">Video 6 (Pluto, 2025-10-28)</span></div></div>
+      <div class="item"><img src="assets/fewer_video07.jpg" alt="fewer video 7" loading="lazy"><div class="cap"><span lang="en">Video 7 (Pluto, 2025-10-27)</span></div></div>
+      <div class="item"><img src="assets/fewer_video08.jpg" alt="fewer video 8" loading="lazy"><div class="cap"><span lang="en">Video 8 (Pluto, 2025-10-24)</span></div></div>
+      <div class="item"><img src="assets/fewer_video09.jpg" alt="fewer video 9" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23)</span></div></div>
+      <div class="item"><img src="assets/fewer_video10.jpg" alt="fewer video 10" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22)</span></div></div>
+      <div class="item"><img src="assets/fewer_video11.jpg" alt="fewer video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
+    </div></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>5 or 10 labels are enough on a few videos but cannot replace 20.
+    <ol>
+      <li><b>The result:</b> of the 12 videos only 3 have both 5-label subsets within 10% of the 20-label model (videos 5, 7, 11), and 4 have both 10-label subsets within 10% (videos 5, 7, 8, 11); on video 3 the difference is only 0.1–0.5 px. On the other videos 5 or 10 labels are worse: e.g. video 0: 79 / 82 px (5 labels) and 20 / 21 px (10) against 12.9 px (20); video 1: 96 / 41 px and 20 / 16 px against 10.4 px. The 20-label model is better than both 5-label subsets on 10 videos and better than both 10-label subsets on 7.</li>
+      <li><b>Is it enough:</b> on videos already well covered by the earlier videos, yes. Their error is low at 0 labels (videos 3, 5, 7: 4.4, 11.9, 5.4 px at 0 labels), so labels make little difference either way. Video 11 is the exception: the first video of the third mouse, 26 px at 0 labels, 9.7 / 10.0 px with 5 and 9.2 px with 20.</li>
+      <li><b>Can it replace 20 labels:</b> no, for three reasons. (a) On most videos the error with 5 or 10 labels is clearly higher than with 20. (b) One cannot tell in advance which kind a new video is: both are a change of mouse, yet 5 labels give 96 / 41 px on video 1 and 9.7 / 10.0 px on video 11. (c) With few frames the result depends on which frames happen to be taken: two 5-label subsets of the same video can differ a lot (video 1: 96 vs 41 px; video 6: 6.7 vs 12.8 px); 20 labels do not have this problem.</li>
+      <li><b>Cost against benefit:</b> 5 or 10 labels save only 15 or 10 labels per video, at the price of an unstable result. The regular procedure therefore stays: 20 labels in the first batch of every video, then 20 per step.</li>
+      <li><b>Not explained:</b> on video 4, 10 labels (45 px, both subsets) are worse than 0 labels (32 px); video 4 is one of the blurry videos.</li>
+      <li><b>Scope of this conclusion:</b> the 5 and 10 labels are taken out of the 20 already labeled frames of the first batch, picked by image appearance without a model; what is compared is the size of the first batch. It is not a procedure of "label 5, find wrong frames with jump, label 5 more"; that procedure was not run and these numbers must not be read as its result.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="no">7</span><span lang="en">Do new videos hurt old ones: no</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Video</span></th><td><span lang="en">All videos of step 5.</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">Phase 2 (the definitions of step 4).</span></td></tr>
+    <tr><th><span lang="en">Data</span></th><td><span lang="en">Every model trained in steps 5 and 6 (final snapshot) is scored on the 50 test frames of every video. No new training and no new labels.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Same as step 5: median frame RMSE.</span></td></tr>
+  </tbody></table></div>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>Every model trained along the sequence was scored on the test set of every video (back-test).</p>
+  <figure>
+    <div class="figbox scroll"><img src="assets/all_view_backtest.jpg" alt="All videos, back-test" style="width:2400px"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 7-1, how to read:</span>The same figure as Figure 5-4, here with the back-test emphasized. One colour per video: its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block and grey before its own block (its labels not yet in the training set). Two things to see: (1) the bold lines are essentially flat: adding other videos later does not make an earlier video worse. (2) At the far left, with labels of the first mouse only, every Pluto video (grey) is at 170–350 px; as soon as video 1's labels enter, all drop below a few tens of px. The figure is wide; scroll sideways.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox scroll"><img src="assets/cross_video_matrix.jpg" alt="Error of each model on each test set" style="width:2400px"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 7-2, how to read:</span>The same data as a table: rows = test videos, columns = models, cells = error (px); yellow is good, purple is bad. The purple block on the left is the models with labels of the first mouse only; to the right each row keeps its colour and never turns purple again.</figcaption>
+  </figure>
+  
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>One model can keep accumulating videos without hurting the old ones. Videos of the same day transfer directly (video 3 was at 4.4 px before any of its own labels); a new day needs its 0-label error checked before deciding how much to label. A 0-label score from a single model is not reliable; individual models can be far off.</p>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="no">8</span><span lang="en">Error and confidence of each keypoint: pupil top is the least accurate; low confidence goes with larger error</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">The 12 finished videos (videos 0–11).</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
+    <tr><th><span lang="en">Data</span></th><td><span lang="en">The 50 test frames of each video (final 10% of the video, never used for training); the per-point error and confidence tables saved when each step was scored.</span></td></tr>
+    <tr><th><span lang="en">Model</span></th><td><span lang="en">The model of every step of every video (ResNet-50, batch 2, 120 epochs, final snapshot); the pooled figure and table use each video's plateau-point model (video 7: its 20-label model).</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Error of a point = straight-line distance (px) between the prediction and the human label, no confidence cut-off, points without a human label excluded; confidence = the model's confidence of the point (0 to 1). Per keypoint: median and 90th percentile of the error, and mean confidence.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/keypoint_confidence_error.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/keypoint_confidence_error/</code>.</span></td></tr>
+  </tbody></table></div>
+  
+  <p class="text" lang="en"><span class="tag">Why this comes here:</span>The pupil area that follows uses the four pupil points, and the frames without a visible pupil are found from the confidence. So first: how accurate is each point, and can its confidence be trusted.</p>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>On the 50 test frames of each video, the error (straight-line distance between prediction and human label, px) and the model's confidence were summarized for each of the 8 points. The data are the per-point error tables saved when each step was scored. There is one figure per video (<code>results/keypoint_confidence_error/keypoint_confidence_error_videoNN.png</code>); below is the figure for the 12 videos together, with each video's plateau-point model.</p>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_kp_conf_error.jpg" alt="Error and confidence by keypoint, all videos"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-1, how to read:</span>Left: median error of each point (row) on each video (column); the last column is the 12 videos pooled. Middle: the mean confidence. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox scroll"><div class="strip">
+      <div class="item"><img src="assets/kpconf_video00.jpg" alt="kpconf video 0" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video01.jpg" alt="kpconf video 1" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video02.jpg" alt="kpconf video 2" loading="lazy"><div class="cap"><span lang="en">Video 2 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video03.jpg" alt="kpconf video 3" loading="lazy"><div class="cap"><span lang="en">Video 3 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video04.jpg" alt="kpconf video 4" loading="lazy"><div class="cap"><span lang="en">Video 4 (Pluto, 2025-10-30)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video05.jpg" alt="kpconf video 5" loading="lazy"><div class="cap"><span lang="en">Video 5 (Pluto, 2025-10-29)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video06.jpg" alt="kpconf video 6" loading="lazy"><div class="cap"><span lang="en">Video 6 (Pluto, 2025-10-28)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video07.jpg" alt="kpconf video 7" loading="lazy"><div class="cap"><span lang="en">Video 7 (Pluto, 2025-10-27)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video08.jpg" alt="kpconf video 8" loading="lazy"><div class="cap"><span lang="en">Video 8 (Pluto, 2025-10-24)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video09.jpg" alt="kpconf video 9" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video10.jpg" alt="kpconf video 10" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22)</span></div></div>
+      <div class="item"><img src="assets/kpconf_video11.jpg" alt="kpconf video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
+    </div></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-2, how to read:</span>One figure per video in one row; scroll sideways. In each: left, the median error of the 8 points at each step of this video (20, 40, 60, … labels); middle, the mean confidence; right, every point of the plateau-point model on the 50 test frames, x = confidence, y = error (log scale), colour = keypoint, dashed line = confidence 0.6. Points towards the upper left have low confidence and a large error.</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>Pupil top is the least accurate point, and points with low confidence have larger errors.
+    <ol>
+      <li>Pooled over the 12 videos the median error of pupil top is 10.9 px, the other 7 points 3.9–5.8 px; pupil top and pupil left have the lowest mean confidence (0.72 and 0.74), and pupil left the largest 90th-percentile error (39 px).</li>
+      <li>For every point a lower confidence goes with a larger error (rank correlation −0.26 to −0.60): points with confidence 0.8–1 have a median error of 2.4–4.5 px (pupil top 8.3 px), points with confidence 0.2–0.4 have 6.6–45.7 px.</li>
+      <li>Pupil top has an error of 8.3 px even at high confidence, so its confidence does not show that a prediction is accurate the way it does for the other points.</li>
+      <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="no">9</span><span lang="en">Pupil area and blinks: the four-point area has the lowest error; the mean confidence of the pupil points best finds the frames in which a person could not label the pupil; blinks have no definition or truth yet</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">The 12 finished videos (videos 0–11; 1 of mouse A, 10 of Pluto, 1 of Terra).</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
+    <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off.</span></td></tr>
+    <tr><th><span lang="en">Frames for the area</span></th><td><span lang="en">The frames among each video's 50 frozen test frames in which all four pupil points have human labels, 594 frames in total. Test frames come from the final 10% of the video; no model was trained on them.</span></td></tr>
+    <tr><th><span lang="en">Frames for eye closure</span></th><td><span lang="en">Human-labeled frames the predicting model was not trained on: test50 and val20 (prediction of the plateau model) and every batch from the 2nd on (prediction of the model of the step before, which selected that batch). A frame whose four pupil points were all left empty by the labeler counts as closed (28 frames, from 9 videos); a frame with all four labeled counts as open (1484 frames); frames with 1–3 pupil points are not used.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>, the time series of each video in <code>blink_area_timeseries_videoNN.png</code> there (NN = video index).</span></td></tr>
+  </tbody></table></div>
+
+  <h3><span lang="en">9.1 How the area and its error are computed</span></h3>
+  
+  <div class="text" lang="en">
+    <p>The four pupil points are top T, bottom B, left L, right R, with coordinates (x, y) in pixels; the image y axis points down.</p>
+    <ol>
+      <li><b>Truth (human labels):</b> the four points are the endpoints of the two axes of an ellipse, so the area is<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>A</mi><mo>=</mo><mfrac><mi>π</mi><mn>4</mn></mfrac><mo>·</mo><mi>w</mi><mo>·</mo><mi>h</mi><mo>,</mo><mspace width='1em'/><mi>w</mi><mo>=</mo><mrow><mo>|</mo><msub><mi>x</mi><mi mathvariant='normal'>R</mi></msub><mo>−</mo><msub><mi>x</mi><mi mathvariant='normal'>L</mi></msub><mo>|</mo></mrow><mo>,</mo><mspace width='1em'/><mi>h</mi><mo>=</mo><mrow><mo>|</mo><msub><mi>y</mi><mi mathvariant='normal'>B</mi></msub><mo>−</mo><msub><mi>y</mi><mi mathvariant='normal'>T</mi></msub><mo>|</mo></mrow></math></li>
+      <li><b>Four-point rule (model):</b> the same formula on the model's four points.</li>
+      <li><b>Three-point rule (top unused; the rule of the current area script <code>pupil_trace.py</code>):</b> the width is unchanged and the height is twice the distance from the bottom point to the midline of the left and right points,<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>A</mi><mtext>no top</mtext></msub><mo>=</mo><mfrac><mi>π</mi><mn>4</mn></mfrac><mo>·</mo><mi>w</mi><mo>·</mo><mn>2</mn><mrow><mo>(</mo><msub><mi>y</mi><mi mathvariant='normal'>B</mi></msub><mo>−</mo><mfrac><mrow><msub><mi>y</mi><mi mathvariant='normal'>L</mi></msub><mo>+</mo><msub><mi>y</mi><mi mathvariant='normal'>R</mi></msub></mrow><mn>2</mn></mfrac><mo>)</mo></mrow></math>The rules without the bottom, left or right point are built the same way (twice the distance from the opposite point to the midpoint of the other axis).</li>
+      <li><b>The other rules:</b> "drop lowest confidence": per frame, leave out the pupil point with the lowest model confidence; "four, fallback": the four-point rule when all four confidences are at least 0.6, otherwise drop the lowest; "four + median filter": a running median of 5 or 31 frames (0.5 s) of the four-point area over the whole video.</li>
+      <li><b>Area error of a frame (%):</b><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mn>100</mn><mo>×</mo><mfrac><mrow><mo>|</mo><msub><mover><mi>A</mi><mo>^</mo></mover><mi>i</mi></msub><mo>−</mo><msub><mi>A</mi><mi>i</mi></msub><mo>|</mo></mrow><msub><mi>A</mi><mi>i</mi></msub></mfrac></math>where <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mover><mi>A</mi><mo>^</mo></mover><mi>i</mi></msub></math> is the area on the model side and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>A</mi><mi>i</mi></msub></math> the truth. Per video and for the 12 videos pooled, the median and the 90th percentile of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>e</mi><mi>i</mi></msub></math> are reported.</li>
+    </ol>
+  </div>
+  <figure>
+    <div class="figbox"><img src="assets/fig_eye_area.jpg" alt="Area rules on all videos"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-1, how to read:</span>Left: the 594 test frames of the 12 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 0.5-s median filter (dark).</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on the area:</span>Among these rules the four-point rule has the lowest error, but on some videos the area is still not accurate.
+    <ol>
+      <li>Pooled over the 12 videos the four-point rule has a median error of 6.6%, the lowest group of the 9 rules; the three-point rule of the current script 8.3%; leaving out the bottom, left or right point 10.8–11.7%.</li>
+      <li>Per video the four-point rule is lower than the three-point rule on 8 of the 12 videos; on videos 1, 2, 5 and 7 the three-point rule is lower.</li>
+      <li>A median filter over time does not help (5 frames 6.5%, 0.5 s 6.8%): the error is mostly not frame-to-frame jitter.</li>
+      <li>The error differs a lot between videos: 2–10% on 8 videos, 43.8% on video 4 and 24.0% on video 8, the two videos with the largest keypoint error (step 5: 15.01 and 25.34 px). The pooled 90th percentile is 46%: in one frame of ten the area is off by almost half.</li>
+      <li><b>Why the four-point rule is better:</b> both rules use the same width; they differ in the height. The four-point rule measures the height directly from top to bottom. The three-point rule has no top point, so it assumes that the left and right points lie exactly at mid-height of the ellipse and takes twice the distance from the bottom point to the line through them. A labeler cannot place the left and right points exactly at mid-height; they are always a few pixels too high or too low. The four-point rule uses only the x coordinates of these two points and is not affected, whereas the three-point rule doubles this offset into the height. Applying the three-point formula to the human points themselves (no model involved) differs from the human four-point area by a median of 4.7% over the 594 frames (13.0% on video 3, 9.0% on video 6). The model learns from the human labels and carries the same offset.</li>
+    </ol>
+  </div>
+
+  <h3><span lang="en">9.2 How eye closure is detected and compared</span></h3>
+  
+  <div class="text" lang="en">
+    <p>For every frame the signals below are computed from the model's prediction, and the question is which signal best separates the frames a person marked as closed from those marked as open. <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>T</mi></msub></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>B</mi></msub></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>L</mi></msub></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>R</mi></msub></math> are the model's confidences (0 to 1) of the four pupil points.</p>
+    <ol>
+      <li><b>Eye opening:</b> the difference of the y coordinates of the lower and upper eyelid points,<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>O</mi><mo>=</mo><msub><mi>y</mi><mtext>EB</mtext></msub><mo>−</mo><msub><mi>y</mi><mtext>ET</mtext></msub></math>"relative to the 5-s median" is O divided by its centred running median over 5 s (300 frames); "relative to the video" is O divided by the median O of the whole video.</li>
+      <li><b>Lowest pupil confidence:</b> the smallest of the four confidences. <b>Mean pupil confidence:</b><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mover><mi>p</mi><mo>¯</mo></mover><mo>=</mo><mfrac><mrow><msub><mi>p</mi><mi mathvariant='normal'>T</mi></msub><mo>+</mo><msub><mi>p</mi><mi mathvariant='normal'>B</mi></msub><mo>+</mo><msub><mi>p</mi><mi mathvariant='normal'>L</mi></msub><mo>+</mo><msub><mi>p</mi><mi mathvariant='normal'>R</mi></msub></mrow><mn>4</mn></mfrac></math></li>
+      <li><b>Offset of the two axis midpoints:</b> the distance between the midpoint of left/right and the midpoint of top/bottom, divided by the width w. <b>Aspect:</b> h / w.</li>
+      <li><b>AUC:</b> how well a signal separates the two kinds of frames. With <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>n</mi><mi>c</mi></msub></math> closed and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>n</mi><mi>o</mi></msub></math> open frames and a signal that is lower when the eye is closed, pair every closed frame with every open frame and count the share of pairs in which the closed frame has the lower signal (ties count one half):<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi mathvariant='normal'>AUC</mi><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>n</mi><mi>c</mi></msub><msub><mi>n</mi><mi>o</mi></msub></mrow></mfrac><munder><mo>∑</mo><mi>c</mi></munder><munder><mo>∑</mo><mi>o</mi></munder><mrow><mo>(</mo><mn>1</mn><mo>[</mo><msub><mi>s</mi><mi>c</mi></msub><mo>&lt;</mo><msub><mi>s</mi><mi>o</mi></msub><mo>]</mo><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mn>1</mn><mo>[</mo><msub><mi>s</mi><mi>c</mi></msub><mo>=</mo><msub><mi>s</mi><mi>o</mi></msub><mo>]</mo><mo>)</mo></mrow></math>1 = perfectly separated, 0.5 = chance.</li>
+      <li><b>Threshold rule:</b> "closed if the signal is below a threshold t". t maximizes "share of closed frames detected − share of open frames flagged". So that the threshold is not chosen and scored on the same frames, the reported numbers are leave-one-video-out: the t applied to a video is chosen from the frames of the other videos only.</li>
+      <li><b>Rule of the current script (<code>pupil_trace.py</code>):</b> a frame is untrusted if the left, right or bottom pupil point has confidence below 0.6 or the eye opening is below 95% of its 5-s median; widened by 3 frames on both sides.</li>
+    </ol>
+  </div>
+  <figure>
+    <div class="figbox"><img src="assets/fig_eye_blink.jpg" alt="Closure signals on all videos"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-2, how to read:</span>A: AUC of the six signals (28 closed and 1484 open frames pooled). B: the values of the best signal (mean pupil confidence) on closed (red) and open (grey) frames; dashed = threshold 0.527. C: for each rule the share of closed frames detected (green) and of open frames flagged (red), with frame counts; the first six thresholds are chosen leave-one-video-out, the last two are fixed rules.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox"><img src="assets/fig_closed_frames.jpg" alt="The 28 closed-eye frames"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-3:</span>All 28 frames used as "closed" truth (the labeler left all four pupil points empty); video, batch and frame number are printed on each. Source: training batches 2 and later of videos 1–9 (Pluto).</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion (finding the frames in which a person could not label the pupil):</span>This does not test blinks. The truth is "frames in which the labeler left all four pupil points empty"; by the label rule this means the pupil could not be seen or placed in that frame. By eye most of the 28 frames show a closed or nearly closed eye (Figure 9-3) and one is almost black. An empty frame is not a blink: a blink is one closing-and-opening event, and in half-closed frames the pupil points were still labeled, so those frames count as labeled here. Blinks have no definition and no truth yet. With that premise: the confidence of the pupil points finds these frames better than the eye opening does; the rule of the current script flags far too much.
+    <ol>
+      <li>AUC: mean pupil confidence 0.995, lowest confidence 0.993; eye opening relative to the video 0.930, relative to its 5-s median 0.901; aspect 0.394 (no separation).</li>
+      <li>Rule "mean confidence &lt; 0.527" (threshold chosen leave-one-video-out): 27 of the 28 closed frames detected, 61 of the 1484 open frames flagged (4.1%).</li>
+      <li>Rule of the current script: all 28 closed frames detected, but 826 of the 1484 open frames (55.7%) are also marked untrusted.</li>
+      <li>Limits: only 28 closed frames, from 9 videos; none in videos 0, 10 and 11 (none of Terra); they come from batches picked by the jump algorithm, not from a random sample; "closed" is defined as the labeler leaving all four pupil points empty.</li>
+    </ol>
+  </div>
+
+  <h3><span lang="en">9.3 Time series of the whole videos</span></h3>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of 9.2 (mean confidence &lt; 0.527) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-4, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox scroll"><div class="strip">
+      <div class="item"><img src="assets/eyets_video00.jpg" alt="eyets video 0" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min)</span></div></div>
+      <div class="item"><img src="assets/eyets_video01.jpg" alt="eyets video 1" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/eyets_video02.jpg" alt="eyets video 2" loading="lazy"><div class="cap"><span lang="en">Video 2 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/eyets_video03.jpg" alt="eyets video 3" loading="lazy"><div class="cap"><span lang="en">Video 3 (Pluto, 2025-10-31)</span></div></div>
+      <div class="item"><img src="assets/eyets_video04.jpg" alt="eyets video 4" loading="lazy"><div class="cap"><span lang="en">Video 4 (Pluto, 2025-10-30)</span></div></div>
+      <div class="item"><img src="assets/eyets_video05.jpg" alt="eyets video 5" loading="lazy"><div class="cap"><span lang="en">Video 5 (Pluto, 2025-10-29)</span></div></div>
+      <div class="item"><img src="assets/eyets_video06.jpg" alt="eyets video 6" loading="lazy"><div class="cap"><span lang="en">Video 6 (Pluto, 2025-10-28)</span></div></div>
+      <div class="item"><img src="assets/eyets_video07.jpg" alt="eyets video 7" loading="lazy"><div class="cap"><span lang="en">Video 7 (Pluto, 2025-10-27)</span></div></div>
+      <div class="item"><img src="assets/eyets_video08.jpg" alt="eyets video 8" loading="lazy"><div class="cap"><span lang="en">Video 8 (Pluto, 2025-10-24)</span></div></div>
+      <div class="item"><img src="assets/eyets_video09.jpg" alt="eyets video 9" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23)</span></div></div>
+      <div class="item"><img src="assets/eyets_video10.jpg" alt="eyets video 10" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22)</span></div></div>
+      <div class="item"><img src="assets/eyets_video11.jpg" alt="eyets video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
+    </div></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-5, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; x = time (s), red = frames flagged as "pupil not visible".</figcaption>
+  </figure>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Mouse</span></th><th><span lang="en">Area error: four-point / three-point (%)</span></th><th><span lang="en">Closed / open frames (human)</span></th><th><span lang="en">Frames flagged closed (%)</span></th><th><span lang="en">Events (per min)</span></th><th><span lang="en">Median event (ms)</span></th><th><span lang="en">Untrusted by the current script (%)</span></th><th><span lang="en">Relative spread of the area (%)</span></th><th><span lang="en">Correlation of area and opening</span></th></tr></thead>
+    <tbody>
+<tr><td>0</td><td>mouse A</td><td>2.6 / 6.0</td><td>0 / 148</td><td>0.35</td><td>8 (1.6)</td><td>108</td><td>10.3</td><td>8.0</td><td>0.87</td></tr>
+<tr><td>1</td><td>Pluto</td><td>9.5 / 6.0</td><td>2 / 184</td><td>2.62</td><td>170 (8.5)</td><td>133</td><td>83.8</td><td>16.8</td><td>0.36</td></tr>
+<tr><td>2</td><td>Pluto</td><td>5.3 / 3.9</td><td>4 / 119</td><td>0.60</td><td>40 (2.0)</td><td>150</td><td>40.1</td><td>22.8</td><td>0.89</td></tr>
+<tr><td>3</td><td>Pluto</td><td>2.2 / 14.8</td><td>4 / 101</td><td>0.76</td><td>34 (1.7)</td><td>175</td><td>40.2</td><td>30.9</td><td>0.92</td></tr>
+<tr><td>4</td><td>Pluto</td><td>43.8 / 50.9</td><td>6 / 122</td><td>1.02</td><td>45 (2.3)</td><td>183</td><td>49.8</td><td>86.0</td><td>0.84</td></tr>
+<tr><td>5</td><td>Pluto</td><td>10.7 / 2.4</td><td>1 / 88</td><td>0.08</td><td>11 (0.6)</td><td>50</td><td>15.5</td><td>29.1</td><td>0.73</td></tr>
+<tr><td>6</td><td>Pluto</td><td>2.7 / 8.8</td><td>1 / 107</td><td>0.40</td><td>32 (1.6)</td><td>108</td><td>42.2</td><td>35.0</td><td>0.85</td></tr>
+<tr><td>7</td><td>Pluto</td><td>5.6 / 2.4</td><td>4 / 86</td><td>0.27</td><td>13 (0.7)</td><td>350</td><td>10.8</td><td>54.8</td><td>0.72</td></tr>
+<tr><td>8</td><td>Pluto</td><td>24.0 / 38.2</td><td>1 / 108</td><td>12.86</td><td>213 (10.7)</td><td>183</td><td>64.7</td><td>59.3</td><td>0.92</td></tr>
+<tr><td>9</td><td>Pluto</td><td>7.6 / 13.7</td><td>5 / 163</td><td>1.04</td><td>48 (2.4)</td><td>200</td><td>38.0</td><td>34.9</td><td>0.86</td></tr>
+<tr><td>10</td><td>Pluto</td><td>13.3 / 13.8</td><td>0 / 128</td><td>2.20</td><td>66 (3.3)</td><td>250</td><td>44.1</td><td>18.3</td><td>0.83</td></tr>
+<tr><td>11</td><td>Terra</td><td>3.9 / 5.0</td><td>0 / 130</td><td>0.22</td><td>23 (1.1)</td><td>83</td><td>30.6</td><td>14.7</td><td>0.83</td></tr>
+    </tbody>
+  </table></div>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on the time series:</span>The closure rule gives plausible shares on every video, but the area traces still contain jumps that the closure rule does not cover; this part is not solved yet.
+    <ol>
+      <li>With the new rule 11 of the 12 videos have 0.1–2.6% of their frames flagged as closed, 0.6–8.5 events per minute; video 8 has 12.9%, concentrated in its second half, where the model's confidence is low overall. The rule of the current script removes 10–84% of the frames of the same videos.</li>
+      <li>The area traces of videos 1, 2, 4, 6 and 8 contain stretches in which neighbouring frames jump back and forth; the eye is open in these frames and the closure rule does not flag them. This is one pupil point of the model alternating between two positions: a tracking error, not a blink.</li>
+      <li>On 11 videos the correlation of area and eye opening is 0.72–0.92 (0.36 on video 1). This number alone cannot tell whether pupil and eyelid really change together or the upper eyelid covers the pupil and makes the area smaller.</li>
+      <li>Not done yet: a rule for the jumps of point 2, checked against human-labeled frames; and, as was done earlier on the 5-minute video, an event-by-event check against the original video of whether each event is a blink, an eye movement or a tracking error.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="no">10</span><span lang="en">Where there is no conclusion yet</span></h2>
+  
+  <div class="text" lang="en">
+    <ul>
+      <li><b>The plateau rule works at the noise floor:</b> With 50 test frames, retraining the same setting moves the median by about 0.5–1 px, while 3% is about 0.3 px. Each video's plateau point therefore carries an uncertainty of roughly ±20 labels. Every point is a single training run.</li>
+      <li><b>Anchoring by pre-labels:</b> Test sets are made by correcting a model's pre-labels, so the model that made them looks better than it is on that test set (clearest on videos 5 and 6).</li>
+      <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
+      <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
+      <li><b>The third mouse (Terra, videos 11–18)</b> has just started with its first video (numbers in the table of step 5); until it is finished, "a new mouse needs 20 labels" rests on one new mouse.</li>
+      <li><b>Jumps in the area traces</b> (section 9.3): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
+      <li><b>Area and blinks</b>: the production area script still uses the three-point rule and the earlier blink rule; the switch to the four-point rule and the "mean confidence" rule is undecided. The closed-eye truth is only 28 frames, none on Terra yet.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- appendix -->
+<section id="s11">
+  <h2><span class="no"><span lang="en">A</span></span><span lang="en">Appendix: the selection sheet of every batch of every video</span></h2>
+  
+  <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. Algorithm and how to read a sheet: section 5.1 and Figure 5-1 of step 5. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
+  <p class="text"><b><span lang="en">Video 0 (mouse A, 5-min): 6 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video00_batch01.jpg" alt="Video 0 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 0, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video00_batch02.jpg" alt="Video 0 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 0, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video00_batch03.jpg" alt="Video 0 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 0, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video00_batch04.jpg" alt="Video 0 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 0, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video00_batch05.jpg" alt="Video 0 batch 5" loading="lazy"><div class="cap"><span lang="en">Video 0, batch 5 (picked by the jump rule of the 80-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video00_batch06.jpg" alt="Video 0 batch 6" loading="lazy"><div class="cap"><span lang="en">Video 0, batch 6 (picked by the jump rule of the 100-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 1 (Pluto, 2025-10-31): 8 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video01_batch01.jpg" alt="Video 1 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch02.jpg" alt="Video 1 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch03.jpg" alt="Video 1 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch04.jpg" alt="Video 1 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch05.jpg" alt="Video 1 batch 5" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 5 (picked by the jump rule of the 80-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch06.jpg" alt="Video 1 batch 6" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 6 (picked by the jump rule of the 100-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch07.jpg" alt="Video 1 batch 7" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 7 (picked by the jump rule of the 120-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video01_batch08.jpg" alt="Video 1 batch 8" loading="lazy"><div class="cap"><span lang="en">Video 1, batch 8 (picked by the jump rule of the 140-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 2 (Pluto, 2025-10-31): 4 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video02_batch01.jpg" alt="Video 2 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 2, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video02_batch02.jpg" alt="Video 2 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 2, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video02_batch03.jpg" alt="Video 2 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 2, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video02_batch04.jpg" alt="Video 2 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 2, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 3 (Pluto, 2025-10-31): 4 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video03_batch01.jpg" alt="Video 3 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 3, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video03_batch02.jpg" alt="Video 3 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 3, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video03_batch03.jpg" alt="Video 3 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 3, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video03_batch04.jpg" alt="Video 3 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 3, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 4 (Pluto, 2025-10-30): 4 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video04_batch01.jpg" alt="Video 4 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 4, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video04_batch02.jpg" alt="Video 4 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 4, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video04_batch03.jpg" alt="Video 4 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 4, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video04_batch04.jpg" alt="Video 4 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 4, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 5 (Pluto, 2025-10-29): 2 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video05_batch01.jpg" alt="Video 5 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 5, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video05_batch02.jpg" alt="Video 5 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 5, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 6 (Pluto, 2025-10-28): 3 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video06_batch01.jpg" alt="Video 6 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 6, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video06_batch02.jpg" alt="Video 6 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 6, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video06_batch03.jpg" alt="Video 6 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 6, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 7 (Pluto, 2025-10-27): 2 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video07_batch01.jpg" alt="Video 7 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 7, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video07_batch02.jpg" alt="Video 7 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 7, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 8 (Pluto, 2025-10-24): 3 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video08_batch01.jpg" alt="Video 8 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 8, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video08_batch02.jpg" alt="Video 8 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 8, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video08_batch03.jpg" alt="Video 8 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 8, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 9 (Pluto, 2025-10-23): 7 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video09_batch01.jpg" alt="Video 9 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video09_batch02.jpg" alt="Video 9 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video09_batch03.jpg" alt="Video 9 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video09_batch04.jpg" alt="Video 9 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video09_batch05.jpg" alt="Video 9 batch 5" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 5 (picked by the jump rule of the 80-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video09_batch06.jpg" alt="Video 9 batch 6" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 6 (picked by the jump rule of the 100-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video09_batch07.jpg" alt="Video 9 batch 7" loading="lazy"><div class="cap"><span lang="en">Video 9, batch 7 (picked by the jump rule of the 120-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 10 (Pluto, 2025-10-22): 5 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video10_batch01.jpg" alt="Video 10 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 10, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video10_batch02.jpg" alt="Video 10 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 10, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video10_batch03.jpg" alt="Video 10 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 10, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video10_batch04.jpg" alt="Video 10 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 10, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video10_batch05.jpg" alt="Video 10 batch 5" loading="lazy"><div class="cap"><span lang="en">Video 10, batch 5 (picked by the jump rule of the 80-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 11 (Terra, 2025-10-17): 5 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video11_batch01.jpg" alt="Video 11 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 11, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video11_batch02.jpg" alt="Video 11 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 11, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video11_batch03.jpg" alt="Video 11 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 11, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video11_batch04.jpg" alt="Video 11 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 11, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video11_batch05.jpg" alt="Video 11 batch 5" loading="lazy"><div class="cap"><span lang="en">Video 11, batch 5 (picked by the jump rule of the 80-label model)</span></div></div>
+  </div></div></figure>
+</section>
+
+<section>
+  
+  <div class="text small muted" lang="en">
+    <p><b>Where things are:</b> Code, documentation, result tables and figures are in the GitHub repository: steps 1–3 under <code>v1_old_pupil_top/</code>, steps 4–9 under <code>v2_new_pupil_top_video_scaling/</code> (one folder per video, cross-video results in <code>results/</code>). Every important state has a git tag, listed in <code>CHANGELOG.md</code>. Raw videos, labels, model weights and per-frame predictions are kept locally and on the backup drive only. The figures on this page are the original figures of the <code>results/</code> folders.</p>
+  </div>
+</section>
+
+</div>
+
+<script>document.documentElement.setAttribute("data-lang","en");document.documentElement.lang="en";</script>

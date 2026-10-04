@@ -195,4 +195,60 @@ for k, v in FILL.items():
     assert k in html, k
     html = html.replace(k, v)
 (REP / "index.html").write_text(html, encoding="utf-8")
+
+# ---- English-only version for the group: every lang="zh" element removed, no language switch ------
+import re
+from html.parser import HTMLParser
+
+
+class DropZh(HTMLParser):
+    VOID = {"img", "br", "meta", "link", "input", "mspace", "hr", "col"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.out, self.skip = [], 0
+
+    def handle_starttag(self, tag, attrs):
+        zh = dict(attrs).get("lang") == "zh"
+        if self.skip or zh:
+            self.skip += tag not in self.VOID
+            return
+        self.out.append(self.get_starttag_text())
+
+    def handle_startendtag(self, tag, attrs):
+        if not self.skip and dict(attrs).get("lang") != "zh":
+            self.out.append(self.get_starttag_text())
+
+    def handle_endtag(self, tag):
+        if self.skip:
+            self.skip -= tag not in self.VOID
+            return
+        self.out.append(f"</{tag}>")
+
+    def handle_data(self, d):
+        self.skip or self.out.append(d)
+
+    def handle_entityref(self, n):
+        self.skip or self.out.append(f"&{n};")
+
+    def handle_charref(self, n):
+        self.skip or self.out.append(f"&#{n};")
+
+    def handle_comment(self, d):
+        self.skip or self.out.append(f"<!--{d}-->")
+
+    def handle_decl(self, d):
+        self.out.append(f"<!{d}>")
+
+
+body, script = html.split("<script>", 1)[0], None
+dz = DropZh()
+dz.feed(body)
+en = "".join(dz.out)
+en = re.sub(r'<div class="langbar".*?</div>', "", en, flags=re.S)
+en += '<script>document.documentElement.setAttribute("data-lang","en");document.documentElement.lang="en";</script>\n'
+left = re.findall(r"[\u4e00-\u9fff]+", en)
+assert not left, left[:10]
+(REP / "index_en.html").write_text(en, encoding="utf-8")
+print("built", REP / "index_en.html", "| English only,", len(en) // 1024, "KB")
 print("built", REP / "index.html", "|", len(rows), "videos,", len(fewer), "fewer-labels rows")
