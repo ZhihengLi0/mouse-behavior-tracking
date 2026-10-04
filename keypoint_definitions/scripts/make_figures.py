@@ -169,22 +169,20 @@ LOWER = [(410, 482), (440, 540), (480, 581), (540, 611), tuple(eb), (700, 620), 
 LOWER_L = [tuple(n + (-7, -22)), tuple(n), (383, 428), (410, 482)]                              # continued up to the crossing
 LOWER_R = [(775, 603), (838, 572), (874, 524), (870, 484), tuple(t)]                             # outer line, right of the reflections
 an, at = xy(A, "eye_nasal_corner"), xy(A, "eye_temporal_corner")      # the alternative placement that was discussed and not adopted
-# yellow: how the alternative points arise - the margins are followed only as far as the dark part of the eye goes
-ALT_NU = [(440, 351), (418, 368), tuple(an)]                      # upper margin bending down where the dark part ends
-ALT_NL = [(410, 482), (404, 446), tuple(an)]                      # lower-left margin, not continued
-ALT_TU = [(765, 358), (794, 400), tuple(at)]                      # upper margin bending down inside the reflections
-ALT_TL = [(775, 603), (792, 548), (805, 498), tuple(at)]          # inner line next to the reflection
-SHADOW = np.vstack([smooth(UPPER_L[1:]).T, smooth(ALT_NU).T, smooth(ALT_NL).T[::-1], smooth(LOWER_L[1:]).T[::-1]])
-fig, axes = plt.subplots(1, 3, figsize=(19, 6.6), constrained_layout=True)
-for ax in axes:
-    ax.imshow(img, cmap="gray", vmin=0, vmax=255); ax.set_xticks([]); ax.set_yticks([])
-    ax.add_patch(plt.Polygon(SHADOW, closed=True, fc=YELLOW, ec="none", alpha=0.18, hatch="////"))
+# yellow: the INNER border of the shadow / of the reflections, followed down to near the lower-eyelid point
+ALT_N = [(440, 351), (418, 372), tuple(an), (408, 450), (424, 500), (455, 548), (495, 586), (548, 609), (600, 621)]
+ALT_T = [(765, 358), (794, 400), tuple(at), (801, 492), (786, 530), (768, 560), (742, 582), (700, 599), (650, 613)]
+SHADOW = np.vstack([smooth(UPPER_L[1:]).T, smooth(ALT_N).T, smooth([(600, 621), tuple(eb)]).T, smooth(LOWER[:5]).T[::-1], smooth(LOWER_L[1:]).T[::-1]])
+
+
+def corner_lines(ax):
+    ax.add_patch(plt.Polygon(SHADOW, closed=True, fc=YELLOW, ec="none", alpha=0.16, hatch="////"))
     for solid in (UPPER, LOWER):
         ax.plot(*smooth(solid), "-", color=RED, lw=2.4)
     for dashed in (UPPER_L, UPPER_R, LOWER_L, LOWER_R):
         ax.plot(*smooth(dashed), "--", color=RED, lw=2.2)
-    for alt in (ALT_NU, ALT_NL, ALT_TU, ALT_TL):
-        ax.plot(*smooth(alt), ":", color=YELLOW, lw=2.4)
+    for alt in (ALT_N, ALT_T):
+        ax.plot(*smooth(alt), ":", color=YELLOW, lw=2.6)
     for c in (n, t):
         ax.add_patch(plt.Circle(c, 13, fill=False, ec=RED, lw=2.4))
     ax.plot(*an, "x", color=YELLOW, ms=13, mew=3); ax.plot(*at, "x", color=YELLOW, ms=13, mew=3)
@@ -192,17 +190,26 @@ for ax in axes:
         ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=9, mew=1.2)
     for bp in ("eyelid_top", "eyelid_bottom"):
         ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=7)
-crop(axes[0], B, pad=60); axes[0].set_title("whole eye", fontsize=11)
-crop(axes[1], B, box=(n[0] - 110, n[0] + 190, n[1] - 90, n[1] + 150)); axes[1].set_title("nasal corner (left)", fontsize=11)
-note(axes[1], "CORRECT (red circle, cyan dot): the lower-left margin\nand the upper margin are continued until they cross", n, n + (62, -66), CYAN)
-note(axes[1], "NOT USED (yellow cross): the margins are followed\nonly to where the dark part ends (dotted yellow)", an, an + (105, 70), YELLOW)
-note(axes[1], "shadow", (382, 392), (300, 470), YELLOW)
-crop(axes[2], B, box=(t[0] - 200, t[0] + 60, t[1] - 110, t[1] + 170)); axes[2].set_title("temporal corner (right)", fontsize=11)
-note(axes[2], "CORRECT (red circle, cyan dot): the lower margin continued upwards\nalong the OUTER line, right of the reflections, meets the upper margin", t, t + (-95, -88), CYAN)
-note(axes[2], "NOT USED (yellow cross): the inner line\nnext to the reflection (dotted yellow)", at, at + (-95, 95), YELLOW)
-fig.suptitle("How the two corners are constructed (5-min video, img015001), after the sketch of 2026-09-20.\n"
-             "Red solid = eyelid margin traced by eye, red dashed = its continuation, red circle = crossing = corner, cyan = labelled point. "
-             "Yellow dotted + cross = the alternative that was discussed and is not used; hatched = shadow", fontsize=10)
+
+
+BOXES = [("whole eye", (n[0] - 70, t[0] + 70, et[1] - 70, eb[1] + 60)),
+         ("nasal corner (left)", (275, 635, 300, 660)),
+         ("temporal corner (right)", (610, 928, 318, 660))]
+fig, axes = plt.subplots(3, 2, figsize=(15, 19.5), constrained_layout=True)
+for (title, box), (a0, a1) in zip(BOXES, axes):
+    for ax in (a0, a1):
+        ax.imshow(img, cmap="gray", vmin=0, vmax=255); ax.set_xticks([]); ax.set_yticks([])
+        ax.set_xlim(box[0], box[1]); ax.set_ylim(box[3], box[2])
+    corner_lines(a1)
+    a0.set_title(f"{title}: the frame without any line", fontsize=12); a1.set_title(f"{title}: the same frame with the construction", fontsize=12)
+note(axes[1, 1], "CORRECT (red circle, cyan dot): the lower-left margin (outer border of the\nshadow) and the upper margin are continued until they cross", n, (455, 322), CYAN)
+note(axes[1, 1], "NOT USED (yellow cross): crossing on the\nINNER border of the shadow (dotted yellow)", an, (535, 455), YELLOW)
+note(axes[1, 1], "shadow (hatched), narrower\nbut still present further down", (392, 440), (345, 590), YELLOW)
+note(axes[2, 1], "CORRECT (red circle, cyan dot): the lower margin continued upwards\nalong the OUTER line, right of the reflections, meets the upper margin", t, (765, 338), CYAN)
+note(axes[2, 1], "NOT USED (yellow cross): crossing on the INNER line,\nalong the inner edge of the reflection and of the shadow below it", at, (725, 640), YELLOW)
+fig.suptitle("How the two corners are constructed (5-min video, img015001), after the sketch of 2026-09-20. Left column: the frame as it is. Right column: the same frame with the lines.\n"
+             "Red solid = eyelid margin traced by eye, red dashed = its continuation, red circle = crossing = corner, cyan = labelled point.\n"
+             "Yellow dotted + cross = the construction that was discussed and is NOT used (inner border of the shadow / of the reflections)", fontsize=11)
 save(fig, "fig7_construction_corners.jpg")
 
 fig, axes = plt.subplots(1, 3, figsize=(19, 6.2), constrained_layout=True)
