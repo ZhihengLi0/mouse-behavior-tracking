@@ -79,9 +79,8 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>用哪个模型？</b>用 ResNet-50（第 3 步）。</li>
       <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，从 80 帧加到 300 帧，误差不变（第 4 步，只在第一只老鼠的 5 分钟视频上做过）。</li>
       <li><b>用哪种算法挑要补标的帧？</b>三种算法没有明显差距，jump 略微领先，之后都用 jump（第 4 步）。</li>
-      <li><b>不用标注能看出什么？</b>从预测的时间序列可以分出眨眼、眼动和追踪丢失（第 5 步）。</li>
+      <li><b>模型的预测怎么用来找眨眼和出错的地方？</b>把模型对每一帧的预测按时间画成曲线，不需要人工标注，就能认出三类事件：眨眼、眼球转动、模型把点跟丢（第 5 步）。</li>
       <li><b>瞳孔面积怎么算？</b>在这个标准下上点落在眼睑边上，所以只用左、右、下三个点（第 6 步）。</li>
-      <li><b>换一只新老鼠怎么办？</b>旧模型完全不能用（185 px）；标 20 帧回到约 14 px，标 80 帧到约 10 px（第 7 步）。</li>
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
     <p>9 月 20 日起改了瞳孔四个点的定义（见下）。改的只是“点标在哪里”，8 个点里另外 4 个点的定义没有变，图像、任务和训练方式也没有变。batch size 和模型的选择取决于图像和训练方式，不取决于某一个点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
@@ -89,7 +88,7 @@ code{font-family:var(--mono);font-size:.9em}
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
       <li><b>同一个视频标多少帧够？</b>和第一阶段的“约 80 帧饱和”一致：同一个 5 分钟视频在新标准下重新做，20 / 40 / 60 / 80 / 100 帧的误差是 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px，没有随帧数下降；之后每个视频的平台点也都不超过 80 帧（第 9 步）。</li>
-      <li><b>换一只新老鼠怎么办？</b>和第一阶段一致：第二只老鼠的第一个视频，0 帧 208 px，标 20 帧到 10.4 px；第三只老鼠的数字见第 9 步的表（第 9 步）。</li>
+      <li><b>换一只新老鼠怎么办？</b>要重新标，标 20 帧就到约 10 px。第二只老鼠（当时的模型只见过一只老鼠）：0 帧 208 px，标 20 帧到 10.4 px。第三只老鼠（模型已见过两只老鼠）：0 帧 26 px，标 20 帧到 9.2 px。第二次换老鼠时，不标任何帧的起点误差小得多（第 9 步）。</li>
       <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台，已完成的 9 个里有 1 个需要 80 帧（第 9 步）。</li>
       <li><b>只标 5 帧或 10 帧够不够？</b>多数视频不够，20 帧是在每个视频上都有效的最小批量（第 10 步）。</li>
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 11 步）。</li>
@@ -108,9 +107,8 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>Which model?</b> ResNet-50 (step 3).</li>
       <li><b>How many labels are enough within one video?</b> About 80 saturate it; from 80 to 300 labels the error does not change (step 4, done only on the 5-minute video of the first mouse).</li>
       <li><b>Which algorithm picks the frames to label next?</b> The three algorithms show no clear gap; jump is slightly ahead and is the one used from then on (step 4).</li>
-      <li><b>What can be seen without labels?</b> Blinks, eye movements and tracking loss separate in the predicted time series (step 5).</li>
+      <li><b>How do the predictions reveal blinks and failures?</b> Plotting the model's prediction of every frame over time shows three kinds of events without any human labels: blinks, eye movements, and the model losing the points (step 5).</li>
       <li><b>How to compute the pupil area?</b> Under this standard the top point sits on the lid, so only left, right and bottom are used (step 6).</li>
-      <li><b>What about a new mouse?</b> The old model is useless (185 px); 20 labels bring it to about 14 px and 80 labels to about 10 px (step 7).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
     <p>From 2026-09-20 the definition of the four pupil points changed (below). Only where the points are placed changed; the other 4 of the 8 points, the images, the task and the training procedure stayed the same. The choice of batch size and model depends on the images and the training procedure, not on where one point is placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
@@ -118,7 +116,7 @@ code{font-family:var(--mono);font-size:.9em}
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
       <li><b>How many labels are enough within one video?</b> Consistent with "about 80 saturate" from phase 1: the same 5-minute video redone under the new standard gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 9).</li>
-      <li><b>What about a new mouse?</b> Consistent with phase 1: the first video of the second mouse goes from 208 px at 0 labels to 10.4 px at 20; the numbers of the third mouse are in the table of step 9 (step 9).</li>
+      <li><b>What about a new mouse?</b> It needs its own labels, and 20 of them reach about 10 px. Second mouse (the model had seen one mouse): 208 px at 0 labels, 10.4 px at 20. Third mouse (the model had seen two mice): 26 px at 0 labels, 9.2 px at 20. The second time the mouse changed, the starting error without any labels was far smaller (step 9).</li>
       <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau; 1 of the 9 finished ones needed 80 (step 9).</li>
       <li><b>Are 5 or 10 labels enough?</b> Not on most videos; 20 is the smallest batch that worked on every video (step 10).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 11).</li>
@@ -270,8 +268,8 @@ code{font-family:var(--mono);font-size:.9em}
     <figcaption lang="zh"><span class="tag">怎么看：</span>一批 20 帧是怎么挑出来的（以第 2 批为例）。最下面一行：每一帧里关键点的最大跳动，红色虚线是阈值（眼宽的 3%），超过的帧是候选。最上面：候选帧按画面外观分成 20 类，每类挑一帧（星号）。中间：这 20 帧在时间上分散在整段视频里（竖线）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>How one batch of 20 frames is chosen (batch 2 as the example). Bottom row: largest keypoint jump in every frame; the red dashed line is the threshold (3% of the eye width) and frames above it are candidates. Top: the candidates are clustered into 20 groups by appearance and one frame is taken from each (stars). Middle: the 20 picks are spread over the whole video (vertical lines).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>换老鼠必须重新标，但 20 帧就能把误差从 185 px 降到约 14 px，80 帧到约 10 px。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>A new mouse needs its own labels, but 20 of them bring the error from 185 px to about 14 px, and 80 to about 10 px.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>换老鼠必须重新标，但 20 帧就能把误差从 185 px 降到约 14 px，80 帧到约 10 px。这是旧标注标准下的第一次尝试；新标准下更完整的比较（两次换老鼠）见第 9 步。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>A new mouse needs its own labels, but 20 of them bring the error from 185 px to about 14 px, and 80 to about 10 px. This was the first attempt, under the old label standard; the fuller comparison under the new standard (two changes of mouse) is in step 9.</p>
 </section>
 
 <!-- 8 -->
@@ -362,8 +360,8 @@ code{font-family:var(--mono);font-size:.9em}
       <li>Video 8 stays above 25 px at every step with 12–16% of test frames above 50 px; the cause is not known yet.</li>
     </ul>
   </div>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>新老鼠的第一个视频要标 20 帧；同一只老鼠之后的视频，多数标 20 帧就到平台，最少 0 帧，最多 80 帧。到平台时的误差多数在 3–16 px 之间（视频 8 除外）。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The first video of a new mouse needs 20 labels; later videos of the same mouse mostly reach the plateau with 20, at least 0 and at most 80. The error at the plateau is mostly between 3 and 16 px (video 8 excepted).</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>换老鼠的起点在变好：第二只老鼠 0 帧时 208 px（模型只见过一只老鼠、100 帧标注），第三只老鼠 0 帧时 26 px（模型见过两只老鼠、540 帧标注）；不过第三只老鼠上，相邻几个模型的 0 帧成绩在 17–33 px 之间变动，单个数字不稳定。新老鼠的第一个视频要标 20 帧；同一只老鼠之后的视频，多数标 20 帧就到平台，最少 0 帧，最多 80 帧。到平台时的误差多数在 3–16 px 之间（视频 8 除外）。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The starting point on a new mouse is improving: 208 px at 0 labels on the second mouse (the model had seen one mouse and 100 labels), 26 px on the third (two mice and 540 labels); on the third mouse, however, neighbouring models score between 17 and 33 px at 0 labels, so a single number is not stable. The first video of a new mouse needs 20 labels; later videos of the same mouse mostly reach the plateau with 20, at least 0 and at most 80. The error at the plateau is mostly between 3 and 16 px (video 8 excepted).</p>
 </section>
 
 <!-- 10 -->
