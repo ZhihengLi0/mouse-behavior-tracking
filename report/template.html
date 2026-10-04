@@ -77,7 +77,8 @@ code{font-family:var(--mono);font-size:.9em}
     <ol>
       <li><b>batch size 用多少？</b>用 2（第 2 步）。</li>
       <li><b>用哪个模型？</b>用 ResNet-50（第 3 步）。</li>
-      <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，从 80 帧加到 300 帧，误差不变；用哪种算法挑帧也没有差别（第 4 步，只在第一只老鼠的 5 分钟视频上做过）。</li>
+      <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，从 80 帧加到 300 帧，误差不变（第 4 步，只在第一只老鼠的 5 分钟视频上做过）。</li>
+      <li><b>用哪种算法挑要补标的帧？</b>三种算法没有明显差距，jump 略微领先，之后都用 jump（第 4 步）。</li>
       <li><b>不用标注能看出什么？</b>从预测的时间序列可以分出眨眼、眼动和追踪丢失（第 5 步）。</li>
       <li><b>瞳孔面积怎么算？</b>在这个标准下上点落在眼睑边上，所以只用左、右、下三个点（第 6 步）。</li>
       <li><b>换一只新老鼠怎么办？</b>旧模型完全不能用（185 px）；标 20 帧回到约 14 px，标 80 帧到约 10 px（第 7 步）。</li>
@@ -105,7 +106,8 @@ code{font-family:var(--mono);font-size:.9em}
     <ol>
       <li><b>Which batch size?</b> 2 (step 2).</li>
       <li><b>Which model?</b> ResNet-50 (step 3).</li>
-      <li><b>How many labels are enough within one video?</b> About 80 saturate it; from 80 to 300 labels the error does not change, and the algorithm used to pick the frames makes no difference (step 4, done only on the 5-minute video of the first mouse).</li>
+      <li><b>How many labels are enough within one video?</b> About 80 saturate it; from 80 to 300 labels the error does not change (step 4, done only on the 5-minute video of the first mouse).</li>
+      <li><b>Which algorithm picks the frames to label next?</b> The three algorithms show no clear gap; jump is slightly ahead and is the one used from then on (step 4).</li>
       <li><b>What can be seen without labels?</b> Blinks, eye movements and tracking loss separate in the predicted time series (step 5).</li>
       <li><b>How to compute the pupil area?</b> Under this standard the top point sits on the lid, so only left, right and bottom are used (step 6).</li>
       <li><b>What about a new mouse?</b> The old model is useless (185 px); 20 labels bring it to about 14 px and 80 labels to about 10 px (step 7).</li>
@@ -198,16 +200,16 @@ code{font-family:var(--mono);font-size:.9em}
 
 <!-- 4 -->
 <section id="s4">
-  <h2><span class="no">4</span><span lang="zh">主动学习：让算法挑帧来补标，没有带来改善</span><span lang="en">Active learning: algorithm-picked frames brought no gain</span></h2>
+  <h2><span class="no">4</span><span lang="zh">主动学习：让算法挑帧来补标，80 帧之后没有带来改善</span><span lang="en">Active learning: algorithm-picked frames brought no gain beyond 80 labels</span></h2>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>从 80 帧起步，每轮让算法在视频里找“模型可能出错的帧”，人工标 20 帧加进去，重新训练。三种找帧算法各走一条线：置信度低的帧（uncertain）、关键点在相邻帧之间突然跳动的帧（jump）、偏离平滑轨迹的帧（fitting）。一共 11 轮，每条线从 80 帧加到 300 帧。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Starting from 80 labels, each round an algorithm searched the video for frames where the model is probably wrong; a person labeled 20 of them and the model was retrained. Three detectors ran as three branches: low confidence (uncertain), keypoints jumping between consecutive frames (jump), deviation from a smooth trajectory (fitting). 11 rounds, each branch from 80 to 300 labels.</p>
   <figure>
     <div class="figbox"><img src="assets/fig_active_learning.jpg" alt="Active learning convergence, rounds 0-11"></div>
-    <figcaption lang="zh"><span class="tag">怎么看：</span>横轴是累计训练帧数，三种颜色是三种算法。<b>中间一幅是主要指标</b>（中位帧 RMSE）：三条线一直在 15.7–17.5 px 之间上下波动，没有下降趋势，也分不出谁更好；注意这幅图的纵轴只跨 2 px。左边一幅是均值，会被几帧严重错误拉高（蓝线在 120–140 帧的尖峰就是几帧眨眼造成的）。</figcaption>
-    <figcaption lang="en"><span class="tag">How to read:</span>x = cumulative training frames, the three colours are the three detectors. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend and no ranking; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>横轴是累计训练帧数，三种颜色是三种算法。<b>中间一幅是主要指标</b>（中位帧 RMSE）：三条线一直在 15.7–17.5 px 之间上下波动，没有下降趋势；红线（jump）多数时候略低；注意这幅图的纵轴只跨 2 px。左边一幅是均值，会被几帧严重错误拉高（蓝线在 120–140 帧的尖峰就是几帧眨眼造成的）。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>x = cumulative training frames, the three colours are the three detectors. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变；三种算法没有区别。新标准下在同一个视频上重做，结果一致（第 9 步，视频 0：20–100 帧都在 12–13 px）。更正记录：第 6 轮曾报告“误差下降”，后来查出是中途换了误差公式造成的，已撤回（9 月 18 日）；这张图是统一公式后重算的。从此规定：同一个指标只用同一个脚本、同一个公式。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>On this video (phase-1 label standard) about 80 labels already saturate; 300 labels give the same error, and the three detectors are indistinguishable. Redone on the same video under the new standard, the result is the same (step 9, video 0: 12–13 px anywhere from 20 to 100 labels). Correction on record: a "drop" reported at round 6 was traced to a change of error formula mid-series and was retracted (2026-09-18); this figure is recomputed with one formula. Rule since then: one metric, one script, one formula.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变。三种算法没有明显差距，jump 略微领先：11 轮的平均中位误差是 jump 16.4 px、uncertain 16.8 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低；但差距只有 0.4–0.6 px，小于同一设置重复训练时的波动，所以不能说 jump 确实更好。之后的实验统一用 jump 挑帧。新标准下在同一个视频上重做，结果一致（第 9 步，视频 0：20–100 帧都在 12–13 px）。更正记录：第 6 轮曾报告“误差下降”，后来查出是中途换了误差公式造成的，已撤回（9 月 18 日）；这张图是统一公式后重算的。从此规定：同一个指标只用同一个脚本、同一个公式。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>On this video (phase-1 label standard) about 80 labels already saturate; 300 labels give the same error. The three detectors show no clear gap, with jump slightly ahead: the mean of the median error over the 11 rounds is 16.4 px for jump, 16.8 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds; but the gap is only 0.4–0.6 px, smaller than the run-to-run variation of one setting, so jump cannot be called truly better. All later experiments pick frames with jump. Redone on the same video under the new standard, the result is the same (step 9, video 0: 12–13 px anywhere from 20 to 100 labels). Correction on record: a "drop" reported at round 6 was traced to a change of error formula mid-series and was retracted (2026-09-18); this figure is recomputed with one formula. Rule since then: one metric, one script, one formula.</p>
 </section>
 
 <!-- 5 -->
