@@ -14,3 +14,17 @@ video's labels; shuffles 811, 812, ...
 | 40 (shuffle 812) | 5.84 px | 8.2 | 0% | 100% | pending |
 
 **Plateau rule fired at step 2 (2026-09-29):** neither 20 labels (5.86 px) nor 40 labels (5.84 px) improved the 0-label score of 5.36 px by more than 3%, so by the rule this video needs no labels of its own (plateau point = 0 labels, 5.36 px); the batch03 popup is held pending the user's decision. batch02 note: one closed-eye frame (img022586) had a stray pupil_top and swapped corners; corrected on re-check and step 2 was retrained on the corrected batch.
+
+**Fewer-labels study (2026-10-03)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: videos 0-3 + 40 of video 4 + 20 each of videos 5 and 6; shuffles 2071-2074) ->
+`fewer_labels.png` / `fewer_labels.csv`.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 5.36 px | 8.9 | 0% |
+| 5 (subset a / b) | 6.38 / 6.07 px | 9.0 / 7.9 | 0% / 0% |
+| 10 (subset a / b) | 5.83 / 5.83 px | 7.8 / 7.9 | 0% / 0% |
+| 20 | 5.86 px | 7.6 | 0% |
+
+On this video every setting gives 5.4-6.4 px: the earlier videos already cover it (plateau point 0 labels), and 5, 10
+or 20 of its own labels neither help nor hurt beyond 1 px.
