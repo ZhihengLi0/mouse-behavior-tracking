@@ -63,6 +63,8 @@ extend the two margins until they cross.
 - **Temporal corner (right).** There are bright reflection bands next to this corner. The corner is the right apex of
   the dark area to the right of the reflections, reached by extending the lower eyelid margin upwards (the outer line,
   which stays visible in every frame). Do not label on a reflection or on the inner line next to it.
+  Why the outer side: in the discussion of 2026-09-20 it was concluded that fur does not reflect, so the bright
+  reflections are still inside the eye and the corner must lie outside them.
 
 Both corners and both eyelid points only serve blink detection, so a robust position that can be found in every frame
 is preferred over an exact one.
