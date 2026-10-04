@@ -170,7 +170,7 @@ LOWER_L = [tuple(n + (-7, -22)), tuple(n), (383, 428), (410, 482)]              
 LOWER_R = [(775, 603), (838, 572), (874, 524), (870, 484), tuple(t)]                             # outer line, right of the reflections
 an, at = xy(A, "eye_nasal_corner"), xy(A, "eye_temporal_corner")      # the alternative placement that was discussed and not adopted
 # yellow: the INNER border of the shadow / of the reflections, followed down to near the lower-eyelid point
-ALT_N = [(440, 351), (418, 372), tuple(an), (408, 450), (424, 500), (455, 548), (495, 586), (548, 609), (600, 621)]
+ALT_N = [(440, 351), (418, 372), tuple(an), (418, 452), (441, 500), (468, 542), (504, 577), (550, 601), (600, 619)]
 ALT_T = [(765, 358), (794, 400), tuple(at), (801, 492), (786, 530), (768, 560), (742, 582), (700, 599), (650, 613)]
 SHADOW = np.vstack([smooth(UPPER_L[1:]).T, smooth(ALT_N).T, smooth([(600, 621), tuple(eb)]).T, smooth(LOWER[:5]).T[::-1], smooth(LOWER_L[1:]).T[::-1]])
 
