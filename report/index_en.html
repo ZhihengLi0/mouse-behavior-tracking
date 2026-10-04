@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:17 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -841,9 +841,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>The plateau rule works at the noise floor:</b> With 50 test frames, retraining the same setting moves the median by about 0.5–1 px, while 3% is about 0.3 px. Each video's plateau point therefore carries an uncertainty of roughly ±20 labels. Every point is a single training run.</li>
       <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
-      <li><b>The third mouse (Terra, videos 11–18)</b> has just started with its first video (numbers in the table of step 5); until it is finished, "a new mouse needs 20 labels" rests on one new mouse.</li>
+      <li><b>The third mouse (Terra, videos 11–18)</b>: its first video (video 11) is finished, the second (video 12) is in progress, the others are not started. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
-      <li><b>Area and blinks</b>: the production area script still uses the three-point rule and the earlier blink rule; the switch to the four-point rule and the "mean confidence" rule is undecided. The closed-eye truth is only 28 frames, none on Terra yet.</li>
+      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: neither the definition nor the truth is fixed (step 10), so there is no result yet.</li>
     </ul>
   </div>
 </section>
