@@ -72,7 +72,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:35 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:37 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -343,14 +343,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><b>数据怎么来的：</b>都是人工标注之间的比较，不涉及模型。用了两种比法。</p>
     <ul>
       <li><b>位置（表中“中位坐标”一列）：</b>同一个视频（第一只老鼠的 5 分钟视频）最后 1 分钟里，取两组人工标注的测试帧：2026 年 9 月 20 日之前标的 100 帧，和现在的 50 帧。镜头和眼睛的位置没有变，所以对每个点取各自一组帧上的中位坐标，就能看出这个点标在哪里。坐标是原始画面上的像素，x 向右，y 向下。</li>
-      <li><b>同一帧上的位移（表中最后一列）：</b>同一帧有前后两份标注时，直接算两份标注之间的距离，再取中位数。瞳孔四个点用的是 Pluto 2025-10-31 视频的 40 帧（之前的标注对按椭圆重标的标注）。眼角和眼睑用的是 5 分钟视频的 90 帧（测试集 50、验证集 20、第一批 20）：2026 年 9 月 20 日下午先标了一版，眼角仍在内侧，18:18 存了备份；当晚讨论后把眼角改到外侧。表中是这两版之间的距离。所有模型用的都是改过之后的标注。</li>
+      <li><b>同一帧上的位移（表中最后一列）：</b>同一帧有前后两份标注时，直接算两份标注之间的距离，再取中位数。瞳孔四个点用的是 Pluto 2025-10-31 视频的 40 帧（之前的标注对按椭圆重标的标注）。眼角和眼睑用的是第一只老鼠 5 分钟视频的 90 帧（测试集 50、验证集 20、第一批 20），眼角在内侧和在外侧的两份标注。</li>
     </ul>
   </div>
   <div class="text" lang="en">
     <p><b>Where the numbers come from:</b> all are comparisons between human labels; no model is involved. Two comparisons are used.</p>
     <ul>
       <li><b>Position (column "median coordinates"):</b> two sets of human-labeled test frames from the final minute of the same video (the 5-minute video of the first mouse): 100 frames labeled before 2026-09-20 and the present 50 frames. Camera and eye position did not change, so the median coordinates of a point over each set show where that point was placed. Coordinates are pixels of the original frame, x to the right, y downwards.</li>
-      <li><b>Shift on the same frame (last column):</b> where a frame has two versions of labels, the distance between the two is taken and then the median over the frames. The four pupil points use 40 frames of the Pluto 2025-10-31 video (earlier labels vs the labels redone as an ellipse). The corners and eyelids use 90 frames of the 5-minute video (test set 50, validation set 20, first batch 20): a first version was labeled in the afternoon of 2026-09-20 with the corners still on the inner side and backed up at 18:18; after the discussion that evening the corners were moved to the outer side. The table gives the distance between these two versions. All models use the labels after the change.</li>
+      <li><b>Shift on the same frame (last column):</b> where a frame has two versions of labels, the distance between the two is taken and then the median over the frames. The four pupil points use 40 frames of the Pluto 2025-10-31 video (earlier labels vs the labels redone as an ellipse). The corners and eyelids use 90 frames of the 5-minute video of the first mouse (test set 50, validation set 20, first batch 20), with the two versions of labels: corners on the inner side and on the outer side.</li>
     </ul>
   </div>
   <div class="tablebox">
