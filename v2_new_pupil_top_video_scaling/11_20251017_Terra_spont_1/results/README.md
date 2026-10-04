@@ -13,6 +13,9 @@ batch01: 99 of 160), then the test set was frozen. Training set of every step = 
 | 20 (shuffle 1211) | 9.24 px | 166.4 | 20% | 86% | 9762 of 57158 (17.1%) |
 | 40 (shuffle 1212) | 8.86 px | 17.5 | 4% | 94% | 4456 of 57158 (7.8%) |
 | 60 (shuffle 1213) | 8.77 px | 12.9 | 2% | 97% | 3350 of 57158 (5.9%) |
+| 80 (shuffle 1214) | 8.65 px | 13.1 | 2% | 98% | pending |
+
+The plateau rule fired at 80 labels: steps 3 and 4 (8.77, 8.65 px) each improved the running best by less than 3% (1.0% and 1.4%). Plateau point: 40 labels, 8.86 px; awaiting user decision (2026-10-04).
 
 Back-test of the earlier models on this test set (`../results/cross_video_matrix.csv`): the models of the sequence
 score between 16.5 and 313 px; the other models of video 10 (20 / 60 / 80 labels) give 16.54 / 29.18 / 33.41 px, so
