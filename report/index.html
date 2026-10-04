@@ -70,7 +70,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 12:25 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 12:27 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -79,7 +79,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <h3>第一阶段的结论（第 1–6 步）</h3>
     <p>前提：瞳孔上点标在看得见的、没有被眼睑挡住的瞳孔的最高处。</p>
     <ol>
-      <li><b>batch size 用多少？</b>用 2（第 1 步）。</li>
+      <li><b>batch size 用多少？</b>用 2。按内部验证损失选出；在测试集上四种 batch size 相差不大（第 1 步）。</li>
       <li><b>用哪个模型？</b>用 ResNet-50（第 2 步）。</li>
       <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，从 80 帧加到 300 帧，误差不变（第 3 步，只在第一只老鼠的 5 分钟视频上做过）。</li>
       <li><b>用哪种纠错算法挑要补标的帧？</b>用 jump。三种算法没有明显差距，jump 略微领先（第 3 步）。</li>
@@ -107,7 +107,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <h3>Conclusions of phase 1 (steps 1–6)</h3>
     <p>Premise: pupil top is placed at the highest point of the visible pupil, the part not hidden by the eyelid.</p>
     <ol>
-      <li><b>Which batch size?</b> 2 (step 1).</li>
+      <li><b>Which batch size?</b> 2, chosen by the internal validation loss; on the test set the four batch sizes differ little (step 1).</li>
       <li><b>Which model?</b> ResNet-50 (step 2).</li>
       <li><b>How many labels are enough within one video?</b> About 80 saturate it; from 80 to 300 labels the error does not change (step 3, done only on the 5-minute video of the first mouse).</li>
       <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
@@ -184,7 +184,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">同一批 100 帧里时间最晚的 20 帧（34–236 秒），与训练帧相隔 1.2 秒以上。用来选 batch size。</span><span lang="en">The latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the batch size.</span></td></tr>
     <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
     <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">HRNet-W32（当时使用的模型），从 ImageNet 预训练权重开始训练 100 轮，CPU；学习率在第 80、95 轮下降；每个 batch size 训练一次；取内部验证 mAP 最高的那次存档来打分。</span><span lang="en">HRNet-W32 (the model in use at that time), trained for 100 epochs from ImageNet-pretrained weights on CPU; learning rate drops at epochs 80 and 95; one run per batch size; the snapshot with the best internal validation mAP is scored.</span></td></tr>
-    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">测试帧上全部关键点合在一起的 RMSE（像素），公式见页面开头“指标怎么算”的第 3 条（N 最多为 100 帧 × 8 点 = 800）。这一步和第 2 步用这个指标，第 3 步起用中位帧 RMSE。</span><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 use this metric; from step 3 on the median frame RMSE is used.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">测试帧上全部关键点合在一起的 RMSE（像素），公式见页面开头“指标怎么算”的第 3 条（N 最多为 100 帧 × 8 点 = 800）。这一步和第 2 步当时用这个指标；下面第二张图同时给出中位帧 RMSE。</span><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 used this metric at the time; the second figure below also gives the median frame RMSE.</span></td></tr>
   </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>用审核后的标注（前 80 帧训练，后 20 帧验证），batch size 取 2、4、8、16 各训练一次（100 轮）。选择规则在看结果之前定好：内部验证损失最低的 batch。最后 1 分钟的测试帧只用来报告，不参与选择。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>With the reviewed labels (first 80 frames train, last 20 validate), one run each at batch 2, 4, 8, 16 (100 epochs). The selection rule was fixed before looking at results: lowest internal validation loss. The final-minute test frames are report-only.</p>
@@ -193,8 +193,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>右上：内部验证损失，batch 2 最低（星号）。左上：测试集误差，蓝线在 batch 2 也最低（21.07 px）。右下：把两者画在一起，batch 2 在左下角，两个信号一致。左下：置信度 ≥ 0.6 的点的比例，batch 越大越低。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>Top right: internal validation loss, lowest at batch 2 (star). Top left: test error, the blue line is also lowest at batch 2 (21.07 px). Bottom right: both together, batch 2 sits in the lower-left corner, so the two signals agree. Bottom left: share of points with confidence ≥ 0.6 falls as the batch grows.</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>选 batch 2。内部验证集和独立测试集选出同一个 batch，说明扩大后的验证集可以信任。每个 batch 只跑了一次，batch 之间的差距不大（21.1–23.6 px）。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batch 2. The internal validation set and the independent test set pick the same batch, which shows the enlarged validation set can be trusted. One run per batch; the differences between batches are small (21.1–23.6 px).</p>
+  <figure>
+    <div class="figbox"><img src="assets/fig_batch_two_metrics.jpg" alt="Batch sizes scored with both metrics"></div>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>同样的四次训练，用两种指标打分（2026-10-04 补算，没有重新训练）。左：当时用的指标，全部关键点合在一起的 RMSE。中：后面各步用的指标，中位帧 RMSE，和左图用同一个纵轴刻度。右：帧 RMSE 超过 50 px 的测试帧所占比例。按中位帧 RMSE，四个 batch size 是 19.7 / 18.5 / 20.1 / 19.1 px，都在 18.5–20.1 px 之间，batch 4 最低。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>The same four runs scored with both metrics (added 2026-10-04, no retraining). Left: the metric used at the time, RMSE over all keypoints. Middle: the metric of the later steps, median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
+  </figure>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>选 batch 2。内部验证集和独立测试集选出同一个 batch，说明扩大后的验证集可以信任。每个 batch 只跑了一次，batch 之间的差距不大（21.1–23.6 px）。用后面各步的指标（中位帧 RMSE）补算：四个 batch 在 18.5–20.1 px 之间，batch 4 最低（18.5 px），batch 2 是 19.7 px，相差 1.3 px；batch 4 和 batch 8 各有 1–2 帧错到 50 px 以上，batch 2 没有。选择规则是内部验证损失，不看测试集，所以选 batch 2 的决定不变；但按中位帧 RMSE，测试集并不显示 batch 2 最好，四个 batch 实际上分不出高下。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batch 2. The internal validation set and the independent test set pick the same batch, which shows the enlarged validation set can be trusted. One run per batch; the differences between batches are small (21.1–23.6 px). Re-scored with the metric of the later steps (median frame RMSE): the four batches lie between 18.5 and 20.1 px, batch 4 is the lowest (18.5 px) and batch 2 gives 19.7 px, 1.3 px apart; batch 4 and batch 8 each have 1–2 frames above 50 px, batch 2 has none. The selection rule is the internal validation loss and does not look at the test set, so the choice of batch 2 stands; but by median frame RMSE the test set does not show batch 2 as the best, and the four batches cannot really be told apart.</p>
 </section>
 
 <!-- 2 -->
@@ -208,7 +213,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">与第 1 步相同：最晚的 20 帧。用来选模型。</span><span lang="en">Same as step 1: the latest 20 frames. Used to choose the model.</span></td></tr>
     <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
     <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">5 种模型（ResNet-50、HRNet-W18、HRNet-W32、HRNet-W48、CSPNeXt-S），batch 2，各训练 100 轮，CPU，其余设置与第 1 步相同，每种训练一次。</span><span lang="en">Five models (ResNet-50, HRNet-W18, HRNet-W32, HRNet-W48, CSPNeXt-S), batch 2, 100 epochs each on CPU, other settings as in step 1, one run each.</span></td></tr>
-    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">与第 1 步相同：全部关键点合在一起的 RMSE。</span><span lang="en">Same as step 1: RMSE over all keypoints.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">与第 1 步相同：当时用全部关键点合在一起的 RMSE；下面第二张图同时给出中位帧 RMSE。</span><span lang="en">Same as step 1: RMSE over all keypoints at the time; the second figure below also gives the median frame RMSE.</span></td></tr>
   </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>同样的数据和设置（batch 2，100 轮），比较 5 种模型：ResNet-50、HRNet-W18 / W32 / W48、CSPNeXt-S。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Same data and settings (batch 2, 100 epochs), five backbones: ResNet-50, HRNet-W18 / W32 / W48, CSPNeXt-S.</p>
@@ -217,8 +222,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>左上：测试集误差，ResNet-50 最低（20.1 px），HRNet-W32 接近（21.1 px）。右上：内部验证损失，5 个模型只差 1.4%，分不出高下。左下：置信度 ≥ 0.6 的点，ResNet-50 最多（800 个点里 514 个）。右下：训练时间对误差，ResNet-50 用时 1.7 小时，在左下角（误差低，用时短；只有误差高得多的 CSPNeXt-S 比它快）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>Top left: test error, ResNet-50 lowest (20.1 px), HRNet-W32 close (21.1 px). Top right: internal validation loss, the five models differ by only 1.4% and cannot be separated. Bottom left: points with confidence ≥ 0.6, ResNet-50 has the most (514 of 800). Bottom right: training time vs error, ResNet-50 takes 1.7 h and sits in the lower-left corner (low error, short time; only CSPNeXt-S, with a much higher error, is faster).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>综合考虑，选 ResNet-50。（1）测试集误差最低：20.1 px。（2）5 种模型的验证损失相差不大，只差 1.4%。（3）置信度的区分最好：800 个点里有 514 个置信度 ≥ 0.6，其余模型是 75–375 个；这有利于之后用置信度判断眨眼和追踪丢失。（4）训练成本低：1.7 小时；误差接近的 HRNet-W32 要 3.7 小时。此后所有实验都用 ResNet-50 和 batch 2。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Taking everything together, ResNet-50. (1) Lowest test error: 20.1 px. (2) The validation losses of the five models are close, within 1.4%. (3) Best use of confidence: 514 of 800 points have confidence ≥ 0.6, against 75–375 for the other models; this helps when confidence is used later to detect blinks and tracking loss. (4) Low training cost: 1.7 h, against 3.7 h for HRNet-W32, the model with a similar error. All later experiments use ResNet-50 with batch 2.</p>
+  <figure>
+    <div class="figbox"><img src="assets/fig_model_two_metrics.jpg" alt="Models scored with both metrics"></div>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>同样的五个模型，用两种指标打分（2026-10-04 补算，没有重新训练）。左：全部关键点合在一起的 RMSE，从 20.1 到 47.9 px，差别很大。中：中位帧 RMSE，同一个纵轴刻度，五个模型是 18.4 / 19.7 / 19.2 / 19.6 / 20.5 px，只差约 2 px。右：帧 RMSE 超过 50 px 的测试帧比例，HRNet-W18 有 15%，CSPNeXt-S 有 2%，ResNet-50 和 HRNet-W32 是 0。左图的差别主要来自右图里这些错得很远的帧。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>The same five models scored with both metrics (added 2026-10-04, no retraining). Left: RMSE over all keypoints, from 20.1 to 47.9 px, a large spread. Middle: median frame RMSE on the same y scale; the five models give 18.4 / 19.7 / 19.2 / 19.6 / 20.5 px, only about 2 px apart. Right: share of test frames with frame RMSE above 50 px: 15% for HRNet-W18, 2% for CSPNeXt-S, none for ResNet-50 and HRNet-W32. The spread in the left panel comes mainly from these far-off frames.</figcaption>
+  </figure>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>综合考虑，选 ResNet-50。（1）测试集误差最低：20.1 px。（2）5 种模型的验证损失相差不大，只差 1.4%。（3）置信度的区分最好：800 个点里有 514 个置信度 ≥ 0.6，其余模型是 75–375 个；这有利于之后用置信度判断眨眼和追踪丢失。（4）训练成本低：1.7 小时；误差接近的 HRNet-W32 要 3.7 小时。此后所有实验都用 ResNet-50 和 batch 2。用中位帧 RMSE 补算后，ResNet-50 仍然最低（18.4 px），但五种模型只差约 2 px。两种指标的对比说明：全部关键点合在一起的 RMSE 容易被少数错得很远的帧拉偏（HRNet-W18 的 47.9 px 主要来自 15% 的帧），它反映的是“有没有严重错误”，不是典型一帧的误差。所以第 3 步起都用中位帧 RMSE 作为主要指标，并单独报告误差超过 50 px 的帧的比例。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Taking everything together, ResNet-50. (1) Lowest test error: 20.1 px. (2) The validation losses of the five models are close, within 1.4%. (3) Best use of confidence: 514 of 800 points have confidence ≥ 0.6, against 75–375 for the other models; this helps when confidence is used later to detect blinks and tracking loss. (4) Low training cost: 1.7 h, against 3.7 h for HRNet-W32, the model with a similar error. All later experiments use ResNet-50 with batch 2. Re-scored with the median frame RMSE, ResNet-50 is still the lowest (18.4 px), but the five models are only about 2 px apart. The comparison of the two metrics shows that the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. This is why the median frame RMSE is the main metric from step 3 on, with the share of frames above 50 px reported separately.</p>
 </section>
 
 <!-- 3 -->

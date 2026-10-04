@@ -1,0 +1,5 @@
+run,n_test_frames,overall_rmse_px,median_frame_rmse_px,p90_frame_rmse_px,frames_rmse_gt_50px_pct,max_frame_rmse_px
+2,100,21.07,19.71,27.33,0.0,35.4
+4,100,22.28,18.46,28.55,2.0,69.5
+8,100,23.61,20.07,28.62,1.0,99.5
+16,100,21.37,19.12,29.04,0.0,33.4

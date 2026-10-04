@@ -1,0 +1,6 @@
+run,n_test_frames,overall_rmse_px,median_frame_rmse_px,p90_frame_rmse_px,frames_rmse_gt_50px_pct,max_frame_rmse_px
+ResNet-50,100,20.1,18.39,26.22,0.0,41.2
+HRNet-W32,100,21.07,19.71,27.33,0.0,35.4
+HRNet-W48,100,24.73,19.25,27.54,1.0,135.7
+CSPNeXt-S,100,35.45,19.63,26.13,2.0,214.4
+HRNet-W18,100,47.88,20.47,111.79,15.0,118.6

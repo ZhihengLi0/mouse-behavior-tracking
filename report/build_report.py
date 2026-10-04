@@ -23,6 +23,8 @@ V2 = ROOT / "v2_new_pupil_top_video_scaling"      # ellipse label standard, one 
 # ---- result figures used on the page: (source PNG, asset name, max width in px) ------------------
 FIGURES = [
     (V1 / "batch-size-selection/results/01_batch_size_overview.png", "fig_batch_size.jpg", 2000),
+    (V1 / "batch-size-selection/results/overall_vs_median.png", "fig_batch_two_metrics.jpg", 2000),
+    (V1 / "model-selection/results/overall_vs_median.png", "fig_model_two_metrics.jpg", 2000),
     (V1 / "model-selection/results/01_model_selection_overview.png", "fig_model_selection.jpg", 2000),
     (V1 / "active-learning-jump-selection/results/01_convergence_curves.png", "fig_active_learning.jpg", 2400),
     (V1 / "time-series-analysis/results/01_keypoint_timeseries.png", "fig_timeseries.jpg", 2000),

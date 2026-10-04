@@ -68,6 +68,23 @@ lowest at **batch 2**
    accordingly (see the hours column).
 5. Single run per batch size. Only large gaps are interpretable.
 
+## Both metrics (added 2026-10-04)
+
+`two_metrics.csv`, `overall_vs_median.png` (`../scripts/plot_overall_vs_median.py`; from the per-frame errors already on
+disk, no retraining). The same four runs under the metric used here (RMSE over all keypoints) and under the metric of
+all later work (median over the test frames of the per-frame RMSE):
+
+| Batch | overall RMSE | median frame RMSE | p90 frame RMSE | frames > 50 px | worst frame |
+|---:|---:|---:|---:|---:|---:|
+| 2 | 21.07 px | 19.71 px | 27.3 px | 0% | 35.4 px |
+| 4 | 22.28 px | 18.46 px | 28.6 px | 2% | 69.5 px |
+| 8 | 23.61 px | 20.07 px | 28.6 px | 1% | 99.5 px |
+| 16 | 21.37 px | 19.12 px | 29.0 px | 0% | 33.4 px |
+
+By median frame RMSE the four batch sizes lie within 18.5-20.1 px and batch 4 is the lowest; the overall RMSE differs
+mostly through one or two far-off frames. Batch 2 was selected by the internal rule (validation loss), which does not
+use the test set, so the selection stands; the test set does not separate the batch sizes under the median metric.
+
 ## 中文摘要
 
 复查标注 + 时间块 80/20 划分 + 100 epoch 下的 batch size 重扫。内部规则
