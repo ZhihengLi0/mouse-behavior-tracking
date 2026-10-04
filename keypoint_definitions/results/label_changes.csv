@@ -1,0 +1,41 @@
+change,keypoint,frames,moved_gt_2px,median_shift_px,mean_dx_px,mean_dy_px
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",pupil_top,32,32,52.4,-8.9,-45.9
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",pupil_bottom,38,36,13.5,-4.2,-4.3
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",pupil_left,33,33,14.2,-2.0,-9.7
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",pupil_right,36,36,14.9,-0.6,-15.2
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",eyelid_top,40,39,16.5,-2.1,-10.9
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",eyelid_bottom,40,39,20.1,-17.6,-1.5
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",eye_nasal_corner,37,37,38.5,-37.3,-11.2
+"A: visible-edge standard -> ellipse standard + outer corners (Pluto 2025-10-31, same frames)",eye_temporal_corner,37,37,67.9,61.6,6.0
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",pupil_top,89,4,0.0,0.3,-0.3
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",pupil_bottom,90,0,0.0,0.0,0.0
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",pupil_left,90,1,0.0,0.1,-0.0
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",pupil_right,89,2,0.0,-0.0,0.1
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",eyelid_top,90,62,16.9,5.3,-13.2
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",eyelid_bottom,90,1,0.0,-0.0,0.0
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",eye_nasal_corner,90,90,39.8,-35.8,-11.8
+"B: first corner definition -> outer corners (5-min video, same frames, both under the ellipse standard)",eye_temporal_corner,90,90,56.3,52.7,21.6
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",pupil_top,50,14,0.0,-2.7,0.0
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",pupil_bottom,50,6,0.0,1.0,-0.0
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",pupil_left,50,0,0.0,0.0,0.0
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",pupil_right,50,4,0.0,-0.1,-0.4
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",eyelid_top,50,0,0.0,0.0,0.0
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",eyelid_bottom,50,0,0.0,0.0,0.0
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",eye_nasal_corner,50,0,0.0,0.0,0.0
+"C: convention v1 -> v2, double contour = left one (video 6 test set)",eye_temporal_corner,50,0,0.0,0.0,0.0
+C: convention v1 -> v2 (video 7 test set),pupil_top,50,3,0.0,0.1,-0.1
+C: convention v1 -> v2 (video 7 test set),pupil_bottom,50,1,0.0,-0.2,0.0
+C: convention v1 -> v2 (video 7 test set),pupil_left,50,0,0.0,0.0,0.0
+C: convention v1 -> v2 (video 7 test set),pupil_right,50,4,0.0,-0.5,-0.1
+C: convention v1 -> v2 (video 7 test set),eyelid_top,50,3,0.0,-7.8,7.2
+C: convention v1 -> v2 (video 7 test set),eyelid_bottom,50,4,0.0,0.9,0.2
+C: convention v1 -> v2 (video 7 test set),eye_nasal_corner,50,0,0.0,0.0,0.0
+C: convention v1 -> v2 (video 7 test set),eye_temporal_corner,50,0,0.0,0.0,0.0
+C: convention v1 -> v2 (video 8 test set),pupil_top,49,24,1.5,0.3,5.2
+C: convention v1 -> v2 (video 8 test set),pupil_bottom,49,31,7.8,-3.8,4.1
+C: convention v1 -> v2 (video 8 test set),pupil_left,47,20,0.0,10.8,1.9
+C: convention v1 -> v2 (video 8 test set),pupil_right,50,24,0.6,-6.3,1.7
+C: convention v1 -> v2 (video 8 test set),eyelid_top,50,3,0.0,0.5,0.0
+C: convention v1 -> v2 (video 8 test set),eyelid_bottom,50,3,0.0,-0.8,-0.2
+C: convention v1 -> v2 (video 8 test set),eye_nasal_corner,50,2,0.0,-1.1,-0.4
+C: convention v1 -> v2 (video 8 test set),eye_temporal_corner,50,1,0.0,-0.0,-0.1

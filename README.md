@@ -71,6 +71,7 @@ v2_new_pupil_top_video_scaling/   era 3 (current): one folder per video, indexed
     results/blink_area_analysis/ per video: eye time series and blink / pupil-area studies
   results/                     across videos: labels-to-plateau table, cross-video back-test, pupil-area study
   scripts/                     frame selection, pre-labels, training step, scoring, back-test, plots
+keypoint_definitions/          where each of the eight keypoints is placed, what changed, common mistakes (example figures)
 v1_old_pupil_top/              eras 1-2 (5-minute video, earlier label standards) - kept for the record
 dlc_projects/                  DeepLabCut workspaces (config tracked; labels and weights local)
 environment/                   conda environment and setup check
