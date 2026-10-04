@@ -218,6 +218,10 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | 9 (v2 labels; added 2026-10-02) | 23.41 (8%) | 11.7 / 12.6 (6% / 8%) | 11.6 / 11.1 (0% / 0%) | 10.39 (8%) |
 | 10 (v2 labels; added 2026-10-03) | 18.13 (8%) | 15.0 / 12.5 (4% / 2%) | 11.7 / 13.1 (8% / 2%) | 11.83 (2%) |
 
+- What this study compares: the size of the FIRST batch. The 5 and 10 labels are taken out of the 20 batch01 labels that were
+  already made (appearance-based, model-free, like batch01 itself). It is not a procedure of 5 labels per step (label 5,
+  select with the jump rule, label 5 more); that procedure was not run and these numbers must not be read as its result. The
+  regular procedure stays unchanged: 20 labels in the first batch and 20 per step (user decision 2026-10-03).
 - 5 labels were enough on 2 of 6 videos (3 and 5), both of which the earlier videos already covered well.
 - On the other 4, 5 and 10 labels fall short of 20: the first video of a mouse (0, 1) improves steadily with labels,
   video 2 does not improve on 0 labels until 20, and on video 4 10 labels are worse than none (both subsets agree;
