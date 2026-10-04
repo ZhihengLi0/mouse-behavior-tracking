@@ -73,7 +73,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:48 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:52 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -453,7 +453,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>在视频最后 10% 里均匀取 50 帧作测试集，人工标好后冻结。</li>
       <li>先用上一个模型直接预测这个视频，得到“0 帧”的误差。</li>
       <li>每步加 20 帧这个视频的标注（挑帧办法见下面的图；每批先由模型预标，人再逐帧改正），和之前视频带入的标注一起重新训练，在测试集上打分。</li>
-      <li><b>平台规则</b>：连续两步都没有让最好成绩改善超过 3%，就停。平台点是最后一次有改善的那一步。规则触发后由人确认是否结束这个视频。到目前为止，12 个视频里有 11 个的平台点就是规则给出的结果；<b>视频 5 是例外，由人决定</b>：按规则它的平台点是 0 帧（0 帧的中位误差 11.9 px 已经是最低），但 0 帧模型有 12% 的测试帧误差超过 50 px，标 20 帧后这类帧降为 0，所以平台点记为 20 帧，并在标到 40 帧后停止。</li>
+      <li><b>平台规则</b>：连续两步都没有让最好成绩改善超过 3%，就停。平台点是最后一次有改善的那一步。规则触发后由人确认是否结束这个视频。到目前为止，12 个视频都是在规则触发时停止的；平台点有 11 个就是规则给出的那一步，<b>只有视频 5 的平台点是人改记的</b>：它的 20 帧（15.85 px）和 40 帧（16.58 px）都没有比 0 帧（11.90 px）好，规则在 40 帧触发，按规则平台点应是 0 帧；但 0 帧模型在 50 帧测试帧里有 6 帧（12%）误差超过 50 px，标 20 帧后这类帧降为 0，所以平台点记为 20 帧，带入后面视频的也是这 20 帧。</li>
       <li>进入下一个视频，只带入这个视频<span class="hl">到平台点为止</span>的标注（不是这个视频标过的所有帧都进入后面视频的训练：平台点之后标的帧不进入之后的训练）。这样做是为了模拟真实使用：到平台就不再标了。</li>
     </ol>
   </div>
@@ -470,7 +470,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>50 frames evenly spaced over the final 10% of the video become the test set; they are labeled and frozen.</li>
       <li>The previous model is applied unchanged to get the "0 labels" error.</li>
       <li>Each step adds 20 labels of this video (picked as shown in the figure below; the model pre-labels each batch and a person corrects every frame), retrains together with the labels carried from earlier videos, and scores on the test set.</li>
-      <li><b>Plateau rule</b>: stop when two consecutive steps each fail to improve the best error by more than 3%. The plateau point is the last step that did improve it. When the rule fires, a person confirms whether the video is finished. So far the plateau point of 11 of the 12 videos is the one the rule gives; <b>video 5 is the exception and was decided by a person</b>: by the rule its plateau point is 0 labels (the median error of 11.9 px at 0 labels is already the lowest), but the 0-label model is off by more than 50 px on 12% of the test frames and 20 labels remove all of these, so the plateau point is recorded as 20 labels and labeling stopped at 40.</li>
+      <li><b>Plateau rule</b>: stop when two consecutive steps each fail to improve the best error by more than 3%. The plateau point is the last step that did improve it. When the rule fires, a person confirms whether the video is finished. So far all 12 videos stopped when the rule fired; for 11 of them the plateau point is the step the rule gives, and <b>only for video 5 was the plateau point changed by a person</b>: its 20 labels (15.85 px) and 40 labels (16.58 px) are both no better than 0 labels (11.90 px), so the rule fired at 40 and by the rule the plateau point would be 0 labels; but the 0-label model is off by more than 50 px on 6 of the 50 test frames (12%) and 20 labels remove all of these, so the plateau point is recorded as 20 labels, and these 20 labels are what later videos carry.</li>
       <li>The next video starts, carrying only this video's labels <span class="hl">up to the plateau point</span> (not every frame labeled on this video goes into the training of later videos: frames labeled after the plateau point are left out). This mirrors real use, where labeling stops at the plateau.</li>
     </ol>
   </div>
