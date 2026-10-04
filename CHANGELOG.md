@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.13-video11-plateau` | 2026-10-04 | Video 11 (Terra = mouse C, 2025-10-17, first video of a new mouse) finished: plateau at 40 labels, 8.86 px (0 / 20 / 40 / 60 / 80 = 25.96 / 9.24 / 8.86 / 8.77 / 8.65 px; rule fired at 80); 40 labels carried into video 12 (580 in total); fewer-labels study complete for videos 0-11; `keypoint_definitions/` added; summary page reduced to 9 steps with basic information and metric formulas |
 | `v0.9.12-video10-plateau` | 2026-10-03 | Video 10 (2025-10-22, v2 line, last Pluto video) finished: plateau at 40 labels, 10.32 px (0 / 20 / 40 / 60 / 80 = 18.13 / 11.83 / 10.32 / 10.49 / 10.76 px; rule fired at 80); 40 labels carried into video 11 (540 in total); fewer-labels study extended to videos 6, 8, 9, 10; summary page (`report/`) rewritten as a plain step-by-step record |
 | `v0.9.11-video9-plateau` | 2026-10-01 | Video 9 (2025-10-23, v2 line) finished: plateau at 80 labels, 8.20 px (0 / 20 / 40 / 60 / 80 / 100 / 120 = 23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63 px; rule fired at 120); 80 labels carried into video 10; summary page (`report/`) extended to era 3 |
 | `v0.9.10-carry-rule` | 2026-10-01 | Rule fixed for which labels of a finished video go into later training sets: only the labels up to the plateau point (in force since video 4; videos 0-3 carry the 320 labels that existed when the next video started); documented in the READMEs with the per-video table |

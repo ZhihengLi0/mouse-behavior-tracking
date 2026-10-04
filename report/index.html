@@ -72,7 +72,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 12:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 12:41 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -97,7 +97,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 7 步）。</li>
       <li><b>瞳孔面积怎么算？</b>按 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，用四个点算的面积误差约为三点法的一半（第 8 步）。</li>
     </ol>
-    <p><b>进度：</b>已完成 11 个视频（视频 0–10）；视频 11 进行中，按 0 / 20 / 40 / … 帧的误差为 25.96 / 9.24 / 8.86 / 8.77 / 8.65 px。</p>
+    <p><b>进度：</b>已完成 12 个视频（视频 0–11）。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Task:</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
@@ -122,7 +122,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and the 4-point area has about half the error of the 3-point rule (step 8).</li>
     </ol>
-    <p><b>Status:</b> 11 videos finished (videos 0–10); video 11 in progress, error at 0 / 20 / 40 / … labels: 25.96 / 9.24 / 8.86 / 8.77 / 8.65 px.</p>
+    <p><b>Status:</b> 12 videos finished (videos 0–11).</p>
   </div>
 
   <div class="text" lang="zh">
@@ -278,37 +278,37 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="zh">
     <p><span class="tag">做了什么：</span>把 8 个点各自标在哪里写清楚，并按新的写法把之前的视频全部重新标注。从这一步起所有模型和数字都用这套定义。完整的定义、例图和容易标错的地方在仓库的 <code>keypoint_definitions/</code> 文件夹里。</p>
     <ul>
-      <li><b>瞳孔上、下、左、右：</b>把瞳孔看作一个椭圆，四个点是椭圆两条轴的四个端点。被上眼睑或毛挡住的部分按椭圆补全，所以瞳孔上点常常落在上眼睑点的上方，也就是标在被眼睑盖住的位置上。瞳孔边界取变暗区域的外缘；边界出现两层轮廓时取左边那层（9 月 26 日）；黑色核心外面较亮的一圈也算瞳孔（9 月 29 日）。</li>
-      <li><b>上眼睑、下眼睑：</b>眼皮和眼球的分界线叫睑缘。上眼睑点是上睑缘的中点，下眼睑点是下睑缘的中点。</li>
+      <li><b>瞳孔上、下、左、右（图 4-2）：</b>把瞳孔看作一个椭圆，四个点是椭圆两条轴的四个端点。被上眼睑或毛挡住的部分按椭圆补全，所以瞳孔上点常常落在上眼睑点的上方，也就是标在被眼睑盖住的位置上。图 4-2 里红点是正确位置；黄色叉是不取的错误位置：沿着看得见的瞳孔边缘标，上点停在眼睑边上。瞳孔边界取变暗区域的外缘；边界出现两层轮廓时取左边那层（9 月 26 日）；黑色核心外面较亮的一圈也算瞳孔（9 月 29 日）。</li>
+      <li><b>上眼睑、下眼睑（图 4-1）：</b>眼皮和眼球的分界线叫睑缘。上眼睑点是上睑缘的中点，下眼睑点是下睑缘的中点。</li>
       <li><b>看不清的点：</b>所有 8 个点都一样，看得清楚就标；不能准确判断位置时，这个点留空不标。</li>
-      <li><b>左眼角（鼻侧，内眦）：</b>把左下方的睑缘和上睑缘各自延长，取两条延长线的交点；延长线取外侧、没有阴影的那条边。</li>
-      <li><b>右眼角（颞侧，外眦）：</b>右侧有几条反光亮带。把下睑缘沿外层那条线向上延伸，与上睑缘相交的点就是眼角，它在反光的右侧。不标在反光上，也不标在紧挨反光的内层线上。</li>
+      <li><b>左眼角（鼻侧，内眦；图 4-3 中间一幅）：</b>把左下方的睑缘和上睑缘各自延长（图中红色虚线），取两条延长线的交点（红圈），青色点是标注的位置。延长线取外侧、没有阴影的那条边。图中黄色叉是不取的错误位置：标在深色部分结束的地方，两条睑缘没有延长到相交。</li>
+      <li><b>右眼角（颞侧，外眦；图 4-3 右边一幅）：</b>右侧有几条反光亮带。把下睑缘沿外层那条线向上延伸（图中红色虚线），与上睑缘相交的点（红圈）就是眼角，它在反光的右侧，青色点是标注的位置。图中黄色叉是不取的错误位置：标在紧挨反光的内层线上。也不标在反光亮带上。</li>
     </ul>
   </div>
   <div class="text" lang="en">
     <p><span class="tag">What was done:</span>Where each of the 8 points is placed was written down, and all earlier videos were relabeled accordingly. From this step on every model and number uses these definitions. The full definitions, example figures and the common mistakes are in the folder <code>keypoint_definitions/</code> of the repository.</p>
     <ul>
-      <li><b>Pupil top, bottom, left, right:</b> the pupil is treated as an ellipse and the four points are the ends of its two axes. Parts hidden by the upper eyelid or by fur are completed with the ellipse, so the pupil-top point often lies above the upper-eyelid point, that is, at a position covered by the lid. The pupil boundary is the outer edge of the darkened region; where the edge looks doubled the left contour is used (2026-09-26); the brighter band around the dark core counts as pupil (2026-09-29).</li>
-      <li><b>Upper and lower eyelid:</b> the line between the eyelid skin and the eyeball is the eyelid margin. The upper-eyelid point is the midpoint of the upper margin, the lower-eyelid point the midpoint of the lower margin.</li>
+      <li><b>Pupil top, bottom, left, right (Fig. 4-2):</b> the pupil is treated as an ellipse and the four points are the ends of its two axes. Parts hidden by the upper eyelid or by fur are completed with the ellipse, so the pupil-top point often lies above the upper-eyelid point, that is, at a position covered by the lid. In Fig. 4-2 the red dots are the correct positions; the yellow crosses are the wrong placement that is not used: along the visible pupil edge, with the top point stopping at the eyelid. The pupil boundary is the outer edge of the darkened region; where the edge looks doubled the left contour is used (2026-09-26); the brighter band around the dark core counts as pupil (2026-09-29).</li>
+      <li><b>Upper and lower eyelid (Fig. 4-1):</b> the line between the eyelid skin and the eyeball is the eyelid margin. The upper-eyelid point is the midpoint of the upper margin, the lower-eyelid point the midpoint of the lower margin.</li>
       <li><b>Points that cannot be seen:</b> the same for all 8 points: a point is labeled when it can be seen clearly and left empty when its position cannot be judged accurately.</li>
-      <li><b>Left corner (nasal, medial canthus):</b> the lower-left margin and the upper margin are each continued, and the corner is where the two continuations cross; the continuation follows the outer edge, the one without the shadow.</li>
-      <li><b>Right corner (temporal, lateral canthus):</b> there are several bright reflections on this side. The lower margin is continued upwards along the outer line until it meets the upper margin; that point is the corner, and it lies to the right of the reflections. It is not placed on a reflection or on the inner line next to it.</li>
+      <li><b>Left corner (nasal, medial canthus; Fig. 4-3, middle panel):</b> the lower-left margin and the upper margin are each continued (dashed red lines) and the corner is where the two continuations cross (red circle); the cyan dot is the labeled position. The continuation follows the outer edge, the one without the shadow. The yellow cross is the wrong placement that is not used: where the dark part ends, with the two margins not continued to their crossing.</li>
+      <li><b>Right corner (temporal, lateral canthus; Fig. 4-3, right panel):</b> there are several bright reflections on this side. The lower margin is continued upwards along the outer line (dashed red line) until it meets the upper margin (red circle); that point is the corner, to the right of the reflections, and the cyan dot is the labeled position. The yellow cross is the wrong placement that is not used: on the inner line next to the reflection. The corner is not placed on a reflection either.</li>
     </ul>
   </div>
   <figure>
     <div class="figbox"><img src="assets/kp_all_keypoints.jpg" alt="All eight keypoints on three mice"></div>
-    <figcaption lang="zh"><span class="tag">怎么看：</span>三只老鼠各一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；青色点是上下眼睑和两个眼角。图像为了看清做了提亮。</figcaption>
-    <figcaption lang="en"><span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.</figcaption>
+    <figcaption lang="zh"><b>图 4-1</b>　<span class="tag">怎么看：</span>三只老鼠各一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；青色点是上下眼睑和两个眼角。图像为了看清做了提亮。</figcaption>
+    <figcaption lang="en"><b>Fig. 4-1.</b> <span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/kp_construction_pupil.jpg" alt="How the pupil points are constructed"></div>
-    <figcaption lang="zh"><span class="tag">怎么看：</span>瞳孔四个点怎么来。红色椭圆盖住整个瞳孔，红色虚线是它的两条轴，四个点是轴的端点。黄色叉和黄色虚线是 9 月 20 日之前的标法：沿着看得见的瞳孔边缘标，上点停在眼睑边上。</figcaption>
-    <figcaption lang="en"><span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: along the visible pupil edge, with the top point stopping at the eyelid.</figcaption>
+    <figcaption lang="zh"><b>图 4-2</b>　<span class="tag">怎么看：</span>瞳孔四个点怎么来。红色椭圆盖住整个瞳孔，红色虚线是它的两条轴，四个点是轴的端点。黄色叉和黄色虚线是 9 月 20 日之前的标法：沿着看得见的瞳孔边缘标，上点停在眼睑边上。</figcaption>
+    <figcaption lang="en"><b>Fig. 4-2.</b> <span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: along the visible pupil edge, with the top point stopping at the eyelid.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/kp_construction_corners.jpg" alt="How the two corners are constructed"></div>
-    <figcaption lang="zh"><span class="tag">怎么看：</span>两个眼角怎么来，画法照 9 月 20 日讨论时的手绘图。红色实线是沿图像描出的睑缘，红色虚线是它的延长线，红圈是交点，也就是眼角；青色点是实际标注的位置。黄色叉是当天第一次的标法，也是容易标错的位置：左边标在深色部分结束的地方，右边标在紧挨反光的内层线上。</figcaption>
-    <figcaption lang="en"><span class="tag">How to read:</span>How the two corners are obtained, drawn after the hand sketch used in the discussion of 2026-09-20. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner; cyan = the labeled point. Yellow crosses are the first placement of that day and the easy mistake: on the left, where the dark part ends; on the right, on the inner line next to the reflection.</figcaption>
+    <figcaption lang="zh"><b>图 4-3</b>　<span class="tag">怎么看：</span>两个眼角怎么来，画法照 9 月 20 日讨论时的手绘图。红色实线是沿图像描出的睑缘，红色虚线是它的延长线，红圈是交点，也就是眼角；青色点是实际标注的位置。黄色叉是当天第一次的标法，也是容易标错的位置：左边标在深色部分结束的地方，右边标在紧挨反光的内层线上。</figcaption>
+    <figcaption lang="en"><b>Fig. 4-3.</b> <span class="tag">How to read:</span>How the two corners are obtained, drawn after the hand sketch used in the discussion of 2026-09-20. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner; cyan = the labeled point. Yellow crosses are the first placement of that day and the easy mistake: on the left, where the dark part ends; on the right, on the inner line next to the reflection.</figcaption>
   </figure>
   <p class="text" lang="zh">定义明确前后，同一批帧上各个点移动了多少（<code>keypoint_definitions/results/label_changes.csv</code>）：</p>
   <p class="text" lang="en">How far each point moved on the same frames when the definitions were made explicit (<code>keypoint_definitions/results/label_changes.csv</code>):</p>
@@ -413,7 +413,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>8</td><td>Pluto<br>2025-10-24</td><td>400</td><td>27.46 / 25.34 / 30.03 / 33.77</td><td><span lang="zh"><b>20 帧，25.34 px</b></span><span lang="en"><b>20 labels, 25.34 px</b></span></td><td>60</td><td>20</td></tr>
 <tr><td>9</td><td>Pluto<br>2025-10-23</td><td>420</td><td>23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63</td><td><span lang="zh"><b>80 帧，8.20 px</b></span><span lang="en"><b>80 labels, 8.20 px</b></span></td><td>120</td><td>80</td></tr>
 <tr><td>10</td><td>Pluto<br>2025-10-22</td><td>500</td><td>18.13 / 11.83 / 10.32 / 10.49 / 10.76</td><td><span lang="zh"><b>40 帧，10.32 px</b></span><span lang="en"><b>40 labels, 10.32 px</b></span></td><td>80</td><td>40</td></tr>
-<tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86 / 8.77 / 8.65</td><td><span lang="zh">进行中（目前最好：40 帧，8.86 px）</span><span lang="en">in progress (best so far: 40 labels, 8.86 px)</span></td><td>80</td><td>–</td></tr>
+<tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86 / 8.77 / 8.65</td><td><span lang="zh"><b>40 帧，8.86 px</b></span><span lang="en"><b>40 labels, 8.86 px</b></span></td><td>80</td><td>40</td></tr>
       </tbody>
     </table>
   </div>
