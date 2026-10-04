@@ -36,6 +36,8 @@ section{border-top:1px solid var(--rule);padding-top:28px}
 .tag{font-weight:650;color:var(--accent);white-space:nowrap}
 [lang="en"] .tag{margin-right:.35em}
 .concl{background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;max-width:46rem}
+div.concl{display:flex;flex-direction:column;gap:8px}
+.concl ul{margin-top:6px}
 figure{margin:0;display:flex;flex-direction:column;gap:8px}
 .page>*,header>*,section>*,figure>*{min-width:0;max-width:100%}
 .text,.concl{max-width:min(46rem,100%)}
@@ -251,8 +253,32 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>横轴是累计训练帧数，三种颜色是三种算法。图中每一轮都用同一个公式计算。<b>中间一幅是主要指标</b>（中位帧 RMSE）：三条线一直在 15.7–17.5 px 之间上下波动，没有下降趋势；红线（jump）多数时候略低；注意这幅图的纵轴只跨 2 px。左边一幅是均值，会被几帧严重错误拉高（蓝线在 120–140 帧的尖峰就是几帧眨眼造成的）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>x = cumulative training frames, the three colours are the three detectors. Every round in the figure is scored with the same formula. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>选 jump 作为纠错算法，之后的实验统一用它挑帧。在这次实验里 jump 的误差最低：11 轮的平均中位误差是 jump 16.4 px、uncertain 17.0 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低。领先幅度约 0.6 px，小于同一设置重新训练一次时的波动（0.3–2 px），所以我们认为这几种纠错算法差距不大，jump 略微领先。这一步同时得到另一个结果：在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变。2026 年 9 月 20 日明确点位定义之后（见第 7 步；主要变化是瞳孔上点从“看得见的瞳孔的最高处”改为“瞳孔椭圆真实的最高点”，被眼睑挡住时按椭圆估计；两个眼角也明确为睑缘延长线的交点），在同一个视频上按新定义重新标注、重新做了一遍，结果一致：20、40、60、80、100 帧的误差都在 12–13 px 之间，没有随帧数下降（第 8 步，视频 0）。两套定义下的误差数值不能直接比较，一致的是“约 80 帧以内就饱和”这个结论。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>jump is chosen as the error-correction algorithm and picks the frames in all later experiments. In this experiment jump has the lowest error: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds. The lead is about 0.6 px, smaller than the variation when one setting is trained again (0.3–2 px), so we regard the three error-correction algorithms as close, with jump slightly ahead. The step gave a second result as well: on this video (phase-1 label standard) about 80 labels already saturate, and 300 labels give the same error. After the keypoint definitions were made explicit on 2026-09-20 (step 7; the main change is that pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", estimated from the ellipse where the eyelid hides it; the two corners were also made explicit as the crossing of the continued eyelid margins), the same video was relabeled under the new definitions and the experiment was repeated, with the same result: the error stays between 12 and 13 px at 20, 40, 60, 80 and 100 labels and does not fall with the number of labels (step 8, video 0). The error values under the two sets of definitions cannot be compared directly; what agrees is the conclusion that the video saturates within about 80 labels.</p>
+  <div class="concl" lang="zh">
+    <p><span class="tag">结论：</span>这一步有两个结论：纠错算法选 jump；在这个视频上，标注到约 80 帧就饱和。</p>
+    <ol>
+      <li><b>纠错算法选 jump，之后的实验统一用它挑帧。</b>在这次实验里 jump 的误差最低：11 轮的平均中位误差是 jump 16.4 px、uncertain 17.0 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低。领先幅度约 0.6 px，小于同一设置重新训练一次时的波动（0.3–2 px），所以我们认为这几种纠错算法差距不大，jump 略微领先。</li>
+      <li><b>在这个视频上，约 80 帧就饱和。</b>从 80 帧加到 300 帧，三条线的中位误差一直在 15.7–17.5 px 之间，没有下降。
+        <ul>
+          <li>这个结果用的是 9 月 20 日之前的点位定义。</li>
+          <li>9 月 20 日明确点位定义之后，在同一个视频上重新标注、重做了一遍，结论一致：20、40、60、80、100 帧的误差都在 12–13 px 之间，没有随帧数下降（第 8 步，视频 0）。明确的内容见第 7 步，主要是瞳孔上点从“看得见的瞳孔的最高处”改为“瞳孔椭圆真实的最高点”，两个眼角明确为睑缘延长线的交点。</li>
+          <li>两套定义下的误差数值不能直接比较，一致的是“约 80 帧以内就饱和”。</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+  <div class="concl" lang="en">
+    <p><span class="tag">Conclusion:</span>This step has two conclusions: jump is chosen as the error-correction algorithm, and on this video about 80 labels saturate.</p>
+    <ol>
+      <li><b>jump is the error-correction algorithm and picks the frames in all later experiments.</b> In this experiment jump has the lowest error: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds. The lead is about 0.6 px, smaller than the variation when one setting is trained again (0.3–2 px), so we regard the three error-correction algorithms as close, with jump slightly ahead.</li>
+      <li><b>On this video about 80 labels saturate.</b> From 80 to 300 labels the median error of all three branches stays between 15.7 and 17.5 px, with no decrease.
+        <ul>
+          <li>This result uses the keypoint definitions from before 2026-09-20.</li>
+          <li>After the definitions were made explicit on 2026-09-20, the same video was relabeled and the experiment repeated, with the same conclusion: the error stays between 12 and 13 px at 20, 40, 60, 80 and 100 labels and does not fall with the number of labels (step 8, video 0). What was made explicit is described in step 7; mainly, pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", and the two corners became the crossing of the continued eyelid margins.</li>
+          <li>The error values under the two sets of definitions cannot be compared directly; what agrees is that the video saturates within about 80 labels.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
 </section>
 
 <!-- 4 -->
