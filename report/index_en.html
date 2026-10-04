@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:04 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:06 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -649,7 +649,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_kp_conf_error.jpg" alt="Error and confidence by keypoint, all videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-1, how to read:</span>Left: median error of each point (row) on each video (column); the last column is the 12 videos pooled. Middle: the mean confidence. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1, how to read:</span>Left: one row per keypoint, sorted from the largest error. The bar is the median error of the 12 videos pooled (number at its end), the dots are the 12 videos one by one; the two videos with the largest error are named (e.g. v8 = video 8). What to see: pupil top has the longest bar (10.9 px), the other 7 points are at 3.9–5.8 px; the dots far from the bars are mostly videos 4 and 8. Middle: the same for the mean confidence; dashed line = 0.6; the two videos with the lowest confidence are named. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint; the lines fall from left to right: the higher the confidence, the smaller the error.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -667,7 +667,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/kpconf_video11.jpg" alt="kpconf video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-2, how to read:</span>One figure per video in one row; scroll sideways. In each: left, the median error of the 8 points at each step of this video (20, 40, 60, … labels); middle, the mean confidence; right, every point of the plateau-point model on the 50 test frames, x = confidence, y = error (log scale), colour = keypoint, dashed line = confidence 0.6. Points towards the upper left have low confidence and a large error.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-2, how to read:</span>One figure per video in one row; scroll sideways. In each: left, one line per keypoint, x = labels of this video (20, 40, 60, …), y = median error; lower is more accurate; the dotted line is the plateau point and the value of the last step is written at the right end; the four pupil points are solid, eyelids and corners dashed. Middle, the same with the mean confidence on the y axis; higher is better. Right, every point of the plateau-point model on the 50 test frames, x = confidence, y = error (log scale), colour = keypoint, dashed line = confidence 0.6; points towards the upper left have low confidence and a large error.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>Pupil top is the least accurate point, and points with low confidence have larger errors.

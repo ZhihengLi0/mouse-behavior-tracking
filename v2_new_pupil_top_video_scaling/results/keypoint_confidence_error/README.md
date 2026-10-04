@@ -13,7 +13,7 @@ point. Data = the `per_frame_errors.csv` files written when each step was scored
 | file | made by | content |
 |---|---|---|
 | `keypoint_confidence_error_videoNN.png` | `scripts/keypoint_confidence_error.py` | one figure per video (NN = video index): median error and mean confidence of each keypoint at each step; confidence against error for every test point of the plateau-point model |
-| `keypoint_confidence_error_all_videos.png` | same script | the two tables with one column per video plus the pooled column; median error by confidence bin |
+| `keypoint_confidence_error_all_videos.png` | same script | per keypoint: bar = all videos pooled, dots = the 12 videos, for the median error and for the mean confidence; median error by confidence bin |
 | `keypoint_confidence_error_all_videos.csv` | same script | per video, step and keypoint: n, median and p90 error, mean confidence, share with confidence >= 0.6, Spearman correlation of confidence and error |
 | `keypoint_confidence_error_bins_all_videos.csv` | same script | pooled: points, median error and share of errors > 20 px in each confidence bin, per keypoint |
 

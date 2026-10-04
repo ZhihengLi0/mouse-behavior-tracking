@@ -86,11 +86,16 @@ for r in PL.itertuples():
                 pooled.append(pd.DataFrame({"video": r.video, "keypoint": k, "error": t[f"{k}_error_px"].to_numpy(float), "conf": t[f"{k}_likelihood"].to_numpy(float)}))
     E, C = np.array(E).T, np.array(C).T
     fig, ax = plt.subplots(1, 3, figsize=(20, 5.6), constrained_layout=True, gridspec_kw={"width_ratios": [1, 1, 1.25]})
-    cols = [f"{l}" + ("\n(plateau)" if l // 20 == pstep else "") for l in labs]
-    fig.colorbar(heat(ax[0], E, cols, "Median error of each keypoint (px)", "YlOrRd", "%.1f", 0, max(20, np.nanmax(E))), ax=ax[0], shrink=0.8)
-    fig.colorbar(heat(ax[1], C, cols, "Mean confidence of each keypoint", "YlGnBu", "%.2f", 0, 1), ax=ax[1], shrink=0.8)
-    for a in ax[:2]:
-        a.set_xlabel("labels of this video in the training set")
+    for i, (n, c) in enumerate(zip(NAME, COL)):                       # one line per keypoint; pupil points solid, the others dashed
+        ls = "-" if i < 4 else "--"
+        ax[0].plot(labs, E[i], "o" + ls, color=c, lw=1.8, ms=5, label=n)
+        ax[1].plot(labs, C[i], "o" + ls, color=c, lw=1.8, ms=5, label=n)
+        ax[0].annotate(f"{E[i][-1]:.1f}", (labs[-1], E[i][-1]), textcoords="offset points", xytext=(6, 0), va="center", fontsize=8, color=c)
+        ax[1].annotate(f"{C[i][-1]:.2f}", (labs[-1], C[i][-1]), textcoords="offset points", xytext=(6, 0), va="center", fontsize=8, color=c)
+    for a_, t_, yl in ((ax[0], "Median error of each keypoint (px): lower is better", "median error (px)"), (ax[1], "Mean confidence of each keypoint: higher is better", "mean confidence")):
+        a_.axvline(pstep * 20, color="0.5", ls=":", lw=1); a_.set_xticks(labs); a_.set_xlim(labs[0] - 6, labs[-1] + 14)
+        a_.set_xlabel("labels of this video in the training set (dotted line = plateau point)"); a_.set_ylabel(yl); a_.set_title(t_, fontsize=11); a_.grid(alpha=0.3)
+    ax[0].set_ylim(0, None); ax[1].set_ylim(0, 1.03); ax[0].legend(fontsize=8.5, ncol=2)
     for k, n, c in zip(KP, NAME, COL):
         ax[2].scatter(plate[f"{k}_likelihood"], plate[f"{k}_error_px"].clip(lower=0.5), s=16, color=c, alpha=0.75, label=n, lw=0)
     ax[2].axvline(0.6, color="0.4", ls="--", lw=0.8); ax[2].set_yscale("log"); ax[2].set_xlim(-0.02, 1.02)
@@ -116,12 +121,19 @@ pm = T[T.plateau_model.astype(bool)]
 vids = list(PL.video) + ["all"]
 E = np.array([[pm[(pm.video.astype(str) == str(v)) & (pm.keypoint == k)].median_error_px.iloc[0] for v in vids] for k in KP])
 C = np.array([[pm[(pm.video.astype(str) == str(v)) & (pm.keypoint == k)].mean_confidence.iloc[0] for v in vids] for k in KP])
-fig, ax = plt.subplots(1, 3, figsize=(24, 5.8), constrained_layout=True, gridspec_kw={"width_ratios": [1.25, 1.25, 1]})
-cols = [str(v) for v in PL.video] + ["all"]
-fig.colorbar(heat(ax[0], E, cols, "Median error of each keypoint (px)", "YlOrRd", "%.1f", 0, 30), ax=ax[0], shrink=0.8)
-fig.colorbar(heat(ax[1], C, cols, "Mean confidence of each keypoint", "YlGnBu", "%.2f", 0, 1), ax=ax[1], shrink=0.8)
-for a in ax[:2]:
-    a.set_xlabel("video (model at its plateau point); all = pooled")
+fig, ax = plt.subplots(1, 3, figsize=(24, 6.2), constrained_layout=True, gridspec_kw={"width_ratios": [1, 1, 1]})
+order = np.argsort(-E[:, -1])                                         # keypoints sorted by pooled error, worst on top
+ypos = np.arange(8)[::-1]
+for a_, M, fmt, xl, t_ in ((ax[0], E, "%.1f px", "median error (px)", "Median error of each keypoint: bar = all videos pooled, dots = the 12 videos"),
+                           (ax[1], C, "%.2f", "mean confidence", "Mean confidence of each keypoint: bar = all videos pooled, dots = the 12 videos")):
+    a_.barh(ypos, M[order, -1], color=[COL[i] for i in order], alpha=0.55, height=0.62)
+    for yy, i in zip(ypos, order):
+        a_.plot(M[i, :-1], np.full(M.shape[1] - 1, yy), "o", color=COL[i], ms=5.5, mec="white", mew=0.7)
+        for j in np.argsort(-M[i, :-1])[:2] if a_ is ax[0] else np.argsort(M[i, :-1])[:2]:      # name the two extreme videos
+            a_.annotate(f"v{vids[j]}", (M[i, j], yy), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=7.5, color="0.25")
+        a_.text(M[i, -1], yy - 0.42, " " + fmt % M[i, -1], va="center", ha="left", fontsize=9, color="k", fontweight="bold")
+    a_.set_yticks(ypos); a_.set_yticklabels([NAME[i] for i in order], fontsize=10.5); a_.set_xlabel(xl); a_.set_title(t_, fontsize=11); a_.grid(axis="x", alpha=0.3)
+ax[1].set_xlim(0, 1.03); ax[1].axvline(0.6, color="0.4", ls="--", lw=0.8)
 for k, n, c in zip(KP, NAME, COL):
     g = Bn[(Bn.keypoint == k) & (Bn.n >= 5)]
     ax[2].plot(g["bin"].cat.codes, g.median_error_px, "o-", color=c, label=n, lw=1.6, ms=5)
