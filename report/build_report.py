@@ -30,7 +30,6 @@ FIGURES = [
     (V2 / "1_20251031_Pluto_spont_1/results/selection_sheets/selection_040_frames.png", "fig_selection.jpg", 2400),
     (V2 / "results/labels_to_plateau.png", "fig_labels_to_plateau.jpg", 2400),
     (V2 / "results/scale_curves_all_videos.png", "fig_all_videos.jpg", 5148),
-    (V2 / "9_20251023_Pluto1/results/scale_curve.png", "fig_video9.jpg", 2400),
     (V2 / "5_20251029_Pluto_spont_1/results/fewer_labels.png", "fig_fewer_video5.jpg", 1900),
     (V2 / "1_20251031_Pluto_spont_1/results/fewer_labels.png", "fig_fewer_video1.jpg", 1900),
     (V2 / "results/cross_video_curves.png", "cross_video_curves.jpg", 2600),
@@ -47,8 +46,8 @@ FIGURES = [
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
 ]
+import cv2
 try:
-    import cv2
 
     for src, dst, width in FIGURES:
         im = cv2.imread(str(src))
@@ -94,6 +93,22 @@ for r in pl.itertuples():
         fewer.append(f"<tr><td>{int(r.video)}</td><td>{px(r.zero_label_px)}</td><td>{g('sub05a')} / {g('sub05b')}</td>"
                      f"<td>{g('sub10a')} / {g('sub10b')}</td><td>{px(reg['median_frame_rmse_px'].iloc[0])}</td></tr>")
 
+# every video's own scale curve, shown in one scrolling row (figure 5-3)
+strip = []
+for r in pl.itertuples():
+    src = V2 / r.unit / "results/scale_curve.png"
+    im = cv2.imread(str(src))
+    if im is None:
+        continue
+    name = f"scale_video{int(r.video):02d}.jpg"
+    sc = 1600 / im.shape[1]
+    cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 86])
+    fin = r.status == "final"
+    zh = f"视频 {int(r.video)}（{r.mouse}，{r.date}）：" + (f"平台点 {int(r.labels_at_plateau)} 帧，{float(r.plateau_median_px):.2f} px" if fin else "进行中")
+    en = f"Video {int(r.video)} ({r.mouse}, {r.date}): " + (f"plateau at {int(r.labels_at_plateau)} labels, {float(r.plateau_median_px):.2f} px" if fin else "in progress")
+    strip.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)}: error vs own labels" loading="lazy">'
+                 f'<div class="cap"><span lang="zh">{zh}</span><span lang="en">{en}</span></div></div>')
+
 if in_progress:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）；视频 {in_progress[0]} 进行中，按 0 / 20 / 40 / … 帧的误差为 {' / '.join(in_progress[1])} px。"
     en_status = f"{n_final} videos finished (videos 0–{n_final - 1}); video {in_progress[0]} in progress, error at 0 / 20 / 40 / … labels: {' / '.join(in_progress[1])} px."
@@ -113,6 +128,7 @@ for r in ts.itertuples():
                f"<td>{r.production_flagged_pct:.1f}</td><td>{r.area_rel_spread_pct:.1f}</td><td>{r.corr_area_opening:.2f}</td></tr>")
 
 FILL = {
+    "{{SCALE_STRIP}}": "\n".join(strip),
     "{{EYE_ROWS}}": "\n".join(eye),
     "{{VIDEO_ROWS}}": "\n".join(rows),
     "{{FEWER_ROWS}}": "\n".join(fewer),
