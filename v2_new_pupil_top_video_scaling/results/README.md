@@ -241,3 +241,15 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | `keypoint_confidence_error/` | `keypoint_confidence_error.py` | error and confidence of each of the 8 keypoints; one figure per video (`keypoint_confidence_error_videoNN.png`) and all videos together. Pupil top is the least accurate point (median 10.9 px; the others 3.9-5.8 px) |
 
 Each folder has its own README with the basic information, the file-to-script table and the results.
+
+## All videos in one figure, three views (2026-10-04)
+
+`scripts/plot_all_videos_views.py` draws the same figure (blocks = videos in training order, x inside a block = labels
+of that video, y = median frame RMSE of each test set, from `cross_video_matrix.csv` and `labels_to_plateau.csv`) three
+times with a different emphasis:
+
+| file | emphasis |
+|---|---|
+| `all_videos_view_main.png` | main line: each video's own test set while its own labels are added |
+| `all_videos_view_fewer.png` | first batch of 5 / 10 labels: the band spans the two subsets (a, b) of each size. These models were only trained and scored afterwards; no jump selection and no further labeling followed them |
+| `all_videos_view_backtest.png` | back-test: each test set after its own block, one colour per video |
