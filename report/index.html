@@ -63,44 +63,66 @@ code{font-family:var(--mono);font-size:.9em}
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-03 22:32 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-03 22:39 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务。</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
-    <p><b>核心问题。</b>拿到一个新视频，人要标多少帧，模型才够用？为了回答它，按顺序解决了下面几个问题。</p>
-    <p><b>目前的答案（按做的先后顺序）。</b></p>
+    <p><b>核心问题。</b>拿到一个新视频，人要标多少帧，模型才够用？</p>
+    <p>工作分成两个阶段，区别在于瞳孔上点（pupil top）怎么标。两个阶段的误差数字不能直接比较。</p>
+    <p><b>第一阶段的结论（第 1–7 步）。前提：瞳孔上点标在看得见的、没有被眼睑挡住的瞳孔的最高处。</b></p>
     <ol>
-      <li><b>batch size 用多少？</b>用 2。</li>
-      <li><b>用哪个模型？</b>用 ResNet-50。</li>
-      <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，加到 300 帧误差不变；用哪种算法挑帧也没有差别。</li>
-      <li><b>换一只新老鼠怎么办？</b>旧模型完全不能用（误差约 200 px）；标 20 帧就回到约 10 px。</li>
-      <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台（已完成的 9 个里有 1 个需要 80 帧）。</li>
-      <li><b>加入新视频会不会让旧视频变差？</b>不会。</li>
+      <li><b>batch size 用多少？</b>用 2（第 2 步）。</li>
+      <li><b>用哪个模型？</b>用 ResNet-50（第 3 步）。</li>
+      <li><b>同一个视频标多少帧够？</b>约 80 帧就饱和，从 80 帧加到 300 帧，误差不变；用哪种算法挑帧也没有差别（第 4 步，只在第一只老鼠的 5 分钟视频上做过）。</li>
+      <li><b>不用标注能看出什么？</b>从预测的时间序列可以分出眨眼、眼动和追踪丢失（第 5 步）。</li>
+      <li><b>瞳孔面积怎么算？</b>在这个标准下上点落在眼睑边上，所以只用左、右、下三个点（第 6 步）。</li>
+      <li><b>换一只新老鼠怎么办？</b>旧模型完全不能用（185 px）；标 20 帧回到约 14 px，标 80 帧到约 10 px（第 7 步）。</li>
+    </ol>
+    <p><b>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2。</b>9 月 20 日起改了瞳孔四个点的定义（见下）。改的只是“点标在哪里”，8 个点里另外 4 个点的定义没有变，图像、任务和训练方式也没有变。batch size 和模型的选择取决于图像和训练方式，不取决于某一个点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
+    <p><b>第二阶段的结论（第 8–12 步）。前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</b></p>
+    <ol>
+      <li><b>同一个视频标多少帧够？</b>和第一阶段的“约 80 帧饱和”一致：同一个 5 分钟视频在新标准下重新做，20 / 40 / 60 / 80 / 100 帧的误差是 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px，没有随帧数下降；之后每个视频的平台点也都不超过 80 帧（第 9 步）。</li>
+      <li><b>换一只新老鼠怎么办？</b>和第一阶段一致：第二只老鼠的第一个视频，0 帧 208 px，标 20 帧到 10.4 px；第三只老鼠的数字见第 9 步的表（第 9 步）。</li>
+      <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台（已完成的 9 个里有 1 个需要 80 帧）（第 9 步）。</li>
+      <li><b>只标 5 帧或 10 帧够不够？</b>多数视频不够，20 帧是在每个视频上都有效的最小批量（第 10 步）。</li>
+      <li><b>加入新视频会不会让旧视频变差？</b>不会（第 11 步）。</li>
+      <li><b>瞳孔面积怎么算？</b>新标准下四个点都是椭圆端点，用四个点算的面积误差约为三点法的一半（第 12 步）。</li>
     </ol>
     <p><b>进度。</b>已完成 11 个视频（视频 0–10）；视频 11 进行中，按 0 / 20 / 40 / … 帧的误差为 25.96 / 9.24 / 8.86 px。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Task.</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
-    <p><b>Main question.</b> On a new video, how many frames must a person label before the model is good enough? To answer it, the questions below were settled in order.</p>
-    <p><b>Answers so far (in the order the work was done).</b></p>
+    <p><b>Main question.</b> On a new video, how many frames must a person label before the model is good enough?</p>
+    <p>The work has two phases, which differ in how the pupil-top point is labeled. Error numbers of the two phases cannot be compared directly.</p>
+    <p><b>Conclusions of phase 1 (steps 1–7). Premise: pupil top is placed at the highest point of the visible pupil, the part not hidden by the eyelid.</b></p>
     <ol>
-      <li><b>Which batch size?</b> 2.</li>
-      <li><b>Which model?</b> ResNet-50.</li>
-      <li><b>How many labels are enough within one video?</b> About 80 saturate it; 300 give the same error, and the algorithm used to pick the frames makes no difference.</li>
-      <li><b>What about a new mouse?</b> The old model is useless (error about 200 px); 20 labels bring it back to about 10 px.</li>
-      <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau (1 of the 9 finished ones needed 80).</li>
-      <li><b>Do new videos make old ones worse?</b> No.</li>
+      <li><b>Which batch size?</b> 2 (step 2).</li>
+      <li><b>Which model?</b> ResNet-50 (step 3).</li>
+      <li><b>How many labels are enough within one video?</b> About 80 saturate it; from 80 to 300 labels the error does not change, and the algorithm used to pick the frames makes no difference (step 4, done only on the 5-minute video of the first mouse).</li>
+      <li><b>What can be seen without labels?</b> Blinks, eye movements and tracking loss separate in the predicted time series (step 5).</li>
+      <li><b>How to compute the pupil area?</b> Under this standard the top point sits on the lid, so only left, right and bottom are used (step 6).</li>
+      <li><b>What about a new mouse?</b> The old model is useless (185 px); 20 labels bring it to about 14 px and 80 labels to about 10 px (step 7).</li>
+    </ol>
+    <p><b>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed.</b> From 2026-09-20 the definition of the four pupil points changed (below). Only where the points are placed changed; the other 4 of the 8 points, the images, the task and the training procedure stayed the same. The choice of batch size and model depends on the images and the training procedure, not on where one point is placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
+    <p><b>Conclusions of phase 2 (steps 8–12). Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</b></p>
+    <ol>
+      <li><b>How many labels are enough within one video?</b> Consistent with "about 80 saturate" from phase 1: the same 5-minute video redone under the new standard gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 9).</li>
+      <li><b>What about a new mouse?</b> Consistent with phase 1: the first video of the second mouse goes from 208 px at 0 labels to 10.4 px at 20; the numbers of the third mouse are in the table of step 9 (step 9).</li>
+      <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau (1 of the 9 finished ones needed 80) (step 9).</li>
+      <li><b>Are 5 or 10 labels enough?</b> Not on most videos; 20 is the smallest batch that worked on every video (step 10).</li>
+      <li><b>Do new videos make old ones worse?</b> No (step 11).</li>
+      <li><b>How to compute the pupil area?</b> Under the new standard all four points are ellipse endpoints, and the 4-point area has about half the error of the 3-point rule (step 12).</li>
     </ol>
     <p><b>Status.</b> 11 videos finished (videos 0–10); video 11 in progress, error at 0 / 20 / 40 / … labels: 25.96 / 9.24 / 8.86 px.</p>
   </div>
 
   <div class="text" lang="zh">
     <p><b>怎么量误差（全页统一）。</b>每个视频留出一组人工标注的测试帧，不参与训练，也不参与任何选择。对每一帧，算 8 个点的预测位置与人工标注之间的 RMSE（像素），再取所有测试帧的<b>中位数</b>。数字越小越好。作为参照：眼睛宽度约 320–390 px，所以 10 px 约为眼宽的 3%。</p>
-    <p><b>训练配置（第 2、3 步选定后固定）。</b>ResNet-50，batch 2。每个模型都从 ImageNet 预训练权重开始重新训练，不接着我们自己之前的模型继续训。</p>
+    <p><b>训练配置（第 2、3 步选定，两个阶段都使用）。</b>ResNet-50，batch 2。每个模型都从 ImageNet 预训练权重开始重新训练，不接着我们自己之前的模型继续训。</p>
   </div>
   <div class="text" lang="en">
     <p><b>How error is measured (same on the whole page).</b> Each video has a set of human-labeled test frames that are never used for training or for any decision. For each frame we take the RMSE (pixels) between predicted and human positions over the 8 points, then the <b>median</b> over the test frames. Lower is better. For scale: the eye is about 320–390 px wide, so 10 px is about 3% of the eye width.</p>
-    <p><b>Training recipe (fixed after steps 2 and 3).</b> ResNet-50, batch 2. Every model is trained anew from ImageNet-pretrained weights; it never continues from one of our earlier models.</p>
+    <p><b>Training recipe (chosen in steps 2 and 3, used in both phases).</b> ResNet-50, batch 2. Every model is trained anew from ImageNet-pretrained weights; it never continues from one of our earlier models.</p>
   </div>
 
   <nav class="text">
@@ -175,8 +197,8 @@ code{font-family:var(--mono);font-size:.9em}
     <figcaption lang="zh"><span class="tag">怎么看</span>横轴是累计训练帧数，三种颜色是三种算法。<b>中间一幅是主要指标</b>（中位帧 RMSE）：三条线一直在 15.7–17.5 px 之间上下波动，没有下降趋势，也分不出谁更好；注意这幅图的纵轴只跨 2 px。左边一幅是均值，会被几帧严重错误拉高（蓝线在 120–140 帧的尖峰就是几帧眨眼造成的）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read</span>x = cumulative training frames, the three colours are the three detectors. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend and no ranking; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论</span>在这个视频上，约 80 帧就已经饱和，加到 300 帧误差不变；三种算法没有区别。更正记录：第 6 轮曾报告"误差下降"，后来查出是中途换了误差公式造成的，已撤回（9 月 18 日）；这张图是统一公式后重算的。从此规定：同一个指标只用同一个脚本、同一个公式。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion</span>On this video about 80 labels already saturate; 300 labels give the same error, and the three detectors are indistinguishable. Correction on record: a "drop" reported at round 6 was traced to a change of error formula mid-series and was retracted (2026-09-18); this figure is recomputed with one formula. Rule since then: one metric, one script, one formula.</p>
+  <p class="concl" lang="zh"><span class="tag">结论</span>在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变；三种算法没有区别。新标准下在同一个视频上重做，结果一致（第 9 步，视频 0：20–100 帧都在 12–13 px）。更正记录：第 6 轮曾报告"误差下降"，后来查出是中途换了误差公式造成的，已撤回（9 月 18 日）；这张图是统一公式后重算的。从此规定：同一个指标只用同一个脚本、同一个公式。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion</span>On this video (phase-1 label standard) about 80 labels already saturate; 300 labels give the same error, and the three detectors are indistinguishable. Redone on the same video under the new standard, the result is the same (step 9, video 0: 12–13 px anywhere from 20 to 100 labels). Correction on record: a "drop" reported at round 6 was traced to a change of error formula mid-series and was retracted (2026-09-18); this figure is recomputed with one formula. Rule since then: one metric, one script, one formula.</p>
 </section>
 
 <!-- 5 -->
@@ -251,8 +273,8 @@ code{font-family:var(--mono);font-size:.9em}
     <figcaption lang="zh"><span class="tag">怎么看</span>一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；蓝点是上下眼睑和两个眼角。</figcaption>
     <figcaption lang="en"><span class="tag">How to read</span>One human-labeled frame. Red dots are the four pupil points and the red line is the ellipse through them; blue dots are the two eyelids and the two eye corners.</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论</span>新标准下四个点都有明确的几何含义，面积可以直接由四个点算出。旧标准（第 1–7 步）的误差数字不能和新标准（第 9 步起）的数字直接比较。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion</span>Under the new standard all four points have a clear geometric meaning and the area follows directly from them. Error numbers under the old standard (steps 1–7) cannot be compared directly with those under the new one (from step 9).</p>
+  <p class="concl" lang="zh"><span class="tag">结论</span>新标准下四个点都有明确的几何含义，面积可以直接由四个点算出。模型和 batch size 沿用第 2、3 步的选择（ResNet-50，batch 2）：改的只是点标在哪里，图像和训练方式没有变，所以没有重新比较。旧标准（第 1–7 步）的误差数字不能和新标准（第 9 步起）的数字直接比较。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion</span>Under the new standard all four points have a clear geometric meaning and the area follows directly from them. Model and batch size are carried over from steps 2 and 3 (ResNet-50, batch 2): only where the points are placed changed, not the images or the training procedure, so they were not compared again. Error numbers under the old standard (steps 1–7) cannot be compared directly with those under the new one (from step 9).</p>
 </section>
 
 <!-- 9 -->
