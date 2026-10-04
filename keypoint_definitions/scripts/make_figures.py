@@ -20,9 +20,9 @@ FIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figures")
 L = "training-data/labels"
 OLD = os.path.join(ROOT, "v1_old_pupil_top/new-video-generalization/training-data/labels")
 BK = os.path.join(ROOT, "local_data/backups/newstd_labels_cornerV1_20260920_1818/first5minvedio/training-data/labels")
-MICE = [("mouse A, 5-min video (unit 0)", f"{V2}/0_first5minvedio/{L}/test50", "img015001.png"),
-        ("Pluto, 2025-10-31 (unit 1)", f"{V2}/1_20251031_Pluto_spont_1/{L}/test50", "img068086.png"),
-        ("Terra, 2025-10-17 (unit 11)", f"{V2}/11_20251017_Terra_spont_1/{L}/test50", "img068086.png")]
+MICE = [("first mouse, 5-min video (video 0)", f"{V2}/0_first5minvedio/{L}/test50", "img015001.png"),
+        ("Pluto, 2025-10-31 (video 1)", f"{V2}/1_20251031_Pluto_spont_1/{L}/test50", "img068086.png"),
+        ("Terra, 2025-10-17 (video 11)", f"{V2}/11_20251017_Terra_spont_1/{L}/test50", "img068086.png")]
 
 
 def bright(img):
