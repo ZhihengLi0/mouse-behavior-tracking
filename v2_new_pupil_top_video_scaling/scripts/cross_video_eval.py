@@ -158,14 +158,23 @@ def score(shuffle, tsi, final_idx, test_unit):
 def plot(m):
     units = test_units()
     # ordered colours: video 0 darkest -> newest video lightest (viridis, perceptually ordered), so the sequence reads as a trend
-    colors = {v[0]: plt.cm.viridis(0.85 * i / max(1, len(VIDEOS) - 1)) for i, v in enumerate(VIDEOS)}
+    # one colour family per mouse (user request 2026-10-04), spread widely inside each family so neighbouring videos differ:
+    # mouse A black, Pluto dark-to-mid cool colours (purple -> blue -> green), Terra light warm colours (yellow -> orange)
+    colors, fam = {}, {}
+    for v in VIDEOS:
+        fam.setdefault(v[1], []).append(v[0])
+    for mouse, us in fam.items():
+        for i, u in enumerate(us):
+            f = i / max(1, len(us) - 1)
+            colors[u] = ("#111111" if "Pluto" not in mouse and "Terra" not in mouse else
+                         plt.cm.viridis(0.02 + 0.78 * f) if "Pluto" in mouse else plt.cm.Wistia(0.15 + 0.85 * f))
     markers = {v[0]: "o" for v in VIDEOS}   # one plain marker; the videos are told apart by colour only (user request 2026-09-29)
     short = {v[0]: label_of(v[0]) for v in VIDEOS}
     mods = models()
     # positions come from the current model sequence (the csv keeps a model_idx from the run that scored the row)
     m = m[m.shuffle.isin(mods.shuffle)].drop(columns=["model_idx", "subset"], errors="ignore").merge(mods[["shuffle", "model_idx", "subset"]], on="shuffle")
     m["subset"] = m["subset"].fillna("")
-    fig, ax = plt.subplots(figsize=(21, 8), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(26.5, 8), constrained_layout=True)
     for tu in units:
         s = m[(m.test_unit == tu) & (m.subset == "")].sort_values("model_idx")
         ax.plot(s.model_idx, s.median_frame_rmse_px, "-", marker=markers[tu], color=colors[tu], lw=1.8, ms=3.5, label=f"test set of {short[tu]}")
@@ -195,13 +204,13 @@ def plot(m):
         ax.axvspan(x0, x1, color=colors[u], alpha=0.06)
         head = f"video {u.split('_')[0]}" + (" (POOR QUALITY)" if u in POOR_QUALITY else "")
         mname = mouse.split("(")[-1].rstrip(")")                      # "mouse A", "Pluto", "Terra"
-        ax.text((x0 + x1) / 2, 1.02, f"{head}\n{mname}, {date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
+        ax.text((x0 + x1) / 2, 1.02, f"{head}\n{mname}, {date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color="0.15")
         if prev_mouse is not None and mouse != prev_mouse:            # change of mouse: thick line + label (user request 2026-10-04)
             ax.axvline(x0, color="k", lw=2.2, zorder=6)
             ax.text(x0, 0.985, f" NEW MOUSE: {mname} ", transform=ax.get_xaxis_transform(), ha="left", va="top", fontsize=10, fontweight="bold",
                     color="w", bbox=dict(fc="k", ec="none", pad=2), zorder=7)
         prev_mouse = mouse
-    ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=8.5, loc="lower left", ncol=2, framealpha=0.9)
+    ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=8.5, loc="upper left", bbox_to_anchor=(1.003, 1.0), framealpha=0.9)
     # per-video panels (user request 2026-09-29): each video's own test set vs its own labels, 5/10-label subsets as open circles
     own = [u for u in units if (mods.model_unit == u).any()]
     fig2, axs = plt.subplots(1, len(own), figsize=(3.6 * len(own), 4.2), constrained_layout=True)

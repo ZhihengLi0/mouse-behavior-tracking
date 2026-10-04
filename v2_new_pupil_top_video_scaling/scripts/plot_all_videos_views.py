@@ -28,7 +28,14 @@ import cross_video_eval as c  # noqa: E402
 TITLE = {"main": "Main line: each video's own test set while its own labels are added (bold); the first 20 labels bring most videos close to their plateau",
          "fewer": "First batch of 5 or 10 labels instead of 20: shaded = range between the two subsets (a, b) of each size; these models were only trained and scored, no jump selection followed",
          "backtest": "Back-test: each video's test set after its own block (one colour per video); adding later videos does not make earlier ones worse"}
-VCOL = plt.cm.tab20(np.linspace(0, 1, 20))
+# one colour family per mouse, as in cross_video_eval.py: mouse A black, Pluto cool colours (purple -> green), Terra light warm colours
+VCOL, _fam = {}, {}
+for _v in c.VIDEOS:
+    _fam.setdefault(_v[1], []).append(_v[0])
+for _m, _us in _fam.items():
+    for _i, _u in enumerate(_us):
+        _f = _i / max(1, len(_us) - 1)
+        VCOL[_u] = ("#111111" if "Pluto" not in _m and "Terra" not in _m else plt.cm.viridis(0.02 + 0.78 * _f) if "Pluto" in _m else plt.cm.Wistia(0.15 + 0.85 * _f))
 ACCENT = ["#2a78d6", "#eb6834"]            # blue / orange, alternating between neighbouring blocks
 GREY, INK, MUTED = "#c4c8cc", "#1c1f22", "#5d6368"
 
@@ -93,7 +100,7 @@ for FOCUS in ("main", "fewer", "backtest"):
         if u in zero_slot:
             px, py = [zero_slot[u]] + px, [float(zero[u])] + py
         if FOCUS == "backtest":                                       # own block thin; the part after the block in the video's colour
-            vc = VCOL[int(u.split("_")[0]) % 20]
+            vc = VCOL[u]
             ax.plot(px, py, "-", color=vc, lw=1.2, zorder=3)
             after = series[u][series[u].x >= own.x.max()]
             ax.plot(after.x, after.median_frame_rmse_px, "-", color=vc, lw=2.4, zorder=4, solid_joinstyle="round")
@@ -141,8 +148,8 @@ for FOCUS in ("main", "fewer", "backtest"):
          "fewer": [matplotlib.patches.Patch(facecolor=ACCENT[0], alpha=0.4, edgecolor=ACCENT[0], label="shaded: range between the two subsets at 5 labels (5a, 5b) and at 10 labels (10a, 10b), from the 0-label point to the 20-label point"),
                    plt.Line2D([], [], color=ACCENT[0], lw=0, marker="o", mfc="white", mec=ACCENT[0], mew=1.6, ms=6, label="small circles: the four subset models of a video (x = 5 and x = 10)"),
                    plt.Line2D([], [], color=ACCENT[0], lw=1.3, marker="o", mec="white", ms=4, label="thin coloured line: the regular steps of 20 labels")],
-         "backtest": [plt.Line2D([], [], color=VCOL[2], lw=2.4, label="bold, one colour per video: its test set scored by the models trained AFTER its own block"),
-                      plt.Line2D([], [], color=VCOL[2], lw=1.2, label="thin, same colour: inside its own block"),
+         "backtest": [plt.Line2D([], [], color=VCOL["5_20251029_Pluto_spont_1"], lw=2.4, label="bold, one colour per video (black = mouse A, purple to green = Pluto, yellow = Terra): its test set scored by the models trained AFTER its own block"),
+                      plt.Line2D([], [], color=VCOL["5_20251029_Pluto_spont_1"], lw=1.2, label="thin, same colour: inside its own block"),
                       plt.Line2D([], [], color=GREY, lw=1.1, label="grey: before its own block (the video not yet in the training set)")]}[FOCUS]
     ax.legend(handles=h, fontsize=9, loc="lower left", frameon=True, framealpha=0.92, edgecolor="#d8dbde", bbox_to_anchor=(0.012, 0.02))
     fig.suptitle(TITLE[FOCUS], fontsize=12.5, color=INK, x=0.012, ha="left")
