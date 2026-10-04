@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:06 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 15:13 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -91,7 +91,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
     <p>On 2026-09-20 the placement of each of the 8 points was made explicit (point-by-point comparison in step 4). Three things changed: pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; and the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. The definitions of pupil bottom and of the two eyelid points did not change. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions. The three choices of phase 1 were themselves made under one set of definitions: all training and test frames of that video were labeled in the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms are fair.</p>
-    <h3>Conclusions of phase 2 (steps 4–9)</h3>
+    <h3>Conclusions of phase 2 (steps 4–11)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
       <li><b>How many labels are enough within one video?</b> It saturates within about 80 labels: the same 5-minute video, relabeled under the keypoint definitions made explicit on 2026-09-20 and redone, gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 5). In phase 1 the same video showed no decrease from 80 to 300 labels either (step 3).</li>
@@ -101,7 +101,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.9 px; the other 7 points 3.9–5.8 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to find the frames in which the pupil cannot be seen?</b> Mean confidence of the four pupil points below 0.527: 27 of the 28 frames in which the labeler left all four pupil points empty are found, and 4.1% of the frames with all four labeled are flagged; the earlier rule flags 55.7%. An empty frame is not the same as a blink; blinks have no definition or truth yet (step 9).</li>
+      <li><b>How to detect blinks?</b> No result yet: the definition of a blink and its truth are not fixed. Only a preliminary observation so far: a mean confidence of the four pupil points below 0.527 finds the frames in which the labeler left all four pupil points empty (27 of 28, with 4.1% of the other frames flagged), but an empty frame is not the same as a blink (step 10).</li>
     </ol>
     <p><b>Status:</b> 12 videos finished (videos 0–11).</p>
   </div>
@@ -116,7 +116,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>RMSE over all keypoints (used in steps 1 and 2):</b> one root mean square over the errors of all points of all test frames, <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi mathvariant='normal'>RMSE</mi><mo>=</mo><msqrt><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>,</mo><mi>k</mi></mrow></munder><msubsup><mi>e</mi><mrow><mi>i</mi><mi>k</mi></mrow><mn>2</mn></msubsup></msqrt></math>where N is the total number of labeled points (100 frames × 8 points, at most 800). A few points that are far off pull it up, which is why the median frame RMSE was used later.</li>
       <li><b>The other numbers:</b> "90th percentile" is the 90th percentile of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi mathvariant='normal'>RMSE</mi><mi>i</mi></msub></math>; "test frames above 50 px" is the share of frames with <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi mathvariant='normal'>RMSE</mi><mi>i</mi></msub></math> &gt; 50; "points with confidence ≥ 0.6" is the share of labeled points whose model confidence is at least 0.6.</li>
     </ol>
-    <p>Lower is better. For scale: the eye is about 320–390 px wide, so 10 px is about 3% of the eye width. The scoring scripts are in the repository: <code>v1_old_pupil_top/batch-size-selection/scripts/evaluate_eye_test_set.py</code> and the script of the same name under <code>model-selection/scripts/</code> for steps 1 and 2, <code>active-learning-jump-selection/scripts/round_train_pipeline.py</code> for step 3, and <code>v2_new_pupil_top_video_scaling/scripts/scale_step.py</code> from step 5 on; every score is written to the csv tables of the <code>results/</code> folders. The video, data, model and metric of every step are listed in the "Basic information" table at its start.</p>
+    <p>Lower is better. For scale: under the present keypoint definitions the eye width (distance between the two corners, median of the human labels on each video's test frames) is 363–497 px, so 10 px is about 2–3% of the eye width and 50 px about 10–14%. The scoring scripts are in the repository: <code>v1_old_pupil_top/batch-size-selection/scripts/evaluate_eye_test_set.py</code> and the script of the same name under <code>model-selection/scripts/</code> for steps 1 and 2, <code>active-learning-jump-selection/scripts/round_train_pipeline.py</code> for step 3, and <code>v2_new_pupil_top_video_scaling/scripts/scale_step.py</code> from step 5 on; every score is written to the csv tables of the <code>results/</code> folders. The video, data, model and metric of every step are listed in the "Basic information" table at its start.</p>
     <p><b>Training recipe (chosen in steps 1 and 2, used in both phases):</b> ResNet-50, batch 2. Every model is trained anew from ImageNet-pretrained weights; it never continues from one of our earlier models.</p>
   </div>
 
@@ -131,9 +131,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><a href="#s6"><span lang="en">Asked afterwards: would a first batch of 5 or 10 labels be enough</span></a></li>
       <li><a href="#s7"><span lang="en">Do new videos hurt old ones</span></a></li>
       <li><a href="#s8"><span lang="en">Error and confidence of each keypoint</span></a></li>
-      <li><a href="#s9"><span lang="en">Pupil area and blinks: four-point rule; frames without a visible pupil found by mean confidence</span></a></li>
-      <li><a href="#s10"><span lang="en">Where there is no conclusion yet</span></a></li>
-      <li><a href="#s11"><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
+      <li><a href="#s9"><span lang="en">Pupil area: the four-point rule</span></a></li>
+      <li><a href="#s10"><span lang="en">Blinks: no result yet</span></a></li>
+      <li><a href="#s11"><span lang="en">Time series of the whole videos</span></a></li>
+      <li><a href="#s12"><span lang="en">Where there is no conclusion yet</span></a></li>
+      <li><a href="#s13"><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
     </ol>
   </nav>
 </header>
@@ -411,7 +413,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><b>(c) From batch 2 on: candidates by the jump rule, then clustering by appearance</b></p>
     <ol>
       <li>The model of the previous step predicts every frame of the whole video.</li>
-      <li>Threshold: eye width = distance from the nasal to the temporal corner in each frame, median over the video; threshold = 3% of the median eye width (about 12–15 px).</li>
+      <li>Threshold: eye width = distance from the nasal to the temporal corner in each frame, median over the video; threshold = 3% of the median eye width (about 11–15 px).</li>
       <li>Jump: for each frame, the distance each of the 8 points moved from the previous frame; the largest of the 8.</li>
       <li>Pool frames whose jump exceeds the threshold are the candidates (the frames flagged by the jump rule). More than 12000 candidates are thinned evenly to about 12000; with fewer than 40, the 2000 frames with the largest jumps are used instead.</li>
       <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart, more clusters if short.</li>
@@ -682,18 +684,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 9 -->
 <section id="s9">
-  <h2><span class="no">9</span><span lang="en">Pupil area and blinks: the four-point area has the lowest error; the mean confidence of the pupil points best finds the frames in which a person could not label the pupil; blinks have no definition or truth yet</span></h2>
+  <h2><span class="no">9</span><span lang="en">Pupil area: the four-point rule has the lowest error; on videos 4 and 8 the area is still not accurate</span></h2>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">The 12 finished videos (videos 0–11; 1 of mouse A, 10 of Pluto, 1 of Terra).</span></td></tr>
     <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
     <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off.</span></td></tr>
-    <tr><th><span lang="en">Frames for the area</span></th><td><span lang="en">The frames among each video's 50 frozen test frames in which all four pupil points have human labels, 594 frames in total. Test frames come from the final 10% of the video; no model was trained on them.</span></td></tr>
-    <tr><th><span lang="en">Frames for eye closure</span></th><td><span lang="en">Human-labeled frames the predicting model was not trained on: test50 and val20 (prediction of the plateau model) and every batch from the 2nd on (prediction of the model of the step before, which selected that batch). A frame whose four pupil points were all left empty by the labeler counts as closed (28 frames, from 9 videos); a frame with all four labeled counts as open (1484 frames); frames with 1–3 pupil points are not used.</span></td></tr>
-    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>, the time series of each video in <code>blink_area_timeseries_videoNN.png</code> there (NN = video index).</span></td></tr>
+    <tr><th><span lang="en">Frames used</span></th><td><span lang="en">The frames among each video's 50 frozen test frames in which all four pupil points have human labels, 594 frames in total. Test frames come from the final 10% of the video; no model was trained on them.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code> (part A); results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>.</span></td></tr>
   </tbody></table></div>
-
-  <h3><span lang="en">9.1 How the area and its error are computed</span></h3>
   
   <div class="text" lang="en">
     <p>The four pupil points are top T, bottom B, left L, right R, with coordinates (x, y) in pixels; the image y axis points down.</p>
@@ -721,7 +720,21 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="en">9.2 How eye closure is detected and compared</span></h3>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="no">10</span><span lang="en">Blinks: no result yet (definition and truth not fixed); only a preliminary observation so far</span></h2>
+  
+  <p class="text" lang="en"><span class="hl">Status: there is no result on blinks yet.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">The 12 finished videos (videos 0–11; 1 of mouse A, 10 of Pluto, 1 of Terra).</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
+    <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off.</span></td></tr>
+    <tr><th><span lang="en">Frames used</span></th><td><span lang="en">Human-labeled frames the predicting model was not trained on: test50 and val20 (prediction of the plateau model) and every batch from the 2nd on (prediction of the model of the step before, which selected that batch). A frame whose four pupil points were all left empty by the labeler counts as closed (28 frames, from 9 videos); a frame with all four labeled counts as open (1484 frames); frames with 1–3 pupil points are not used.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code> (part B); results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>.</span></td></tr>
+  </tbody></table></div>
   
   <div class="text" lang="en">
     <p>For every frame the signals below are computed from the model's prediction, and the question is which signal best separates the frames a person marked as closed from those marked as open. <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>T</mi></msub></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>B</mi></msub></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>L</mi></msub></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>R</mi></msub></math> are the model's confidences (0 to 1) of the four pupil points.</p>
@@ -737,15 +750,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_eye_blink.jpg" alt="Closure signals on all videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-2, how to read:</span>A: AUC of the six signals (28 closed and 1484 open frames pooled). B: the values of the best signal (mean pupil confidence) on closed (red) and open (grey) frames; dashed = threshold 0.527. C: for each rule the share of closed frames detected (green) and of open frames flagged (red), with frame counts; the first six thresholds are chosen leave-one-video-out, the last two are fixed rules.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-1, how to read:</span>A: AUC of the six signals (28 closed and 1484 open frames pooled). B: the values of the best signal (mean pupil confidence) on closed (red) and open (grey) frames; dashed = threshold 0.527. C: for each rule the share of closed frames detected (green) and of open frames flagged (red), with frame counts; the first six thresholds are chosen leave-one-video-out, the last two are fixed rules.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_closed_frames.jpg" alt="The 28 closed-eye frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-3:</span>All 28 frames used as "closed" truth (the labeler left all four pupil points empty); video, batch and frame number are printed on each. Source: training batches 2 and later of videos 1–9 (Pluto).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-2:</span>All 28 frames used as "closed" truth (the labeler left all four pupil points empty); video, batch and frame number are printed on each. Source: training batches 2 and later of videos 1–9 (Pluto).</figcaption>
   </figure>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion (finding the frames in which a person could not label the pupil):</span>This does not test blinks. The truth is "frames in which the labeler left all four pupil points empty"; by the label rule this means the pupil could not be seen or placed in that frame. By eye most of the 28 frames show a closed or nearly closed eye (Figure 9-3) and one is almost black. An empty frame is not a blink: a blink is one closing-and-opening event, and in half-closed frames the pupil points were still labeled, so those frames count as labeled here. Blinks have no definition and no truth yet. With that premise: the confidence of the pupil points finds these frames better than the eye opening does; the rule of the current script flags far too much.
+  <div class="concl" lang="en"><span class="tag">Conclusion (finding the frames in which a person could not label the pupil):</span>This does not test blinks. The truth is "frames in which the labeler left all four pupil points empty"; by the label rule this means the pupil could not be seen or placed in that frame. By eye most of the 28 frames show a closed or nearly closed eye (Figure 10-2) and one is almost black. An empty frame is not a blink: a blink is one closing-and-opening event, and in half-closed frames the pupil points were still labeled, so those frames count as labeled here. Blinks have no definition and no truth yet. With that premise: the confidence of the pupil points finds these frames better than the eye opening does; the rule of the current script flags far too much.
     <ol>
       <li>AUC: mean pupil confidence 0.995, lowest confidence 0.993; eye opening relative to the video 0.930, relative to its 5-s median 0.901; aspect 0.394 (no separation).</li>
       <li>Rule "mean confidence &lt; 0.527" (threshold chosen leave-one-video-out): 27 of the 28 closed frames detected, 61 of the 1484 open frames flagged (4.1%).</li>
@@ -754,13 +767,24 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="en">9.3 Time series of the whole videos</span></h3>
+</section>
+
+<!-- 11 -->
+<section id="s11">
+  <h2><span class="no">11</span><span lang="en">Time series of the whole videos: the area traces still contain unresolved jumps</span></h2>
+  <p class="text"><b><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">The 12 finished videos (videos 0–11; 1 of mouse A, 10 of Pluto, 1 of Terra).</span></td></tr>
+    <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
+    <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code> (part C); results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>; the time series of each video is <code>blink_area_timeseries_videoNN.png</code> there.</span></td></tr>
+  </tbody></table></div>
   
-  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of 9.2 (mean confidence &lt; 0.527) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
+  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of step 10 (mean confidence &lt; 0.527) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
   <figure>
     <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-4, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-1, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -778,7 +802,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/eyets_video11.jpg" alt="eyets video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-5, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; x = time (s), red = frames flagged as "pupil not visible".</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-2, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; x = time (s), red = frames flagged as "pupil not visible".</figcaption>
   </figure>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Mouse</span></th><th><span lang="en">Area error: four-point / three-point (%)</span></th><th><span lang="en">Closed / open frames (human)</span></th><th><span lang="en">Frames flagged closed (%)</span></th><th><span lang="en">Events (per min)</span></th><th><span lang="en">Median event (ms)</span></th><th><span lang="en">Untrusted by the current script (%)</span></th><th><span lang="en">Relative spread of the area (%)</span></th><th><span lang="en">Correlation of area and opening</span></th></tr></thead>
@@ -808,9 +832,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
 </section>
 
-<!-- 10 -->
-<section id="s10">
-  <h2><span class="no">10</span><span lang="en">Where there is no conclusion yet</span></h2>
+<!-- 12 -->
+<section id="s12">
+  <h2><span class="no">12</span><span lang="en">Where there is no conclusion yet</span></h2>
   
   <div class="text" lang="en">
     <ul>
@@ -819,14 +843,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b> has just started with its first video (numbers in the table of step 5); until it is finished, "a new mouse needs 20 labels" rests on one new mouse.</li>
-      <li><b>Jumps in the area traces</b> (section 9.3): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
+      <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
       <li><b>Area and blinks</b>: the production area script still uses the three-point rule and the earlier blink rule; the switch to the four-point rule and the "mean confidence" rule is undecided. The closed-eye truth is only 28 frames, none on Terra yet.</li>
     </ul>
   </div>
 </section>
 
 <!-- appendix -->
-<section id="s11">
+<section id="s13">
   <h2><span class="no"><span lang="en">A</span></span><span lang="en">Appendix: the selection sheet of every batch of every video</span></h2>
   
   <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. Algorithm and how to read a sheet: section 5.1 and Figure 5-1 of step 5. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
@@ -924,7 +948,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <section>
   
   <div class="text small muted" lang="en">
-    <p><b>Where things are:</b> Code, documentation, result tables and figures are in the GitHub repository: steps 1–3 under <code>v1_old_pupil_top/</code>, steps 4–9 under <code>v2_new_pupil_top_video_scaling/</code> (one folder per video, cross-video results in <code>results/</code>). Every important state has a git tag, listed in <code>CHANGELOG.md</code>. Raw videos, labels, model weights and per-frame predictions are kept locally and on the backup drive only. The figures on this page are the original figures of the <code>results/</code> folders.</p>
+    <p><b>Where things are:</b> Code, documentation, result tables and figures are in the GitHub repository: steps 1–3 under <code>v1_old_pupil_top/</code>, steps 4–11 under <code>v2_new_pupil_top_video_scaling/</code> (one folder per video, cross-video results in <code>results/</code>). Every important state has a git tag, listed in <code>CHANGELOG.md</code>. Raw videos, labels, model weights and per-frame predictions are kept locally and on the backup drive only. The figures on this page are the original figures of the <code>results/</code> folders.</p>
   </div>
 </section>
 
