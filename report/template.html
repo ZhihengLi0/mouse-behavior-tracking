@@ -213,11 +213,11 @@ code{font-family:var(--mono);font-size:.9em}
   <p class="text" lang="en"><span class="tag">What was done:</span>Same data and settings (batch 2, 100 epochs), five backbones: ResNet-50, HRNet-W18 / W32 / W48, CSPNeXt-S.</p>
   <figure>
     <div class="figbox"><img src="assets/fig_model_selection.jpg" alt="Model selection overview"></div>
-    <figcaption lang="zh"><span class="tag">怎么看：</span>左上：测试集误差，ResNet-50 最低（20.1 px），HRNet-W32 接近（21.1 px）。右上：内部验证损失，5 个模型只差 1.4%，分不出高下。左下：置信度 ≥ 0.6 的点，ResNet-50 最多（800 个点里 514 个）。右下：训练时间对误差，ResNet-50 用时 1.7 小时，在左下角（又快又准）。</figcaption>
-    <figcaption lang="en"><span class="tag">How to read:</span>Top left: test error, ResNet-50 lowest (20.1 px), HRNet-W32 close (21.1 px). Top right: internal validation loss, the five models differ by only 1.4% and cannot be separated. Bottom left: points with confidence ≥ 0.6, ResNet-50 has the most (514 of 800). Bottom right: training time vs error, ResNet-50 takes 1.7 h and sits in the lower-left corner (fast and accurate).</figcaption>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>左上：测试集误差，ResNet-50 最低（20.1 px），HRNet-W32 接近（21.1 px）。右上：内部验证损失，5 个模型只差 1.4%，分不出高下。左下：置信度 ≥ 0.6 的点，ResNet-50 最多（800 个点里 514 个）。右下：训练时间对误差，ResNet-50 用时 1.7 小时，在左下角（误差低，用时短；只有误差高得多的 CSPNeXt-S 比它快）。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>Top left: test error, ResNet-50 lowest (20.1 px), HRNet-W32 close (21.1 px). Top right: internal validation loss, the five models differ by only 1.4% and cannot be separated. Bottom left: points with confidence ≥ 0.6, ResNet-50 has the most (514 of 800). Bottom right: training time vs error, ResNet-50 takes 1.7 h and sits in the lower-left corner (low error, short time; only CSPNeXt-S, with a much higher error, is faster).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>选 ResNet-50。验证损失分不出模型，按事先定好的规则用置信度决定；ResNet-50 同时误差最低、训练最快。此后所有实验都用 ResNet-50 + batch 2。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>ResNet-50. Validation loss could not separate the models, so the pre-declared tie-break (confidence) decided; ResNet-50 also has the lowest error and trains fastest. All later experiments use ResNet-50 with batch 2.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>综合考虑，选 ResNet-50。（1）测试集误差最低：20.1 px。（2）5 种模型的验证损失相差不大，只差 1.4%。（3）置信度的区分最好：800 个点里有 514 个置信度 ≥ 0.6，其余模型是 75–375 个；这有利于之后用置信度判断眨眼和追踪丢失。（4）训练成本低：1.7 小时；误差接近的 HRNet-W32 要 3.7 小时。此后所有实验都用 ResNet-50 和 batch 2。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Taking everything together, ResNet-50. (1) Lowest test error: 20.1 px. (2) The validation losses of the five models are close, within 1.4%. (3) Best use of confidence: 514 of 800 points have confidence ≥ 0.6, against 75–375 for the other models; this helps when confidence is used later to detect blinks and tracking loss. (4) Low training cost: 1.7 h, against 3.7 h for HRNet-W32, the model with a similar error. All later experiments use ResNet-50 with batch 2.</p>
 </section>
 
 <!-- 3 -->
