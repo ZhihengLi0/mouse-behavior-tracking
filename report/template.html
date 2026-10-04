@@ -83,7 +83,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>瞳孔面积怎么算？</b>在这个标准下上点落在眼睑边上，所以只用左、右、下三个点（第 6 步）。</li>
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
-    <p>9 月 20 日起改了瞳孔四个点的定义（见下）。改的只是“点标在哪里”，8 个点里另外 4 个点的定义没有变，图像、任务和训练方式也没有变。batch size 和模型的选择取决于图像和训练方式，不取决于某一个点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
+    <p>9 月 20 日起改了瞳孔四个点（瞳孔上、下、左、右）的定义：它们现在是瞳孔椭圆的四个端点，其中变化最大的是上点。另外四个点（上眼睑、下眼睑、鼻侧眼角、颞侧眼角）的定义没有变。改的只是“瞳孔的点标在哪里”，图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于某一个点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
     <h3>第二阶段的结论（第 8–12 步）</h3>
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
@@ -111,7 +111,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>How to compute the pupil area?</b> Under this standard the top point sits on the lid, so only left, right and bottom are used (step 6).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
-    <p>From 2026-09-20 the definition of the four pupil points changed (below). Only where the points are placed changed; the other 4 of the 8 points, the images, the task and the training procedure stayed the same. The choice of batch size and model depends on the images and the training procedure, not on where one point is placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
+    <p>From 2026-09-20 the definition of the four pupil points (pupil top, bottom, left, right) changed: they are now the four endpoints of the pupil ellipse, and the top point changed the most. The other four points (upper eyelid, lower eyelid, nasal eye corner, temporal eye corner) kept their definition. Only where the pupil points are placed changed; the images, the task and the training procedure stayed the same. The choice of batch size and model depends on the images and the training procedure, not on where one point is placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
     <h3>Conclusions of phase 2 (steps 8–12)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
