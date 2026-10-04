@@ -17,3 +17,19 @@ batch01: 99 of 160), then the test set was frozen. Training set of every step = 
 Back-test of the earlier models on this test set (`../results/cross_video_matrix.csv`): the models of the sequence
 score between 16.5 and 313 px; the other models of video 10 (20 / 60 / 80 labels) give 16.54 / 29.18 / 33.41 px, so
 the 0-label number of a single model is not stable on this new mouse.
+
+**Fewer-labels study (2026-10-04)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: the 540 carried labels of videos 0-10; shuffles 2111-2114) ->
+`fewer_labels.png` / `fewer_labels.csv`. This compares the size of the first batch (the 5 / 10 labels are taken out of
+the 20 already labeled, picked by image appearance without a model); it is not a procedure of 5 labels per step.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 25.96 px | 80.1 | 16% |
+| 5 (subset a / b) | 9.69 / 9.97 px | 22.9 / 24.0 | 2% / 2% |
+| 10 (subset a / b) | 9.54 / 8.87 px | 17.1 / 14.8 | 0% / 2% |
+| 20 | 9.24 px | 166.4 | 20% |
+
+On this first video of a new mouse 5 labels already bring the median from 26 px to 9.7-10.0 px, within 1 px of the
+20-label model (9.24 px); 10 labels give 8.9-9.5 px. The 20-label model has more test frames above 50 px (20%) than
+the 5- and 10-label models (0-2%); with one run per point this difference is not explained.
