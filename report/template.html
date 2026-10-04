@@ -49,6 +49,7 @@ figure{margin:0;display:flex;flex-direction:column;gap:8px}
 .strip{display:flex;gap:14px;align-items:flex-start}
 .strip .item{flex:0 0 auto;width:min(960px,82vw)}
 .figbox.scroll .strip img{width:100%;max-width:100%}
+.strip.tall .item{width:min(600px,80vw)}
 .strip .cap{font-size:13px;line-height:1.5;margin-top:6px;color:var(--muted,#555)}
 .figbox.narrow{max-width:34rem}
 figcaption{font-size:14.5px;line-height:1.65;color:var(--ink);max-width:52rem}
@@ -481,9 +482,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
   <figure>
-    <div class="figbox"><img src="assets/fig_selection.jpg" alt="How one batch of 20 frames is chosen"></div>
-    <figcaption lang="zh"><span class="tag">图 5-1 怎么看：</span>一批 20 帧是怎么挑出来的（视频 1 的第 2 批）。最下面一行：模型预测整段视频后，每一帧里关键点相对上一帧的最大跳动；红色虚线是阈值（眼宽的 3%），超过阈值的帧是候选，这就是 jump 规则。最上面：候选帧按画面外观聚成 20 类，每类挑一帧（星号）。中间各行：这 20 帧（竖线）在时间上分散在整段视频里。每个视频的第一批没有模型可用，直接对全部帧按画面外观聚类挑 20 帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>How one batch of 20 frames is chosen (batch 2 of video 1). Bottom row: after the model has predicted the whole video, the largest jump of a keypoint from the previous frame; the red dashed line is the threshold (3% of the eye width), frames above it are candidates; this is the jump rule. Top: the candidates are clustered into 20 groups by image appearance and one frame is taken from each (stars). Rows in between: the 20 picks (vertical lines) are spread over the whole video. The first batch of a video has no model to use, so 20 frames are picked by clustering the appearance of all frames.</figcaption>
+    <div class="figbox scroll"><div class="strip tall">
+{{SELECTION_STRIP}}
+    </div></div>
+    <figcaption lang="zh"><span class="tag">图 5-1 怎么看：</span>一批 20 帧是怎么挑出来的。每个视频各一张（它的第 2 批，也就是第一次由 jump 规则挑的那一批），排成一行，可以左右拖动；每张图下面注明视频。每张图的读法相同：最下面一行：模型预测整段视频后，每一帧里关键点相对上一帧的最大跳动；红色虚线是阈值（眼宽的 3%），超过阈值的帧是候选，这就是 jump 规则。最上面：候选帧按画面外观聚成 20 类，每类挑一帧（星号）。中间各行：这 20 帧（竖线）在时间上分散在整段视频里。每个视频的第一批没有模型可用，直接对全部帧按画面外观聚类挑 20 帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>How one batch of 20 frames is chosen. One sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Every sheet reads the same way: Bottom row: after the model has predicted the whole video, the largest jump of a keypoint from the previous frame; the red dashed line is the threshold (3% of the eye width), frames above it are candidates; this is the jump rule. Top: the candidates are clustered into 20 groups by image appearance and one frame is taken from each (stars). Rows in between: the 20 picks (vertical lines) are spread over the whole video. The first batch of a video has no model to use, so 20 frames are picked by clustering the appearance of all frames.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>

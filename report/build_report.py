@@ -27,7 +27,6 @@ FIGURES = [
     (V1 / "model-selection/results/overall_vs_median.png", "fig_model_two_metrics.jpg", 2000),
     (V1 / "model-selection/results/01_model_selection_overview.png", "fig_model_selection.jpg", 2000),
     (V1 / "active-learning-jump-selection/results/01_convergence_curves.png", "fig_active_learning.jpg", 2400),
-    (V2 / "1_20251031_Pluto_spont_1/results/selection_sheets/selection_040_frames.png", "fig_selection.jpg", 2400),
     (V2 / "results/labels_to_plateau.png", "fig_labels_to_plateau.jpg", 2400),
     (V2 / "results/scale_curves_all_videos.png", "fig_all_videos.jpg", 5148),
     (V2 / "5_20251029_Pluto_spont_1/results/fewer_labels.png", "fig_fewer_video5.jpg", 1900),
@@ -112,6 +111,18 @@ for r in pl.itertuples():
     strip.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)}: error vs own labels" loading="lazy">'
                  f'<div class="cap"><span lang="zh">{zh}</span><span lang="en">{en}</span></div></div>')
 
+# every video's first jump-selected batch (selection sheet of batch 2), one scrolling row (figure 5-1)
+sel_strip = []
+for r in pl.itertuples():
+    im = cv2.imread(str(V2 / r.unit / "results/selection_sheets/selection_040_frames.png"))
+    if im is None:
+        continue
+    name = f"selection_video{int(r.video):02d}.jpg"
+    sc = 1200 / im.shape[1]
+    cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 84])
+    sel_strip.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)}: batch 2 selection" loading="lazy">'
+                     f'<div class="cap"><span lang="zh">视频 {int(r.video)}（{r.mouse}，{r.date}）：第 2 批</span><span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}): batch 2</span></div></div>')
+
 if in_progress:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）；视频 {in_progress[0]} 进行中，按 0 / 20 / 40 / … 帧的误差为 {' / '.join(in_progress[1])} px。"
     en_status = f"{n_final} videos finished (videos 0–{n_final - 1}); video {in_progress[0]} in progress, error at 0 / 20 / 40 / … labels: {' / '.join(in_progress[1])} px."
@@ -131,6 +142,7 @@ for r in ts.itertuples():
                f"<td>{r.production_flagged_pct:.1f}</td><td>{r.area_rel_spread_pct:.1f}</td><td>{r.corr_area_opening:.2f}</td></tr>")
 
 FILL = {
+    "{{SELECTION_STRIP}}": "\n".join(sel_strip),
     "{{SCALE_STRIP}}": "\n".join(strip),
     "{{EYE_ROWS}}": "\n".join(eye),
     "{{VIDEO_ROWS}}": "\n".join(rows),
