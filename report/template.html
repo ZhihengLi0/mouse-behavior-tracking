@@ -4,19 +4,19 @@
 /* Layout: one plain column. Each numbered item = what was done, the result figure(s), how to read them, the conclusion. */
 :root{
   --ground:#FBFBFA; --surface:#FFFFFF; --ink:#1B1F23; --muted:#5A636B; --rule:#D9DEE2;
-  --accent:#2C6A9B; --accent-soft:#E8F0F6; --figure:#FFFFFF;
+  --accent:#2C6A9B; --accent-soft:#E8F0F6; --figure:#FFFFFF; --alert:#C0392B;
   --sans:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Segoe UI","Helvetica Neue",Arial,sans-serif;
   --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --ground:#14171A; --surface:#1C2024; --ink:#E6E9EC; --muted:#9BA5AE; --rule:#30373D;
-    --accent:#7DB6E3; --accent-soft:#1C2A36; --figure:#FFFFFF; color-scheme:dark;
+    --accent:#7DB6E3; --accent-soft:#1C2A36; --figure:#FFFFFF; --alert:#FF7B6B; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --ground:#14171A; --surface:#1C2024; --ink:#E6E9EC; --muted:#9BA5AE; --rule:#30373D;
-  --accent:#7DB6E3; --accent-soft:#1C2A36; --figure:#FFFFFF; color-scheme:dark;
+  --accent:#7DB6E3; --accent-soft:#1C2A36; --figure:#FFFFFF; --alert:#FF7B6B; color-scheme:dark;
 }
 :root[data-lang="zh"] [lang="en"], :root[data-lang="en"] [lang="zh"]{display:none}
 body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75;padding-inline:20px;padding-block:36px 80px}
@@ -34,6 +34,7 @@ a{color:var(--accent)}
 header,section{display:flex;flex-direction:column;gap:16px}
 section{border-top:1px solid var(--rule);padding-top:28px}
 .tag{font-weight:650;color:var(--accent);white-space:nowrap}
+.hl{color:var(--alert);font-weight:650}
 [lang="en"] .tag{margin-right:.35em}
 .concl{background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;max-width:46rem}
 div.concl{display:flex;flex-direction:column;gap:8px}
@@ -453,7 +454,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>先用上一个模型直接预测这个视频，得到“0 帧”的误差。</li>
       <li>每步加 20 帧这个视频的标注（挑帧办法见下面的图；每批先由模型预标，人再逐帧改正），和之前视频带入的标注一起重新训练，在测试集上打分。</li>
       <li><b>平台规则</b>：连续两步都没有让最好成绩改善超过 3%，就停。平台点是最后一次有改善的那一步。规则触发后由人确认是否结束这个视频。到目前为止，12 个视频里有 11 个的平台点就是规则给出的结果；<b>视频 5 是例外，由人决定</b>：按规则它的平台点是 0 帧（0 帧的中位误差 11.9 px 已经是最低），但 0 帧模型有 12% 的测试帧误差超过 50 px，标 20 帧后这类帧降为 0，所以平台点记为 20 帧，并在标到 40 帧后停止。</li>
-      <li>进入下一个视频，只带入这个视频到平台点为止的标注。这样做是为了模拟真实使用：到平台就不再标了。</li>
+      <li>进入下一个视频，只带入这个视频<span class="hl">到平台点为止</span>的标注（不是这个视频标过的所有帧都进入后面视频的训练：平台点之后标的帧不进入之后的训练）。这样做是为了模拟真实使用：到平台就不再标了。</li>
     </ol>
   </div>
   <div class="text" lang="en">
@@ -470,7 +471,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The previous model is applied unchanged to get the "0 labels" error.</li>
       <li>Each step adds 20 labels of this video (picked as shown in the figure below; the model pre-labels each batch and a person corrects every frame), retrains together with the labels carried from earlier videos, and scores on the test set.</li>
       <li><b>Plateau rule</b>: stop when two consecutive steps each fail to improve the best error by more than 3%. The plateau point is the last step that did improve it. When the rule fires, a person confirms whether the video is finished. So far the plateau point of 11 of the 12 videos is the one the rule gives; <b>video 5 is the exception and was decided by a person</b>: by the rule its plateau point is 0 labels (the median error of 11.9 px at 0 labels is already the lowest), but the 0-label model is off by more than 50 px on 12% of the test frames and 20 labels remove all of these, so the plateau point is recorded as 20 labels and labeling stopped at 40.</li>
-      <li>The next video starts, carrying only this video's labels up to the plateau point. This mirrors real use, where labeling stops at the plateau.</li>
+      <li>The next video starts, carrying only this video's labels <span class="hl">up to the plateau point</span> (not every frame labeled on this video goes into the training of later videos: frames labeled after the plateau point are left out). This mirrors real use, where labeling stops at the plateau.</li>
     </ol>
   </div>
   <figure>
