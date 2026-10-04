@@ -431,7 +431,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h2><span class="no">5</span><span lang="zh">主线：每个新视频要标多少帧</span><span lang="en">Main line: labels needed per new video</span></h2>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">视频 0：第一只老鼠的 5 分钟视频。视频 1–10：Pluto 的 19.9 分钟视频。视频 11 起：Terra 的 19.9 分钟视频。都是 60 帧/秒。</span><span lang="en">Video 0: the 5-minute video of the first mouse. Videos 1–10: 19.9-minute videos of Pluto. From video 11: 19.9-minute videos of Terra. All at 60 fps.</span></td></tr>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">视频 0：第一只老鼠的 5 分钟视频。视频 1–10：Pluto 的 19.9 分钟视频，其中视频 1、2、3 是同一天（2025-10-31）的三段，视频 4–10 每个录制日一段。视频 11 起：Terra 的 19.9 分钟视频，每个录制日一段。都是 60 帧/秒。</span><span lang="en">Video 0: the 5-minute video of the first mouse. Videos 1–10: 19.9-minute videos of Pluto; videos 1, 2, 3 are three recordings of the same day (2025-10-31), videos 4–10 one per recording day. From video 11: 19.9-minute videos of Terra, one per recording day. All at 60 fps.</span></td></tr>
     <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第二阶段（第 4 步的定义）。</span><span lang="en">Phase 2 (the definitions of step 4).</span></td></tr>
     <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">之前各视频带入的标注（见下表）加上这个视频自己的标注。自己的标注从视频前 80% 里挑：第一批 20 帧按画面外观聚类，之后每批 20 帧从跳动大的帧里聚类；每批先由模型预标，人再逐帧改正。</span><span lang="en">The labels carried from earlier videos (table below) plus this video's own labels. Its own labels are picked from the first 80% of the video: the first 20 by clustering image appearance, each later batch of 20 by clustering among the frames with large jumps; the model pre-labels each batch and a person corrects every frame.</span></td></tr>
     <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">视频第 80%–90% 的部分里取 20 帧，与前后各隔 2 秒。</span><span lang="en">20 frames from the part between 80% and 90% of the video, with 2-second guards on both sides.</span></td></tr>
@@ -440,7 +440,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">该视频 50 帧测试帧上的中位帧 RMSE（8 个点）。</span><span lang="en">Median frame RMSE (8 points) on the 50 test frames of that video.</span></td></tr>
   </tbody></table></div>
   <div class="text" lang="zh">
-    <p><span class="tag">做了什么：</span>把视频一个一个加进来：视频 0 是第一只老鼠的 5 分钟视频，视频 1–10 是 Pluto 的 20 分钟视频，一天一个，从 2025-10-31 往前到 10-22（视频 1、2、3 是同一天）；视频 11 起是第三只老鼠 Terra，同样一天一个，从 2025-10-17 往前。每个视频的流程相同：</p>
+    <p><span class="tag">做了什么：</span>把视频一个一个加进来，顺序如下。</p>
+    <ul>
+      <li><b>视频 0：</b>第一只老鼠的 5 分钟视频。</li>
+      <li><b>视频 1、2、3：</b>第二只老鼠 Pluto，同一天（2025-10-31）录的三段，每段 19.9 分钟。</li>
+      <li><b>视频 4–10：</b>Pluto，每个录制日一段，日期从近到远：10-30、10-29、10-28、10-27、10-24、10-23、10-22（中间跳过了 10-26、10-25）。</li>
+      <li><b>视频 11 起：</b>第三只老鼠 Terra，每个录制日一段，日期从近到远：视频 11 是 2025-10-17，视频 12 是 10-16，之后依次是 10-15、10-14、10-13、10-10、10-09、10-08（视频 13–18，还没有做）。</li>
+    </ul>
+    <p>每个视频的流程相同：</p>
     <ol>
       <li>在视频最后 10% 里均匀取 50 帧作测试集，人工标好后冻结。</li>
       <li>先用上一个模型直接预测这个视频，得到“0 帧”的误差。</li>
@@ -450,7 +457,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
   <div class="text" lang="en">
-    <p><span class="tag">What was done:</span>Videos are added one at a time: video 0 is the 5-minute video of the first mouse, videos 1–10 are 20-minute videos of Pluto, one recording day each, going back from 2025-10-31 to 10-22 (videos 1, 2, 3 are the same day); from video 11 on the videos are of a third mouse, Terra, again one day each, going back from 2025-10-17. Every video follows the same steps:</p>
+    <p><span class="tag">What was done:</span>Videos are added one at a time, in this order.</p>
+    <ul>
+      <li><b>Video 0:</b> the 5-minute video of the first mouse.</li>
+      <li><b>Videos 1, 2, 3:</b> the second mouse, Pluto; three recordings of the same day (2025-10-31), 19.9 minutes each.</li>
+      <li><b>Videos 4–10:</b> Pluto, one recording per recording day, from the most recent backwards: 10-30, 10-29, 10-28, 10-27, 10-24, 10-23, 10-22 (10-26 and 10-25 are skipped).</li>
+      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18, not done yet).</li>
+    </ul>
+    <p>Every video follows the same steps:</p>
     <ol>
       <li>50 frames evenly spaced over the final 10% of the video become the test set; they are labeled and frozen.</li>
       <li>The previous model is applied unchanged to get the "0 labels" error.</li>
