@@ -49,7 +49,7 @@ Construction of the pupil points: the ellipse covers the whole pupil, the dashed
 `eyelid_top` is the midpoint of the upper eyelid margin and `eyelid_bottom` the midpoint of the lower eyelid margin
 (midpoint of the arc between the two corners). Lashes and fur are ignored: the margin is the edge of the dark eye
 region. The distance between the two points is the eye opening, so they are not required to be vertically aligned.
-They are labelled in every frame, also during blinks.
+As for every point: labelled when it can be seen clearly, left empty when its position cannot be judged accurately.
 
 ![eyelids](figures/fig3_eyelids_open_and_blink.jpg)
 
@@ -116,7 +116,6 @@ point. Video 8, a video where the pupil edge is hard to see: 20-31 of 50 frames 
 | right contour of a doubled pupil edge | left contour | fig. 6 |
 | nasal corner inside the shadow | left border of the shadow, at its crossing with the upper margin | fig. 7, middle panel |
 | temporal corner on the inner line or on a reflection band | outer apex of the dark area to the right of the reflections | fig. 7, right panel |
-| eyelid points left empty in a blink | always labelled; only the pupil is left empty | fig. 3, lower row |
 | a point dragged far away, or the two corners swapped | caught by the geometry check that runs on every saved batch | – |
 
 ## Files
