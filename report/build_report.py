@@ -27,7 +27,7 @@ FIGURES = [
     (V1 / "model-selection/results/overall_vs_median.png", "fig_model_two_metrics.jpg", 2000),
     (V1 / "model-selection/results/01_model_selection_overview.png", "fig_model_selection.jpg", 2000),
     (V1 / "active-learning-jump-selection/results/01_convergence_curves.png", "fig_active_learning.jpg", 2400),
-    (V2 / "1_20251031_Pluto_spont_1/results/selection_sheets/selection_040_frames.png", "fig_selection.jpg", 1700),
+    (V2 / "1_20251031_Pluto_spont_1/results/selection_sheets/selection_040_frames.png", "fig_selection.jpg", 2400),
     (V2 / "results/labels_to_plateau.png", "fig_labels_to_plateau.jpg", 2400),
     (V2 / "results/scale_curves_all_videos.png", "fig_all_videos.jpg", 5148),
     (V2 / "9_20251023_Pluto1/results/scale_curve.png", "fig_video9.jpg", 2400),

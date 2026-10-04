@@ -72,7 +72,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -474,7 +474,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
   <figure>
-    <div class="figbox narrow"><img src="assets/fig_selection.jpg" alt="How one batch of 20 frames is chosen"></div>
+    <div class="figbox"><img src="assets/fig_selection.jpg" alt="How one batch of 20 frames is chosen"></div>
     <figcaption lang="zh"><span class="tag">怎么看：</span>一批 20 帧是怎么挑出来的（视频 1 的第 2 批）。最下面一行：模型预测整段视频后，每一帧里关键点相对上一帧的最大跳动；红色虚线是阈值（眼宽的 3%），超过阈值的帧是候选，这就是 jump 规则。最上面：候选帧按画面外观聚成 20 类，每类挑一帧（星号）。中间各行：这 20 帧（竖线）在时间上分散在整段视频里。每个视频的第一批没有模型可用，直接对全部帧按画面外观聚类挑 20 帧。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>How one batch of 20 frames is chosen (batch 2 of video 1). Bottom row: after the model has predicted the whole video, the largest jump of a keypoint from the previous frame; the red dashed line is the threshold (3% of the eye width), frames above it are candidates; this is the jump rule. Top: the candidates are clustered into 20 groups by image appearance and one frame is taken from each (stars). Rows in between: the 20 picks (vertical lines) are spread over the whole video. The first batch of a video has no model to use, so 20 frames are picked by clustering the appearance of all frames.</figcaption>
   </figure>
