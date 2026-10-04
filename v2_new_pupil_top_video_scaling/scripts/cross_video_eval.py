@@ -186,6 +186,7 @@ def plot(m):
     ax.set_xticklabels([f"{r.subset or r.labels_this_video}\n({r.total_labels})" for r in mods.itertuples()], fontsize=7)
     ax.set_xlabel("model, in training order: labels of its own video (total labels in its training set); 5a/5b/10a/10b = fewer-labels subsets of batch01 (open markers)")
     # video spans below the axis
+    prev_mouse = None
     for u, mouse, date, _ in VIDEOS:
         g = mods[mods.model_unit == u]
         if g.empty:
@@ -193,8 +194,14 @@ def plot(m):
         x0, x1 = g.model_idx.min() - 0.5, g.model_idx.max() + 0.5
         ax.axvspan(x0, x1, color=colors[u], alpha=0.06)
         head = f"video {u.split('_')[0]}" + (" (POOR QUALITY)" if u in POOR_QUALITY else "")
-        ax.text((x0 + x1) / 2, 1.02, f"{head}\n{date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
-    ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=9, loc="upper right")
+        mname = mouse.split("(")[-1].rstrip(")")                      # "mouse A", "Pluto", "Terra"
+        ax.text((x0 + x1) / 2, 1.02, f"{head}\n{mname}, {date}", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=colors[u])
+        if prev_mouse is not None and mouse != prev_mouse:            # change of mouse: thick line + label (user request 2026-10-04)
+            ax.axvline(x0, color="k", lw=2.2, zorder=6)
+            ax.text(x0, 0.985, f" NEW MOUSE: {mname} ", transform=ax.get_xaxis_transform(), ha="left", va="top", fontsize=10, fontweight="bold",
+                    color="w", bbox=dict(fc="k", ec="none", pad=2), zorder=7)
+        prev_mouse = mouse
+    ax.grid(alpha=0.3, which="both"); ax.legend(fontsize=8.5, loc="lower left", ncol=2, framealpha=0.9)
     # per-video panels (user request 2026-09-29): each video's own test set vs its own labels, 5/10-label subsets as open circles
     own = [u for u in units if (mods.model_unit == u).any()]
     fig2, axs = plt.subplots(1, len(own), figsize=(3.6 * len(own), 4.2), constrained_layout=True)

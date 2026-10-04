@@ -69,15 +69,23 @@ for FOCUS in ("main", "fewer", "backtest"):
         s = m[(m.test_unit == tu) & (m.subset == "")].sort_values("x")
         series[tu] = s
         ax.plot(s.x, s.median_frame_rmse_px, "-", color=GREY, lw=1.1 if FOCUS != "fewer" else 0.7, zorder=1)
+    prev_mouse = None
     for u, g in blocks:                                             # blocks: tint, header, own test set in the block colour
         xs = [pos[i] for i in g.model_idx] + ([zero_slot[u]] if u in zero_slot else [])
         x0, x1, col = start_of[u] - 0.3, max(xs) + 0.3, colour[u]
+        v_ = next(v for v in c.VIDEOS if v[0] == u)
+        short = v_[1].split("(")[-1].rstrip(")")                  # "mouse A", "Pluto", "Terra"
+        if prev_mouse is not None and v_[1] != prev_mouse:          # change of mouse: thick line + label
+            ax.axvline(x0 - GAP / 2 + 0.3, color="k", lw=2.2, zorder=6)
+            ax.text(x0 - GAP / 2 + 0.3, 0.985, f" NEW MOUSE: {short} ", transform=ax.get_xaxis_transform(), ha="left", va="top", fontsize=10,
+                    fontweight="bold", color="w", bbox=dict(fc="k", ec="none", pad=2), zorder=7)
+        prev_mouse = v_[1]
         ax.axvspan(x0, x1, color=col, alpha=0.07, lw=0, zorder=0)
         ax.plot([x0 + 0.15, x1 - 0.15], [1.012, 1.012], color=col, lw=5, solid_capstyle="butt", transform=ax.get_xaxis_transform(), clip_on=False)
         v = next(v for v in c.VIDEOS if v[0] == u)
         head = f"video {u.split('_')[0]}" + ("\npoor quality" if u in c.POOR_QUALITY else "")
         carried = int(g[g.subset == ""].total_labels.iloc[0] - g[g.subset == ""].labels_this_video.iloc[0])
-        ax.text((x0 + x1) / 2, 1.03, f"{head}\n{'mouse A' if u.startswith('0_') else v[2][5:]}\n+{carried} carried", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=INK)
+        ax.text((x0 + x1) / 2, 1.03, f"{head}\n{short}{'' if u.startswith('0_') else ', ' + v[2][5:]}\n+{carried} carried", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=INK)
         if u not in series:
             continue
         own = series[u][series[u].model_unit == u]
