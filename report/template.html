@@ -86,7 +86,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>用哪种纠错算法挑要补标的帧？</b>用 jump。三种算法没有明显差距，jump 略微领先（第 3 步）。</li>
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
-    <p>2026 年 9 月 20 日起明确了瞳孔四个点的标法：把瞳孔看成椭圆，四个点是椭圆的四个端点。定义真正改变的只有瞳孔上点：从“看得见的瞳孔的最高处”改为“椭圆真实的最高点”。瞳孔下、左、右三个点原来就标在瞳孔边缘，这次明确为椭圆的端点，位置移动约 14 px。同一天还明确了两个眼角的标法（上下睑缘延长线的交点，取外侧），两个眼角向外移动 40–56 px，上眼睑点随之上移约 17 px，下眼睑点不变。详见第 4 步。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有按明确后的定义重新比较过 batch size 和模型。</p>
+    <p>2026 年 9 月 20 日把 8 个点各自标在哪里明确了下来（逐点对照见第 4 步）。和之前相比有三处变化：瞳孔上点从“看得见的瞳孔的最高处”改为“瞳孔椭圆真实的最高点”，上移约 50 px；瞳孔左、右两点从“看得见的瞳孔最靠左、最靠右的位置”改为椭圆横轴的两个端点；两个眼角从阴影和反光的内侧改到外侧，各外移 40–50 px。瞳孔下点和上下眼睑点的定义没有变。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有按明确后的定义重新比较过 batch size 和模型。第一阶段的三项选择本身是在同一套定义下做的：当时这个视频上的全部训练帧和测试帧都按同一种标法（核对见第 4 步），所以 batch size 之间、模型之间、纠错算法之间的比较是公平的。</p>
     <h3>第二阶段的结论（第 4–8 步）</h3>
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
@@ -111,7 +111,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
-    <p>From 2026-09-20 the way the four pupil points are labeled was made explicit: the pupil is treated as an ellipse and the four points are its four endpoints. Only the definition of pupil top really changed: from "the highest point of the visible pupil" to "the true top of the ellipse". Pupil bottom, left and right were already placed on the pupil edge and were made explicit as ellipse endpoints, moving by about 14 px. On the same day the placement of the two corners was made explicit as well (the crossing of the continued upper and lower eyelid margins, on the outer side): the corners moved outwards by 40–56 px, the upper-eyelid point moved up by about 17 px with them, and the lower-eyelid point did not move. Details in step 4. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions.</p>
+    <p>On 2026-09-20 the placement of each of the 8 points was made explicit (point-by-point comparison in step 4). Three things changed: pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; and the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. The definitions of pupil bottom and of the two eyelid points did not change. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions. The three choices of phase 1 were themselves made under one set of definitions: all training and test frames of that video were labeled in the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms are fair.</p>
     <h3>Conclusions of phase 2 (steps 4–8)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
@@ -338,29 +338,92 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Points that cannot be seen:</b> the same for all 8 points: a point is labeled when it can be seen clearly and left empty when its position cannot be judged accurately.</li>
     </ul>
   </div>
-  <p class="text" lang="zh">定义明确前后，同一批帧上各个点移动了多少（<code>keypoint_definitions/results/label_changes.csv</code>）：</p>
-  <p class="text" lang="en">How far each point moved on the same frames when the definitions were made explicit (<code>keypoint_definitions/results/label_changes.csv</code>):</p>
+  <h3><span lang="zh">之前的定义和现在的定义，逐点对照</span><span lang="en">Earlier and present definitions, point by point</span></h3>
+  <div class="text" lang="zh">
+    <p><b>数据怎么来的：</b>都是人工标注之间的比较，不涉及模型。用了两种比法。</p>
+    <ul>
+      <li><b>位置（表中“中位坐标”一列）：</b>同一个视频（第一只老鼠的 5 分钟视频）最后 1 分钟里，取两组人工标注的测试帧：2026 年 9 月 20 日之前标的 100 帧，和现在的 50 帧。镜头和眼睛的位置没有变，所以对每个点取各自一组帧上的中位坐标，就能看出这个点标在哪里。坐标是原始画面上的像素，x 向右，y 向下。</li>
+      <li><b>同一帧上的位移（表中最后一列）：</b>同一帧有前后两份标注时，直接算两份标注之间的距离，再取中位数。瞳孔四个点用的是 Pluto 2025-10-31 视频的 40 帧（之前的标注对按椭圆重标的标注）。眼角和眼睑用的是 5 分钟视频的 90 帧（测试集 50、验证集 20、第一批 20）：2026 年 9 月 20 日下午先标了一版，眼角仍在内侧，18:18 存了备份；当晚讨论后把眼角改到外侧。表中是这两版之间的距离。所有模型用的都是改过之后的标注。</li>
+    </ul>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Where the numbers come from:</b> all are comparisons between human labels; no model is involved. Two comparisons are used.</p>
+    <ul>
+      <li><b>Position (column "median coordinates"):</b> two sets of human-labeled test frames from the final minute of the same video (the 5-minute video of the first mouse): 100 frames labeled before 2026-09-20 and the present 50 frames. Camera and eye position did not change, so the median coordinates of a point over each set show where that point was placed. Coordinates are pixels of the original frame, x to the right, y downwards.</li>
+      <li><b>Shift on the same frame (last column):</b> where a frame has two versions of labels, the distance between the two is taken and then the median over the frames. The four pupil points use 40 frames of the Pluto 2025-10-31 video (earlier labels vs the labels redone as an ellipse). The corners and eyelids use 90 frames of the 5-minute video (test set 50, validation set 20, first batch 20): a first version was labeled in the afternoon of 2026-09-20 with the corners still on the inner side and backed up at 18:18; after the discussion that evening the corners were moved to the outer side. The table gives the distance between these two versions. All models use the labels after the change.</li>
+    </ul>
+  </div>
   <div class="tablebox">
     <table>
       <thead><tr>
         <th><span lang="zh">点</span><span lang="en">point</span></th>
-        <th><span lang="zh">位移中位数</span><span lang="en">median shift</span></th>
-        <th><span lang="zh">性质</span><span lang="en">what happened</span></th>
+        <th><span lang="zh">2026 年 9 月 20 日之前的定义</span><span lang="en">definition before 2026-09-20</span></th>
+        <th><span lang="zh">现在的定义</span><span lang="en">present definition</span></th>
+        <th><span lang="zh">中位坐标：之前 → 现在</span><span lang="en">median coordinates: before → now</span></th>
+        <th><span lang="zh">同一帧上的位移中位数</span><span lang="en">median shift on the same frame</span></th>
       </tr></thead>
       <tbody>
-        <tr><td><span lang="zh">瞳孔上点</span><span lang="en">pupil top</span></td><td>52 px</td><td><span lang="zh">定义改变：从看得见的瞳孔的最高处，改为椭圆的顶端</span><span lang="en">definition changed: from the top of the visible pupil to the top of the ellipse</span></td></tr>
-        <tr><td><span lang="zh">瞳孔下、左、右</span><span lang="en">pupil bottom, left, right</span></td><td><span lang="zh">约 14 px</span><span lang="en">about 14 px</span></td><td><span lang="zh">明确为椭圆轴的端点</span><span lang="en">made explicit as the ends of the ellipse axes</span></td></tr>
-        <tr><td><span lang="zh">左眼角</span><span lang="en">left (nasal) corner</span></td><td>40 px</td><td><span lang="zh">明确为两条睑缘延长线的交点，向外移</span><span lang="en">made explicit as the crossing of the two continued margins; moved outwards</span></td></tr>
-        <tr><td><span lang="zh">右眼角</span><span lang="en">right (temporal) corner</span></td><td>56 px</td><td><span lang="zh">明确为外层线上的交点，向外移</span><span lang="en">made explicit as the crossing on the outer line; moved outwards</span></td></tr>
-        <tr><td><span lang="zh">上眼睑点</span><span lang="en">upper eyelid</span></td><td>17 px</td><td><span lang="zh">随眼角的明确上移到睑缘（90 帧里 62 帧有移动）</span><span lang="en">moved up onto the margin together with the corners (62 of 90 frames moved)</span></td></tr>
-        <tr><td><span lang="zh">下眼睑点</span><span lang="en">lower eyelid</span></td><td>0 px</td><td><span lang="zh">不变</span><span lang="en">unchanged</span></td></tr>
+        <tr><td><span lang="zh">瞳孔上点</span><span lang="en">pupil top</span></td>
+          <td><span lang="zh">看得见的瞳孔的最高处，停在眼睑边上；在上眼睑点下方约 25 px</span><span lang="en">highest point of the visible pupil, stopping at the eyelid; about 25 px below the upper-eyelid point</span></td>
+          <td><span lang="zh">瞳孔椭圆的顶端，被挡住时按椭圆估计；在上眼睑点上方约 11 px</span><span lang="en">top of the pupil ellipse, estimated from the ellipse where hidden; about 11 px above the upper-eyelid point</span></td>
+          <td>y 368 → 319<span lang="zh">（上移 49 px）</span><span lang="en"> (49 px up)</span></td><td>52 px</td></tr>
+        <tr><td><span lang="zh">瞳孔左点、右点</span><span lang="en">pupil left, right</span></td>
+          <td><span lang="zh">看得见的瞳孔最靠左、最靠右的位置，没有按椭圆拟合；左点比右点高约 37 px</span><span lang="en">leftmost and rightmost visible points of the pupil, no ellipse fitted; left about 37 px higher than right</span></td>
+          <td><span lang="zh">椭圆横轴的两个端点；左右两点等高（相差 0 px）</span><span lang="en">the two ends of the horizontal axis of the ellipse; left and right at the same height (0 px apart)</span></td>
+          <td><span lang="zh">左</span><span lang="en">left</span> y 425 → 447<span lang="zh">，右</span><span lang="en">, right</span> y 462 → 448</td><td><span lang="zh">约 14 px</span><span lang="en">about 14 px</span></td></tr>
+        <tr><td><span lang="zh">瞳孔下点</span><span lang="en">pupil bottom</span></td>
+          <td><span lang="zh">看得见的瞳孔的最低处</span><span lang="en">lowest point of the visible pupil</span></td>
+          <td><span lang="zh">椭圆的底端（下缘一般看得见，位置基本不变）</span><span lang="en">bottom of the ellipse (the lower edge is usually visible, so the position hardly changes)</span></td>
+          <td>y 585 → 586</td><td><span lang="zh">约 14 px</span><span lang="en">about 14 px</span></td></tr>
+        <tr><td><span lang="zh">左眼角</span><span lang="en">left (nasal) corner</span></td>
+          <td><span lang="zh">阴影的内侧</span><span lang="en">inner side of the shadow</span></td>
+          <td><span lang="zh">阴影的外侧：两条睑缘延长线的交点。原因：讨论后认为这片阴影是毛发遮挡造成的，眼角在阴影外侧更合理</span><span lang="en">outer side of the shadow: crossing of the two continued eyelid margins. Reason: after the discussion the shadow was attributed to fur covering the eye, so the corner is more plausibly on its outer side</span></td>
+          <td>x 410 → 370<span lang="zh">（外移 40 px）</span><span lang="en"> (40 px outwards)</span></td><td>40 px</td></tr>
+        <tr><td><span lang="zh">右眼角</span><span lang="en">right (temporal) corner</span></td>
+          <td><span lang="zh">反光区域的内侧</span><span lang="en">inner side of the reflections</span></td>
+          <td><span lang="zh">反光区域的外侧：下睑缘沿外层线向上延伸与上睑缘的交点。原因：皮毛不会反光，反光亮带仍在眼睛内部</span><span lang="en">outer side of the reflections: where the lower margin, continued upwards along the outer line, meets the upper margin. Reason: fur does not reflect, so the reflections are still inside the eye</span></td>
+          <td>x 808 → 857<span lang="zh">（外移 49 px）</span><span lang="en"> (49 px outwards)</span></td><td>56 px</td></tr>
+        <tr><td><span lang="zh">上眼睑点</span><span lang="en">upper eyelid</span></td>
+          <td><span lang="zh">上睑缘弧线的中点</span><span lang="en">midpoint of the upper eyelid margin</span></td>
+          <td><span lang="zh">定义不变；眼角外移后位置略向上</span><span lang="en">same definition; slightly higher after the corners moved</span></td>
+          <td>y 345 → 336<span lang="zh">（上移 9 px）</span><span lang="en"> (9 px up)</span></td><td><span lang="zh">17 px（90 帧里 62 帧有移动）</span><span lang="en">17 px (62 of 90 frames moved)</span></td></tr>
+        <tr><td><span lang="zh">下眼睑点</span><span lang="en">lower eyelid</span></td>
+          <td><span lang="zh">下睑缘弧线的中点</span><span lang="en">midpoint of the lower eyelid margin</span></td>
+          <td><span lang="zh">定义不变</span><span lang="en">same definition</span></td>
+          <td>y 624 → 615<span lang="zh">（两组帧不同，相差 9 px）</span><span lang="en"> (different frames; 9 px apart)</span></td><td>0 px</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="text small muted" lang="zh">瞳孔四个点的数字来自 Pluto 2025-10-31 的 40 帧（旧标法对椭圆标法）；眼角和眼睑的数字来自 5 分钟视频的 90 帧（讨论时比较的另一种画法对最终采用的画法）。2026 年 9 月 26 日“两层轮廓取左边”只让瞳孔点移动几个像素；2026 年 9 月 29 日的亮带裁定没有改任何标注。</p>
-  <p class="text small muted" lang="en">The numbers for the four pupil points come from 40 frames of Pluto 2025-10-31 (old placement vs ellipse placement); those for the corners and eyelids from 90 frames of the 5-minute video (the alternative construction compared in the discussion vs the one adopted). The 2026-09-26 convention (left contour) moved pupil points by a few pixels only; the 2026-09-29 decision on the bright band changed no labels.</p>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>定义真正改变的是瞳孔上点；其余的点是把标法明确下来，其中两个眼角的位置变化最大。眼睑和眼角的四个点只用来判断眨眼，所以选每一帧都找得到的稳定位置。模型和 batch size 沿用第 1、2 步的选择（ResNet-50，batch 2）：变的是点标在哪里，图像和训练方式没有变，所以没有重新比较。第 1–3 步的误差数字不能和第 5 步起的数字直接比较。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The definition that really changed is pupil top; for the other points the placement was made explicit, and the two corners moved the most. The four eyelid and corner points only serve to detect blinks, so a stable position that can be found in every frame is preferred. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again. Error numbers of steps 1–3 cannot be compared directly with those from step 5 on.</p>
+  <div class="text" lang="zh">
+    <p><b>之前的定义是不是统一的：</b>是。2026 年 9 月 20 日之前在这个视频上的全部人工标注都按同一种标法，逐组核对的结果如下（<code>keypoint_definitions/results/definition_by_label_set.csv</code>，脚本 <code>scripts/definition_check.py</code>）：</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Were the earlier definitions applied consistently:</b> yes. All human labels made on this video before 2026-09-20 follow one placement; the check per label set is below (<code>keypoint_definitions/results/definition_by_label_set.csv</code>, script <code>scripts/definition_check.py</code>):</p>
+  </div>
+  <div class="tablebox">
+    <table>
+      <thead><tr>
+        <th><span lang="zh">标注集</span><span lang="en">label set</span></th>
+        <th><span lang="zh">帧数</span><span lang="en">frames</span></th>
+        <th><span lang="zh">左眼角 x</span><span lang="en">left corner x</span></th>
+        <th><span lang="zh">右眼角 x</span><span lang="en">right corner x</span></th>
+        <th><span lang="zh">瞳孔上点在上眼睑点上方 (px)</span><span lang="en">pupil top above upper-eyelid point (px)</span></th>
+        <th><span lang="zh">瞳孔左点比右点高 (px)</span><span lang="en">pupil left higher than right (px)</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span lang="zh">之前：训练帧（第 1、2 步用）</span><span lang="en">before: training frames (steps 1, 2)</span></td><td>100</td><td>417</td><td>795</td><td>−26</td><td>27</td></tr>
+        <tr><td><span lang="zh">之前：第 3 步 jump 各轮</span><span lang="en">before: step 3, jump rounds</span></td><td>220</td><td>404</td><td>795</td><td>−27</td><td>33</td></tr>
+        <tr><td><span lang="zh">之前：第 3 步 uncertain 各轮</span><span lang="en">before: step 3, uncertain rounds</span></td><td>220</td><td>410</td><td>795</td><td>−25</td><td>34</td></tr>
+        <tr><td><span lang="zh">之前：第 3 步 fitting 各轮</span><span lang="en">before: step 3, fitting rounds</span></td><td>220</td><td>419</td><td>795</td><td>−27</td><td>34</td></tr>
+        <tr><td><span lang="zh">之前：测试帧（第 1–3 步用）</span><span lang="en">before: test frames (steps 1–3)</span></td><td>100</td><td>410</td><td>808</td><td>−25</td><td>37</td></tr>
+        <tr><td><span lang="zh">现在：视频 0 的测试帧</span><span lang="en">present: test frames of video 0</span></td><td>50</td><td>370</td><td>857</td><td>+11</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="text small muted" lang="zh">每个数是该标注集里所有帧的中位数。负数表示瞳孔上点在上眼睑点的下方。之前的五组标注彼此一致（左眼角 x 404–419，右眼角 x 795–808，瞳孔上点在上眼睑点下方 25–27 px），和现在的标法明显不同。</p>
+  <p class="text small muted" lang="en">Each number is the median over the frames of the label set. A negative value means pupil top lies below the upper-eyelid point. The five earlier label sets agree with one another (left corner x 404–419, right corner x 795–808, pupil top 25–27 px below the upper-eyelid point) and differ clearly from the present placement.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>变化最大的是瞳孔上点和两个眼角：上点从看得见的最高处改为椭圆顶端，眼角从内侧改到外侧。瞳孔左右点明确为椭圆横轴的端点，下点和上下眼睑点的定义不变。之前的定义在第 1–3 步里是统一使用的，现在的定义从第 5 步起统一使用。眼睑和眼角的四个点只用来判断眨眼，所以选每一帧都找得到的稳定位置。模型和 batch size 沿用第 1、2 步的选择（ResNet-50，batch 2）：变的是点标在哪里，图像和训练方式没有变，所以没有重新比较。第 1–3 步的误差数字不能和第 5 步起的数字直接比较。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The largest changes are pupil top and the two corners: the top point moved from the highest visible point to the top of the ellipse, and the corners from the inner to the outer side. Pupil left and right became the ends of the horizontal axis of the ellipse; pupil bottom and the two eyelid points keep their definitions. The earlier definitions were used consistently in steps 1–3, the present ones are used consistently from step 5 on. The four eyelid and corner points only serve to detect blinks, so a stable position that can be found in every frame is preferred. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again. Error numbers of steps 1–3 cannot be compared directly with those from step 5 on.</p>
 </section>
 
 <!-- 5 -->

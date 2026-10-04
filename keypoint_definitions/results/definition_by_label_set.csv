@@ -1,0 +1,8 @@
+period,label_set,frames,pupil_top_x,pupil_top_y,pupil_bottom_x,pupil_bottom_y,pupil_left_x,pupil_left_y,pupil_right_x,pupil_right_y,eyelid_top_x,eyelid_top_y,eyelid_bottom_x,eyelid_bottom_y,eye_nasal_corner_x,eye_nasal_corner_y,eye_temporal_corner_x,eye_temporal_corner_y,corner_to_corner_px,pupil_top_above_eyelid_top_px,pupil_left_higher_than_right_px
+before 2026-09-20,"training pool, 100 frames (batch-size and model selection)",100,611,385,619,584,471,435,760,464,615,357,619,618,417,418,795,464,382,-26,27
+before 2026-09-20,"active learning, branch jump, rounds 1-11",220,613,384,617,589,469,430,767,463,616,358,615,620,404,408,795,463,395,-27,33
+before 2026-09-20,"active learning, branch uncertain, rounds 1-11",220,612,384,620,586,470,429,763,463,616,359,619,617,410,410,795,464,388,-25,34
+before 2026-09-20,"active learning, branch fitting, rounds 1-11",220,612,383,621,585,472,432,762,465,614,358,620,617,419,411,795,464,378,-27,34
+before 2026-09-20,"test set, 100 frames of the final minute",100,626,368,626,585,463,425,772,462,632,345,625,624,410,405,808,463,403,-25,37
+2026-09-20 18:18,"video 0 test set, 50 frames of the final minute (pupil as ellipse, corners not yet moved)",50,623,319,619,586,469,447,768,448,624,348,613,615,408,407,805,458,399,23,0
+present,"video 0 test set, 50 frames of the final minute",50,623,319,619,586,469,447,768,448,628,336,613,615,370,398,857,478,497,11,0

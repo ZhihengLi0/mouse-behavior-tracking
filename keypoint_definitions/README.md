@@ -107,6 +107,29 @@ point. Video 8, a video where the pupil edge is hard to see: 20-31 of 50 frames 
 ![change B](figures/fig5_change_outer_corners.jpg)
 ![change C](figures/fig6_change_convention_v2.jpg)
 
+## The earlier definitions, checked (2026-10-04)
+
+`scripts/definition_check.py` -> `results/definition_by_label_set.csv`. Median coordinates of the human labels of the
+5-minute video (first mouse) per label set; camera and eye position are fixed, so sets with different frames can be compared:
+
+| label set | frames | nasal corner x | temporal corner x | pupil top above upper-eyelid point (px) | pupil left higher than right (px) |
+|---|---|---|---|---|---|
+| before: training frames (batch size, model selection) | 100 | 417 | 795 | -26 | 27 |
+| before: active learning, jump rounds | 220 | 404 | 795 | -27 | 33 |
+| before: active learning, uncertain rounds | 220 | 410 | 795 | -25 | 34 |
+| before: active learning, fitting rounds | 220 | 419 | 795 | -27 | 34 |
+| before: final-minute test frames | 100 | 410 | 808 | -25 | 37 |
+| present: test frames of video 0 | 50 | 370 | 857 | +11 | 0 |
+
+- Definitions before 2026-09-20: pupil top = highest point of the visible pupil (about 25 px below the upper-eyelid
+  point); pupil left / right = leftmost / rightmost visible points of the pupil (left about 30-37 px higher than right);
+  nasal corner on the inner side of the shadow, temporal corner on the inner side of the reflections; eyelid points =
+  midpoints of the eyelid margins.
+- The five earlier label sets agree with one another, so batch size, model and error-correction algorithm were
+  compared under one set of definitions.
+- The present definitions are above; the nasal corner moved to the outer side of the shadow because the shadow is
+  attributed to fur covering the eye.
+
 ## Placements that are easy to get wrong
 
 | mistake | correct placement | example |
