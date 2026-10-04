@@ -460,7 +460,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li>在视频最后 10% 里均匀取 50 帧作测试集，人工标好后冻结。</li>
       <li>先用上一个模型直接预测这个视频，得到“0 帧”的误差。</li>
-      <li>每步加 20 帧这个视频的标注（挑帧办法见图 5-1；每批先由模型预标，人再逐帧改正），和之前视频带入的标注一起重新训练，在测试集上打分。</li>
+      <li>每步加 20 帧这个视频的标注（挑帧的算法见下面的 5.1 节和图 5-1；每批先由模型预标，人再逐帧改正），和之前视频带入的标注一起重新训练，在测试集上打分。</li>
       <li><b>平台规则</b>：连续两步都没有让最好成绩改善超过 3%，就停。平台点是最后一次有改善的那一步。规则触发后由人确认是否结束这个视频。到目前为止，12 个视频都是在规则触发时停止的，都符合平台的定义；平台点有 11 个就是规则给出的那一步，<b>只有视频 5 的平台点另外做了考虑</b>。视频 5 的 20 帧（15.85 px）和 40 帧（16.58 px）的中位误差都没有比 0 帧（11.90 px）好，规则在 40 帧触发，这符合平台的定义，按规则平台点是 0 帧。但我们考虑到：0 帧模型在 50 帧测试帧里有 6 帧（12%）误差超过 50 px，属于明显错误；标 20 帧后这类帧降为 0 帧，明显错误全部消除；标到 40 帧仍然是 0 帧，效果保持住了，也没有进一步的改善。所以取 20 帧作为平台点，带入后面视频的也是这 20 帧。</li>
       <li>进入下一个视频，只带入这个视频<span class="hl">到平台点为止</span>的标注（不是这个视频标过的所有帧都进入后面视频的训练：平台点之后标的帧不进入之后的训练）。这样做是为了模拟真实使用：到平台就不再标了。</li>
     </ol>
@@ -477,17 +477,72 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li>50 frames evenly spaced over the final 10% of the video become the test set; they are labeled and frozen.</li>
       <li>The previous model is applied unchanged to get the "0 labels" error.</li>
-      <li>Each step adds 20 labels of this video (picked as shown in Figure 5-1; the model pre-labels each batch and a person corrects every frame), retrains together with the labels carried from earlier videos, and scores on the test set.</li>
+      <li>Each step adds 20 labels of this video (picked by the algorithm of section 5.1 and Figure 5-1 below; the model pre-labels each batch and a person corrects every frame), retrains together with the labels carried from earlier videos, and scores on the test set.</li>
       <li><b>Plateau rule</b>: stop when two consecutive steps each fail to improve the best error by more than 3%. The plateau point is the last step that did improve it. When the rule fires, a person confirms whether the video is finished. So far all 12 videos stopped when the rule fired, so all of them meet the definition of the plateau; for 11 of them the plateau point is the step the rule gives, and <b>only for video 5 was the plateau point given further consideration</b>. On video 5 the median error at 20 labels (15.85 px) and at 40 labels (16.58 px) is no better than at 0 labels (11.90 px), so the rule fired at 40; this meets the definition of the plateau, and by the rule the plateau point is 0 labels. But we took into account that the 0-label model is off by more than 50 px on 6 of the 50 test frames (12%), which are gross errors; with 20 labels there are 0 such frames, so all gross errors are removed; with 40 labels there are still 0, so the effect holds and nothing further is gained. The plateau point is therefore taken as 20 labels, and these 20 labels are what later videos carry.</li>
       <li>The next video starts, carrying only this video's labels <span class="hl">up to the plateau point</span> (not every frame labeled on this video goes into the training of later videos: frames labeled after the plateau point are left out). This mirrors real use, where labeling stops at the plateau.</li>
     </ol>
+  </div>
+  <h3><span lang="zh">5.1 每一批 20 帧是怎么挑出来的（算法）</span><span lang="en">5.1 How each batch of 20 frames is picked (algorithm)</span></h3>
+  <div class="text" lang="zh">
+    <p>脚本：<code>v2_new_pupil_top_video_scaling/scripts/select_frames.py</code>。下面的数字都是脚本里固定的参数，照着做可以得到同样的帧。</p>
+    <p><b>（一）先把视频分成三段</b></p>
+    <ol>
+      <li>测试段：视频最后 10%（不少于 60 秒）。在这一段里按时间等间隔取 50 帧，作为测试帧。</li>
+      <li>验证段：测试段之前的 10%（不少于 60 秒）。等间隔取 20 帧，作为验证帧。</li>
+      <li>候选池：验证段之前的全部帧（约前 80%；19.9 分钟的视频是 57158 帧）。训练用的帧只从这里挑。验证段两侧各去掉 2 秒，避免三段之间有几乎相同的相邻帧。</li>
+    </ol>
+    <p><b>（二）第 1 批：按画面外观聚类（不用任何模型）</b></p>
+    <ol>
+      <li>在候选池里每 5 帧取 1 帧。</li>
+      <li>给每一帧算一个“外观指纹”：转成灰度图，缩小到 128 × 96；用标准差 1 px 的高斯模糊图减去标准差 6 px 的高斯模糊图（留下边缘和形状，去掉缓慢的明暗变化）；再缩小到 32 × 24，展开成 768 个数；减去均值、除以标准差。</li>
+      <li>对这些指纹做 k-means 聚类，分成 20 类（scikit-learn 的 <code>KMeans</code>，<code>n_clusters=20, n_init=10, max_iter=300, random_state=42</code>）。</li>
+      <li>每一类取离类中心最近的那一帧（欧氏距离），共 20 帧。从帧数最多的类开始取。</li>
+      <li>间隔要求：取的帧之间、以及和已经标过的帧之间，至少相隔 1 秒；不满足的跳过。如果因此不足 20 帧，把类数增加到 30、40、…（最多 80）重新聚类，用新的类中心帧补足。</li>
+    </ol>
+    <p><b>（三）第 2 批起：先用 jump 规则找候选帧，再按外观聚类</b></p>
+    <ol>
+      <li>用上一步训练出的模型预测整段视频的每一帧。</li>
+      <li>算阈值：眼宽 = 每一帧鼻侧眼角到颞侧眼角的距离，取整段视频的中位数；阈值 = 眼宽中位数 × 3%（约 12–15 px）。</li>
+      <li>算跳动：对每一帧，8 个点各自相对上一帧移动的距离，取其中最大的一个。</li>
+      <li>候选池里跳动超过阈值的帧就是候选帧（被 jump 标出的帧）。候选帧超过 12000 帧时等间隔抽稀到约 12000 帧；少于 40 帧时改用跳动最大的 2000 帧。</li>
+      <li>对候选帧做和第 1 批完全相同的步骤：算外观指纹、k-means 分 20 类、每类取离中心最近的一帧、相隔至少 1 秒、不足时增加类数。</li>
+      <li>如果还不足 20 帧（模型已经很好、候选帧很少且挤在几秒内时会发生），按跳动从大到小从候选帧里补，仍要求相隔 1 秒。</li>
+    </ol>
+    <p>所以每一批都是“一类一帧”：jump 规则决定去哪里找（模型不稳的帧），聚类保证挑出的 20 帧画面各不相同，而不是 20 张几乎一样的帧。</p>
+  </div>
+  <div class="text" lang="en">
+    <p>Script: <code>v2_new_pupil_top_video_scaling/scripts/select_frames.py</code>. All numbers below are fixed parameters of the script; following them gives the same frames.</p>
+    <p><b>(a) The video is first split into three segments</b></p>
+    <ol>
+      <li>Test segment: the final 10% of the video (at least 60 s). 50 frames evenly spaced in time are the test frames.</li>
+      <li>Validation segment: the 10% before it (at least 60 s). 20 evenly spaced frames are the validation frames.</li>
+      <li>Pool: all frames before the validation segment (about the first 80%; 57158 frames for a 19.9-min video). Training frames are picked from the pool only. 2 s are removed on both sides of the validation segment so that the three segments share no near-identical neighbouring frames.</li>
+    </ol>
+    <p><b>(b) Batch 1: clustering by image appearance (no model)</b></p>
+    <ol>
+      <li>Every 5th frame of the pool is taken.</li>
+      <li>An "appearance fingerprint" is computed for each frame: greyscale, downscaled to 128 × 96; a Gaussian blur with sigma 1 px minus a Gaussian blur with sigma 6 px (keeps edges and shape, removes slow lighting changes); downscaled to 32 × 24 and flattened to 768 numbers; mean subtracted and divided by the standard deviation.</li>
+      <li>k-means on the fingerprints with 20 clusters (scikit-learn <code>KMeans</code>, <code>n_clusters=20, n_init=10, max_iter=300, random_state=42</code>).</li>
+      <li>From each cluster the frame closest to the cluster centre (Euclidean distance) is taken, 20 frames in total, starting with the largest cluster.</li>
+      <li>Spacing: picked frames must be at least 1 s apart from each other and from every frame labeled earlier; frames that violate this are skipped. If fewer than 20 remain, the number of clusters is raised to 30, 40, … (at most 80) and the new centre frames fill the batch.</li>
+    </ol>
+    <p><b>(c) From batch 2 on: candidates by the jump rule, then clustering by appearance</b></p>
+    <ol>
+      <li>The model of the previous step predicts every frame of the whole video.</li>
+      <li>Threshold: eye width = distance from the nasal to the temporal corner in each frame, median over the video; threshold = 3% of the median eye width (about 12–15 px).</li>
+      <li>Jump: for each frame, the distance each of the 8 points moved from the previous frame; the largest of the 8.</li>
+      <li>Pool frames whose jump exceeds the threshold are the candidates (the frames flagged by the jump rule). More than 12000 candidates are thinned evenly to about 12000; with fewer than 40, the 2000 frames with the largest jumps are used instead.</li>
+      <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart, more clusters if short.</li>
+      <li>If there are still fewer than 20 (this happens when the model is already good and the few candidates are bunched within a few seconds), the batch is filled from the candidates in order of decreasing jump, still 1 s apart.</li>
+    </ol>
+    <p>Every batch is therefore "one frame per cluster": the jump rule decides where to look (frames on which the model is unstable), and the clustering makes sure the 20 picked frames look different from each other instead of being 20 nearly identical frames.</p>
   </div>
   <figure>
     <div class="figbox scroll"><div class="strip tall">
 {{SELECTION_STRIP}}
     </div></div>
-    <figcaption lang="zh"><span class="tag">图 5-1 怎么看：</span>一批 20 帧是怎么挑出来的。每个视频各一张（它的第 2 批，也就是第一次由 jump 规则挑的那一批），排成一行，可以左右拖动；每张图下面注明视频。每张图的读法相同：最下面一行：模型预测整段视频后，每一帧里关键点相对上一帧的最大跳动；红色虚线是阈值（眼宽的 3%），超过阈值的帧是候选，这就是 jump 规则。最上面：候选帧按画面外观聚成 20 类，每类挑一帧（星号）。中间各行：这 20 帧（竖线）在时间上分散在整段视频里。每个视频的第一批没有模型可用，直接对全部帧按画面外观聚类挑 20 帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>How one batch of 20 frames is chosen. One sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Every sheet reads the same way: Bottom row: after the model has predicted the whole video, the largest jump of a keypoint from the previous frame; the red dashed line is the threshold (3% of the eye width), frames above it are candidates; this is the jump rule. Top: the candidates are clustered into 20 groups by image appearance and one frame is taken from each (stars). Rows in between: the 20 picks (vertical lines) are spread over the whole video. The first batch of a video has no model to use, so 20 frames are picked by clustering the appearance of all frames.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 5-1 怎么看：</span>每个视频各一张选帧图（它的第 2 批，也就是第一次由 jump 规则挑的那一批），排成一行，可以左右拖动；每张图下面注明视频。每张图从上到下：（1）左上的散点图：每个点是一帧候选帧，位置是外观指纹降到二维后的坐标，颜色是它所属的类，黑色星号是挑中的 20 帧。右上的横条：每一类有多少帧。（2）第二行：每一类的帧出现在视频的什么时间，星号是挑中的帧。（3）下面几行是模型预测出的曲线，横轴是时间，细竖线是挑中的 20 帧：瞳孔中心的横坐标和纵坐标、眼睛睁开高度、瞳孔面积、瞳孔点最低置信度。（4）最下面一行：每一帧的最大跳动，红色虚线是阈值，超过阈值的帧是候选帧。<b>要看的是：</b>星号分布在散点图的各个区域，每一类里都有一帧，说明挑出的 20 帧覆盖了候选帧里各种不同的画面形态，没有集中在某一种；竖线也分散在整段时间里，没有挤在同一个时刻。每个视频每一批的图都在页面最后的附录里。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>One selection sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Each sheet, from top to bottom: (1) scatter plot at the top left: one dot per candidate frame, placed by the first two principal components of its fingerprint and coloured by cluster; black stars are the 20 picked frames. Bars at the top right: frames per cluster. (2) Second row: when the frames of each cluster occur in the video; stars are the picks. (3) The next rows are traces predicted by the model against time, with a thin vertical line at each of the 20 picks: pupil centre x and y, eye opening, pupil area, lowest pupil confidence. (4) Bottom row: the largest jump in each frame; the red dashed line is the threshold and frames above it are candidates. <b>What to see:</b> the stars are spread over all regions of the scatter plot with one frame in every cluster, so the 20 picks cover the different appearances among the candidates instead of concentrating on one; the vertical lines are also spread over the whole duration instead of bunching at one moment. The sheets of every batch of every video are in the appendix at the end of the page.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>
@@ -824,8 +879,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <!-- appendix -->
 <section id="s10">
   <h2><span class="no">附</span><span lang="zh">附录：每个视频每一批的选帧图</span><span lang="en">Appendix: the selection sheet of every batch of every video</span></h2>
-  <p class="text" lang="zh">这里是过程记录，不对应新的结论。每个视频一行，从第 1 批到最后一批，可以左右拖动。第 1 批没有模型可用，是对全部帧按画面外观聚类挑的 20 帧；第 2 批起是模型预测整段视频后，由 jump 规则标出候选帧，再按画面外观聚类挑的 20 帧。读法见图 5-1。到平台点之后的批次也在这里（它们已经标注，但没有带入后面的视频）。</p>
-  <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. How to read a sheet: Figure 5-1. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
+  <p class="text" lang="zh">这里是过程记录，不对应新的结论。每个视频一行，从第 1 批到最后一批，可以左右拖动。第 1 批没有模型可用，是对全部帧按画面外观聚类挑的 20 帧；第 2 批起是模型预测整段视频后，由 jump 规则标出候选帧，再按画面外观聚类挑的 20 帧。算法和读法见第 5 步的 5.1 节和图 5-1。到平台点之后的批次也在这里（它们已经标注，但没有带入后面的视频）。</p>
+  <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. Algorithm and how to read a sheet: section 5.1 and Figure 5-1 of step 5. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
 {{APPENDIX_SELECTION}}
 </section>
 
