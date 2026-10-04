@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 15:34 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 16:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -105,7 +105,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 12 个视频的 594 帧测试帧上，四点法的面积误差中位数是 6.6%，三点法是 8.3%；视频 4 和 8 上面积仍然不准（第 9 步）。</li>
       <li><b>眨眼怎么判断？</b>还没有结果：眨眼的定义和真值还没有定。目前只有一个初步观察：瞳孔四个点的平均置信度低于 0.527，可以找出人工把四个瞳孔点都留空的帧（28 帧里 27 帧，其余帧误报 4.1%），但留空的帧不等于眨眼（第 10 步）。</li>
     </ol>
-    <p><b>进度：</b>已完成 12 个视频（视频 0–11）。</p>
+    <p><b>进度：</b>已完成 12 个视频（视频 0–11）；视频 12 进行中，按 0 / 20 / 40 / … 帧的误差为 5.13 / 5.77 px。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Task:</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
@@ -132,7 +132,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
       <li><b>How to detect blinks?</b> No result yet: the definition of a blink and its truth are not fixed. Only a preliminary observation so far: a mean confidence of the four pupil points below 0.527 finds the frames in which the labeler left all four pupil points empty (27 of 28, with 4.1% of the other frames flagged), but an empty frame is not the same as a blink (step 10).</li>
     </ol>
-    <p><b>Status:</b> 12 videos finished (videos 0–11).</p>
+    <p><b>Status:</b> 12 videos finished (videos 0–11); video 12 in progress, error at 0 / 20 / 40 / … labels: 5.13 / 5.77 px.</p>
   </div>
 
   <div class="text" lang="zh">
@@ -579,6 +579,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/scale_video09.jpg" alt="Video 9: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 9（Pluto，2025-10-23）：平台点 80 帧，8.20 px</span><span lang="en">Video 9 (Pluto, 2025-10-23): plateau at 80 labels, 8.20 px</span></div></div>
       <div class="item"><img src="assets/scale_video10.jpg" alt="Video 10: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 10（Pluto，2025-10-22）：平台点 40 帧，10.32 px</span><span lang="en">Video 10 (Pluto, 2025-10-22): plateau at 40 labels, 10.32 px</span></div></div>
       <div class="item"><img src="assets/scale_video11.jpg" alt="Video 11: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 11（Terra，2025-10-17）：平台点 40 帧，8.86 px</span><span lang="en">Video 11 (Terra, 2025-10-17): plateau at 40 labels, 8.86 px</span></div></div>
+      <div class="item"><img src="assets/scale_video12.jpg" alt="Video 12: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 12（Terra，2025-10-16）：进行中</span><span lang="en">Video 12 (Terra, 2025-10-16): in progress</span></div></div>
     </div></div>
     <figcaption lang="zh"><span class="tag">图 5-3 怎么看：</span>每个视频自己的曲线排成一行，从视频 0 到最新的视频，可以左右拖动；每张图下面注明视频、老鼠、日期和平台点。三幅小图的读法以视频 9 为例。左图：横轴是这个视频自己的标注帧数，纵轴是误差；20 帧 10.4 px，40 帧 8.6 px，80 帧 8.2 px，之后两步（9.4、8.6 px）都没有再改善，规则在 120 帧触发，平台点记为 80 帧。中图：8 个点各自的误差，瞳孔下点（蓝）最难。右图：不需要标注的指标，紫线是整段视频里被跳动规则标出的帧的比例，随标注增加从 18% 降到 9%。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 5-3, how to read:</span>The curves of every video in one row, from video 0 to the newest; scroll sideways. Under each figure: video, mouse, date and plateau point. How to read the three panels, with video 9 as the example. Left: x = this video's own labels, y = error; 10.4 px at 20 labels, 8.6 px at 40, 8.2 px at 80, then two steps without a gain (9.4, 8.6 px), so the rule fired at 120 and the plateau point is 80. Middle: error of each of the 8 points; pupil bottom (blue) is the hardest. Right: label-free signals; the purple line is the share of video frames flagged by the jump rule, falling from 18% to 9% as labels are added.</figcaption>
@@ -614,6 +615,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>9</td><td>Pluto<br>2025-10-23</td><td>420</td><td>23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63</td><td><span lang="zh"><b>80 帧，8.20 px</b></span><span lang="en"><b>80 labels, 8.20 px</b></span></td><td>120</td><td>80</td></tr>
 <tr><td>10</td><td>Pluto<br>2025-10-22</td><td>500</td><td>18.13 / 11.83 / 10.32 / 10.49 / 10.76</td><td><span lang="zh"><b>40 帧，10.32 px</b></span><span lang="en"><b>40 labels, 10.32 px</b></span></td><td>80</td><td>40</td></tr>
 <tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86 / 8.77 / 8.65</td><td><span lang="zh"><b>40 帧，8.86 px</b></span><span lang="en"><b>40 labels, 8.86 px</b></span></td><td>80</td><td>40</td></tr>
+<tr><td>12</td><td>Terra<br>2025-10-16</td><td>580</td><td>5.13 / 5.77</td><td><span lang="zh">进行中（目前最好：0 帧，5.13 px）</span><span lang="en">in progress (best so far: 0 labels, 5.13 px)</span></td><td>20</td><td>–</td></tr>
       </tbody>
     </table>
   </div>

@@ -11,7 +11,11 @@ total) + this video's labels; shuffles 1311, 1312, ...
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-11 40-label model 1212, applied unchanged) | 5.13 px | 9.4 | 0% | 77% | – |
+| 20 (shuffle 1311) | 5.77 px | 7.7 | 0% | 99% | pending |
 
 The 0-label number is biased low: model 1212 produced the pre-labels of this test set and 290 of the 400 test points
 were left as pre-labeled, so its error on those points is 0. The other models of video 11 (20 / 60 / 80 labels), which
 did not produce the pre-labels, give 10.66 / 8.29 / 8.99 px on this test set (`../results/cross_video_matrix.csv`).
+
+Step 1 (20 labels): 5.77 px. Against the 0-label number (5.13 px, biased low by the pre-labels) this is no gain, so by the
+rule it counts as one flat step; against the other video-11 models on this test set (8.29-10.66 px) it is clearly better.
