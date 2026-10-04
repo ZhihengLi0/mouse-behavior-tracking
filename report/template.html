@@ -947,7 +947,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="zh">
     <ul>
       <li><b>平台规则在噪声边缘：</b>测试集只有 50 帧，同一设置重复训练，中位误差本身会有约 0.5–1 px 的波动，而 3% 约等于 0.3 px。所以每个视频的平台点有大约 ±20 帧的不确定性。每个点只训练了一次。</li>
-      <li><b>预标带来的偏向：</b>测试集是人在模型预标的基础上改出来的，做预标的那个模型在这组测试集上会显得比实际好（视频 5、6 最明显）。</li>
       <li><b>跳动规则找错帧找得准不准</b>还没有量过：被标出的帧里有多少真的错，没被标出的帧里漏了多少。</li>
       <li><b>视频 4、5、8</b> 误差偏大（视频 8 一直在 25 px 以上）。目前的解释是标注的人的判断：画面比较模糊，肉眼也难以识别点位。这一点还没有用数字验证过：用整幅画面的清晰度（拉普拉斯方差）和亮度去量，这三个视频和其他 Pluto 视频没有差别，所以模糊如果存在，是在瞳孔边缘这样的局部，需要专门去量。</li>
       <li><b>第三只老鼠（Terra，视频 11–18）</b>刚开始做第一个视频（数字见第 5 步的表）；在它做完之前，“新老鼠需要 20 帧”只在一只新老鼠上验证过。</li>
@@ -958,7 +957,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="en">
     <ul>
       <li><b>The plateau rule works at the noise floor:</b> With 50 test frames, retraining the same setting moves the median by about 0.5–1 px, while 3% is about 0.3 px. Each video's plateau point therefore carries an uncertainty of roughly ±20 labels. Every point is a single training run.</li>
-      <li><b>Anchoring by pre-labels:</b> Test sets are made by correcting a model's pre-labels, so the model that made them looks better than it is on that test set (clearest on videos 5 and 6).</li>
       <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b> has just started with its first video (numbers in the table of step 5); until it is finished, "a new mouse needs 20 labels" rests on one new mouse.</li>
