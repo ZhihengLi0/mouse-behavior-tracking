@@ -70,7 +70,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 12:27 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 12:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -87,16 +87,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>瞳孔面积怎么算？</b>在这个标准下上点落在眼睑边上，所以只用左、右、下三个点（第 5 步）。</li>
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
-    <p>9 月 20 日起明确了瞳孔四个点的标法：把瞳孔看成椭圆，四个点是椭圆的四个端点。定义真正改变的只有瞳孔上点：从“看得见的瞳孔的最高处”改为“椭圆真实的最高点”。瞳孔下、左、右三个点原来就标在瞳孔边缘，这次明确为椭圆的端点，位置移动约 14 px。同一天还明确了两个眼角的标法（上下睑缘延长线的交点，取外侧），两个眼角向外移动 40–56 px，上眼睑点随之上移约 17 px，下眼睑点不变。详见第 7 步。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
+    <p>9 月 20 日起明确了瞳孔四个点的标法：把瞳孔看成椭圆，四个点是椭圆的四个端点。定义真正改变的只有瞳孔上点：从“看得见的瞳孔的最高处”改为“椭圆真实的最高点”。瞳孔下、左、右三个点原来就标在瞳孔边缘，这次明确为椭圆的端点，位置移动约 14 px。同一天还明确了两个眼角的标法（上下睑缘延长线的交点，取外侧），两个眼角向外移动 40–56 px，上眼睑点随之上移约 17 px，下眼睑点不变。详见第 7 步。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有按明确后的定义重新比较过 batch size 和模型。</p>
     <h3>第二阶段的结论（第 7–11 步）</h3>
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
-      <li><b>同一个视频标多少帧够？</b>和第一阶段的“约 80 帧饱和”一致：同一个 5 分钟视频在新标准下重新做，20 / 40 / 60 / 80 / 100 帧的误差是 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px，没有随帧数下降；之后每个视频的平台点也都不超过 80 帧（第 8 步）。</li>
+      <li><b>同一个视频标多少帧够？</b>和第一阶段的“约 80 帧饱和”一致：同一个 5 分钟视频按 9 月 20 日明确的点位定义重新标注后重做，20 / 40 / 60 / 80 / 100 帧的误差是 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px，没有随帧数下降；之后每个视频的平台点也都不超过 80 帧（第 8 步）。</li>
       <li><b>换一只新老鼠怎么办？</b>要重新标，标 20 帧就到约 10 px。第二只老鼠（当时的模型只见过一只老鼠）：0 帧 208 px，标 20 帧到 10.4 px。第三只老鼠（模型已见过两只老鼠）：0 帧 26 px，标 20 帧到 9.2 px。第二次换老鼠时，不标任何帧的起点误差小得多（第 8 步）。</li>
       <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台，已完成的 9 个里有 1 个需要 80 帧（第 8 步）。</li>
       <li><b>第一批只标 5 帧或 10 帧够不够？</b>有的视频够，有的不够，事先无法判断；20 帧最稳定。这里比的是第一批的大小（从已标的 20 帧里取 5 帧或 10 帧），不是每步 5 帧的流程（第 9 步）。</li>
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 10 步）。</li>
-      <li><b>瞳孔面积怎么算？</b>新标准下四个点都是椭圆端点，用四个点算的面积误差约为三点法的一半（第 11 步）。</li>
+      <li><b>瞳孔面积怎么算？</b>按 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，用四个点算的面积误差约为三点法的一半（第 11 步）。</li>
     </ol>
     <p><b>进度：</b>已完成 11 个视频（视频 0–10）；视频 11 进行中，按 0 / 20 / 40 / … 帧的误差为 25.96 / 9.24 / 8.86 / 8.77 / 8.65 px。</p>
   </div>
@@ -115,16 +115,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to compute the pupil area?</b> Under this standard the top point sits on the lid, so only left, right and bottom are used (step 5).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
-    <p>From 2026-09-20 the way the four pupil points are labeled was made explicit: the pupil is treated as an ellipse and the four points are its four endpoints. Only the definition of pupil top really changed: from "the highest point of the visible pupil" to "the true top of the ellipse". Pupil bottom, left and right were already placed on the pupil edge and were made explicit as ellipse endpoints, moving by about 14 px. On the same day the placement of the two corners was made explicit as well (the crossing of the continued upper and lower eyelid margins, on the outer side): the corners moved outwards by 40–56 px, the upper-eyelid point moved up by about 17 px with them, and the lower-eyelid point did not move. Details in step 7. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
+    <p>From 2026-09-20 the way the four pupil points are labeled was made explicit: the pupil is treated as an ellipse and the four points are its four endpoints. Only the definition of pupil top really changed: from "the highest point of the visible pupil" to "the true top of the ellipse". Pupil bottom, left and right were already placed on the pupil edge and were made explicit as ellipse endpoints, moving by about 14 px. On the same day the placement of the two corners was made explicit as well (the crossing of the continued upper and lower eyelid margins, on the outer side): the corners moved outwards by 40–56 px, the upper-eyelid point moved up by about 17 px with them, and the lower-eyelid point did not move. Details in step 7. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions.</p>
     <h3>Conclusions of phase 2 (steps 7–11)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
-      <li><b>How many labels are enough within one video?</b> Consistent with "about 80 saturate" from phase 1: the same 5-minute video redone under the new standard gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 8).</li>
+      <li><b>How many labels are enough within one video?</b> Consistent with "about 80 saturate" from phase 1: the same 5-minute video, relabeled under the keypoint definitions made explicit on 2026-09-20 and redone, gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 8).</li>
       <li><b>What about a new mouse?</b> It needs its own labels, and 20 of them reach about 10 px. Second mouse (the model had seen one mouse): 208 px at 0 labels, 10.4 px at 20. Third mouse (the model had seen two mice): 26 px at 0 labels, 9.2 px at 20. The second time the mouse changed, the starting error without any labels was far smaller (step 8).</li>
       <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau; 1 of the 9 finished ones needed 80 (step 8).</li>
       <li><b>Would a first batch of 5 or 10 labels be enough?</b> On some videos yes, on others no, and this cannot be told in advance; 20 is the most stable. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 9).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 10).</li>
-      <li><b>How to compute the pupil area?</b> Under the new standard all four points are ellipse endpoints, and the 4-point area has about half the error of the 3-point rule (step 11).</li>
+      <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and the 4-point area has about half the error of the 3-point rule (step 11).</li>
     </ol>
     <p><b>Status:</b> 11 videos finished (videos 0–10); video 11 in progress, error at 0 / 20 / 40 / … labels: 25.96 / 9.24 / 8.86 / 8.77 / 8.65 px.</p>
   </div>
@@ -161,13 +161,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><a href="#s2"><span lang="zh">选模型</span><span lang="en">Backbone</span></a></li>
       <li><a href="#s3"><span lang="zh">选纠错算法：jump</span><span lang="en">Error-correction algorithm: jump</span></a></li>
       <li><a href="#s4"><span lang="zh">时间序列：眨眼、眼动、追踪丢失</span><span lang="en">Time series: blinks, eye movements, tracking loss</span></a></li>
-      <li><a href="#s5"><span lang="zh">瞳孔面积怎么算（旧标注标准）</span><span lang="en">Pupil area (old label standard)</span></a></li>
+      <li><a href="#s5"><span lang="zh">瞳孔面积怎么算（9 月 20 日之前的点位定义）</span><span lang="en">Pupil area (definitions before 2026-09-20)</span></a></li>
       <li><a href="#s6"><span lang="zh">换一只新老鼠</span><span lang="en">A new mouse</span></a></li>
       <li><a href="#s7"><span lang="zh">点位定义的明确：瞳孔按椭圆标，眼角取延长线交点</span><span lang="en">Keypoint definitions made explicit</span></a></li>
       <li><a href="#s8"><span lang="zh">主线：每个新视频要标多少帧</span><span lang="en">Main line: labels needed per new video</span></a></li>
       <li><a href="#s9"><span lang="zh">第一批只标 5 帧或 10 帧够不够</span><span lang="en">Would a first batch of 5 or 10 labels be enough</span></a></li>
       <li><a href="#s10"><span lang="zh">加入新视频会不会让旧视频变差</span><span lang="en">Do new videos hurt old ones</span></a></li>
-      <li><a href="#s11"><span lang="zh">瞳孔面积和眨眼（新标注标准）</span><span lang="en">Pupil area and blinks (new label standard)</span></a></li>
+      <li><a href="#s11"><span lang="zh">瞳孔面积和眨眼（9 月 20 日明确的点位定义）</span><span lang="en">Pupil area and blinks (definitions made explicit on 2026-09-20)</span></a></li>
       <li><a href="#s12"><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></a></li>
     </ol>
   </nav>
@@ -251,8 +251,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>横轴是累计训练帧数，三种颜色是三种算法。图中每一轮都用同一个公式计算。<b>中间一幅是主要指标</b>（中位帧 RMSE）：三条线一直在 15.7–17.5 px 之间上下波动，没有下降趋势；红线（jump）多数时候略低；注意这幅图的纵轴只跨 2 px。左边一幅是均值，会被几帧严重错误拉高（蓝线在 120–140 帧的尖峰就是几帧眨眼造成的）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>x = cumulative training frames, the three colours are the three detectors. Every round in the figure is scored with the same formula. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>选 jump 作为纠错算法，之后的实验统一用它挑帧。三种算法没有明显差距，jump 略微领先：11 轮的平均中位误差是 jump 16.4 px、uncertain 17.0 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低；差距只有约 0.6 px，小于同一设置重复训练时的波动，所以不能说 jump 确实更好。这一步同时得到另一个结果：在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变。新标准下在同一个视频上重做，结果一致（第 8 步，视频 0：20–100 帧都在 12–13 px）。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>jump is chosen as the error-correction algorithm and picks the frames in all later experiments. The three detectors show no clear gap, with jump slightly ahead: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds; but the gap is only about 0.6 px, smaller than the run-to-run variation of one setting, so jump cannot be called truly better. The step gave a second result as well: on this video (phase-1 label standard) about 80 labels already saturate, and 300 labels give the same error. Redone on the same video under the new standard, the result is the same (step 8, video 0: 12–13 px anywhere from 20 to 100 labels).</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>选 jump 作为纠错算法，之后的实验统一用它挑帧。三种算法没有明显差距，jump 略微领先：11 轮的平均中位误差是 jump 16.4 px、uncertain 17.0 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低；差距只有约 0.6 px，小于同一设置重复训练时的波动，所以不能说 jump 确实更好。这一步同时得到另一个结果：在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变。2026 年 9 月 20 日明确点位定义之后（见第 7 步；主要变化是瞳孔上点从“看得见的瞳孔的最高处”改为“瞳孔椭圆真实的最高点”，被眼睑挡住时按椭圆估计；两个眼角也明确为睑缘延长线的交点），在同一个视频上按新定义重新标注、重新做了一遍，结果一致：20、40、60、80、100 帧的误差都在 12–13 px 之间，没有随帧数下降（第 8 步，视频 0）。两套定义下的误差数值不能直接比较，一致的是“约 80 帧以内就饱和”这个结论。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>jump is chosen as the error-correction algorithm and picks the frames in all later experiments. The three detectors show no clear gap, with jump slightly ahead: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds; but the gap is only about 0.6 px, smaller than the run-to-run variation of one setting, so jump cannot be called truly better. The step gave a second result as well: on this video (phase-1 label standard) about 80 labels already saturate, and 300 labels give the same error. After the keypoint definitions were made explicit on 2026-09-20 (step 7; the main change is that pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", estimated from the ellipse where the eyelid hides it; the two corners were also made explicit as the crossing of the continued eyelid margins), the same video was relabeled under the new definitions and the experiment was repeated, with the same result: the error stays between 12 and 13 px at 20, 40, 60, 80 and 100 labels and does not fall with the number of labels (step 8, video 0). The error values under the two sets of definitions cannot be compared directly; what agrees is the conclusion that the video saturates within about 80 labels.</p>
 </section>
 
 <!-- 4 -->
@@ -283,7 +283,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 5 -->
 <section id="s5">
-  <h2><span class="no">5</span><span lang="zh">瞳孔面积怎么算（旧标注标准）：用左、右、下三个点</span><span lang="en">Pupil area (old label standard): from the left, right and bottom points</span></h2>
+  <h2><span class="no">5</span><span lang="zh">瞳孔面积怎么算（9 月 20 日之前的点位定义）：用左、右、下三个点</span><span lang="en">Pupil area (definitions before 2026-09-20): from the left, right and bottom points</span></h2>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
@@ -308,8 +308,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>上图：灰线是原始面积，红线是处理后的面积，橙色竖条是标为不可信的帧（共 8.9%）。下排是三次眨眼的放大：灰线在眨眼时掉下去，红线用直线跨过去。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>Top: grey = raw area, red = area after blink handling, orange bars = frames marked untrusted (8.9% in total). Bottom: three blinks enlarged; grey drops during the blink, red bridges it with a straight line.</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>在旧标注标准下，三点椭圆更准，于是面积脚本采用三点法加眨眼插值。这个结论在第 7 步换了标注标准之后有变化，见第 11 步。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Under the old label standard the 3-point ellipse was more accurate, so the area script used it together with blink interpolation. This changes after the label standard of step 7; see step 11.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>按 9 月 20 日之前的点位定义，三点椭圆更准，于是面积脚本采用三点法加眨眼插值。这个结论在第 7 步换了标注标准之后有变化，见第 11 步。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Under the definitions used before 2026-09-20 the 3-point ellipse was more accurate, so the area script used it together with blink interpolation. This changes after the label standard of step 7; see step 11.</p>
 </section>
 
 <!-- 6 -->
@@ -337,8 +337,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>一批 20 帧是怎么挑出来的（以第 2 批为例）。最下面一行：每一帧里关键点的最大跳动，红色虚线是阈值（眼宽的 3%），超过的帧是候选。最上面：候选帧按画面外观分成 20 类，每类挑一帧（星号）。中间：这 20 帧在时间上分散在整段视频里（竖线）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>How one batch of 20 frames is chosen (batch 2 as the example). Bottom row: largest keypoint jump in every frame; the red dashed line is the threshold (3% of the eye width) and frames above it are candidates. Top: the candidates are clustered into 20 groups by appearance and one frame is taken from each (stars). Middle: the 20 picks are spread over the whole video (vertical lines).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>换老鼠必须重新标，但 20 帧就能把误差从 185 px 降到约 14 px，80 帧到约 10 px。这是旧标注标准下的第一次尝试；新标准下更完整的比较（两次换老鼠）见第 8 步。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>A new mouse needs its own labels, but 20 of them bring the error from 185 px to about 14 px, and 80 to about 10 px. This was the first attempt, under the old label standard; the fuller comparison under the new standard (two changes of mouse) is in step 8.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>换老鼠必须重新标，但 20 帧就能把误差从 185 px 降到约 14 px，80 帧到约 10 px。这是 9 月 20 日明确点位定义之前的第一次尝试；按明确后的定义做的更完整的比较（两次换老鼠）见第 8 步。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>A new mouse needs its own labels, but 20 of them bring the error from 185 px to about 14 px, and 80 to about 10 px. This was the first attempt, before the keypoint definitions were made explicit on 2026-09-20; the fuller comparison under the explicit definitions (two changes of mouse) is in step 8.</p>
 </section>
 
 <!-- 7 -->
@@ -586,7 +586,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 11 -->
 <section id="s11">
-  <h2><span class="no">11</span><span lang="zh">瞳孔面积和眨眼（新标注标准）</span><span lang="en">Pupil area and blinks (new label standard)</span></h2>
+  <h2><span class="no">11</span><span lang="zh">瞳孔面积和眨眼（9 月 20 日明确的点位定义）</span><span lang="en">Pupil area and blinks (definitions made explicit on 2026-09-20)</span></h2>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">视频 0–7（面积）和视频 0–4（眨眼）。</span><span lang="en">Videos 0–7 (area) and videos 0–4 (blinks).</span></td></tr>
@@ -597,7 +597,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text" lang="zh"><span class="tag">做了什么：</span>换成椭圆标注标准后，重新比较面积的算法：三点法（第 5 步的做法）、四点法（宽 × 上下高度），以及“每帧去掉一个点”的几种变体。以人工标注的四点椭圆面积为真值。同时在多个视频上检查现有眨眼规则：哪个信号最能把人工认定的闭眼帧分出来。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>With the ellipse label standard the area rules were compared again: the 3-point rule (step 5), the 4-point rule (width × top-to-bottom height) and several "drop one point" variants. Truth = the 4-point ellipse area from the human labels. The current blink rule was also checked on several videos: which signal best separates the frames a person marked as eye-closed.</p>
   <figure>
-    <div class="figbox"><img src="assets/fig_area_variants.jpg" alt="Pupil-area rules under the new label standard"></div>
+    <div class="figbox"><img src="assets/fig_area_variants.jpg" alt="Pupil-area rules under the definitions of 2026-09-20"></div>
     <figcaption lang="zh"><span class="tag">怎么看：</span>左图：每组柱子是一种算法，纵轴是面积误差（%，越低越好），灰柱是 4 个视频合在一起。四点法 3.7%，现行三点法 6.9%；去掉任何一个点都更差（9–11%）；按模型置信度每帧去掉一个点是 7.9%，也不如四点法。右图：人工改正预标时，四个瞳孔点各被改了多少次，上点被改得最多（20–40%）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>Left: one group of bars per rule, y = area error (%, lower is better), grey = the four videos pooled. 4-point 3.7%, current 3-point 6.9%; dropping any point is worse (9–11%); dropping the lowest-confidence point per frame gives 7.9%, also worse than 4-point. Right: how often the labeler corrected each pupil point in the pre-labels; the top point most often (20–40%).</figcaption>
   </figure>
@@ -606,8 +606,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">怎么看：</span>A：8 个视频的测试集上，四点法（绿）在 7 个上比三点法（灰）误差低。B：五种信号区分“闭眼帧”和“睁眼帧”的能力（AUC，1 = 完全分开，0.5 = 随机）；黑线是合并结果，“瞳孔点最低置信度”达到 1.0，现行规则用的“睁开高度 / 5 秒中位数”是 0.90。C：现行眨眼规则（橙）在 Pluto 的视频上把 26–50% 的帧标为不可信，远多于真实的眨眼。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>A: on the test sets of 8 videos the 4-point rule (green) has the lower error on 7. B: how well five signals separate eye-closed from eye-open frames (AUC, 1 = perfect, 0.5 = chance); the black line is pooled, "lowest pupil confidence" reaches 1.0 and the signal used by the current rule ("opening / 5-s median") 0.90. C: the current blink rule (orange) marks 26–50% of the frames of the Pluto videos as untrusted, far more than real blinks.</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>新标准下四点法的面积误差约为三点法的一半（3.7% 对 6.9%），建议改用四点法；正式的面积脚本目前仍是三点法，等确认后再换。现行眨眼规则是在视频 0 上调的，在新老鼠上标得过多，需要重新设计。B 图只有 16 个人工认定的闭眼帧，样本很少。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Under the new standard the 4-point area error is about half that of the 3-point rule (3.7% vs 6.9%), so switching is recommended; the production area script still uses the 3-point rule until that is approved. The current blink rule was tuned on video 0, flags far too much on the new mouse, and needs to be redesigned. Panel B rests on only 16 human-marked closed-eye frames.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>按 9 月 20 日明确的点位定义，四点法的面积误差约为三点法的一半（3.7% 对 6.9%），建议改用四点法；正式的面积脚本目前仍是三点法，等确认后再换。现行眨眼规则是在视频 0 上调的，在新老鼠上标得过多，需要重新设计。B 图只有 16 个人工认定的闭眼帧，样本很少。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Under the keypoint definitions made explicit on 2026-09-20 the 4-point area error is about half that of the 3-point rule (3.7% vs 6.9%), so switching is recommended; the production area script still uses the 3-point rule until that is approved. The current blink rule was tuned on video 0, flags far too much on the new mouse, and needs to be redesigned. Panel B rests on only 16 human-marked closed-eye frames.</p>
 </section>
 
 <!-- 12 -->
