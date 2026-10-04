@@ -232,3 +232,12 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 - 2026-10-02: the study is being extended to videos 6-10 and to every later video (subset models use shuffles 2000 + 10 * video + 1..4, trained while the main line is idle). Video 8, a hard day: 5 labels are worse than none, 10 labels are at least as good as 20. Video 9: 5 labels already halve the error (23.4 -> about 12 px); 10 and 20 labels add about 1 px each.
 - Two subsets of the same size can differ a lot (video 1: 96 vs 41 px at 5 labels), so a single small batch is
   unreliable. 20 labels was the smallest size that worked on every video.
+
+## Analyses across all finished videos (2026-10-04)
+
+| folder | script (in `../scripts/`) | content |
+|---|---|---|
+| `blink_and_area/` | `blink_and_area.py` | pupil-area rules, eye-closure signals and rules, time series; one figure per video (`blink_area_timeseries_videoNN.png`) and all videos together. Four-point area: median error 6.6% on 594 test frames (three-point rule 8.3%); rule "mean pupil confidence < 0.527": 27 of 28 human closed-eye frames detected, 4.1% of open frames flagged |
+| `keypoint_confidence_error/` | `keypoint_confidence_error.py` | error and confidence of each of the 8 keypoints; one figure per video (`keypoint_confidence_error_videoNN.png`) and all videos together. Pupil top is the least accurate point (median 10.9 px; the others 3.9-5.8 px) |
+
+Each folder has its own README with the basic information, the file-to-script table and the results.

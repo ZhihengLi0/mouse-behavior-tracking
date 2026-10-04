@@ -37,6 +37,12 @@ FIGURES = [
     (V2 / "results/cross_video_matrix.png", "cross_video_matrix.jpg", 2470),
     (V2 / "results/pupil_area_variants.png", "fig_area_variants.jpg", 2000),
     (V2 / "results/blink_area_consistency.png", "fig_blink_area.jpg", 2400),
+    (V2 / "results/blink_and_area/blink_area_area_methods_all_videos.png", "fig_eye_area.jpg", 2400),
+    (V2 / "results/blink_and_area/blink_area_closure_signals_all_videos.png", "fig_eye_blink.jpg", 2600),
+    (V2 / "results/blink_and_area/blink_area_closed_frames_all_videos.jpg", "fig_closed_frames.jpg", 2784),
+    (V2 / "results/blink_and_area/blink_area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
+    (V2 / "results/blink_and_area/blink_area_timeseries_video11.png", "fig_eye_ts_video11.jpg", 2200),
+    (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
     (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
@@ -95,7 +101,19 @@ else:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）。"
     en_status = f"{n_final} videos finished (videos 0–{n_final - 1})."
 
+ts = pd.read_csv(V2 / "results/blink_and_area/blink_area_timeseries_all_videos.csv")
+am = pd.read_csv(V2 / "results/blink_and_area/blink_area_area_methods_all_videos.csv")
+cs = pd.read_csv(V2 / "results/blink_and_area/blink_area_closure_signals_all_videos.csv").astype({"video": str}).set_index("video")
+eye = []
+for r in ts.itertuples():
+    a = am[am.video.astype(str) == str(r.video)].set_index("rule").median_abs_err_pct
+    c = cs.loc[str(r.video)]
+    eye.append(f"<tr><td>{r.video}</td><td>{r.mouse}</td><td>{a['four']:.1f} / {a['no_top']:.1f}</td><td>{int(c.closed_frames)} / {int(c.open_frames)}</td>"
+               f"<td>{r.flagged_frames_pct:.2f}</td><td>{r.events} ({r.events_per_min:.1f})</td><td>{r.median_event_ms:.0f}</td>"
+               f"<td>{r.production_flagged_pct:.1f}</td><td>{r.area_rel_spread_pct:.1f}</td><td>{r.corr_area_opening:.2f}</td></tr>")
+
 FILL = {
+    "{{EYE_ROWS}}": "\n".join(eye),
     "{{VIDEO_ROWS}}": "\n".join(rows),
     "{{FEWER_ROWS}}": "\n".join(fewer),
     "{{STATUS_ZH}}": zh_status,
