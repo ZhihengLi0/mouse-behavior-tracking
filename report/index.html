@@ -46,6 +46,8 @@ figure{margin:0;display:flex;flex-direction:column;gap:8px}
 .figbox.narrow{max-width:34rem}
 figcaption{font-size:14.5px;line-height:1.65;color:var(--ink);max-width:52rem}
 .tablebox{overflow-x:auto;max-width:100%}
+table.info{max-width:52rem;font-size:14.5px;line-height:1.6}
+table.info th{white-space:nowrap;width:1%}
 table{border-collapse:collapse;font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums;background:var(--surface)}
 th,td{border:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
 th{font-weight:650;background:var(--accent-soft)}
@@ -66,7 +68,7 @@ code{font-family:var(--mono);font-size:.9em}
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-03 23:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-03 23:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -126,11 +128,11 @@ code{font-family:var(--mono);font-size:.9em}
   </div>
 
   <div class="text" lang="zh">
-    <p><b>怎么量误差（全页统一）：</b>每个视频留出一组人工标注的测试帧，不参与训练，也不参与任何选择。对每一帧，算 8 个点的预测位置与人工标注之间的 RMSE（像素），再取所有测试帧的<b>中位数</b>。数字越小越好。作为参照：眼睛宽度约 320–390 px，所以 10 px 约为眼宽的 3%。</p>
+    <p><b>怎么量误差：</b>每个视频留出一组人工标注的测试帧，不参与训练，也不参与任何选择。对每一帧，算 8 个点的预测位置与人工标注之间的 RMSE（像素），再取所有测试帧的<b>中位数</b>。数字越小越好。第 1、2 步是例外，用的是全部关键点合在一起的 RMSE。每一步用的视频、数据、模型和指标，都写在那一步开头的“基本信息”里。作为参照：眼睛宽度约 320–390 px，所以 10 px 约为眼宽的 3%。</p>
     <p><b>训练配置（第 1、2 步选定，两个阶段都使用）：</b>ResNet-50，batch 2。每个模型都从 ImageNet 预训练权重开始重新训练，不接着我们自己之前的模型继续训。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>How error is measured (same on the whole page):</b> Each video has a set of human-labeled test frames that are never used for training or for any decision. For each frame we take the RMSE (pixels) between predicted and human positions over the 8 points, then the <b>median</b> over the test frames. Lower is better. For scale: the eye is about 320–390 px wide, so 10 px is about 3% of the eye width.</p>
+    <p><b>How error is measured:</b> Each video has a set of human-labeled test frames that are never used for training or for any decision. For each frame we take the RMSE (pixels) between predicted and human positions over the 8 points, then the <b>median</b> over the test frames. Lower is better. Steps 1 and 2 are the exception and use the RMSE over all keypoints together. The video, data, model and metric of every step are listed in the "Basic information" table at its start. For scale: the eye is about 320–390 px wide, so 10 px is about 3% of the eye width.</p>
     <p><b>Training recipe (chosen in steps 1 and 2, used in both phases):</b> ResNet-50, batch 2. Every model is trained anew from ImageNet-pretrained weights; it never continues from one of our earlier models.</p>
   </div>
 
@@ -156,6 +158,16 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 1 -->
 <section id="s1">
   <h2><span class="no">1</span><span lang="zh">选 batch size：batch 2</span><span lang="en">Batch size: batch 2</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段（瞳孔上点标在看得见的瞳孔的最高处）；全部标注在 9 月 10 日重新审核过。</span><span lang="en">Phase 1 (pupil top at the highest point of the visible pupil); all labels were re-reviewed on 2026-09-10.</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">前 4 分钟里人工标注的 100 帧：最初 20 帧按画面外观聚类（k-means）挑选，其余 80 帧按时间顺序补充。按时间先后排序，最早的 80 帧（0–33 秒）用于训练。</span><span lang="en">100 hand-labeled frames from the first 4 minutes: the first 20 picked by clustering image appearance (k-means), the other 80 added in time order. Sorted by time, the earliest 80 (0–33 s) are the training set.</span></td></tr>
+    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">同一批 100 帧里时间最晚的 20 帧（34–236 秒），与训练帧相隔 1.2 秒以上。用来选 batch size。</span><span lang="en">The latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the batch size.</span></td></tr>
+    <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">HRNet-W32（当时使用的模型），从 ImageNet 预训练权重开始训练 100 轮，CPU；学习率在第 80、95 轮下降；每个 batch size 训练一次；取内部验证 mAP 最高的那次存档来打分。</span><span lang="en">HRNet-W32 (the model in use at that time), trained for 100 epochs from ImageNet-pretrained weights on CPU; learning rate drops at epochs 80 and 95; one run per batch size; the snapshot with the best internal validation mAP is scored.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">测试帧上全部关键点合在一起的 RMSE（像素）。这一步和第 2 步用这个指标，第 3 步起用中位帧 RMSE。</span><span lang="en">RMSE over all keypoints of all test frames (pixels). This step and step 2 use this metric; from step 3 on the median frame RMSE is used.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>用审核后的标注（前 80 帧训练，后 20 帧验证），batch size 取 2、4、8、16 各训练一次（100 轮）。选择规则在看结果之前定好：内部验证损失最低的 batch。最后 1 分钟的测试帧只用来报告，不参与选择。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>With the reviewed labels (first 80 frames train, last 20 validate), one run each at batch 2, 4, 8, 16 (100 epochs). The selection rule was fixed before looking at results: lowest internal validation loss. The final-minute test frames are report-only.</p>
   <figure>
@@ -170,6 +182,16 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 2 -->
 <section id="s2">
   <h2><span class="no">2</span><span lang="zh">选模型：ResNet-50</span><span lang="en">Backbone: ResNet-50</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段（瞳孔上点标在看得见的瞳孔的最高处）；全部标注在 9 月 10 日重新审核过。</span><span lang="en">Phase 1 (pupil top at the highest point of the visible pupil); all labels were re-reviewed on 2026-09-10.</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">与第 1 步相同：最早的 80 帧训练。</span><span lang="en">Same as step 1: the earliest 80 frames.</span></td></tr>
+    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">与第 1 步相同：最晚的 20 帧。用来选模型。</span><span lang="en">Same as step 1: the latest 20 frames. Used to choose the model.</span></td></tr>
+    <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">5 种模型（ResNet-50、HRNet-W18、HRNet-W32、HRNet-W48、CSPNeXt-S），batch 2，各训练 100 轮，CPU，其余设置与第 1 步相同，每种训练一次。</span><span lang="en">Five models (ResNet-50, HRNet-W18, HRNet-W32, HRNet-W48, CSPNeXt-S), batch 2, 100 epochs each on CPU, other settings as in step 1, one run each.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">与第 1 步相同：全部关键点合在一起的 RMSE。</span><span lang="en">Same as step 1: RMSE over all keypoints.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>同样的数据和设置（batch 2，100 轮），比较 5 种模型：ResNet-50、HRNet-W18 / W32 / W48、CSPNeXt-S。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Same data and settings (batch 2, 100 epochs), five backbones: ResNet-50, HRNet-W18 / W32 / W48, CSPNeXt-S.</p>
   <figure>
@@ -184,6 +206,16 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 3 -->
 <section id="s3">
   <h2><span class="no">3</span><span lang="zh">主动学习：让算法挑帧来补标，80 帧之后没有带来改善</span><span lang="en">Active learning: algorithm-picked frames brought no gain beyond 80 labels</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段。第 6 轮起眨眼帧的眼睑也要标。</span><span lang="en">Phase 1. From round 6 on, the eyelids are labeled in blink frames too.</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">起点是第 1 步的 80 帧。每一轮：模型预测前 4 分钟的全部 14,400 帧，由找帧算法标出可疑帧，再按画面外观聚类从中挑 20 帧，人工改正全部 8 个点后加入训练集。三种算法各自独立累加，11 轮后每条线 300 帧。</span><span lang="en">Starts from the 80 frames of step 1. Each round the model predicts all 14,400 frames of the first 4 minutes, the detector flags suspicious frames, 20 of them are picked by clustering image appearance, all 8 points are corrected by hand and the frames are added to the training set. The three detectors accumulate independently; after 11 rounds each branch has 300 frames.</span></td></tr>
+    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">第 1 步的 20 帧，始终不变。</span><span lang="en">The 20 frames of step 1, never changed.</span></td></tr>
+    <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">ResNet-50，batch 2，100 轮，学习率在第 80、95 轮下降，Apple 芯片 GPU（MPS）训练。每一轮都从 ImageNet 预训练权重重新训练。图中每个点是内部验证 mAP 最高的存档，只训练一次。</span><span lang="en">ResNet-50, batch 2, 100 epochs, learning rate drops at epochs 80 and 95, trained on the Apple GPU (MPS). Every round is trained anew from ImageNet-pretrained weights. Each point in the figure is the snapshot with the best internal validation mAP, from a single run.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">中位帧 RMSE：对每一帧算 8 个点的 RMSE，再取 100 帧的中位数。</span><span lang="en">Median frame RMSE: the RMSE over the 8 points of each frame, then the median over the 100 frames.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>从 80 帧起步，每轮让算法在视频里找“模型可能出错的帧”，人工标 20 帧加进去，重新训练。三种找帧算法各走一条线：置信度低的帧（uncertain）、关键点在相邻帧之间突然跳动的帧（jump）、偏离平滑轨迹的帧（fitting）。一共 11 轮，每条线从 80 帧加到 300 帧。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Starting from 80 labels, each round an algorithm searched the video for frames where the model is probably wrong; a person labeled 20 of them and the model was retrained. Three detectors ran as three branches: low confidence (uncertain), keypoints jumping between consecutive frames (jump), deviation from a smooth trajectory (fitting). 11 rounds, each branch from 80 to 300 labels.</p>
   <figure>
@@ -191,13 +223,20 @@ code{font-family:var(--mono);font-size:.9em}
     <figcaption lang="zh"><span class="tag">怎么看：</span>横轴是累计训练帧数，三种颜色是三种算法。<b>中间一幅是主要指标</b>（中位帧 RMSE）：三条线一直在 15.7–17.5 px 之间上下波动，没有下降趋势；红线（jump）多数时候略低；注意这幅图的纵轴只跨 2 px。左边一幅是均值，会被几帧严重错误拉高（蓝线在 120–140 帧的尖峰就是几帧眨眼造成的）。</figcaption>
     <figcaption lang="en"><span class="tag">How to read:</span>x = cumulative training frames, the three colours are the three detectors. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变。三种算法没有明显差距，jump 略微领先：11 轮的平均中位误差是 jump 16.4 px、uncertain 16.8 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低；但差距只有 0.4–0.6 px，小于同一设置重复训练时的波动，所以不能说 jump 确实更好。之后的实验统一用 jump 挑帧。新标准下在同一个视频上重做，结果一致（第 8 步，视频 0：20–100 帧都在 12–13 px）。更正记录：第 6 轮曾报告“误差下降”，后来查出是中途换了误差公式造成的，已撤回（9 月 18 日）；这张图是统一公式后重算的。从此规定：同一个指标只用同一个脚本、同一个公式。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>On this video (phase-1 label standard) about 80 labels already saturate; 300 labels give the same error. The three detectors show no clear gap, with jump slightly ahead: the mean of the median error over the 11 rounds is 16.4 px for jump, 16.8 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds; but the gap is only 0.4–0.6 px, smaller than the run-to-run variation of one setting, so jump cannot be called truly better. All later experiments pick frames with jump. Redone on the same video under the new standard, the result is the same (step 8, video 0: 12–13 px anywhere from 20 to 100 labels). Correction on record: a "drop" reported at round 6 was traced to a change of error formula mid-series and was retracted (2026-09-18); this figure is recomputed with one formula. Rule since then: one metric, one script, one formula.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>在这个视频上（第一阶段的标注标准），约 80 帧就已经饱和，加到 300 帧误差不变。三种算法没有明显差距，jump 略微领先：11 轮的平均中位误差是 jump 16.4 px、uncertain 17.0 px、fitting 17.0 px，11 轮里有 8 轮 jump 最低；但差距只有约 0.6 px，小于同一设置重复训练时的波动，所以不能说 jump 确实更好。之后的实验统一用 jump 挑帧。新标准下在同一个视频上重做，结果一致（第 8 步，视频 0：20–100 帧都在 12–13 px）。更正记录：第 6 轮曾报告“误差下降”，后来查出是中途换了误差公式造成的，已撤回（9 月 18 日）；这张图是统一公式后重算的。从此规定：同一个指标只用同一个脚本、同一个公式。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>On this video (phase-1 label standard) about 80 labels already saturate; 300 labels give the same error. The three detectors show no clear gap, with jump slightly ahead: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds; but the gap is only about 0.6 px, smaller than the run-to-run variation of one setting, so jump cannot be called truly better. All later experiments pick frames with jump. Redone on the same video under the new standard, the result is the same (step 8, video 0: 12–13 px anywhere from 20 to 100 labels). Correction on record: a "drop" reported at round 6 was traced to a change of error formula mid-series and was retracted (2026-09-18); this figure is recomputed with one formula. Rule since then: one metric, one script, one formula.</p>
 </section>
 
 <!-- 4 -->
 <section id="s4">
   <h2><span class="no">4</span><span lang="zh">时间序列：不用标注就能分出眨眼、眼动和追踪丢失</span><span lang="en">Time series: blinks, eye movements and tracking loss without labels</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">同一个 5 分钟视频的前 4 分钟，全部 14,400 帧。</span><span lang="en">The first 4 minutes of the same 5-minute video, all 14,400 frames.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段。这一步不使用任何人工标注。</span><span lang="en">Phase 1. No human labels are used in this step.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">第 3 步 jump 那条线第 10 轮的模型（ResNet-50，280 帧训练）。</span><span lang="en">The round-10 model of the jump branch of step 3 (ResNet-50, 280 training frames).</span></td></tr>
+    <tr><th><span lang="zh">数据</span><span lang="en">Data</span></th><td><span lang="zh">模型对每一帧的预测。由 8 个点算出瞳孔中心、眼睛睁开高度（上下眼睑两点的距离）、瞳孔面积和瞳孔点的最低置信度。偏离 1 秒滚动中位数超过 5 倍稳健标准差的帧标为异常。</span><span lang="en">The model's prediction of every frame. From the 8 points: pupil centre, eye opening (distance between the two eyelid points), pupil area and the lowest confidence of the pupil points. Frames more than 5 robust deviations away from a 1-second rolling median are marked as anomalies.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>让模型预测前 4 分钟的每一帧（14,400 帧，60 帧/秒），把瞳孔中心位置、眼睛睁开高度、瞳孔面积、置信度随时间画出来。偏离 1 秒滚动中位数太远的帧标为异常（红点）。然后对每个大的异常，回到视频里逐个看是什么。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>The model predicted every frame of the first 4 minutes (14,400 frames, 60 fps). Pupil-centre position, eye opening, pupil area and confidence were plotted over time; frames far from a 1-second rolling median are marked as anomalies (red dots). Each large anomaly was then checked in the video.</p>
   <figure>
@@ -217,6 +256,13 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 5 -->
 <section id="s5">
   <h2><span class="no">5</span><span lang="zh">瞳孔面积怎么算（旧标注标准）：用左、右、下三个点</span><span lang="en">Pupil area (old label standard): from the left, right and bottom points</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段（瞳孔上点标在看得见的瞳孔的最高处）；全部标注在 9 月 10 日重新审核过。</span><span lang="en">Phase 1 (pupil top at the highest point of the visible pupil); all labels were re-reviewed on 2026-09-10.</span></td></tr>
+    <tr><th><span lang="zh">数据</span><span lang="en">Data</span></th><td><span lang="zh">时间曲线用第 3 步模型对前 4 分钟 14,400 帧的预测；准确度用最后 1 分钟的 100 帧测试帧，把同一种算法分别用在模型预测的点和人工标注的点上，比较两者的面积和中心。</span><span lang="en">The traces use the predictions of the step-3 model on the 14,400 frames of the first 4 minutes; accuracy is measured on the 100 test frames of the final minute by applying the same rule to the predicted points and to the human points and comparing area and centre.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">面积误差（%）和中心误差（像素）的中位数与第 90 百分位数。</span><span lang="en">Median and 90th percentile of the area error (%) and of the centre error (pixels).</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>当时的标注标准下，瞳孔上点标在“看得见的瞳孔”的最高处，瞳孔上缘常被上眼睑挡住，所以上点其实落在眼睑边上。比较了两种算法：四点椭圆（用上下左右四个点），和三点椭圆（左右两点定中心和宽度，下点定半高，不用上点）。另外实现了眨眼处理：眨眼期间的帧标为“不可信”，面积用前后插值代替。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Under the label standard of that time the pupil-top point was placed at the top of the visible pupil; the upper pupil edge is often hidden by the lid, so the top point really sat on the lid. Two rules were compared: a 4-point ellipse (all four points) and a 3-point ellipse (left and right give centre and width, bottom gives the half-height, top unused). Blink handling was added: frames during a blink are marked untrusted and the area is interpolated across them.</p>
   <figure>
@@ -241,6 +287,16 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 6 -->
 <section id="s6">
   <h2><span class="no">6</span><span lang="zh">换一只新老鼠：旧模型不能用，标 20 帧就恢复</span><span lang="en">A new mouse: the old model fails, 20 labels recover it</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第二只老鼠 Pluto，2025-10-31 的一段 19.9 分钟视频（60 帧/秒，71,748 帧）。</span><span lang="en">Second mouse, Pluto, a 19.9-minute video of 2025-10-31 (60 fps, 71,748 frames).</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段。</span><span lang="en">Phase 1.</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">第一只老鼠已审核的全部 676 帧，加上 Pluto 视频里逐批标注的帧（每批 20 帧，从视频前 80% 里挑）。</span><span lang="en">All 676 reviewed frames of the first mouse plus the Pluto frames labeled batch by batch (20 per batch, picked from the first 80% of the video).</span></td></tr>
+    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">视频第 80%–90% 的部分，与前后各隔 2 秒。</span><span lang="en">The part between 80% and 90% of the video, with 2-second guards on both sides.</span></td></tr>
+    <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">视频最后 10% 里均匀取的帧，按时间顺序标了前 59 帧后冻结。只用来报告成绩。</span><span lang="en">Frames evenly spaced over the final 10% of the video; the first 59 in time order were labeled and then frozen. Used only to report the score.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">ResNet-50，batch 2，100 轮，学习率在第 80、95 轮下降，每一步都从 ImageNet 预训练权重重新训练。0 帧那个点是第 3 步结束后合并训练出的模型直接使用。成绩取最后一轮的存档。</span><span lang="en">ResNet-50, batch 2, 100 epochs, learning rate drops at epochs 80 and 95, every step trained anew from ImageNet-pretrained weights. The 0-label point is the merged model from the end of step 3 applied unchanged. The final snapshot is scored.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">59 帧测试帧上的中位帧 RMSE。</span><span lang="en">Median frame RMSE on the 59 test frames.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>拿第二只老鼠（Pluto）的一段 20 分钟视频。先把只在第一只老鼠上训练的模型直接用上去（0 帧），再每次加 20 帧 Pluto 的标注重新训练，直到 80 帧。测试集是 Pluto 视频里留出的 59 帧。这里第一次使用后来一直沿用的挑帧办法：第一批 20 帧按画面外观聚类挑选（不需要模型）；之后每批先让模型预测整段视频，找出关键点在相邻两帧之间跳动超过眼宽 3% 的帧，再从这些帧里聚类挑 20 帧。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>A 20-minute video of a second mouse (Pluto). First the model trained only on the first mouse was applied unchanged (0 labels), then 20 Pluto labels were added at a time up to 80. The test set is 59 held-out Pluto frames. The frame-picking procedure used ever since was introduced here: the first 20 frames by clustering image appearance (no model needed); every later batch by predicting the whole video, flagging frames where a keypoint jumps by more than 3% of the eye width between consecutive frames, and clustering 20 frames out of those.</p>
   <figure>
@@ -321,6 +377,16 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 8 -->
 <section id="s8">
   <h2><span class="no">8</span><span lang="zh">主线：每个新视频要标多少帧</span><span lang="en">Main line: labels needed per new video</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">视频 0：第一只老鼠的 5 分钟视频。视频 1–10：Pluto 的 19.9 分钟视频。视频 11 起：Terra 的 19.9 分钟视频。都是 60 帧/秒。</span><span lang="en">Video 0: the 5-minute video of the first mouse. Videos 1–10: 19.9-minute videos of Pluto. From video 11: 19.9-minute videos of Terra. All at 60 fps.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第二阶段（第 7 步的定义）。</span><span lang="en">Phase 2 (the definitions of step 7).</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">之前各视频带入的标注（见下表）加上这个视频自己的标注。自己的标注从视频前 80% 里挑：第一批 20 帧按画面外观聚类，之后每批 20 帧从跳动大的帧里聚类；每批先由模型预标，人再逐帧改正。</span><span lang="en">The labels carried from earlier videos (table below) plus this video's own labels. Its own labels are picked from the first 80% of the video: the first 20 by clustering image appearance, each later batch of 20 by clustering among the frames with large jumps; the model pre-labels each batch and a person corrects every frame.</span></td></tr>
+    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">视频第 80%–90% 的部分里取 20 帧，与前后各隔 2 秒。</span><span lang="en">20 frames from the part between 80% and 90% of the video, with 2-second guards on both sides.</span></td></tr>
+    <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">视频最后 10% 里按时间均匀取 50 帧，人工标注后冻结。只用来报告成绩。</span><span lang="en">50 frames evenly spaced in time over the final 10% of the video, labeled by hand and frozen. Used only to report the score.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">ResNet-50，batch 2，120 轮，学习率在第 96、114 轮下降，MPS 训练，CPU 打分。每一步都从 ImageNet 预训练权重重新训练，只训练一次。成绩取最后一轮（第 120 轮）的存档。</span><span lang="en">ResNet-50, batch 2, 120 epochs, learning rate drops at epochs 96 and 114, trained on MPS, scored on CPU. Every step is trained anew from ImageNet-pretrained weights, a single run. The final snapshot (epoch 120) is scored.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">该视频 50 帧测试帧上的中位帧 RMSE（8 个点）。</span><span lang="en">Median frame RMSE (8 points) on the 50 test frames of that video.</span></td></tr>
+  </tbody></table></div>
   <div class="text" lang="zh">
     <p><span class="tag">做了什么：</span>把视频一个一个加进来：视频 0 是第一只老鼠的 5 分钟视频，视频 1–10 是 Pluto 的 20 分钟视频，一天一个，从 2025-10-31 往前到 10-22（视频 1、2、3 是同一天）；视频 11 起是第三只老鼠 Terra，同样一天一个，从 2025-10-17 往前。每个视频的流程相同：</p>
     <ol>
@@ -410,6 +476,15 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 9 -->
 <section id="s9">
   <h2><span class="no">9</span><span lang="zh">只标 5 帧或 10 帧够不够：多数视频不够</span><span lang="en">Are 5 or 10 labels enough: not on most videos</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">与第 8 步相同的各个视频。</span><span lang="en">The same videos as in step 8.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第二阶段（第 7 步的定义）。</span><span lang="en">Phase 2 (the definitions of step 7).</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">与该视频第 1 步的训练集相同，只是该视频自己的 20 帧换成其中的 5 帧或 10 帧。子集按画面外观挑（把第一批的 20 个聚类合并成 5 组或 10 组，每组取一帧），不依赖任何模型；每种大小取两组（a、b）。</span><span lang="en">The training set of that video's step 1, with the video's own 20 labels replaced by 5 or 10 of them. The subsets are picked by image appearance (the 20 clusters of the first batch are merged into 5 or 10 groups and one frame is taken from each) and depend on no model; two subsets (a, b) per size.</span></td></tr>
+    <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">与第 8 步相同：该视频的 50 帧测试帧。</span><span lang="en">Same as step 8: the 50 test frames of that video.</span></td></tr>
+    <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">与第 8 步相同。</span><span lang="en">Same as step 8.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">与第 8 步相同。</span><span lang="en">Same as step 8.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>每个视频的第一批有 20 帧标注。从中取 5 帧或 10 帧（各取两组不同的帧，记为 a、b），其余条件和该视频第 1 步完全相同，重新训练并打分。不需要新的标注。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Each video's first batch has 20 labels. 5 or 10 of them were taken (two different subsets each, a and b), everything else exactly as in that video's step 1, then retrained and scored. No new labeling is needed.</p>
   <div class="tablebox">
@@ -455,6 +530,13 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 10 -->
 <section id="s10">
   <h2><span class="no">10</span><span lang="zh">加入新视频会不会让旧视频变差：不会</span><span lang="en">Do new videos hurt old ones: no</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第 8 步的全部视频。</span><span lang="en">All videos of step 8.</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第二阶段（第 7 步的定义）。</span><span lang="en">Phase 2 (the definitions of step 7).</span></td></tr>
+    <tr><th><span lang="zh">数据</span><span lang="en">Data</span></th><td><span lang="zh">第 8、9 步训练出的每一个模型（最后一轮的存档），在每一个视频的 50 帧测试帧上打分。没有新的训练，也没有新的标注。</span><span lang="en">Every model trained in steps 8 and 9 (final snapshot) is scored on the 50 test frames of every video. No new training and no new labels.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">与第 8 步相同：中位帧 RMSE。</span><span lang="en">Same as step 8: median frame RMSE.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>把这条线上训练过的每一个模型，拿到每一个视频的测试集上打分（回测）。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>Every model trained along the sequence was scored on the test set of every video (back-test).</p>
   <figure>
@@ -474,6 +556,13 @@ code{font-family:var(--mono);font-size:.9em}
 <!-- 11 -->
 <section id="s11">
   <h2><span class="no">11</span><span lang="zh">瞳孔面积和眨眼（新标注标准）</span><span lang="en">Pupil area and blinks (new label standard)</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">视频 0–7（面积）和视频 0–4（眨眼）。</span><span lang="en">Videos 0–7 (area) and videos 0–4 (blinks).</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第二阶段（第 7 步的定义）。</span><span lang="en">Phase 2 (the definitions of step 7).</span></td></tr>
+    <tr><th><span lang="zh">数据</span><span lang="en">Data</span></th><td><span lang="zh">各视频的测试帧。真值是人工标注的四个瞳孔点算出的椭圆面积；模型一侧用每个视频最后训练的模型的预测。眨眼部分用人工判断为闭眼的 16 帧和睁眼的 687 帧。</span><span lang="en">The test frames of each video. Truth is the ellipse area from the four human pupil points; on the model side, the predictions of the last model trained on each video. The blink part uses 16 frames a person judged as eye-closed and 687 judged as open.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">面积误差的中位数（%）；区分闭眼帧和睁眼帧的 AUC。</span><span lang="en">Median area error (%); AUC for separating closed-eye from open-eye frames.</span></td></tr>
+  </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>换成椭圆标注标准后，重新比较面积的算法：三点法（第 5 步的做法）、四点法（宽 × 上下高度），以及“每帧去掉一个点”的几种变体。以人工标注的四点椭圆面积为真值。同时在多个视频上检查现有眨眼规则：哪个信号最能把人工认定的闭眼帧分出来。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>With the ellipse label standard the area rules were compared again: the 3-point rule (step 5), the 4-point rule (width × top-to-bottom height) and several "drop one point" variants. Truth = the 4-point ellipse area from the human labels. The current blink rule was also checked on several videos: which signal best separates the frames a person marked as eye-closed.</p>
   <figure>
