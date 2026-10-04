@@ -253,3 +253,10 @@ times with a different emphasis:
 | `all_videos_view_main.png` | main line: each video's own test set while its own labels are added |
 | `all_videos_view_fewer.png` | first batch of 5 / 10 labels: the band spans the two subsets (a, b) of each size. These models were only trained and scored afterwards; no jump selection and no further labeling followed them |
 | `all_videos_view_backtest.png` | back-test: each test set after its own block, one colour per video |
+
+## Videos 4, 5 and 8: larger errors (note of 2026-10-04)
+
+Plateau errors 15.01, 15.85 and 25.34 px. The labeler's judgement: these videos are blurry and the pupil edge and
+point positions are hard to identify even by eye, so the human labels themselves are less certain. Not confirmed by a
+number: whole-image sharpness (variance of the Laplacian) and brightness of the 50 test frames do not differ between
+these three and the other Pluto videos (sharpness 738-833 for videos 4, 5, 8; 774-854 for videos 1-3, 6, 7, 9).
