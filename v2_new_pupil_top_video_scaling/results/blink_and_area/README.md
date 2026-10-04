@@ -38,6 +38,12 @@ Truth `A = pi/4 * |xR - xL| * |yB - yT|` from the human points; error of a frame
 3. A median filter over time does not help: the error is not frame-to-frame jitter.
 4. Videos 4 and 8 have 43.8% and 24.0% (four-point); these are the videos with the largest keypoint error
    (15.01 and 25.34 px). The pooled 90th percentile is 46%.
+5. Why the four-point rule is better: both rules use the same width; the three-point rule has no top point and assumes
+   that the left and right points lie exactly at mid-height of the ellipse (height = twice the distance from the bottom
+   point to the line through them). A labeler cannot place them exactly at mid-height; the four-point rule uses only
+   their x coordinates and is not affected, the three-point rule doubles the offset into the height. The three-point
+   formula applied to the human points themselves (rows `no_top_on_human_labels` of the CSV, no model involved)
+   differs from the human four-point area by a median of 4.7% (90th percentile 12.3%; 13.0% on video 3, 9.0% on video 6).
 
 ## B. Eye closure
 

@@ -21,6 +21,7 @@ A. Area. Frames: the 50 frozen test frames of each video whose four pupil points
      four_fallback four when all four confidences >= 0.6, otherwise drop_lowconf
      four_med5     centred 5-frame median of the `four` trace
      four_med31    centred 31-frame (0.5 s) median of the `four` trace
+   Also `no_top_on_human_labels`: the no_top formula on the human points against A (no model involved).
    Error of a frame = 100 * |A_hat - A| / A; per video and pooled: median, 90th percentile, median signed error.
 
 B. Eye closure. Truth from the human labels: closed = all four pupil points left empty, open = all four labeled
@@ -172,8 +173,15 @@ for r in PL.itertuples():
                       "median_abs_err_pct": round(float(np.median(np.abs(e))), 2), "p90_abs_err_pct": round(float(np.percentile(np.abs(e), 90)), 2),
                       "median_signed_err_pct": round(float(np.median(e)), 2)})
         perframe += [{"video": r.video, "rule": rule, "err": x} for x in e]
+    # the three-point formula on the HUMAN points against the human four-point area: how far the rule's assumption
+    # (left and right points at mid-height of the ellipse) is from the labels themselves, no model involved
+    e = (areas(gt)["no_top"].to_numpy(float) - truth) / truth * 100
+    rowsA.append({"video": r.video, "unit": r.unit, "model_step": "human labels", "rule": "no_top_on_human_labels", "n": len(e),
+                  "median_abs_err_pct": round(float(np.median(np.abs(e))), 2), "p90_abs_err_pct": round(float(np.percentile(np.abs(e), 90)), 2),
+                  "median_signed_err_pct": round(float(np.median(e)), 2)})
+    perframe += [{"video": r.video, "rule": "no_top_on_human_labels", "err": x} for x in e]
 PF = pd.DataFrame(perframe)
-for rule in RULES:
+for rule in RULES + ["no_top_on_human_labels"]:
     e = PF[PF.rule == rule].err.to_numpy()
     rowsA.append({"video": "all", "unit": "all videos pooled", "model_step": "", "rule": rule, "n": len(e),
                   "median_abs_err_pct": round(float(np.median(np.abs(e))), 2), "p90_abs_err_pct": round(float(np.percentile(np.abs(e), 90)), 2),

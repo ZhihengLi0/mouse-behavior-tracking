@@ -651,6 +651,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>分视频看，四点法在 12 个视频里的 8 个上比三点法低；视频 1、2、5、7 上三点法更低。</li>
       <li>时间上的中位数滤波没有帮助（5 帧 6.5%，0.5 秒 6.8%）：误差主要不是帧与帧之间的抖动。</li>
       <li>误差在视频之间差别很大：8 个视频在 2–10% 之间，视频 4 是 43.8%，视频 8 是 24.0%。这两个视频也是关键点误差最大的两个（第 5 步：15.01 px 和 25.34 px）。合并后的第 90 百分位数是 46%，即十帧里有一帧面积差了将近一半。</li>
+      <li><b>为什么四点法更好：</b>两种算法的宽度相同，区别在高度。四点法的高度直接量上点到下点的距离。三点法没有上点，要假设左右两点正好在椭圆的中间高度上，再把“下点到左右两点连线的距离”乘以 2 当作高度。人标注时左右两点不可能严格落在中间高度，总会偏上或偏下几个像素；四点法只用左右两点的横坐标，不受这个偏差影响，三点法却把它放大两倍算进高度。把三点法的公式直接用在人工标注的点上（不经过模型），和人工四点面积相比，594 帧的中位差是 4.7%（视频 3 是 13.0%，视频 6 是 9.0%）。模型是照着人的标注学的，也带着同样的偏差。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion on the area:</span>Among these rules the four-point rule has the lowest error, but on some videos the area is still not accurate.
@@ -659,6 +660,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Per video the four-point rule is lower than the three-point rule on 8 of the 12 videos; on videos 1, 2, 5 and 7 the three-point rule is lower.</li>
       <li>A median filter over time does not help (5 frames 6.5%, 0.5 s 6.8%): the error is mostly not frame-to-frame jitter.</li>
       <li>The error differs a lot between videos: 2–10% on 8 videos, 43.8% on video 4 and 24.0% on video 8, the two videos with the largest keypoint error (step 5: 15.01 and 25.34 px). The pooled 90th percentile is 46%: in one frame of ten the area is off by almost half.</li>
+      <li><b>Why the four-point rule is better:</b> both rules use the same width; they differ in the height. The four-point rule measures the height directly from top to bottom. The three-point rule has no top point, so it assumes that the left and right points lie exactly at mid-height of the ellipse and takes twice the distance from the bottom point to the line through them. A labeler cannot place the left and right points exactly at mid-height; they are always a few pixels too high or too low. The four-point rule uses only the x coordinates of these two points and is not affected, whereas the three-point rule doubles this offset into the height. Applying the three-point formula to the human points themselves (no model involved) differs from the human four-point area by a median of 4.7% over the 594 frames (13.0% on video 3, 9.0% on video 6). The model learns from the human labels and carries the same offset.</li>
     </ol>
   </div>
 
