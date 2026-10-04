@@ -69,7 +69,7 @@ is preferred over an exact one.
 
 ![corners](figures/fig2_corners_zoom.jpg)
 
-Construction of the corners: solid = eyelid margin where it is seen, dashed = its extension; the corner is the crossing. Yellow = the placement that is easy to get wrong.
+Construction of the corners (redrawn after the hand sketch used in the discussion of 2026-09-20): solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner; cyan = the labelled point. Yellow crosses = the first placement of that day, which is also the easy mistake. Nasal corner: the lower-left margin and the upper margin are each continued until they cross. Temporal corner: the lower margin is continued upwards along the outer line and meets the upper margin to the right of the reflections.
 
 ![construction corners](figures/fig7_construction_corners.jpg)
 

@@ -41,6 +41,9 @@ FIGURES = [
     (V2 / "results/cross_video_matrix.png", "cross_video_matrix.jpg", 2470),
     (V2 / "results/pupil_area_variants.png", "fig_area_variants.jpg", 2000),
     (V2 / "results/blink_area_consistency.png", "fig_blink_area.jpg", 2400),
+    (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
+    (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
+    (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
 ]
 try:
     import cv2

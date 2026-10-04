@@ -143,27 +143,50 @@ def note(ax, text, at, to, color):
                 bbox=dict(fc="black", ec="none", alpha=0.65, pad=3), arrowprops=dict(arrowstyle="-", color=color, lw=0.8))
 
 
+def smooth(points, n=200):
+    """Smooth curve through points picked by eye on the image (chord-length cubic spline)."""
+    from scipy.interpolate import CubicSpline
+    pts = np.array(points, float)
+    s = np.r_[0, np.cumsum(np.linalg.norm(np.diff(pts, axis=0), axis=1))]
+    return CubicSpline(s, pts)(np.linspace(0, s[-1], n)).T
+
+
+# Fig 7 follows the user's sketch sent to the advisor on 2026-09-20 (Slack): the eyelid margins are traced where they are
+# sharp (solid), continued to where they cross (dashed), and the crossing is circled. Traced by eye on this frame.
 name = "img015001.png"
 A, B = load(f"{BK}/test50").loc[name], load(new0).loc[name]
 img = bright(image(new0, name))
+n, t = xy(B, "eye_nasal_corner"), xy(B, "eye_temporal_corner")
+et, eb = xy(B, "eyelid_top"), xy(B, "eyelid_bottom")
+UPPER = [(420, 350), (480, 339), (550, 332), tuple(et), (700, 336), (765, 358), (812, 398)]      # upper margin, sharp part
+UPPER_L = [tuple(n + (-14, 9)), tuple(n), (385, 359), (420, 350)]                               # continued to the left
+UPPER_R = [(812, 398), (840, 430), tuple(t), tuple(t + (5, 16))]                                # continued to the right
+LOWER = [(410, 482), (440, 540), (480, 581), (540, 611), tuple(eb), (700, 620), (775, 603)]      # lower margin, sharp part
+LOWER_L = [tuple(n + (-7, -22)), tuple(n), (383, 428), (410, 482)]                              # continued up to the crossing
+LOWER_R = [(775, 603), (838, 572), (874, 524), (870, 484), tuple(t)]                             # outer line, right of the reflections
 fig, axes = plt.subplots(1, 3, figsize=(19, 6.2), constrained_layout=True)
 for ax in axes:
     ax.imshow(img, cmap="gray", vmin=0, vmax=255); ax.set_xticks([]); ax.set_yticks([])
-    lid_lines(ax, A, YELLOW, lw=1.1); lid_lines(ax, B, CYAN)
+    for solid in (UPPER, LOWER):
+        ax.plot(*smooth(solid), "-", color=RED, lw=1.6)
+    for dashed in (UPPER_L, UPPER_R, LOWER_L, LOWER_R):
+        ax.plot(*smooth(dashed), "--", color=RED, lw=1.4)
+    for c in (n, t):
+        ax.add_patch(plt.Circle(c, 13, fill=False, ec=RED, lw=1.6))
     for bp in ("eye_nasal_corner", "eye_temporal_corner"):
-        ax.plot(*xy(A, bp), "x", color=YELLOW, ms=9, mew=2); ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=8)
+        ax.plot(*xy(A, bp), "x", color=YELLOW, ms=10, mew=2.2); ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=7)
     for bp in ("eyelid_top", "eyelid_bottom"):
         ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=6)
-crop(axes[0], B, pad=55); axes[0].set_title("whole eye: solid = eyelid margin where it is seen, dashed = its extension to the corner", fontsize=10)
-n, t = xy(B, "eye_nasal_corner"), xy(B, "eye_temporal_corner")
-crop(axes[1], B, box=(n[0] - 70, n[0] + 190, n[1] - 90, n[1] + 110)); axes[1].set_title("nasal corner (left)", fontsize=10)
-note(axes[1], "correct: crossing of the two\nextended margins, on the LEFT\nborder of the shadow", n, n + (95, -62), CYAN)
-note(axes[1], "wrong: inside the shadow\n(margins cut short)", xy(A, "eye_nasal_corner"), xy(A, "eye_nasal_corner") + (95, 45), YELLOW)
-crop(axes[2], B, box=(t[0] - 190, t[0] + 70, t[1] - 100, t[1] + 100)); axes[2].set_title("temporal corner (right)", fontsize=10)
-note(axes[2], "correct: lower margin extended\nupwards (outer line), apex of the dark\narea right of the reflections", t, t + (-75, -78), CYAN)
-note(axes[2], "wrong: inner line,\nnext to the reflection", xy(A, "eye_temporal_corner"), xy(A, "eye_temporal_corner") + (-95, 70), YELLOW)
-fig.suptitle("How the corners are constructed (5-min video, img015001). Cyan = current definition, yellow = the placement that is easy to get wrong (first definition of 2026-09-20). "
-             "Lines are guides drawn through the labelled points", fontsize=10)
+crop(axes[0], B, pad=60); axes[0].set_title("whole eye", fontsize=10)
+crop(axes[1], B, box=(n[0] - 110, n[0] + 190, n[1] - 90, n[1] + 150)); axes[1].set_title("nasal corner (left)", fontsize=10)
+note(axes[1], "correct (circle): the lower-left margin and the upper\nmargin are continued until they cross", n, n + (60, -62), CYAN)
+note(axes[1], "wrong: where the dark part ends;\nthe margins are cut short", xy(A, "eye_nasal_corner"), xy(A, "eye_nasal_corner") + (105, 60), YELLOW)
+crop(axes[2], B, box=(t[0] - 200, t[0] + 60, t[1] - 110, t[1] + 170)); axes[2].set_title("temporal corner (right)", fontsize=10)
+note(axes[2], "correct (circle): the lower margin continued upwards along\nthe OUTER line, right of the reflections, meets the upper margin", t, t + (-95, -85), CYAN)
+note(axes[2], "wrong: inner line,\nnext to the reflection", xy(A, "eye_temporal_corner"), xy(A, "eye_temporal_corner") + (-105, 75), YELLOW)
+fig.suptitle("How the two corners are constructed (5-min video, img015001), after the sketch of 2026-09-20.\n"
+             "Red solid = eyelid margin traced by eye, red dashed = its continuation, red circle = crossing = corner. "
+             "Cyan = labelled point, yellow cross = first placement of 2026-09-20 (easy to get wrong)", fontsize=10)
 save(fig, "fig7_construction_corners.jpg")
 
 fig, axes = plt.subplots(1, 3, figsize=(19, 6.2), constrained_layout=True)

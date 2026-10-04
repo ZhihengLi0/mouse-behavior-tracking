@@ -83,7 +83,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>瞳孔面积怎么算？</b>在这个标准下上点落在眼睑边上，所以只用左、右、下三个点（第 6 步）。</li>
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
-    <p>9 月 20 日起明确了瞳孔四个点的标法：把瞳孔看成椭圆，四个点是椭圆的四个端点。定义真正改变的只有瞳孔上点：从“看得见的瞳孔的最高处”改为“椭圆真实的最高点”。瞳孔下、左、右三个点原来就标在瞳孔边缘，这次只是明确为椭圆的端点；实际位置有小的调整（旧标注里左点比右点高约 32 px，新标法下左右两点在椭圆的同一条轴上）。上眼睑、下眼睑、鼻侧眼角、颞侧眼角的标法没有变。图像、任务和训练方式也都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于瞳孔上点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
+    <p>9 月 20 日起明确了瞳孔四个点的标法：把瞳孔看成椭圆，四个点是椭圆的四个端点。定义真正改变的只有瞳孔上点：从“看得见的瞳孔的最高处”改为“椭圆真实的最高点”。瞳孔下、左、右三个点原来就标在瞳孔边缘，这次明确为椭圆的端点，位置移动约 14 px。同一天还明确了两个眼角的标法（上下睑缘延长线的交点，取外侧），两个眼角向外移动 40–56 px，上眼睑点随之上移约 17 px，下眼睑点不变。详见第 8 步。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有在新标准下重新比较过 batch size 和模型。</p>
     <h3>第二阶段的结论（第 8–12 步）</h3>
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
@@ -111,7 +111,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>How to compute the pupil area?</b> Under this standard the top point sits on the lid, so only left, right and bottom are used (step 6).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
-    <p>From 2026-09-20 the way the four pupil points are labeled was made explicit: the pupil is treated as an ellipse and the four points are its four endpoints. Only the definition of pupil top really changed: from "the highest point of the visible pupil" to "the true top of the ellipse". Pupil bottom, left and right were already placed on the pupil edge and were only made explicit as ellipse endpoints; their positions were adjusted slightly (in the old labels the left point sat about 32 px higher than the right one; now both lie on the same axis of the ellipse). The labeling of the upper eyelid, lower eyelid, nasal corner and temporal corner did not change. The images, the task and the training procedure did not change either. The choice of batch size and model depends on the images and the training procedure, not on where the pupil-top point is placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
+    <p>From 2026-09-20 the way the four pupil points are labeled was made explicit: the pupil is treated as an ellipse and the four points are its four endpoints. Only the definition of pupil top really changed: from "the highest point of the visible pupil" to "the true top of the ellipse". Pupil bottom, left and right were already placed on the pupil edge and were made explicit as ellipse endpoints, moving by about 14 px. On the same day the placement of the two corners was made explicit as well (the crossing of the continued upper and lower eyelid margins, on the outer side): the corners moved outwards by 40–56 px, the upper-eyelid point moved up by about 17 px with them, and the lower-eyelid point did not move. Details in step 8. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the new standard.</p>
     <h3>Conclusions of phase 2 (steps 8–12)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
@@ -144,7 +144,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><a href="#s5"><span lang="zh">时间序列：眨眼、眼动、追踪丢失</span><span lang="en">Time series: blinks, eye movements, tracking loss</span></a></li>
       <li><a href="#s6"><span lang="zh">瞳孔面积怎么算（旧标注标准）</span><span lang="en">Pupil area (old label standard)</span></a></li>
       <li><a href="#s7"><span lang="zh">换一只新老鼠</span><span lang="en">A new mouse</span></a></li>
-      <li><a href="#s8"><span lang="zh">新标注标准：瞳孔按椭圆标</span><span lang="en">New label standard: the pupil as an ellipse</span></a></li>
+      <li><a href="#s8"><span lang="zh">点位定义的明确：瞳孔按椭圆标，眼角取延长线交点</span><span lang="en">Keypoint definitions made explicit</span></a></li>
       <li><a href="#s9"><span lang="zh">主线：每个新视频要标多少帧</span><span lang="en">Main line: labels needed per new video</span></a></li>
       <li><a href="#s10"><span lang="zh">只标 5 帧或 10 帧够不够</span><span lang="en">Are 5 or 10 labels enough</span></a></li>
       <li><a href="#s11"><span lang="zh">加入新视频会不会让旧视频变差</span><span lang="en">Do new videos hurt old ones</span></a></li>
@@ -274,16 +274,63 @@ code{font-family:var(--mono);font-size:.9em}
 
 <!-- 8 -->
 <section id="s8">
-  <h2><span class="no">8</span><span lang="zh">新标注标准（9 月 20 日起）：瞳孔按椭圆标</span><span lang="en">New label standard (from 2026-09-20): the pupil as an ellipse</span></h2>
-  <p class="text" lang="zh"><span class="tag">做了什么：</span>明确了瞳孔四个点的标法：把瞳孔看成一个椭圆，上、下、左、右四个点是椭圆的四个端点；被眼睑挡住的部分按椭圆补全，点标在推断出的位置上。定义改变的只有上点（原来标在看得见的瞳孔的最高处）；下、左、右三个点只是明确为椭圆端点；眼睑和眼角的四个点标法不变。9 月 26 日补充一条约定：瞳孔边缘出现两层轮廓时，标左边那层；黑色核心外面的一圈亮带算作瞳孔。之前的全部视频按新标准重新标注，从这一步起所有模型和数字都是新标准。</p>
-  <p class="text" lang="en"><span class="tag">What was done:</span>The labeling of the four pupil points was made explicit: the pupil is treated as an ellipse and top, bottom, left, right are its four endpoints; where the lid hides the pupil, the ellipse is completed and the point is placed at the inferred position. Only the definition of the top point changed (it used to be the highest point of the visible pupil); bottom, left and right were only made explicit as ellipse endpoints; the four eyelid and corner points are labeled as before. A convention added on 2026-09-26: where the pupil edge shows a double contour, the left one is labeled, and the bright band around the dark core counts as pupil. All earlier videos were relabeled; from here on every model and number uses the new standard.</p>
+  <h2><span class="no">8</span><span lang="zh">点位定义的明确（9 月 20 日起）：瞳孔按椭圆标，眼角取睑缘延长线的交点</span><span lang="en">Keypoint definitions made explicit (from 2026-09-20): pupil as an ellipse, corners at the crossing of the eyelid margins</span></h2>
+  <div class="text" lang="zh">
+    <p><span class="tag">做了什么：</span>把 8 个点各自标在哪里写清楚，并按新的写法把之前的视频全部重新标注。从这一步起所有模型和数字都用这套定义。完整的定义、例图和容易标错的地方在仓库的 <code>keypoint_definitions/</code> 文件夹里。</p>
+    <ul>
+      <li><b>瞳孔上、下、左、右：</b>把瞳孔看作一个椭圆，四个点是椭圆两条轴的四个端点。被上眼睑或毛挡住的部分按椭圆补全，所以上点常常在眼睑下面。瞳孔边界取变暗区域的外缘；边界出现两层轮廓时取左边那层（9 月 26 日）；黑色核心外面较亮的一圈也算瞳孔（9 月 29 日）。</li>
+      <li><b>上眼睑、下眼睑：</b>眼皮和眼球的分界线叫睑缘。上眼睑点是上睑缘的中点，下眼睑点是下睑缘的中点。眨眼时也要标。</li>
+      <li><b>左眼角（鼻侧，内眦）：</b>把左下方的睑缘和上睑缘各自延长，取两条延长线的交点；延长线取外侧、没有阴影的那条边。</li>
+      <li><b>右眼角（颞侧，外眦）：</b>右侧有几条反光亮带。把下睑缘沿外层那条线向上延伸，与上睑缘相交的点就是眼角，它在反光的右侧。不标在反光上，也不标在紧挨反光的内层线上。</li>
+    </ul>
+  </div>
+  <div class="text" lang="en">
+    <p><span class="tag">What was done:</span>Where each of the 8 points is placed was written down, and all earlier videos were relabeled accordingly. From this step on every model and number uses these definitions. The full definitions, example figures and the common mistakes are in the folder <code>keypoint_definitions/</code> of the repository.</p>
+    <ul>
+      <li><b>Pupil top, bottom, left, right:</b> the pupil is treated as an ellipse and the four points are the ends of its two axes. Parts hidden by the upper eyelid or by fur are completed with the ellipse, so the top point often lies under the eyelid. The pupil boundary is the outer edge of the darkened region; where the edge looks doubled the left contour is used (2026-09-26); the brighter band around the dark core counts as pupil (2026-09-29).</li>
+      <li><b>Upper and lower eyelid:</b> the line between the eyelid skin and the eyeball is the eyelid margin. The upper-eyelid point is the midpoint of the upper margin, the lower-eyelid point the midpoint of the lower margin. Both are labeled during blinks too.</li>
+      <li><b>Left corner (nasal, medial canthus):</b> the lower-left margin and the upper margin are each continued, and the corner is where the two continuations cross; the continuation follows the outer edge, the one without the shadow.</li>
+      <li><b>Right corner (temporal, lateral canthus):</b> there are several bright reflections on this side. The lower margin is continued upwards along the outer line until it meets the upper margin; that point is the corner, and it lies to the right of the reflections. It is not placed on a reflection or on the inner line next to it.</li>
+    </ul>
+  </div>
   <figure>
-    <div class="figbox narrow"><img src="assets/label_standard.jpg" alt="One labeled frame under the new standard"></div>
-    <figcaption lang="zh"><span class="tag">怎么看：</span>一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；蓝点是上下眼睑和两个眼角。</figcaption>
-    <figcaption lang="en"><span class="tag">How to read:</span>One human-labeled frame. Red dots are the four pupil points and the red line is the ellipse through them; blue dots are the two eyelids and the two eye corners.</figcaption>
+    <div class="figbox"><img src="assets/kp_all_keypoints.jpg" alt="All eight keypoints on three mice"></div>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>三只老鼠各一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；青色点是上下眼睑和两个眼角。图像为了看清做了提亮。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>新标准下四个点都有明确的几何含义，面积可以直接由四个点算出。模型和 batch size 沿用第 2、3 步的选择（ResNet-50，batch 2）：改的只是点标在哪里，图像和训练方式没有变，所以没有重新比较。旧标准（第 1–7 步）的误差数字不能和新标准（第 9 步起）的数字直接比较。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Under the new standard all four points have a clear geometric meaning and the area follows directly from them. Model and batch size are carried over from steps 2 and 3 (ResNet-50, batch 2): only where the points are placed changed, not the images or the training procedure, so they were not compared again. Error numbers under the old standard (steps 1–7) cannot be compared directly with those under the new one (from step 9).</p>
+  <figure>
+    <div class="figbox"><img src="assets/kp_construction_pupil.jpg" alt="How the pupil points are constructed"></div>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>瞳孔四个点怎么来。红色椭圆盖住整个瞳孔，红色虚线是它的两条轴，四个点是轴的端点。黄色叉和黄色虚线是 9 月 20 日之前的标法：沿着看得见的瞳孔边缘标，上点停在眼睑边上。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: along the visible pupil edge, with the top point stopping at the eyelid.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox"><img src="assets/kp_construction_corners.jpg" alt="How the two corners are constructed"></div>
+    <figcaption lang="zh"><span class="tag">怎么看：</span>两个眼角怎么来，画法照 9 月 20 日讨论时的手绘图。红色实线是沿图像描出的睑缘，红色虚线是它的延长线，红圈是交点，也就是眼角；青色点是实际标注的位置。黄色叉是当天第一次的标法，也是容易标错的位置：左边标在深色部分结束的地方，右边标在紧挨反光的内层线上。</figcaption>
+    <figcaption lang="en"><span class="tag">How to read:</span>How the two corners are obtained, drawn after the hand sketch used in the discussion of 2026-09-20. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner; cyan = the labeled point. Yellow crosses are the first placement of that day and the easy mistake: on the left, where the dark part ends; on the right, on the inner line next to the reflection.</figcaption>
+  </figure>
+  <p class="text" lang="zh">定义明确前后，同一批帧上各个点移动了多少（<code>keypoint_definitions/results/label_changes.csv</code>）：</p>
+  <p class="text" lang="en">How far each point moved on the same frames when the definitions were made explicit (<code>keypoint_definitions/results/label_changes.csv</code>):</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr>
+        <th><span lang="zh">点</span><span lang="en">point</span></th>
+        <th><span lang="zh">位移中位数</span><span lang="en">median shift</span></th>
+        <th><span lang="zh">性质</span><span lang="en">what happened</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span lang="zh">瞳孔上点</span><span lang="en">pupil top</span></td><td>52 px</td><td><span lang="zh">定义改变：从看得见的瞳孔的最高处，改为椭圆的顶端</span><span lang="en">definition changed: from the top of the visible pupil to the top of the ellipse</span></td></tr>
+        <tr><td><span lang="zh">瞳孔下、左、右</span><span lang="en">pupil bottom, left, right</span></td><td><span lang="zh">约 14 px</span><span lang="en">about 14 px</span></td><td><span lang="zh">明确为椭圆轴的端点</span><span lang="en">made explicit as the ends of the ellipse axes</span></td></tr>
+        <tr><td><span lang="zh">左眼角</span><span lang="en">left (nasal) corner</span></td><td>40 px</td><td><span lang="zh">明确为两条睑缘延长线的交点，向外移</span><span lang="en">made explicit as the crossing of the two continued margins; moved outwards</span></td></tr>
+        <tr><td><span lang="zh">右眼角</span><span lang="en">right (temporal) corner</span></td><td>56 px</td><td><span lang="zh">明确为外层线上的交点，向外移</span><span lang="en">made explicit as the crossing on the outer line; moved outwards</span></td></tr>
+        <tr><td><span lang="zh">上眼睑点</span><span lang="en">upper eyelid</span></td><td>17 px</td><td><span lang="zh">随眼角的明确上移到睑缘（90 帧里 62 帧有移动）</span><span lang="en">moved up onto the margin together with the corners (62 of 90 frames moved)</span></td></tr>
+        <tr><td><span lang="zh">下眼睑点</span><span lang="en">lower eyelid</span></td><td>0 px</td><td><span lang="zh">不变</span><span lang="en">unchanged</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="text small muted" lang="zh">瞳孔四个点的数字来自 Pluto 2025-10-31 的 40 帧（旧标法对椭圆标法）；眼角和眼睑的数字来自 5 分钟视频的 90 帧（当天第一次的眼角标法对最终标法）。9 月 26 日“两层轮廓取左边”只让瞳孔点移动几个像素；9 月 29 日的亮带裁定没有改任何标注。</p>
+  <p class="text small muted" lang="en">The numbers for the four pupil points come from 40 frames of Pluto 2025-10-31 (old placement vs ellipse placement); those for the corners and eyelids from 90 frames of the 5-minute video (first corner placement of that day vs the final one). The 2026-09-26 convention (left contour) moved pupil points by a few pixels only; the 2026-09-29 decision on the bright band changed no labels.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>定义真正改变的是瞳孔上点；其余的点是把标法明确下来，其中两个眼角的位置变化最大。眼睑和眼角的四个点只用来判断眨眼，所以选每一帧都找得到的稳定位置。模型和 batch size 沿用第 2、3 步的选择（ResNet-50，batch 2）：变的是点标在哪里，图像和训练方式没有变，所以没有重新比较。第 1–7 步的误差数字不能和第 9 步起的数字直接比较。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The definition that really changed is pupil top; for the other points the placement was made explicit, and the two corners moved the most. The four eyelid and corner points only serve to detect blinks, so a stable position that can be found in every frame is preferred. Model and batch size are carried over from steps 2 and 3 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again. Error numbers of steps 1–7 cannot be compared directly with those from step 9 on.</p>
 </section>
 
 <!-- 9 -->
