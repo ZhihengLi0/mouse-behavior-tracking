@@ -93,7 +93,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
     <p>2026 年 9 月 20 日把 8 个点各自标在哪里明确了下来（逐点对照见第 4 步）。和之前相比有三处变化：瞳孔上点从“看得见的瞳孔的最高处”改为“瞳孔椭圆真实的最高点”，上移约 50 px；瞳孔左、右两点从“看得见的瞳孔最靠左、最靠右的位置”改为椭圆横轴的两个端点；两个眼角从阴影和反光的内侧改到外侧，各外移 40–50 px。瞳孔下点和上下眼睑点的定义没有变。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有按明确后的定义重新比较过 batch size 和模型。第一阶段的三项选择本身是在同一套定义下做的：当时这个视频上的全部训练帧和测试帧都按同一种标法（核对见第 4 步），所以 batch size 之间、模型之间、纠错算法之间的比较是公平的。</p>
-    <h3>第二阶段的结论（第 4–8 步）</h3>
+    <h3>第二阶段的结论（第 4–9 步）</h3>
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
       <li><b>同一个视频标多少帧够？</b>约 80 帧以内就饱和：同一个 5 分钟视频按 2026 年 9 月 20 日明确的点位定义重新标注后重做，20 / 40 / 60 / 80 / 100 帧的误差是 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px，没有随帧数下降；之后每个视频的平台点也都不超过 80 帧（第 5 步）。第一阶段在同一个视频上从 80 帧加到 300 帧，误差也没有下降（第 3 步）。</li>
@@ -101,8 +101,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台，已完成的 9 个里有 1 个需要 80 帧（第 5 步）。</li>
       <li><b>第一批只标 5 帧或 10 帧够不够？</b>有的视频够，有的不够，事先无法判断；20 帧最稳定。这里比的是第一批的大小（从已标的 20 帧里取 5 帧或 10 帧），不是每步 5 帧的流程（第 6 步）。</li>
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 7 步）。</li>
-      <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 12 个视频的 594 帧测试帧上，四点法的面积误差中位数是 6.6%，三点法是 8.3%；视频 4 和 8 上面积仍然不准（第 8 步）。</li>
-      <li><b>怎么找出瞳孔看不到的帧？</b>瞳孔四个点的平均置信度低于 0.527：人工把四个瞳孔点都留空的 28 帧里检出 27 帧，四个点都标了的帧误报 4.1%；原来的规则误报 55.7%。留空的帧不等于眨眼，眨眼还没有定义和真值（第 8 步）。</li>
+      <li><b>模型给出的哪些点准，置信度能不能信？</b>瞳孔上点最不准（误差中位数 10.9 px，其余 7 个点 3.9–5.8 px）；每个点都是置信度越低误差越大，但瞳孔上点即使置信度高也有 8.3 px（第 8 步）。</li>
+      <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 12 个视频的 594 帧测试帧上，四点法的面积误差中位数是 6.6%，三点法是 8.3%；视频 4 和 8 上面积仍然不准（第 9 步）。</li>
+      <li><b>怎么找出瞳孔看不到的帧？</b>瞳孔四个点的平均置信度低于 0.527：人工把四个瞳孔点都留空的 28 帧里检出 27 帧，四个点都标了的帧误报 4.1%；原来的规则误报 55.7%。留空的帧不等于眨眼，眨眼还没有定义和真值（第 9 步）。</li>
     </ol>
     <p><b>进度：</b>{{STATUS_ZH}}</p>
   </div>
@@ -119,7 +120,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
     <p>On 2026-09-20 the placement of each of the 8 points was made explicit (point-by-point comparison in step 4). Three things changed: pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; and the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. The definitions of pupil bottom and of the two eyelid points did not change. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions. The three choices of phase 1 were themselves made under one set of definitions: all training and test frames of that video were labeled in the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms are fair.</p>
-    <h3>Conclusions of phase 2 (steps 4–8)</h3>
+    <h3>Conclusions of phase 2 (steps 4–9)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
       <li><b>How many labels are enough within one video?</b> It saturates within about 80 labels: the same 5-minute video, relabeled under the keypoint definitions made explicit on 2026-09-20 and redone, gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 5). In phase 1 the same video showed no decrease from 80 to 300 labels either (step 3).</li>
@@ -127,8 +128,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau; 1 of the 9 finished ones needed 80 (step 5).</li>
       <li><b>Would a first batch of 5 or 10 labels be enough?</b> On some videos yes, on others no, and this cannot be told in advance; 20 is the most stable. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
-      <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 8).</li>
-      <li><b>How to find the frames in which the pupil cannot be seen?</b> Mean confidence of the four pupil points below 0.527: 27 of the 28 frames in which the labeler left all four pupil points empty are found, and 4.1% of the frames with all four labeled are flagged; the earlier rule flags 55.7%. An empty frame is not the same as a blink; blinks have no definition or truth yet (step 8).</li>
+      <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.9 px; the other 7 points 3.9–5.8 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
+      <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
+      <li><b>How to find the frames in which the pupil cannot be seen?</b> Mean confidence of the four pupil points below 0.527: 27 of the 28 frames in which the labeler left all four pupil points empty are found, and 4.1% of the frames with all four labeled are flagged; the earlier rule flags 55.7%. An empty frame is not the same as a blink; blinks have no definition or truth yet (step 9).</li>
     </ol>
     <p><b>Status:</b> {{STATUS_EN}}</p>
   </div>
@@ -168,9 +170,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><a href="#s5"><span lang="zh">主线：每个新视频要标多少帧</span><span lang="en">Main line: labels needed per new video</span></a></li>
       <li><a href="#s6"><span lang="zh">第一批只标 5 帧或 10 帧够不够</span><span lang="en">Would a first batch of 5 or 10 labels be enough</span></a></li>
       <li><a href="#s7"><span lang="zh">加入新视频会不会让旧视频变差</span><span lang="en">Do new videos hurt old ones</span></a></li>
-      <li><a href="#s8"><span lang="zh">瞳孔面积和眨眼：四点法；瞳孔看不到的帧用平均置信度找</span><span lang="en">Pupil area and blinks: four-point rule; frames without a visible pupil found by mean confidence</span></a></li>
-      <li><a href="#s9"><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></a></li>
-      <li><a href="#s10"><span lang="zh">附录：每个视频每一批的选帧图</span><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
+      <li><a href="#s8"><span lang="zh">每个点的误差和置信度</span><span lang="en">Error and confidence of each keypoint</span></a></li>
+      <li><a href="#s9"><span lang="zh">瞳孔面积和眨眼：四点法；瞳孔看不到的帧用平均置信度找</span><span lang="en">Pupil area and blinks: four-point rule; frames without a visible pupil found by mean confidence</span></a></li>
+      <li><a href="#s10"><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></a></li>
+      <li><a href="#s11"><span lang="zh">附录：每个视频每一批的选帧图</span><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
     </ol>
   </nav>
 </header>
@@ -615,6 +618,30 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">为什么回头做这一步：</span>主线上每个视频第一批标 20 帧。从图 5-4 看，多数视频标完这 20 帧，误差就直接降到接近平台的位置。所以在主线的视频做完之后，我们回到每个视频的第 1 步，问一个问题：如果一开始只标 5 帧或 10 帧，结果会是什么？</p>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>从每个视频已经标好的第一批 20 帧里取 5 帧或 10 帧，其余条件和该视频第 1 步完全相同，重新训练并打分，不需要新的标注。帧数这么少时，结果很受“正好取到哪几帧”的影响，为了避免偶然性，5 帧和 10 帧各取两组不同的帧，分别训练，记为 5a、5b 和 10a、10b；图上的色带就是两组结果之间的范围。</p>
+  <div class="text" lang="zh">
+    <p><b>5 帧和 10 帧具体怎么取（算法）</b>。脚本：<code>v2_new_pupil_top_video_scaling/scripts/make_label_subsets.py</code>。只用第一批已经标好的 20 帧和当时聚类留下的结果，不用任何模型，也不需要新的标注。</p>
+    <ol>
+      <li>第一批的 20 帧来自 20 个外观类（第 5 步 5.1 节的第 1 批算法），每一类有一个类中心（768 个数的外观指纹）和这一类的帧数。</li>
+      <li>把这 20 个类中心再做一次 k-means，合并成 5 组（取 5 帧时）或 10 组（取 10 帧时）。每个类中心按它那一类的帧数加权（scikit-learn 的 <code>KMeans</code>，<code>n_clusters=5 或 10, n_init=20, random_state=0</code>）。</li>
+      <li>已标的 20 帧各自按外观指纹归到离它最近的那一组。</li>
+      <li>a 组：每一组里取离组中心最近的那一帧已标帧。b 组：每一组里取离组中心第二近的那一帧（这一组只有一帧已标帧时，仍取那一帧）。</li>
+      <li>如果有的组取到了重复的帧、凑不够 5 帧或 10 帧，就从没用到的已标帧里，按离任一组中心的距离从近到远补足。</li>
+      <li>得到四份名单：5a、5b、10a、10b。训练时，这个视频自己的 20 帧换成名单里的 5 帧或 10 帧；之前视频带入的标注、验证帧（20 帧）、测试帧（50 帧）、模型和训练设置都和该视频第 1 步完全相同（<code>scale_step.py --step 1 --subset 名单文件</code>）。</li>
+    </ol>
+    <p>所以 5 帧和 10 帧也是“每一种画面形态取一帧”，只是分得更粗；a 和 b 是同一种分法下的两组不同的帧（同一组里最近和第二近的帧），12 个视频里 5a 和 5b 都没有共同的帧，10a 和 10b 有 2–4 帧相同。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>How exactly the 5 and 10 labels are taken (algorithm).</b> Script: <code>v2_new_pupil_top_video_scaling/scripts/make_label_subsets.py</code>. It uses only the 20 labeled frames of the first batch and the clustering saved at the time; no model and no new labeling.</p>
+    <ol>
+      <li>The 20 frames of the first batch come from 20 appearance clusters (batch-1 algorithm of section 5.1 in step 5); each cluster has a centre (a 768-number fingerprint) and a number of frames.</li>
+      <li>The 20 cluster centres are clustered again by k-means into 5 groups (for 5 labels) or 10 groups (for 10 labels), each centre weighted by the number of frames in its cluster (scikit-learn <code>KMeans</code>, <code>n_clusters=5 or 10, n_init=20, random_state=0</code>).</li>
+      <li>Each of the 20 labeled frames is assigned by its fingerprint to the nearest group.</li>
+      <li>Subset a: from each group, the labeled frame closest to the group centre. Subset b: from each group, the second closest (the same frame again when the group holds only one labeled frame).</li>
+      <li>If groups returned the same frame and fewer than 5 or 10 distinct frames result, the subset is filled from the unused labeled frames in order of increasing distance to any group centre.</li>
+      <li>This gives four lists: 5a, 5b, 10a, 10b. In training, the video's own 20 labels are replaced by the 5 or 10 listed frames; the carried labels of the earlier videos, the validation frames (20), the test frames (50), the model and the training settings are exactly those of that video's step 1 (<code>scale_step.py --step 1 --subset list-file</code>).</li>
+    </ol>
+    <p>So the 5 and 10 labels are also "one frame per kind of appearance", only with a coarser grouping; a and b are two different sets of frames under the same grouping (the closest and the second closest frame of each group) In all 12 videos 5a and 5b have no frame in common, and 10a and 10b share 2–4 frames.</p>
+  </div>
   <p class="text" lang="zh"><span class="hl">需要强调：5 帧和 10 帧是事后回头直接看结果，只训练、打分；这些模型之后没有用来做 jump 挑帧，也没有接着标注。主线上第一次用 jump 纠错，是在第一批 20 帧训练之后。所以这一步的结果只用来分析“第一批标多少帧”，不代表“先标 5 帧、再用 jump 补标”的流程。</span></p>
   <p class="text" lang="en"><span class="tag">Why this step was done afterwards:</span>On the main line the first batch of every video has 20 labels. Figure 5-4 shows that for most videos these 20 labels bring the error directly close to the plateau. So after the videos of the main line were finished we went back to step 1 of each video and asked: what would the result have been with a first batch of only 5 or 10 labels?</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>5 or 10 of the 20 labels of each video's first batch were taken, everything else exactly as in that video's step 1, then retrained and scored; no new labeling is needed. With so few frames the result depends strongly on which frames happen to be taken, so to guard against chance two different subsets were taken for each size and trained separately: 5a, 5b and 10a, 10b. The shaded band in the figure is the range between the two results.</p>
@@ -641,14 +668,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text small muted" lang="zh">单位 px，中位帧 RMSE。"–" 表示没有这个点或还没有训练。视频 6 起的子集实验在主线空闲时陆续补做。</p>
   <p class="text small muted" lang="en">Median frame RMSE in px. "–" = no such point or not trained yet. The runs for video 6 onward are added whenever the main line is idle.</p>
   <figure>
-    <div class="figbox"><img src="assets/fig_fewer_video1.jpg" alt="Video 1: fewer labels"></div>
-    <figcaption lang="zh"><span class="tag">图 6-2 怎么看：</span>视频 1（新老鼠的第一个视频）。蓝线是正常的 0、20、40… 帧，橙色点是 5 帧和 10 帧的两组。左图：0 帧 208 px，5 帧 96 / 41 px，10 帧 20 / 16 px，20 帧 10.4 px，标注越多越好，5 帧和 10 帧都不够。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>Video 1 (first video of the new mouse). The blue line is the regular 0, 20, 40… steps; orange markers are the two subsets at 5 and 10 labels. Left: 208 px at 0, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20: more labels are better and neither 5 nor 10 is enough.</figcaption>
-  </figure>
-  <figure>
-    <div class="figbox"><img src="assets/fig_fewer_video5.jpg" alt="Video 5: fewer labels"></div>
-    <figcaption lang="zh"><span class="tag">图 6-3 怎么看：</span>视频 5（之前的视频已经覆盖得比较好）。左图：中位误差在 0–20 帧之间都是 9–16 px，差别不大。右图：误差超过 50 px 的测试帧，0 帧时有 12%，5 帧时已降到 0–4%。在这种视频上 5 帧就够去掉大部分严重错误。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 6-3, how to read:</span>Video 5 (already well covered by the earlier videos). Left: the median error is 9–16 px anywhere between 0 and 20 labels, with little difference. Right: test frames off by more than 50 px, 12% at 0 labels and already 0–4% at 5. On such a video 5 labels remove most gross failures.</figcaption>
+    <div class="figbox scroll"><div class="strip">
+{{FEWER_STRIP}}
+    </div></div>
+    <figcaption lang="zh"><span class="tag">图 6-2 怎么看：</span>每个视频各一张，排成一行，可以左右拖动。每张图里蓝线是正常的 0、20、40… 帧，橙色点是 5 帧和 10 帧的两组；左图是中位误差，右图是误差超过 50 px 的测试帧比例。两个例子：视频 1（新老鼠的第一个视频），0 帧 208 px，5 帧 96 / 41 px，10 帧 20 / 16 px，20 帧 10.4 px，标得越多越好，5 帧和 10 帧都不够；视频 5（之前的视频已经覆盖得比较好），中位误差在 0–20 帧之间都是 9–16 px，差别不大，但误差超过 50 px 的测试帧从 0 帧时的 12% 降到 5 帧时的 0–4%。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
   </figure>
   <p class="concl" lang="zh"><span class="tag">结论：</span>结果因视频而异。（1）5 帧就和 20 帧差不多（相差 1 px 以内）的有视频 3、5、7、11。（2）5 帧明显不如 20 帧的有视频 0、1、4、8，以及视频 2、6、10 的其中一组；同一个视频的两组 5 帧之间可以差到 6 px（视频 6：6.7 和 12.8 px）。（3）两次换老鼠的情况不同：第二只老鼠的第一个视频，5 帧是 96 / 41 px，20 帧是 10.4 px；第三只老鼠的第一个视频，5 帧已经到 9.7 / 10.0 px，20 帧是 9.2 px。（4）视频 4 上 10 帧比 0 帧还差（两组一致，原因未明）。所以 5 帧、10 帧有时够、有时不够，事先无法判断；20 帧的结果最稳定，仍作为每个视频第一批的大小。需要明确的是：这里的 5 帧、10 帧是从已经标好的第一批 20 帧里取出来的，和第一批一样按画面外观挑选，不依赖模型，所以比较的是“第一批标多少帧”。它不是“先标 5 帧、用 jump 找错帧、再标 5 帧”这种每步 5 帧的流程，那种流程没有做过，这些数字不能当作它的结果。正式流程保持不变：每个视频第一批 20 帧，之后每步 20 帧。</p>
   <p class="concl" lang="en"><span class="tag">Conclusion:</span>The result depends on the video. (1) 5 labels are about as good as 20 (within 1 px) on videos 3, 5, 7 and 11. (2) 5 labels are clearly worse than 20 on videos 0, 1, 4 and 8 and for one of the two subsets on videos 2, 6 and 10; two subsets of 5 on the same video can differ by 6 px (video 6: 6.7 and 12.8 px). (3) The two changes of mouse differ: on the first video of the second mouse 5 labels give 96 / 41 px against 10.4 px with 20; on the first video of the third mouse 5 labels already give 9.7 / 10.0 px against 9.2 px with 20. (4) On video 4, 10 labels are worse than none (both subsets agree; not explained). So 5 or 10 labels are sometimes enough and sometimes not, and this cannot be told in advance; 20 labels give the most stable result and remain the size of the first batch of every video. To be explicit: the 5 and 10 labels here are taken out of the first batch of 20 that was already labeled, picked by image appearance like the first batch itself and without any model, so what is compared is the size of the first batch. It is not a procedure of 5 labels per step (label 5, find error frames with jump, label 5 more); that procedure was not run and these numbers must not be read as its result. The regular procedure stays as it is: a first batch of 20 for every video and 20 per step after that.</p>
@@ -682,7 +706,53 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 8 -->
 <section id="s8">
-  <h2><span class="no">8</span><span lang="zh">瞳孔面积和眨眼：四点法面积误差最低；瞳孔点的平均置信度最能找出人标不出瞳孔的帧；眨眼还没有定义和真值</span><span lang="en">Pupil area and blinks: the four-point area has the lowest error; the mean confidence of the pupil points best finds the frames in which a person could not label the pupil; blinks have no definition or truth yet</span></h2>
+  <h2><span class="no">8</span><span lang="zh">每个点的误差和置信度：瞳孔上点最不准；置信度低的点误差更大</span><span lang="en">Error and confidence of each keypoint: pupil top is the least accurate; low confidence goes with larger error</span></h2>
+  <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">视频</span><span lang="en">Videos</span></th><td><span lang="zh">已完成的 12 个视频（视频 0–11）。</span><span lang="en">The 12 finished videos (videos 0–11).</span></td></tr>
+    <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">2026 年 9 月 20 日明确的点位定义（第 4 步）。</span><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
+    <tr><th><span lang="zh">数据</span><span lang="en">Data</span></th><td><span lang="zh">每个视频的 50 帧测试帧（视频最后 10%，不参与训练）；每一步打分时已经存下的逐点误差和置信度表。</span><span lang="en">The 50 test frames of each video (final 10% of the video, never used for training); the per-point error and confidence tables saved when each step was scored.</span></td></tr>
+    <tr><th><span lang="zh">模型</span><span lang="en">Model</span></th><td><span lang="zh">每个视频每一步的模型（ResNet-50，batch 2，120 epochs，最后一个快照）；合并的图和表用每个视频平台点的模型（视频 7 用它的 20 帧模型）。</span><span lang="en">The model of every step of every video (ResNet-50, batch 2, 120 epochs, final snapshot); the pooled figure and table use each video's plateau-point model (video 7: its 20-label model).</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">一个点的误差 = 模型预测位置与人工标注位置之间的直线距离（像素），不按置信度筛点，人没有标的点不算；置信度 = 模型给这个点的置信度（0 到 1）。每个点位报告误差的中位数、第 90 百分位数和平均置信度。</span><span lang="en">Error of a point = straight-line distance (px) between the prediction and the human label, no confidence cut-off, points without a human label excluded; confidence = the model's confidence of the point (0 to 1). Per keypoint: median and 90th percentile of the error, and mean confidence.</span></td></tr>
+    <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><span lang="zh"><code>v2_new_pupil_top_video_scaling/scripts/keypoint_confidence_error.py</code>；结果在 <code>v2_new_pupil_top_video_scaling/results/keypoint_confidence_error/</code>。</span><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/keypoint_confidence_error.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/keypoint_confidence_error/</code>.</span></td></tr>
+  </tbody></table></div>
+  <p class="text" lang="zh"><span class="tag">为什么放在这里：</span>后面的面积用的是四个瞳孔点，找瞳孔看不到的帧用的是置信度。所以先看模型给出的每个点有多准、置信度能不能信。</p>
+  <p class="text" lang="en"><span class="tag">Why this comes here:</span>The pupil area that follows uses the four pupil points, and the frames without a visible pupil are found from the confidence. So first: how accurate is each point, and can its confidence be trusted.</p>
+  <p class="text" lang="zh"><span class="tag">做了什么：</span>在每个视频的 50 帧测试帧上，对 8 个点分别统计误差（预测与人工标注之间的直线距离，像素）和模型给出的置信度。数据是每一步打分时已经存下的逐点误差表。每个视频一张图（<code>results/keypoint_confidence_error/keypoint_confidence_error_videoNN.png</code>），下面是 12 个视频合在一起的图，用的是每个视频平台点的模型。</p>
+  <p class="text" lang="en"><span class="tag">What was done:</span>On the 50 test frames of each video, the error (straight-line distance between prediction and human label, px) and the model's confidence were summarized for each of the 8 points. The data are the per-point error tables saved when each step was scored. There is one figure per video (<code>results/keypoint_confidence_error/keypoint_confidence_error_videoNN.png</code>); below is the figure for the 12 videos together, with each video's plateau-point model.</p>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_kp_conf_error.jpg" alt="Error and confidence by keypoint, all videos"></div>
+    <figcaption lang="zh"><span class="tag">图 8-1 怎么看：</span>左：每个点（行）在每个视频（列）上的误差中位数，最右一列是 12 个视频合并。中：对应的平均置信度。右：把所有点按置信度分成 5 档，每一档里误差的中位数（纵轴是对数刻度），一条线一个点位。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1, how to read:</span>Left: median error of each point (row) on each video (column); the last column is the 12 videos pooled. Middle: the mean confidence. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox scroll"><div class="strip">
+{{KP_STRIP}}
+    </div></div>
+    <figcaption lang="zh"><span class="tag">图 8-2 怎么看：</span>每个视频各一张，排成一行，可以左右拖动。每张图：左，8 个点在这个视频每一步（20、40、60… 帧）的误差中位数；中，对应的平均置信度；右，平台点模型在 50 帧测试帧上的每一个点，横轴是置信度，纵轴是误差（对数刻度），颜色是点位，竖虚线是置信度 0.6。右图里点越往左上，表示置信度低而且误差大。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-2, how to read:</span>One figure per video in one row; scroll sideways. In each: left, the median error of the 8 points at each step of this video (20, 40, 60, … labels); middle, the mean confidence; right, every point of the plateau-point model on the 50 test frames, x = confidence, y = error (log scale), colour = keypoint, dashed line = confidence 0.6. Points towards the upper left have low confidence and a large error.</figcaption>
+  </figure>
+  <div class="concl" lang="zh"><span class="tag">结论：</span>瞳孔上点最不准，置信度低的点误差更大。
+    <ol>
+      <li>合并 12 个视频，瞳孔上点的误差中位数是 10.9 px，其余 7 个点在 3.9–5.8 px；瞳孔上点和左点的平均置信度最低（0.72 和 0.74），瞳孔左点的第 90 百分位误差最大（39 px）。</li>
+      <li>每个点都是置信度越低误差越大（秩相关 −0.26 到 −0.60）：置信度 0.8–1 的点误差中位数 2.4–4.5 px（瞳孔上点 8.3 px），置信度 0.2–0.4 的点是 6.6–45.7 px。</li>
+      <li>瞳孔上点即使置信度高，误差也有 8.3 px，所以它的置信度不能像其他点那样说明预测是准的。</li>
+      <li>视频之间不同：视频 4 和 8 四个瞳孔点都差（9.7–29.8 px），视频 5 只有瞳孔上点差（38.8 px）。</li>
+    </ol>
+  </div>
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>Pupil top is the least accurate point, and points with low confidence have larger errors.
+    <ol>
+      <li>Pooled over the 12 videos the median error of pupil top is 10.9 px, the other 7 points 3.9–5.8 px; pupil top and pupil left have the lowest mean confidence (0.72 and 0.74), and pupil left the largest 90th-percentile error (39 px).</li>
+      <li>For every point a lower confidence goes with a larger error (rank correlation −0.26 to −0.60): points with confidence 0.8–1 have a median error of 2.4–4.5 px (pupil top 8.3 px), points with confidence 0.2–0.4 have 6.6–45.7 px.</li>
+      <li>Pupil top has an error of 8.3 px even at high confidence, so its confidence does not show that a prediction is accurate the way it does for the other points.</li>
+      <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="no">9</span><span lang="zh">瞳孔面积和眨眼：四点法面积误差最低；瞳孔点的平均置信度最能找出人标不出瞳孔的帧；眨眼还没有定义和真值</span><span lang="en">Pupil area and blinks: the four-point area has the lowest error; the mean confidence of the pupil points best finds the frames in which a person could not label the pupil; blinks have no definition or truth yet</span></h2>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">视频</span><span lang="en">Videos</span></th><td><span lang="zh">已完成的 12 个视频（视频 0–11；老鼠 A 1 个，Pluto 10 个，Terra 1 个）。</span><span lang="en">The 12 finished videos (videos 0–11; 1 of mouse A, 10 of Pluto, 1 of Terra).</span></td></tr>
@@ -693,7 +763,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><span lang="zh"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code>；结果在 <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>，每个视频的时序图是其中的 <code>blink_area_timeseries_videoNN.png</code>（NN 是视频编号）。</span><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>, the time series of each video in <code>blink_area_timeseries_videoNN.png</code> there (NN = video index).</span></td></tr>
   </tbody></table></div>
 
-  <h3><span lang="zh">8.1 面积怎么算、误差怎么算</span><span lang="en">8.1 How the area and its error are computed</span></h3>
+  <h3><span lang="zh">9.1 面积怎么算、误差怎么算</span><span lang="en">9.1 How the area and its error are computed</span></h3>
   <div class="text" lang="zh">
     <p>记瞳孔四个点为上 T、下 B、左 L、右 R，坐标 (x, y) 以像素为单位，图像的 y 轴向下。</p>
     <ol>
@@ -716,8 +786,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_eye_area.jpg" alt="Area rules on all videos"></div>
-    <figcaption lang="zh"><span class="tag">图 8-1 怎么看：</span>左图：12 个视频的 594 帧测试帧合并，每根柱子是一种算法的面积误差中位数（%，越低越好），横线是第 90 百分位数。右图：每个视频各 50 帧测试帧上，四点法（绿）、三点法（灰）和四点法加 0.5 秒中位数滤波（深色）的误差中位数。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-1, how to read:</span>Left: the 594 test frames of the 12 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 0.5-s median filter (dark).</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-1 怎么看：</span>左图：12 个视频的 594 帧测试帧合并，每根柱子是一种算法的面积误差中位数（%，越低越好），横线是第 90 百分位数。右图：每个视频各 50 帧测试帧上，四点法（绿）、三点法（灰）和四点法加 0.5 秒中位数滤波（深色）的误差中位数。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-1, how to read:</span>Left: the 594 test frames of the 12 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 0.5-s median filter (dark).</figcaption>
   </figure>
   <div class="concl" lang="zh"><span class="tag">面积的结论：</span>在这几种算法里四点法误差最低，但在一部分视频上面积仍然不准。
     <ol>
@@ -738,7 +808,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="zh">8.2 闭眼怎么判断、怎么比较</span><span lang="en">8.2 How eye closure is detected and compared</span></h3>
+  <h3><span lang="zh">9.2 闭眼怎么判断、怎么比较</span><span lang="en">9.2 How eye closure is detected and compared</span></h3>
   <div class="text" lang="zh">
     <p>对每一帧，从模型的预测算出下面几个信号，再看哪个信号最能把人工认定的闭眼帧和睁眼帧分开。<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>T</mi></msub></math>、<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>B</mi></msub></math>、<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>L</mi></msub></math>、<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>p</mi><mi mathvariant='normal'>R</mi></msub></math> 是模型给四个瞳孔点的置信度（0 到 1）。</p>
     <ol>
@@ -763,15 +833,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_eye_blink.jpg" alt="Closure signals on all videos"></div>
-    <figcaption lang="zh"><span class="tag">图 8-2 怎么看：</span>A：六个信号的 AUC（28 帧闭眼、1484 帧睁眼合并）。B：最好的信号（瞳孔点平均置信度）在闭眼帧（红）和睁眼帧（灰）上的取值，虚线是阈值 0.527。C：每条规则检出的闭眼帧比例（绿）和误报的睁眼帧比例（红），柱旁是帧数；前六条的阈值按“留一个视频”选，后两条是固定规则。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-2, how to read:</span>A: AUC of the six signals (28 closed and 1484 open frames pooled). B: the values of the best signal (mean pupil confidence) on closed (red) and open (grey) frames; dashed = threshold 0.527. C: for each rule the share of closed frames detected (green) and of open frames flagged (red), with frame counts; the first six thresholds are chosen leave-one-video-out, the last two are fixed rules.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-2 怎么看：</span>A：六个信号的 AUC（28 帧闭眼、1484 帧睁眼合并）。B：最好的信号（瞳孔点平均置信度）在闭眼帧（红）和睁眼帧（灰）上的取值，虚线是阈值 0.527。C：每条规则检出的闭眼帧比例（绿）和误报的睁眼帧比例（红），柱旁是帧数；前六条的阈值按“留一个视频”选，后两条是固定规则。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-2, how to read:</span>A: AUC of the six signals (28 closed and 1484 open frames pooled). B: the values of the best signal (mean pupil confidence) on closed (red) and open (grey) frames; dashed = threshold 0.527. C: for each rule the share of closed frames detected (green) and of open frames flagged (red), with frame counts; the first six thresholds are chosen leave-one-video-out, the last two are fixed rules.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_closed_frames.jpg" alt="The 28 closed-eye frames"></div>
-    <figcaption lang="zh"><span class="tag">图 8-3：</span>作为“闭眼”真值的全部 28 帧（人工把四个瞳孔点都留空的帧），每张左上角注明视频、批次和帧号。来源：视频 1–9（Pluto）的第 2 批及以后的训练批次。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-3:</span>All 28 frames used as "closed" truth (the labeler left all four pupil points empty); video, batch and frame number are printed on each. Source: training batches 2 and later of videos 1–9 (Pluto).</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-3：</span>作为“闭眼”真值的全部 28 帧（人工把四个瞳孔点都留空的帧），每张左上角注明视频、批次和帧号。来源：视频 1–9（Pluto）的第 2 批及以后的训练批次。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-3:</span>All 28 frames used as "closed" truth (the labeler left all four pupil points empty); video, batch and frame number are printed on each. Source: training batches 2 and later of videos 1–9 (Pluto).</figcaption>
   </figure>
-  <div class="concl" lang="zh"><span class="tag">结论（找出人标不出瞳孔的帧）：</span>这里检验的不是眨眼。真值是“人工把四个瞳孔点都留空的帧”，按标注规则，它的意思是这一帧看不清、标不出瞳孔；这 28 帧看图多数是眼睛闭上或接近闭上（图 8-3），有 1 帧是画面几乎全黑。留空不等于眨眼：眨眼是一次闭上再睁开的过程，半闭时瞳孔点仍然标了，这些帧在这里算“标了的帧”。眨眼目前还没有定义，也没有真值。在这个前提下：瞳孔点的置信度比眼睛睁开的高度更能找出这些帧；目前脚本的规则误报过多。
+  <div class="concl" lang="zh"><span class="tag">结论（找出人标不出瞳孔的帧）：</span>这里检验的不是眨眼。真值是“人工把四个瞳孔点都留空的帧”，按标注规则，它的意思是这一帧看不清、标不出瞳孔；这 28 帧看图多数是眼睛闭上或接近闭上（图 9-3），有 1 帧是画面几乎全黑。留空不等于眨眼：眨眼是一次闭上再睁开的过程，半闭时瞳孔点仍然标了，这些帧在这里算“标了的帧”。眨眼目前还没有定义，也没有真值。在这个前提下：瞳孔点的置信度比眼睛睁开的高度更能找出这些帧；目前脚本的规则误报过多。
     <ol>
       <li>AUC：瞳孔点平均置信度 0.995，最低置信度 0.993；睁开高度相对整段视频 0.930，相对 5 秒中位数 0.901；高宽比 0.394（没有区分能力）。</li>
       <li>规则“平均置信度 &lt; 0.527”（阈值按留一个视频选）：28 帧闭眼检出 27 帧，1484 帧睁眼误报 61 帧（4.1%）。</li>
@@ -779,7 +849,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>限制：闭眼帧只有 28 帧，来自 9 个视频，视频 0、10、11 没有闭眼帧（Terra 没有）；这些帧来自 jump 算法挑出的批次，不是随机抽的；“闭眼”的定义是人工把四个瞳孔点都留空。</li>
     </ol>
   </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion (finding the frames in which a person could not label the pupil):</span>This does not test blinks. The truth is "frames in which the labeler left all four pupil points empty"; by the label rule this means the pupil could not be seen or placed in that frame. By eye most of the 28 frames show a closed or nearly closed eye (Figure 8-3) and one is almost black. An empty frame is not a blink: a blink is one closing-and-opening event, and in half-closed frames the pupil points were still labeled, so those frames count as labeled here. Blinks have no definition and no truth yet. With that premise: the confidence of the pupil points finds these frames better than the eye opening does; the rule of the current script flags far too much.
+  <div class="concl" lang="en"><span class="tag">Conclusion (finding the frames in which a person could not label the pupil):</span>This does not test blinks. The truth is "frames in which the labeler left all four pupil points empty"; by the label rule this means the pupil could not be seen or placed in that frame. By eye most of the 28 frames show a closed or nearly closed eye (Figure 9-3) and one is almost black. An empty frame is not a blink: a blink is one closing-and-opening event, and in half-closed frames the pupil points were still labeled, so those frames count as labeled here. Blinks have no definition and no truth yet. With that premise: the confidence of the pupil points finds these frames better than the eye opening does; the rule of the current script flags far too much.
     <ol>
       <li>AUC: mean pupil confidence 0.995, lowest confidence 0.993; eye opening relative to the video 0.930, relative to its 5-s median 0.901; aspect 0.394 (no separation).</li>
       <li>Rule "mean confidence &lt; 0.527" (threshold chosen leave-one-video-out): 27 of the 28 closed frames detected, 61 of the 1484 open frames flagged (4.1%).</li>
@@ -788,18 +858,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="zh">8.3 整段视频的时序</span><span lang="en">8.3 Time series of the whole videos</span></h3>
-  <p class="text" lang="zh"><span class="tag">做了什么：</span>对每个视频的每一帧算四点法面积、睁开高度和瞳孔点平均置信度；用 8.2 的规则（平均置信度 &lt; 0.527）标出闭眼帧，相隔不到 0.25 秒（15 帧）的并成一次事件。表里的“面积的相对波动”是未标记帧上 1.4826 × 面积的绝对中位差 ÷ 面积中位数；“面积与睁开高度的相关”是未标记帧上两者的相关系数。</p>
-  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of 8.2 (mean confidence &lt; 0.527) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
+  <h3><span lang="zh">9.3 整段视频的时序</span><span lang="en">9.3 Time series of the whole videos</span></h3>
+  <p class="text" lang="zh"><span class="tag">做了什么：</span>对每个视频的每一帧算四点法面积、睁开高度和瞳孔点平均置信度；用 9.2 的规则（平均置信度 &lt; 0.527）标出闭眼帧，相隔不到 0.25 秒（15 帧）的并成一次事件。表里的“面积的相对波动”是未标记帧上 1.4826 × 面积的绝对中位差 ÷ 面积中位数；“面积与睁开高度的相关”是未标记帧上两者的相关系数。</p>
+  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of 9.2 (mean confidence &lt; 0.527) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
   <figure>
     <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
-    <figcaption lang="zh"><span class="tag">图 8-4 怎么看：</span>每一行是一个视频（视频 0 长 5 分钟，其余 19.9 分钟）。蓝线是四点法面积除以该视频的面积中位数，红色竖条是被判为闭眼的帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-4, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-4 怎么看：</span>每一行是一个视频（视频 0 长 5 分钟，其余 19.9 分钟）。蓝线是四点法面积除以该视频的面积中位数，红色竖条是被判为闭眼的帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-4, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_eye_ts_video11.jpg" alt="Time series of video 11"></div>
-    <figcaption lang="zh"><span class="tag">图 8-5：</span>单个视频的时序图示例（视频 11，Terra，2025 年 10 月 17 日，40 帧模型）。从上到下：四点法面积、睁开高度、瞳孔点最低置信度、瞳孔中心相对中位位置的偏移；红色是被判为闭眼的帧。每个视频都有同样的一张图。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-5:</span>Example of the per-video time series (video 11, Terra, 2025-10-17, 40-label model). Top to bottom: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; red = frames flagged as closed. The same figure exists for every video.</figcaption>
+    <div class="figbox scroll"><div class="strip">
+{{TS_STRIP}}
+    </div></div>
+    <figcaption lang="zh"><span class="tag">图 9-5 怎么看：</span>每个视频各一张时序图，排成一行，可以左右拖动。每张图从上到下：四点法面积、睁开高度、瞳孔点最低置信度、瞳孔中心相对中位位置的偏移；横轴是时间（秒），红色是被判为“瞳孔看不到”的帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-5, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; x = time (s), red = frames flagged as "pupil not visible".</figcaption>
   </figure>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">面积误差：四点法 / 三点法（%）</span><span lang="en">Area error: four-point / three-point (%)</span></th><th><span lang="zh">闭眼 / 睁眼帧数（人工）</span><span lang="en">Closed / open frames (human)</span></th><th><span lang="zh">判为闭眼的帧（%）</span><span lang="en">Frames flagged closed (%)</span></th><th><span lang="zh">事件数（每分钟）</span><span lang="en">Events (per min)</span></th><th><span lang="zh">事件时长中位数（ms）</span><span lang="en">Median event (ms)</span></th><th><span lang="zh">目前脚本标为不可信（%）</span><span lang="en">Untrusted by the current script (%)</span></th><th><span lang="zh">面积的相对波动（%）</span><span lang="en">Relative spread of the area (%)</span></th><th><span lang="zh">面积与睁开高度的相关</span><span lang="en">Correlation of area and opening</span></th></tr></thead>
@@ -823,35 +895,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Not done yet: a rule for the jumps of point 2, checked against human-labeled frames; and, as was done earlier on the 5-minute video, an event-by-event check against the original video of whether each event is a blink, an eye movement or a tracking error.</li>
     </ol>
   </div>
-  <h3><span lang="zh">8.4 每个关键点的误差和置信度</span><span lang="en">8.4 Error and confidence of each keypoint</span></h3>
-  <p class="text" lang="zh"><span class="tag">做了什么：</span>在每个视频的 50 帧测试帧上，对 8 个点分别统计误差（预测与人工标注之间的直线距离，像素）和模型给出的置信度。数据是每一步打分时已经存下的逐点误差表。每个视频一张图（<code>results/keypoint_confidence_error/keypoint_confidence_error_videoNN.png</code>），下面是 12 个视频合在一起的图，用的是每个视频平台点的模型。</p>
-  <p class="text" lang="en"><span class="tag">What was done:</span>On the 50 test frames of each video, the error (straight-line distance between prediction and human label, px) and the model's confidence were summarized for each of the 8 points. The data are the per-point error tables saved when each step was scored. There is one figure per video (<code>results/keypoint_confidence_error/keypoint_confidence_error_videoNN.png</code>); below is the figure for the 12 videos together, with each video's plateau-point model.</p>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_kp_conf_error.jpg" alt="Error and confidence by keypoint, all videos"></div>
-    <figcaption lang="zh"><span class="tag">图 8-6 怎么看：</span>左：每个点（行）在每个视频（列）上的误差中位数，最右一列是 12 个视频合并。中：对应的平均置信度。右：把所有点按置信度分成 5 档，每一档里误差的中位数（纵轴是对数刻度），一条线一个点位。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-6, how to read:</span>Left: median error of each point (row) on each video (column); the last column is the 12 videos pooled. Middle: the mean confidence. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint.</figcaption>
-  </figure>
-  <div class="concl" lang="zh"><span class="tag">结论：</span>瞳孔上点最不准，置信度低的点误差更大。
-    <ol>
-      <li>合并 12 个视频，瞳孔上点的误差中位数是 10.9 px，其余 7 个点在 3.9–5.8 px；瞳孔上点和左点的平均置信度最低（0.72 和 0.74），瞳孔左点的第 90 百分位误差最大（39 px）。</li>
-      <li>每个点都是置信度越低误差越大（秩相关 −0.26 到 −0.60）：置信度 0.8–1 的点误差中位数 2.4–4.5 px（瞳孔上点 8.3 px），置信度 0.2–0.4 的点是 6.6–45.7 px。</li>
-      <li>瞳孔上点即使置信度高，误差也有 8.3 px，所以它的置信度不能像其他点那样说明预测是准的。</li>
-      <li>视频之间不同：视频 4 和 8 四个瞳孔点都差（9.7–29.8 px），视频 5 只有瞳孔上点差（38.8 px）。</li>
-    </ol>
-  </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion:</span>Pupil top is the least accurate point, and points with low confidence have larger errors.
-    <ol>
-      <li>Pooled over the 12 videos the median error of pupil top is 10.9 px, the other 7 points 3.9–5.8 px; pupil top and pupil left have the lowest mean confidence (0.72 and 0.74), and pupil left the largest 90th-percentile error (39 px).</li>
-      <li>For every point a lower confidence goes with a larger error (rank correlation −0.26 to −0.60): points with confidence 0.8–1 have a median error of 2.4–4.5 px (pupil top 8.3 px), points with confidence 0.2–0.4 have 6.6–45.7 px.</li>
-      <li>Pupil top has an error of 8.3 px even at high confidence, so its confidence does not show that a prediction is accurate the way it does for the other points.</li>
-      <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
-    </ol>
-  </div>
 </section>
 
-<!-- 9 -->
-<section id="s9">
-  <h2><span class="no">9</span><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></h2>
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="no">10</span><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></h2>
   <div class="text" lang="zh">
     <ul>
       <li><b>平台规则在噪声边缘：</b>测试集只有 50 帧，同一设置重复训练，中位误差本身会有约 0.5–1 px 的波动，而 3% 约等于 0.3 px。所以每个视频的平台点有大约 ±20 帧的不确定性。每个点只训练了一次。</li>
@@ -859,7 +907,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>跳动规则找错帧找得准不准</b>还没有量过：被标出的帧里有多少真的错，没被标出的帧里漏了多少。</li>
       <li><b>视频 8</b> 的误差一直在 25 px 以上，原因未明。<b>视频 4</b> 画面质量差。</li>
       <li><b>第三只老鼠（Terra，视频 11–18）</b>刚开始做第一个视频（数字见第 5 步的表）；在它做完之前，“新老鼠需要 20 帧”只在一只新老鼠上验证过。</li>
-      <li><b>面积曲线里的跳变</b>（第 8.3 节）：眼睛睁开时某个瞳孔点在两个位置之间来回跳，闭眼规则标不出来；还没有针对它的规则，也还没有逐个事件对照原视频区分眨眼、眼球转动和跟踪错误。</li>
+      <li><b>面积曲线里的跳变</b>（第 9.3 节）：眼睛睁开时某个瞳孔点在两个位置之间来回跳，闭眼规则标不出来；还没有针对它的规则，也还没有逐个事件对照原视频区分眨眼、眼球转动和跟踪错误。</li>
       <li><b>面积和眨眼</b>：正式的面积脚本目前仍是三点法和原来的眨眼规则，是否换成四点法和“平均置信度”规则，待定。闭眼真值只有 28 帧，Terra 上还没有。</li>
     </ul>
   </div>
@@ -870,14 +918,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
       <li><b>Video 8</b> stays above 25 px for an unknown reason. <b>Video 4</b> has poor image quality.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b> has just started with its first video (numbers in the table of step 5); until it is finished, "a new mouse needs 20 labels" rests on one new mouse.</li>
-      <li><b>Jumps in the area traces</b> (section 8.3): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
+      <li><b>Jumps in the area traces</b> (section 9.3): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
       <li><b>Area and blinks</b>: the production area script still uses the three-point rule and the earlier blink rule; the switch to the four-point rule and the "mean confidence" rule is undecided. The closed-eye truth is only 28 frames, none on Terra yet.</li>
     </ul>
   </div>
 </section>
 
 <!-- appendix -->
-<section id="s10">
+<section id="s11">
   <h2><span class="no">附</span><span lang="zh">附录：每个视频每一批的选帧图</span><span lang="en">Appendix: the selection sheet of every batch of every video</span></h2>
   <p class="text" lang="zh">这里是过程记录，不对应新的结论。每个视频一行，从第 1 批到最后一批，可以左右拖动。第 1 批没有模型可用，是对全部帧按画面外观聚类挑的 20 帧；第 2 批起是模型预测整段视频后，由 jump 规则标出候选帧，再按画面外观聚类挑的 20 帧。算法和读法见第 5 步的 5.1 节和图 5-1。到平台点之后的批次也在这里（它们已经标注，但没有带入后面的视频）。</p>
   <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. Algorithm and how to read a sheet: section 5.1 and Figure 5-1 of step 5. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
@@ -886,10 +934,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <section>
   <div class="text small muted" lang="zh">
-    <p><b>资料位置：</b>代码、说明和结果表、结果图在 GitHub 仓库里：第 1–3 步在 <code>v1_old_pupil_top/</code>，第 4–8 步在 <code>v2_new_pupil_top_video_scaling/</code>（每个视频一个文件夹，跨视频的结果在 <code>results/</code>）。每个重要状态有 git 标签，列在 <code>CHANGELOG.md</code>。原始视频、标注、模型权重和逐帧预测只保存在本地和备份硬盘上。本页的图就是各 <code>results/</code> 文件夹里的原图。</p>
+    <p><b>资料位置：</b>代码、说明和结果表、结果图在 GitHub 仓库里：第 1–3 步在 <code>v1_old_pupil_top/</code>，第 4–9 步在 <code>v2_new_pupil_top_video_scaling/</code>（每个视频一个文件夹，跨视频的结果在 <code>results/</code>）。每个重要状态有 git 标签，列在 <code>CHANGELOG.md</code>。原始视频、标注、模型权重和逐帧预测只保存在本地和备份硬盘上。本页的图就是各 <code>results/</code> 文件夹里的原图。</p>
   </div>
   <div class="text small muted" lang="en">
-    <p><b>Where things are:</b> Code, documentation, result tables and figures are in the GitHub repository: steps 1–3 under <code>v1_old_pupil_top/</code>, steps 4–8 under <code>v2_new_pupil_top_video_scaling/</code> (one folder per video, cross-video results in <code>results/</code>). Every important state has a git tag, listed in <code>CHANGELOG.md</code>. Raw videos, labels, model weights and per-frame predictions are kept locally and on the backup drive only. The figures on this page are the original figures of the <code>results/</code> folders.</p>
+    <p><b>Where things are:</b> Code, documentation, result tables and figures are in the GitHub repository: steps 1–3 under <code>v1_old_pupil_top/</code>, steps 4–9 under <code>v2_new_pupil_top_video_scaling/</code> (one folder per video, cross-video results in <code>results/</code>). Every important state has a git tag, listed in <code>CHANGELOG.md</code>. Raw videos, labels, model weights and per-frame predictions are kept locally and on the backup drive only. The figures on this page are the original figures of the <code>results/</code> folders.</p>
   </div>
 </section>
 

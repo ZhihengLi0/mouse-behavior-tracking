@@ -29,8 +29,6 @@ FIGURES = [
     (V1 / "active-learning-jump-selection/results/01_convergence_curves.png", "fig_active_learning.jpg", 2400),
     (V2 / "results/labels_to_plateau.png", "fig_labels_to_plateau.jpg", 2400),
     (V2 / "results/scale_curves_all_videos.png", "fig_all_videos.jpg", 5148),
-    (V2 / "5_20251029_Pluto_spont_1/results/fewer_labels.png", "fig_fewer_video5.jpg", 1900),
-    (V2 / "1_20251031_Pluto_spont_1/results/fewer_labels.png", "fig_fewer_video1.jpg", 1900),
     (V2 / "results/cross_video_curves.png", "cross_video_curves.jpg", 2600),
     (V2 / "results/all_videos_view_main.png", "all_view_main.jpg", 3380),
     (V2 / "results/all_videos_view_fewer.png", "all_view_fewer.jpg", 3380),
@@ -42,7 +40,6 @@ FIGURES = [
     (V2 / "results/blink_and_area/blink_area_closure_signals_all_videos.png", "fig_eye_blink.jpg", 2600),
     (V2 / "results/blink_and_area/blink_area_closed_frames_all_videos.jpg", "fig_closed_frames.jpg", 2784),
     (V2 / "results/blink_and_area/blink_area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
-    (V2 / "results/blink_and_area/blink_area_timeseries_video11.png", "fig_eye_ts_video11.jpg", 2200),
     (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
     (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
@@ -123,6 +120,25 @@ for r in pl.itertuples():
     sel_strip.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)}: batch 2 selection" loading="lazy">'
                      f'<div class="cap"><span lang="zh">视频 {int(r.video)}（{r.mouse}，{r.date}）：第 2 批</span><span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}): batch 2</span></div></div>')
 
+def strip_of(pattern, prefix, width, cap_zh, cap_en):
+    """One scrolling row: the figure `pattern` (formatted with the video row) of every video."""
+    out = []
+    for r in pl.itertuples():
+        im = cv2.imread(str(pattern(r)))
+        if im is None:
+            continue
+        name = f"{prefix}_video{int(r.video):02d}.jpg"
+        sc = width / im.shape[1]
+        cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 84])
+        out.append(f'      <div class="item"><img src="assets/{name}" alt="{prefix} video {int(r.video)}" loading="lazy">'
+                   f'<div class="cap"><span lang="zh">视频 {int(r.video)}（{r.mouse}，{r.date}）{cap_zh}</span><span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}){cap_en}</span></div></div>')
+    return "\n".join(out)
+
+
+fewer_strip = strip_of(lambda r: V2 / r.unit / "results/fewer_labels.png", "fewer", 1500, "", "")
+kp_strip = strip_of(lambda r: V2 / f"results/keypoint_confidence_error/keypoint_confidence_error_video{int(r.video):02d}.png", "kpconf", 1700, "", "")
+ts_strip = strip_of(lambda r: V2 / f"results/blink_and_area/blink_area_timeseries_video{int(r.video):02d}.png", "eyets", 1700, "", "")
+
 # appendix: every selection sheet of every video, one scrolling row per video
 appendix = []
 for r in pl.itertuples():
@@ -161,6 +177,9 @@ for r in ts.itertuples():
                f"<td>{r.production_flagged_pct:.1f}</td><td>{r.area_rel_spread_pct:.1f}</td><td>{r.corr_area_opening:.2f}</td></tr>")
 
 FILL = {
+    "{{FEWER_STRIP}}": fewer_strip,
+    "{{KP_STRIP}}": kp_strip,
+    "{{TS_STRIP}}": ts_strip,
     "{{APPENDIX_SELECTION}}": "\n".join(appendix),
     "{{SELECTION_STRIP}}": "\n".join(sel_strip),
     "{{SCALE_STRIP}}": "\n".join(strip),
