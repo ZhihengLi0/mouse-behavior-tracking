@@ -26,7 +26,11 @@ MICE = [("mouse A, 5-min video (unit 0)", f"{V2}/0_first5minvedio/{L}/test50", "
 
 
 def bright(img):
-    return 255 * (img / 255.0) ** 0.45
+    """Display version of a frame: percentile stretch, gamma 0.6 and local contrast (CLAHE), so that edges stay visible."""
+    import cv2
+    lo, hi = np.percentile(img, (1, 99.5))
+    g = (np.clip((img.astype(float) - lo) / (hi - lo), 0, 1) ** 0.6 * 255).astype(np.uint8)
+    return cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8)).apply(g).astype(float)
 
 
 def xy(row, bp):
@@ -164,29 +168,41 @@ UPPER_R = [(812, 398), (840, 430), tuple(t), tuple(t + (5, 16))]                
 LOWER = [(410, 482), (440, 540), (480, 581), (540, 611), tuple(eb), (700, 620), (775, 603)]      # lower margin, sharp part
 LOWER_L = [tuple(n + (-7, -22)), tuple(n), (383, 428), (410, 482)]                              # continued up to the crossing
 LOWER_R = [(775, 603), (838, 572), (874, 524), (870, 484), tuple(t)]                             # outer line, right of the reflections
-fig, axes = plt.subplots(1, 3, figsize=(19, 6.2), constrained_layout=True)
+an, at = xy(A, "eye_nasal_corner"), xy(A, "eye_temporal_corner")      # the alternative placement that was discussed and not adopted
+# yellow: how the alternative points arise - the margins are followed only as far as the dark part of the eye goes
+ALT_NU = [(440, 351), (418, 368), tuple(an)]                      # upper margin bending down where the dark part ends
+ALT_NL = [(410, 482), (404, 446), tuple(an)]                      # lower-left margin, not continued
+ALT_TU = [(765, 358), (794, 400), tuple(at)]                      # upper margin bending down inside the reflections
+ALT_TL = [(775, 603), (792, 548), (805, 498), tuple(at)]          # inner line next to the reflection
+SHADOW = np.vstack([smooth(UPPER_L[1:]).T, smooth(ALT_NU).T, smooth(ALT_NL).T[::-1], smooth(LOWER_L[1:]).T[::-1]])
+fig, axes = plt.subplots(1, 3, figsize=(19, 6.6), constrained_layout=True)
 for ax in axes:
     ax.imshow(img, cmap="gray", vmin=0, vmax=255); ax.set_xticks([]); ax.set_yticks([])
+    ax.add_patch(plt.Polygon(SHADOW, closed=True, fc=YELLOW, ec="none", alpha=0.18, hatch="////"))
     for solid in (UPPER, LOWER):
-        ax.plot(*smooth(solid), "-", color=RED, lw=1.6)
+        ax.plot(*smooth(solid), "-", color=RED, lw=2.4)
     for dashed in (UPPER_L, UPPER_R, LOWER_L, LOWER_R):
-        ax.plot(*smooth(dashed), "--", color=RED, lw=1.4)
+        ax.plot(*smooth(dashed), "--", color=RED, lw=2.2)
+    for alt in (ALT_NU, ALT_NL, ALT_TU, ALT_TL):
+        ax.plot(*smooth(alt), ":", color=YELLOW, lw=2.4)
     for c in (n, t):
-        ax.add_patch(plt.Circle(c, 13, fill=False, ec=RED, lw=1.6))
+        ax.add_patch(plt.Circle(c, 13, fill=False, ec=RED, lw=2.4))
+    ax.plot(*an, "x", color=YELLOW, ms=13, mew=3); ax.plot(*at, "x", color=YELLOW, ms=13, mew=3)
     for bp in ("eye_nasal_corner", "eye_temporal_corner"):
-        ax.plot(*xy(A, bp), "x", color=YELLOW, ms=10, mew=2.2); ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=7)
+        ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=9, mew=1.2)
     for bp in ("eyelid_top", "eyelid_bottom"):
-        ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=6)
-crop(axes[0], B, pad=60); axes[0].set_title("whole eye", fontsize=10)
-crop(axes[1], B, box=(n[0] - 110, n[0] + 190, n[1] - 90, n[1] + 150)); axes[1].set_title("nasal corner (left)", fontsize=10)
-note(axes[1], "correct (circle): the lower-left margin and the upper\nmargin are continued until they cross", n, n + (60, -62), CYAN)
-note(axes[1], "wrong: where the dark part ends;\nthe margins are cut short", xy(A, "eye_nasal_corner"), xy(A, "eye_nasal_corner") + (105, 60), YELLOW)
-crop(axes[2], B, box=(t[0] - 200, t[0] + 60, t[1] - 110, t[1] + 170)); axes[2].set_title("temporal corner (right)", fontsize=10)
-note(axes[2], "correct (circle): the lower margin continued upwards along\nthe OUTER line, right of the reflections, meets the upper margin", t, t + (-95, -85), CYAN)
-note(axes[2], "wrong: inner line,\nnext to the reflection", xy(A, "eye_temporal_corner"), xy(A, "eye_temporal_corner") + (-105, 75), YELLOW)
+        ax.plot(*xy(B, bp), "o", mfc=CYAN, mec="white", ms=7)
+crop(axes[0], B, pad=60); axes[0].set_title("whole eye", fontsize=11)
+crop(axes[1], B, box=(n[0] - 110, n[0] + 190, n[1] - 90, n[1] + 150)); axes[1].set_title("nasal corner (left)", fontsize=11)
+note(axes[1], "CORRECT (red circle, cyan dot): the lower-left margin\nand the upper margin are continued until they cross", n, n + (62, -66), CYAN)
+note(axes[1], "NOT USED (yellow cross): the margins are followed\nonly to where the dark part ends (dotted yellow)", an, an + (105, 70), YELLOW)
+note(axes[1], "shadow", (382, 392), (300, 470), YELLOW)
+crop(axes[2], B, box=(t[0] - 200, t[0] + 60, t[1] - 110, t[1] + 170)); axes[2].set_title("temporal corner (right)", fontsize=11)
+note(axes[2], "CORRECT (red circle, cyan dot): the lower margin continued upwards\nalong the OUTER line, right of the reflections, meets the upper margin", t, t + (-95, -88), CYAN)
+note(axes[2], "NOT USED (yellow cross): the inner line\nnext to the reflection (dotted yellow)", at, at + (-95, 95), YELLOW)
 fig.suptitle("How the two corners are constructed (5-min video, img015001), after the sketch of 2026-09-20.\n"
-             "Red solid = eyelid margin traced by eye, red dashed = its continuation, red circle = crossing = corner. "
-             "Cyan = labelled point, yellow cross = first placement of 2026-09-20 (easy to get wrong)", fontsize=10)
+             "Red solid = eyelid margin traced by eye, red dashed = its continuation, red circle = crossing = corner, cyan = labelled point. "
+             "Yellow dotted + cross = the alternative that was discussed and is not used; hatched = shadow", fontsize=10)
 save(fig, "fig7_construction_corners.jpg")
 
 fig, axes = plt.subplots(1, 3, figsize=(19, 6.2), constrained_layout=True)
