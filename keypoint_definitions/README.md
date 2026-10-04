@@ -109,7 +109,7 @@ point. Video 8, a video where the pupil edge is hard to see: 20-31 of 50 frames 
 
 | mistake | correct placement | example |
 |---|---|---|
-| `pupil_top` on the visible pupil edge at the eyelid | top of the full ellipse, under the lid if necessary | fig. 8, yellow crosses |
+| `pupil_top` on the visible pupil edge at the eyelid | top of the full ellipse, often above the upper-eyelid point (a position covered by the lid) | fig. 8, yellow crosses |
 | `pupil_left` / `pupil_right` at different heights on the visible outline | ends of the horizontal axis of the ellipse | fig. 4 |
 | pupil point on the border of a reflection | on the pupil edge, which continues under the reflection | fig. 1, `PR` |
 | pupil edge taken at the black core, leaving out the lighter band | outer edge of the darkened region | rule 3 |
