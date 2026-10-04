@@ -123,6 +123,25 @@ for r in pl.itertuples():
     sel_strip.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)}: batch 2 selection" loading="lazy">'
                      f'<div class="cap"><span lang="zh">视频 {int(r.video)}（{r.mouse}，{r.date}）：第 2 批</span><span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}): batch 2</span></div></div>')
 
+# appendix: every selection sheet of every video, one scrolling row per video
+appendix = []
+for r in pl.itertuples():
+    items = []
+    for src in sorted((V2 / r.unit / "results/selection_sheets").glob("selection_*_frames.png")):
+        im = cv2.imread(str(src))
+        b = int(src.stem.split("_")[1]) // 20
+        name = f"selection_video{int(r.video):02d}_batch{b:02d}.jpg"
+        sc = 1000 / im.shape[1]
+        cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 80])
+        how_zh = "按画面外观挑，没有用模型" if b == 1 else f"由 {20 * (b - 1)} 帧模型的 jump 规则挑"
+        how_en = "picked by appearance, no model" if b == 1 else f"picked by the jump rule of the {20 * (b - 1)}-label model"
+        items.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)} batch {b}" loading="lazy">'
+                     f'<div class="cap"><span lang="zh">视频 {int(r.video)} 第 {b} 批（{how_zh}）</span><span lang="en">Video {int(r.video)}, batch {b} ({how_en})</span></div></div>')
+    if items:
+        appendix.append(f'  <p class="text"><b><span lang="zh">视频 {int(r.video)}（{r.mouse}，{r.date}）：{len(items)} 批</span>'
+                        f'<span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}): {len(items)} batches</span></b></p>\n'
+                        f'  <figure><div class="figbox scroll"><div class="strip tall">\n' + "\n".join(items) + '\n  </div></div></figure>')
+
 if in_progress:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）；视频 {in_progress[0]} 进行中，按 0 / 20 / 40 / … 帧的误差为 {' / '.join(in_progress[1])} px。"
     en_status = f"{n_final} videos finished (videos 0–{n_final - 1}); video {in_progress[0]} in progress, error at 0 / 20 / 40 / … labels: {' / '.join(in_progress[1])} px."
@@ -142,6 +161,7 @@ for r in ts.itertuples():
                f"<td>{r.production_flagged_pct:.1f}</td><td>{r.area_rel_spread_pct:.1f}</td><td>{r.corr_area_opening:.2f}</td></tr>")
 
 FILL = {
+    "{{APPENDIX_SELECTION}}": "\n".join(appendix),
     "{{SELECTION_STRIP}}": "\n".join(sel_strip),
     "{{SCALE_STRIP}}": "\n".join(strip),
     "{{EYE_ROWS}}": "\n".join(eye),

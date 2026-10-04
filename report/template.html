@@ -170,6 +170,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><a href="#s7"><span lang="zh">加入新视频会不会让旧视频变差</span><span lang="en">Do new videos hurt old ones</span></a></li>
       <li><a href="#s8"><span lang="zh">瞳孔面积和眨眼：四点法；瞳孔看不到的帧用平均置信度找</span><span lang="en">Pupil area and blinks: four-point rule; frames without a visible pupil found by mean confidence</span></a></li>
       <li><a href="#s9"><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></a></li>
+      <li><a href="#s10"><span lang="zh">附录：每个视频每一批的选帧图</span><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
     </ol>
   </nav>
 </header>
@@ -818,6 +819,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Area and blinks</b>: the production area script still uses the three-point rule and the earlier blink rule; the switch to the four-point rule and the "mean confidence" rule is undecided. The closed-eye truth is only 28 frames, none on Terra yet.</li>
     </ul>
   </div>
+</section>
+
+<!-- appendix -->
+<section id="s10">
+  <h2><span class="no">附</span><span lang="zh">附录：每个视频每一批的选帧图</span><span lang="en">Appendix: the selection sheet of every batch of every video</span></h2>
+  <p class="text" lang="zh">这里是过程记录，不对应新的结论。每个视频一行，从第 1 批到最后一批，可以左右拖动。第 1 批没有模型可用，是对全部帧按画面外观聚类挑的 20 帧；第 2 批起是模型预测整段视频后，由 jump 规则标出候选帧，再按画面外观聚类挑的 20 帧。读法见图 5-1。到平台点之后的批次也在这里（它们已经标注，但没有带入后面的视频）。</p>
+  <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. How to read a sheet: Figure 5-1. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
+{{APPENDIX_SELECTION}}
 </section>
 
 <section>
