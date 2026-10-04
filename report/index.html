@@ -69,7 +69,7 @@ code{font-family:var(--mono);font-size:.9em}
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 00:13 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 00:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -97,7 +97,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 10 步）。</li>
       <li><b>瞳孔面积怎么算？</b>新标准下四个点都是椭圆端点，用四个点算的面积误差约为三点法的一半（第 11 步）。</li>
     </ol>
-    <p><b>进度：</b>已完成 11 个视频（视频 0–10）；视频 11 进行中，按 0 / 20 / 40 / … 帧的误差为 25.96 / 9.24 / 8.86 px。</p>
+    <p><b>进度：</b>已完成 11 个视频（视频 0–10）；视频 11 进行中，按 0 / 20 / 40 / … 帧的误差为 25.96 / 9.24 / 8.86 / 8.77 px。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Task:</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
@@ -125,7 +125,7 @@ code{font-family:var(--mono);font-size:.9em}
       <li><b>Do new videos make old ones worse?</b> No (step 10).</li>
       <li><b>How to compute the pupil area?</b> Under the new standard all four points are ellipse endpoints, and the 4-point area has about half the error of the 3-point rule (step 11).</li>
     </ol>
-    <p><b>Status:</b> 11 videos finished (videos 0–10); video 11 in progress, error at 0 / 20 / 40 / … labels: 25.96 / 9.24 / 8.86 px.</p>
+    <p><b>Status:</b> 11 videos finished (videos 0–10); video 11 in progress, error at 0 / 20 / 40 / … labels: 25.96 / 9.24 / 8.86 / 8.77 px.</p>
   </div>
 
   <div class="text" lang="zh">
@@ -466,7 +466,7 @@ code{font-family:var(--mono);font-size:.9em}
 <tr><td>8</td><td>Pluto<br>2025-10-24</td><td>400</td><td>27.46 / 25.34 / 30.03 / 33.77</td><td><span lang="zh"><b>20 帧，25.34 px</b></span><span lang="en"><b>20 labels, 25.34 px</b></span></td><td>60</td><td>20</td></tr>
 <tr><td>9</td><td>Pluto<br>2025-10-23</td><td>420</td><td>23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63</td><td><span lang="zh"><b>80 帧，8.20 px</b></span><span lang="en"><b>80 labels, 8.20 px</b></span></td><td>120</td><td>80</td></tr>
 <tr><td>10</td><td>Pluto<br>2025-10-22</td><td>500</td><td>18.13 / 11.83 / 10.32 / 10.49 / 10.76</td><td><span lang="zh"><b>40 帧，10.32 px</b></span><span lang="en"><b>40 labels, 10.32 px</b></span></td><td>80</td><td>40</td></tr>
-<tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86</td><td><span lang="zh">进行中（目前最好：40 帧，8.86 px）</span><span lang="en">in progress (best so far: 40 labels, 8.86 px)</span></td><td>40</td><td>–</td></tr>
+<tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86 / 8.77</td><td><span lang="zh">进行中（目前最好：40 帧，8.86 px）</span><span lang="en">in progress (best so far: 40 labels, 8.86 px)</span></td><td>60</td><td>–</td></tr>
       </tbody>
     </table>
   </div>
