@@ -72,7 +72,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:21 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-04 13:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -283,8 +283,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox"><img src="assets/kp_all_keypoints.jpg" alt="All eight keypoints on three mice"></div>
-    <figcaption lang="zh"><b>图 4-1</b>　<span class="tag">怎么看：</span>三只老鼠各一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；青色点是上下眼睑和两个眼角。图像为了看清做了提亮。</figcaption>
-    <figcaption lang="en"><b>Fig. 4-1.</b> <span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.</figcaption>
+    <figcaption lang="zh"><b>图 4-1</b>　<span class="tag">怎么看：</span>三只老鼠各一帧人工标注。红点是瞳孔的四个点，红线是过这四个点的椭圆；青色点是上下眼睑和两个眼角。图像为了看清做了提亮。<br><span class="muted">来源：左，第一只老鼠，视频 0（<code>0_first5minvedio</code>），第 15001 帧；中，Pluto，视频 1（<code>1_20251031_Pluto_spont_1</code>），第 68086 帧；右，Terra，视频 11（<code>11_20251017_Terra_spont_1</code>），第 68086 帧。都取自各视频的测试集，点是人工标注。</span></figcaption>
+    <figcaption lang="en"><b>Fig. 4-1.</b> <span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.<br><span class="muted">Source: left, first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001; middle, Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frame 68086; right, Terra, video 11 (<code>11_20251017_Terra_spont_1</code>), frame 68086. All from the test set of the video; the points are human labels.</span></figcaption>
   </figure>
   <div class="text" lang="zh">
     <ul>
@@ -298,8 +298,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox"><img src="assets/kp_construction_pupil.jpg" alt="How the pupil points are constructed"></div>
-    <figcaption lang="zh"><b>图 4-2</b>　<span class="tag">怎么看：</span>瞳孔四个点怎么来。红色椭圆盖住整个瞳孔，红色虚线是它的两条轴，四个点是轴的端点。黄色叉和黄色虚线是 2026 年 9 月 20 日之前的标法：当时没有刻意按椭圆去拟合，四个点标在看得见的瞳孔最靠上、最靠下、最靠左、最靠右的位置，所以四个点不一定是椭圆的端点，也不一定落在椭圆的两条轴线上。</figcaption>
-    <figcaption lang="en"><b>Fig. 4-2.</b> <span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: no ellipse was fitted on purpose and the four points were placed at the topmost, bottommost, leftmost and rightmost visible points of the pupil, so they are not necessarily the ends of an ellipse and do not necessarily lie on its two axes.</figcaption>
+    <figcaption lang="zh"><b>图 4-2</b>　<span class="tag">怎么看：</span>瞳孔四个点怎么来。红色椭圆盖住整个瞳孔，红色虚线是它的两条轴，四个点是轴的端点。黄色叉和黄色虚线是 2026 年 9 月 20 日之前的标法：当时没有刻意按椭圆去拟合，四个点标在看得见的瞳孔最靠上、最靠下、最靠左、最靠右的位置，所以四个点不一定是椭圆的端点，也不一定落在椭圆的两条轴线上。<br><span class="muted">来源：三幅都是 Pluto，视频 1（<code>1_20251031_Pluto_spont_1</code>），从左到右是第 20855、5160、4835 帧，取自第一批训练帧。红点是按 2026 年 9 月 20 日明确的定义重新标注的位置，黄色叉是同一帧在此之前的标注。</span></figcaption>
+    <figcaption lang="en"><b>Fig. 4-2.</b> <span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: no ellipse was fitted on purpose and the four points were placed at the topmost, bottommost, leftmost and rightmost visible points of the pupil, so they are not necessarily the ends of an ellipse and do not necessarily lie on its two axes.<br><span class="muted">Source: all three panels are Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frames 20855, 5160 and 4835 from left to right, taken from the first training batch. Red dots are the labels made under the definitions of 2026-09-20, yellow crosses the labels of the same frames before that.</span></figcaption>
   </figure>
   <div class="text" lang="zh">
     <ul>
@@ -325,8 +325,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox" style="max-width:58rem"><img src="assets/kp_construction_corners.jpg" alt="How the two corners are constructed"></div>
-    <figcaption lang="zh"><b>图 4-3</b>　<span class="tag">怎么看：</span>两个眼角怎么来，画法照 2026 年 9 月 20 日讨论时的手绘图。三行分别是整只眼睛、左眼角、右眼角；每一行左边是没有任何线的原图，右边是同一张图加上作图线。红色实线是沿图像描出的睑缘，红色虚线是它的延长线，红圈是交点，也就是眼角，青色点是标注的位置。黄色点线和黄色叉是讨论时比较过、最后不取的画法：左眼角沿阴影内侧的边，右眼角沿反光内沿和它下面阴影的内边缘，两条黄线都一直画到接近下眼睑点。斜线区域是左眼角处的阴影。</figcaption>
-    <figcaption lang="en"><b>Fig. 4-3.</b> <span class="tag">How to read:</span>How the two corners are obtained, drawn after the hand sketch used in the discussion of 2026-09-20. The three rows are the whole eye, the left corner and the right corner; in each row the left image is the frame without any line and the right image is the same frame with the construction. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner, cyan = the labeled point. Dotted yellow lines and yellow crosses show the construction that was compared in the discussion and not adopted: along the inner border of the shadow at the left corner, and along the inner edge of the reflection and of the shadow below it at the right corner; both yellow lines run down to near the lower-eyelid point. The hatched area is the shadow at the left corner.</figcaption>
+    <figcaption lang="zh"><b>图 4-3</b>　<span class="tag">怎么看：</span>两个眼角怎么来，画法照 2026 年 9 月 20 日讨论时的手绘图。三行分别是整只眼睛、左眼角、右眼角；每一行左边是没有任何线的原图，右边是同一张图加上作图线。红色实线是沿图像描出的睑缘，红色虚线是它的延长线，红圈是交点，也就是眼角，青色点是标注的位置。黄色点线和黄色叉是讨论时比较过、最后不取的画法：左眼角沿阴影内侧的边，右眼角沿反光内沿和它下面阴影的内边缘，两条黄线都一直画到接近下眼睑点。斜线区域是左眼角处的阴影。<br><span class="muted">来源：三行都是第一只老鼠，视频 0（<code>0_first5minvedio</code>），第 15001 帧，取自测试集。青色点是人工标注；红线、黄线是对着图像画的作图线。</span></figcaption>
+    <figcaption lang="en"><b>Fig. 4-3.</b> <span class="tag">How to read:</span>How the two corners are obtained, drawn after the hand sketch used in the discussion of 2026-09-20. The three rows are the whole eye, the left corner and the right corner; in each row the left image is the frame without any line and the right image is the same frame with the construction. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner, cyan = the labeled point. Dotted yellow lines and yellow crosses show the construction that was compared in the discussion and not adopted: along the inner border of the shadow at the left corner, and along the inner edge of the reflection and of the shadow below it at the right corner; both yellow lines run down to near the lower-eyelid point. The hatched area is the shadow at the left corner.<br><span class="muted">Source: all three rows are the first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001, from the test set. Cyan dots are human labels; the red and yellow lines are construction lines drawn on the image.</span></figcaption>
   </figure>
   <div class="text" lang="zh">
     <ul>
