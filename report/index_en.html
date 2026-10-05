@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 21:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 23:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -685,6 +685,24 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
     </ol>
   </div>
+  <h3><span lang="en">8.1 Can unreliable frames be found without labels</span></h3>
+  
+  <p class="text" lang="en"><span class="tag">What was done:</span>The 50 test frames and 20 validation frames of every finished video (videos 0–12), 910 frames. They are evenly spaced in time, not picked by any model, human-labeled and never trained on. For each frame the frame RMSE of the video's plateau-point model was computed (formula at the top of the page), together with two label-free signals: the jump (displacement of the keypoint that moved farthest from the previous frame ÷ eye width; the jump rule of section 5.1 flags the frame when it exceeds 0.03) and the lowest confidence of the 8 points. The question is how many truly wrong frames these signals find. "Wrong" has two levels: frame RMSE above 50 px (30 frames, 3.3%) and above 20 px (118 frames, 13.0%). Script: <code>scripts/unreliable_frames.py</code>; results in <code>results/unreliable_frames/</code>.</p>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_unreliable.jpg" alt="Jump and confidence against the frame error"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-3, how to read:</span>A: one dot per frame, x = jump, y = error of the frame (both log scale); grey = error up to 20 px, orange 20–50 px, red above 50 px; the dashed line is the threshold of the jump rule, frames to its right are flagged. B: the same with the lowest confidence on x; frames to the left of the line (below 0.6) are flagged. C: recall (solid: share of the wrong frames that are flagged) and precision (hatched: share of the flagged frames that are wrong) of four rules; red = above 50 px, orange = above 20 px; the share of frames each rule flags is written under the axis.</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>So far no rule both finds all wrong frames and avoids flagging many correct ones.
+    <ol>
+      <li><b>The jump rule is selective but incomplete:</b> it flags 12.6% of the frames (115), about half of which (48%) have an error above 20 px. Of the 30 gross errors (above 50 px) it finds 20 (67%) and misses 10: frames in which the prediction is wrong but did not move from the previous frame.</li>
+      <li><b>The confidence is complete but flags too much:</b> lowest confidence below 0.6 finds all 30 gross errors but flags 52.9% of all frames; only 6% of the flagged frames are gross errors.</li>
+      <li>Using both (flag if either holds) is almost the same as the confidence alone. A mean-confidence rule with a leave-one-video-out threshold lies in between: 22.7% of the frames flagged, 24 of the 30 found.</li>
+      <li>Videos differ a lot: 1 to 38 frames above 20 px per video, and the AUC of the same signal ranges from 0.3 to 1.0 across videos. The pooled numbers should not be read as valid for every video.</li>
+      <li>Limits: only 30 gross-error frames, 17 of them from videos 1 and 8; one model per video; single frames are evaluated, runs of consecutive wrong frames are not evaluated as events.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 9 -->
@@ -731,7 +749,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <section id="s10">
   <h2><span class="no">10</span><span lang="en">Blinks: no result yet (definition and truth not fixed); only a preliminary observation so far</span></h2>
   
+  
   <p class="text" lang="en"><span class="hl">Status: there is no result on blinks yet.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
+  <p class="text" lang="en"><span class="tag">First round (agreed with Kaiwen on 2026-10-04, in progress):</span>Closure is first judged from the distance between the upper and lower eyelid points (a frame counts as closed when the eye opening is below 70% of the video's median; closure frames less than 5 frames apart form one event); the rule is run on the videos and part of the result is spot-checked by eye; the finer classes (blink, closed, squint) come after this round. The rule has been run on videos 0–12: 733 events, 140 items sampled for the human spot check. <b>The spot check has not been done, so there is no conclusion yet.</b> Script: <code>scripts/blink_by_eyelid_distance.py</code>; results and the spot-check list in <code>results/blink_eyelid_distance/</code>.</p>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">The 12 finished videos (videos 0–11; 1 of mouse A, 10 of Pluto, 1 of Terra).</span></td></tr>
@@ -844,7 +864,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="en">
     <ul>
       <li><b>The plateau rule works at the noise floor:</b> With 50 test frames, retraining the same setting moves the median by about 0.5–1 px, while 3% is about 0.3 px. Each video's plateau point therefore carries an uncertainty of roughly ±20 labels. Every point is a single training run.</li>
-      <li><b>How well the jump rule finds wrong frames</b> has not been measured: how many flagged frames are really wrong, and how many wrong frames it misses.</li>
+      <li><b>How to find unreliable frames</b> (step 8, section 8.1): the jump rule finds two thirds of the gross errors, the confidence finds all of them but flags half of the frames; there is no rule yet that is both complete and selective, and videos differ a lot.</li>
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: its first video (video 11) is finished, the second (video 12) is in progress, the others are not started. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>

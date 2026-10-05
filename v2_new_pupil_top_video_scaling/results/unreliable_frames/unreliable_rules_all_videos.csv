@@ -1,0 +1,9 @@
+rule,wrong_means,frames,wrong,flagged,flagged_pct,flagged_and_wrong,precision_pct,recall_pct
+jump > 0.03 of the eye width (rule of select_frames.py),frame RMSE > 50 px,910,30,115,12.6,20,17.4,66.7
+jump > 0.03 of the eye width (rule of select_frames.py),frame RMSE > 20 px,910,118,115,12.6,55,47.8,46.6
+lowest confidence < 0.6,frame RMSE > 50 px,910,30,481,52.9,30,6.2,100.0
+lowest confidence < 0.6,frame RMSE > 20 px,910,118,481,52.9,105,21.8,89.0
+mean confidence < t (leave one video out; 0.688 on all frames),frame RMSE > 50 px,910,30,207,22.7,24,11.6,80.0
+mean confidence < t (leave one video out; 0.688 on all frames),frame RMSE > 20 px,910,118,207,22.7,66,31.9,55.9
+jump rule OR lowest confidence < 0.6,frame RMSE > 50 px,910,30,495,54.4,30,6.1,100.0
+jump rule OR lowest confidence < 0.6,frame RMSE > 20 px,910,118,495,54.4,106,21.4,89.8

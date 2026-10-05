@@ -241,6 +241,9 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | `blink_and_area/` | `blink_and_area.py` | pupil-area rules, eye-closure signals and rules, time series; one figure per video (`blink_area_timeseries_videoNN.png`) and all videos together. Four-point area: median error 6.6% on 594 test frames (three-point rule 8.3%); rule "mean pupil confidence < 0.527": 27 of 28 human closed-eye frames detected, 4.1% of open frames flagged |
 | `keypoint_confidence_error/` | `keypoint_confidence_error.py` | error and confidence of each of the 8 keypoints; one figure per video (`keypoint_confidence_error_videoNN.png`) and all videos together. Pupil top is the least accurate point (median 10.9 px; the others 3.9-5.8 px) |
 
+| `unreliable_frames/` | `unreliable_frames.py` | check of the jump rule and of the confidence on 910 evenly spaced human-labeled frames (test50 + val20 of videos 0-12): the jump rule flags 12.6% of the frames and finds 20 of the 30 frames above 50 px; lowest confidence < 0.6 finds all 30 but flags 52.9% |
+| `blink_eyelid_distance/` | `blink_by_eyelid_distance.py` | first-round closure rule from the eyelid distance (r < 0.70 of the video median): 733 events on videos 0-12 and a sample of 140 items for the human spot check (not done yet; no conclusion) |
+
 Each folder has its own README with the basic information, the file-to-script table and the results.
 
 ## All videos in one figure, three views (2026-10-04)

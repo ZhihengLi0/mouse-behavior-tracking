@@ -41,6 +41,7 @@ FIGURES = [
     (V2 / "results/blink_and_area/blink_area_closed_frames_all_videos.jpg", "fig_closed_frames.jpg", 2784),
     (V2 / "results/blink_and_area/blink_area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
     (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
+    (V2 / "results/unreliable_frames/unreliable_frames_all_videos.png", "fig_unreliable.jpg", 2625),
     (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
