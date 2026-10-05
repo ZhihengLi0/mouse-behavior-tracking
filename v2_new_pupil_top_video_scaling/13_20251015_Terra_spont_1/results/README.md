@@ -11,6 +11,7 @@ in total) + this video's labels; shuffles 1411, 1412, ...
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-11 40-label model 1212, applied unchanged) | 69.13 px | 116.6 | 56% | 24% | – |
+| 20 (shuffle 1411) | 9.43 px | 16.0 | 0% | 86% | pending |
 
 The model that fitted video 12 (the day after, 5.13 px) does not fit this day: 69 px at 0 labels, more than half of
 the test frames above 50 px. The other models of videos 11 and 12 give 31.5-79.4 px on this test set
