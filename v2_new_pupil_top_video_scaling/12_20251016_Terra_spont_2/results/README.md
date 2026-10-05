@@ -28,5 +28,17 @@ running best, the 0-label number 5.13 px.
 recording day (as with video 7 after video 6); no labels of this video are carried into later videos. Batches 01-02 stay
 on disk. The three numbers 5.13 / 5.77 / 5.84 px differ by less than 1 px.
 
-Fewer-labels study so far (size of the first batch; 5 of the 20 batch-1 labels, picked by image appearance, no jump
-selection afterwards): subset 5a = 5.79 px (p90 8.0, 0% of frames > 50 px); the other three subsets are queued.
+**Fewer-labels study (2026-10-05)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training
+set otherwise as at the time: the 580 carried labels of videos 0-11; shuffles 2121-2124) -> `fewer_labels.png` /
+`fewer_labels.csv`. This compares the size of the first batch (the 5 / 10 labels are taken out of the 20 already labeled,
+picked by image appearance without a model); it is not a procedure of 5 labels per step and no jump selection followed.
+
+| labels of this video | median | p90 | frames > 50 px |
+|---|---|---|---|
+| 0 | 5.13 px | 9.4 | 0% |
+| 5 (subset a / b) | 5.79 / 6.63 px | 8.0 / 8.7 | 0% / 0% |
+| 10 (subset a / b) | 5.99 / 5.96 px | 7.7 / 8.1 | 0% / 0% |
+| 20 | 5.77 px | 7.7 | 0% |
+
+On this video 0, 5, 10 and 20 labels all give 5.1-6.6 px: the video-11 model already fits this day, so the size of the
+first batch makes no difference here.

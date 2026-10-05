@@ -16,3 +16,8 @@ in total) + this video's labels; shuffles 1411, 1412, ...
 The model that fitted video 12 (the day after, 5.13 px) does not fit this day: 69 px at 0 labels, more than half of
 the test frames above 50 px. The other models of videos 11 and 12 give 31.5-79.4 px on this test set
 (`../results/cross_video_matrix.csv`).
+
+**Fewer-labels study (started 2026-10-05)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each,
+training set otherwise as at the time: the 580 carried labels; shuffles 2131-2134). Size of the first batch only; no
+jump selection followed. So far: 5 labels (subset a) = 10.46 px (p90 30.4, 8% of frames > 50 px) against 69.13 px at 0
+labels and 9.43 px at 20; the other three subsets are queued.
