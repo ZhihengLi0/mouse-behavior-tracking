@@ -1,3 +1,7 @@
 label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
 x020_step01_final,12_20251016_Terra_spont_2,42,20,5.77,4.69,5.9,7.67,0.0,0.988,50,400,final snapshot (120),8.43,2.25,2.53,2.66,5.34,2.66,4.27,4.36
 x020_step01_mAPlate,12_20251016_Terra_spont_2,42,20,6.06,4.99,6.16,8.13,0.0,0.978,50,400,best validation mAP among epochs >= 96 (100),8.23,2.37,3.38,3.74,5.05,2.83,5.33,4.45
+x005_step01_final_sub05a,12_20251016_Terra_spont_2,42,5,5.79,4.91,6.29,7.99,0.0,0.843,50,400,final snapshot (120),7.23,3.0,2.76,2.23,6.01,2.94,6.13,4.48
+x005_step01_mAPlate_sub05a,12_20251016_Terra_spont_2,42,5,6.5,5.33,6.91,9.62,0.0,0.875,50,400,best validation mAP among epochs >= 96 (100),8.51,2.85,2.8,2.74,6.77,4.01,7.05,4.19
+x040_step02_final,12_20251016_Terra_spont_2,42,40,5.84,4.85,6.16,7.65,0.0,0.963,50,400,final snapshot (120),7.57,1.91,2.92,4.34,4.76,2.45,6.9,3.73
+x040_step02_mAPlate,12_20251016_Terra_spont_2,42,40,5.65,4.84,6.09,7.63,0.0,0.973,50,400,best validation mAP among epochs >= 96 (100),7.07,2.37,3.67,4.0,4.87,2.36,7.23,3.65

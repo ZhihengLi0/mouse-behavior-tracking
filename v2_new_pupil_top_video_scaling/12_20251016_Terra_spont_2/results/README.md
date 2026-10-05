@@ -12,6 +12,7 @@ total) + this video's labels; shuffles 1311, 1312, ...
 |---|---|---|---|---|---|
 | 0 (video-11 40-label model 1212, applied unchanged) | 5.13 px | 9.4 | 0% | 77% | – |
 | 20 (shuffle 1311) | 5.77 px | 7.7 | 0% | 99% | 7700 of 57158 (13.5%) |
+| 40 (shuffle 1312) | 5.84 px | 7.7 | 0% | 96% | pending |
 
 The 0-label number is biased low: model 1212 produced the pre-labels of this test set and 290 of the 400 test points
 were left as pre-labeled, so its error on those points is 0. The other models of video 11 (20 / 60 / 80 labels), which
@@ -19,3 +20,13 @@ did not produce the pre-labels, give 10.66 / 8.29 / 8.99 px on this test set (`.
 
 Step 1 (20 labels): 5.77 px. Against the 0-label number (5.13 px, biased low by the pre-labels) this is no gain, so by the
 rule it counts as one flat step; against the other video-11 models on this test set (8.29-10.66 px) it is clearly better.
+
+Step 2 (40 labels): 5.84 px. **The plateau rule fired at 40 labels** (2026-10-04 21:07): steps 1 and 2 (5.77, 5.84 px) did not improve
+the running best, which is the 0-label number 5.13 px; by the rule the plateau point is 0 labels. Awaiting the user's
+decision; the video stays in progress. Note for that decision: the 0-label number is biased low (model 1212 made the
+pre-labels of this test set and 290 of 400 points were left unchanged). The models of video 11 that did not make the
+pre-labels give 10.66 / 8.29 / 8.99 px on this test set (20 / 60 / 80 labels), so against an unbiased starting point the
+first 20 labels of this video do help (to 5.77 px), and 20 more labels change nothing (5.84 px).
+
+Fewer-labels study so far (size of the first batch; 5 of the 20 batch-1 labels, picked by image appearance, no jump
+selection afterwards): subset 5a = 5.79 px (p90 8.0, 0% of frames > 50 px); the other three subsets are queued.
