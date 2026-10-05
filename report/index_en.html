@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 21:08 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-04 21:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -103,7 +103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
       <li><b>How to detect blinks?</b> No result yet: the definition of a blink and its truth are not fixed. Only a preliminary observation so far: a mean confidence of the four pupil points below 0.527 finds the frames in which the labeler left all four pupil points empty (27 of 28, with 4.1% of the other frames flagged), but an empty frame is not the same as a blink (step 10).</li>
     </ol>
-    <p><b>Status:</b> 12 videos finished (videos 0–11); video 12 in progress, error at 0 / 20 / 40 / … labels: 5.13 / 5.77 / 5.84 px.</p>
+    <p><b>Status:</b> 13 videos finished (videos 0–12).</p>
   </div>
 
   
@@ -459,7 +459,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/scale_video09.jpg" alt="Video 9: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23): plateau at 80 labels, 8.20 px</span></div></div>
       <div class="item"><img src="assets/scale_video10.jpg" alt="Video 10: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22): plateau at 40 labels, 10.32 px</span></div></div>
       <div class="item"><img src="assets/scale_video11.jpg" alt="Video 11: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17): plateau at 40 labels, 8.86 px</span></div></div>
-      <div class="item"><img src="assets/scale_video12.jpg" alt="Video 12: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 12 (Terra, 2025-10-16): in progress</span></div></div>
+      <div class="item"><img src="assets/scale_video12.jpg" alt="Video 12: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 12 (Terra, 2025-10-16): plateau at 0 labels, 5.13 px</span></div></div>
     </div></div>
     
     <figcaption lang="en"><span class="tag">Figure 5-3, how to read:</span>The curves of every video in one row, from video 0 to the newest; scroll sideways. Under each figure: video, mouse, date and plateau point. How to read the three panels, with video 9 as the example. Left: x = this video's own labels, y = error; 10.4 px at 20 labels, 8.6 px at 40, 8.2 px at 80, then two steps without a gain (9.4, 8.6 px), so the rule fired at 120 and the plateau point is 80. Middle: error of each of the 8 points; pupil bottom (blue) is the hardest. Right: label-free signals; the purple line is the share of video frames flagged by the jump rule, falling from 18% to 9% as labels are added.</figcaption>
@@ -495,7 +495,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>9</td><td>Pluto<br>2025-10-23</td><td>420</td><td>23.41 / 10.39 / 8.55 / 8.67 / 8.20 / 9.39 / 8.63</td><td><span lang="en"><b>80 labels, 8.20 px</b></span></td><td>120</td><td>80</td></tr>
 <tr><td>10</td><td>Pluto<br>2025-10-22</td><td>500</td><td>18.13 / 11.83 / 10.32 / 10.49 / 10.76</td><td><span lang="en"><b>40 labels, 10.32 px</b></span></td><td>80</td><td>40</td></tr>
 <tr><td>11</td><td>Terra<br>2025-10-17</td><td>540</td><td>25.96 / 9.24 / 8.86 / 8.77 / 8.65</td><td><span lang="en"><b>40 labels, 8.86 px</b></span></td><td>80</td><td>40</td></tr>
-<tr><td>12</td><td>Terra<br>2025-10-16</td><td>580</td><td>5.13 / 5.77 / 5.84</td><td><span lang="en">in progress (best so far: 0 labels, 5.13 px)</span></td><td>40</td><td>–</td></tr>
+<tr><td>12</td><td>Terra<br>2025-10-16</td><td>580</td><td>5.13 / 5.77 / 5.84</td><td><span lang="en"><b>0 labels, 5.13 px</b></span></td><td>40</td><td>0</td></tr>
       </tbody>
     </table>
   </div>
