@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-05 02:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-05 18:50 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -716,7 +716,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>9</td><td>23.41</td><td>11.74 / 12.62</td><td>11.55 / 11.07</td><td>10.39</td></tr>
 <tr><td>10</td><td>18.13</td><td>15.01 / 12.50</td><td>11.70 / 13.08</td><td>11.83</td></tr>
 <tr><td>11</td><td>25.96</td><td>9.69 / 9.97</td><td>9.54 / 8.87</td><td>9.24</td></tr>
-<tr><td>12</td><td>5.13</td><td>5.79 / –</td><td>– / –</td><td>5.77</td></tr>
+<tr><td>12</td><td>5.13</td><td>5.79 / 6.63</td><td>5.99 / 5.96</td><td>5.77</td></tr>
+<tr><td>13</td><td>69.13</td><td>10.46 / –</td><td>– / –</td><td>9.43</td></tr>
       </tbody>
     </table>
   </div>
@@ -737,6 +738,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/fewer_video10.jpg" alt="fewer video 10" loading="lazy"><div class="cap"><span lang="zh">视频 10（Pluto，2025-10-22）</span><span lang="en">Video 10 (Pluto, 2025-10-22)</span></div></div>
       <div class="item"><img src="assets/fewer_video11.jpg" alt="fewer video 11" loading="lazy"><div class="cap"><span lang="zh">视频 11（Terra，2025-10-17）</span><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
       <div class="item"><img src="assets/fewer_video12.jpg" alt="fewer video 12" loading="lazy"><div class="cap"><span lang="zh">视频 12（Terra，2025-10-16）</span><span lang="en">Video 12 (Terra, 2025-10-16)</span></div></div>
+      <div class="item"><img src="assets/fewer_video13.jpg" alt="fewer video 13" loading="lazy"><div class="cap"><span lang="zh">视频 13（Terra，2025-10-15）</span><span lang="en">Video 13 (Terra, 2025-10-15)</span></div></div>
     </div></div>
     <figcaption lang="zh"><span class="tag">图 6-2 怎么看：</span>每个视频各一张，排成一行，可以左右拖动。每张图里蓝线是正常的 0、20、40… 帧，橙色点是 5 帧和 10 帧的两组；左图是中位误差，右图是误差超过 50 px 的测试帧比例。两个例子：视频 1（新老鼠的第一个视频），0 帧 208 px，5 帧 96 / 41 px，10 帧 20 / 16 px，20 帧 10.4 px，标得越多越好，5 帧和 10 帧都不够；视频 5（之前的视频已经覆盖得比较好），中位误差在 0–20 帧之间都是 9–16 px，差别不大，但误差超过 50 px 的测试帧从 0 帧时的 12% 降到 5 帧时的 0–4%。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
