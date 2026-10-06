@@ -7,3 +7,5 @@ mean confidence < t (leave one video out; 0.688 on all frames),frame RMSE > 50 p
 mean confidence < t (leave one video out; 0.688 on all frames),frame RMSE > 20 px,910,118,207,22.7,66,31.9,55.9
 jump rule OR lowest confidence < 0.6,frame RMSE > 50 px,910,30,495,54.4,30,6.1,100.0
 jump rule OR lowest confidence < 0.6,frame RMSE > 20 px,910,118,495,54.4,106,21.4,89.8
+fitting: mean SARIMAX deviation > 20 px (DLC 'fitting' detector),frame RMSE > 50 px,910,30,26,2.9,22,84.6,73.3
+fitting: mean SARIMAX deviation > 20 px (DLC 'fitting' detector),frame RMSE > 20 px,910,118,26,2.9,23,88.5,19.5
