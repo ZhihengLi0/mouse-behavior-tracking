@@ -222,6 +222,8 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | 9 (v2 labels; added 2026-10-02) | 23.41 (8%) | 11.7 / 12.6 (6% / 8%) | 11.6 / 11.1 (0% / 0%) | 10.39 (8%) |
 | 10 (v2 labels; added 2026-10-03) | 18.13 (8%) | 15.0 / 12.5 (4% / 2%) | 11.7 / 13.1 (8% / 2%) | 11.83 (2%) |
 | 11 (Terra, first video of mouse C; added 2026-10-04) | 25.96 (16%) | 9.7 / 10.0 (2% / 2%) | 9.5 / 8.9 (0% / 2%) | 9.24 (20%) |
+| 12 (Terra; added 2026-10-05) | 5.13 (0%) | 5.8 / 6.6 (0% / 0%) | 6.0 / 6.0 (0% / 0%) | 5.77 (0%) |
+| 13 (Terra; added 2026-10-06) | 69.13 (56%) | 10.5 / 16.0 (8% / 14%) | 11.2 / 10.3 (2% / 2%) | 9.43 (0%) |
 
 - What this study compares: the size of the FIRST batch. The 5 and 10 labels are taken out of the 20 batch01 labels that were
   already made (appearance-based, model-free, like batch01 itself). It is not a procedure of 5 labels per step (label 5,
