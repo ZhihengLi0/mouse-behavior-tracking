@@ -43,6 +43,7 @@ FIGURES = [
     (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
     (V2 / "results/unreliable_frames/unreliable_frames_all_videos.png", "fig_unreliable.jpg", 2625),
     (V2 / "results/blink_eyelid_distance/blink_final_summary.png", "fig_blink_final.jpg", 2210),
+    (V2 / "results/blink_eyelid_distance/blink_notopen_rule_summary.png", "fig_blink_notopen.jpg", 1875),
     (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
@@ -160,6 +161,9 @@ for r in pl.itertuples():
                         f'<span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}): {len(items)} batches</span></b></p>\n'
                         f'  <figure><div class="figbox scroll"><div class="strip tall">\n' + "\n".join(items) + '\n  </div></div></figure>')
 
+# appendix: the single-frame "not open" spot check, one contact sheet per video (the labeler's verdicts on the original frames)
+notopen_strip = strip_of(lambda r: V2 / f"results/blink_eyelid_distance/blink_notopen_sheet_video{int(r.video):02d}.png", "notopen", 1700, "：18 帧单帧盲评", ": 18 single frames, blind")
+
 if in_progress:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）；视频 {in_progress[0]} 进行中，按 0 / 20 / 40 / … 帧的误差为 {' / '.join(in_progress[1])} px。"
     en_status = f"{n_final} videos finished (videos 0–{n_final - 1}); video {in_progress[0]} in progress, error at 0 / 20 / 40 / … labels: {' / '.join(in_progress[1])} px."
@@ -183,6 +187,7 @@ FILL = {
     "{{KP_STRIP}}": kp_strip,
     "{{TS_STRIP}}": ts_strip,
     "{{APPENDIX_SELECTION}}": "\n".join(appendix),
+    "{{APPENDIX_NOTOPEN}}": notopen_strip,
     "{{SELECTION_STRIP}}": "\n".join(sel_strip),
     "{{SCALE_STRIP}}": "\n".join(strip),
     "{{EYE_ROWS}}": "\n".join(eye),

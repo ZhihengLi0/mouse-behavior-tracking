@@ -1,0 +1,13 @@
+rule,flagged,flagged_pct,precision_pct,recall_pct,recall_r>=1.00,recall_0.70-0.85,recall_0.85-1.00,recall_eyelid points implausible,recall_r<0.70,accuracy_pct
+r < t (leave one video out; 0.817 on all) OR eyelid implausible,123,51.5,61.8,67.3,0.0,62.0,9.0,100.0,100.0,
+ph < t (leave one video out; 0.921 on all) OR eyelid implausible,143,59.8,67.1,85.0,50.0,84.0,65.0,100.0,95.0,
+area < t (leave one video out; 0.923 on all) OR eyelid implausible,145,60.7,61.4,78.8,50.0,81.0,52.0,100.0,87.0,
+asp < t (leave one video out; 0.941 on all) OR eyelid implausible,112,46.9,61.6,61.1,0.0,59.0,48.0,100.0,62.0,
+O_w < t (leave one video out; 0.347 on all); implausible -> not open,136,56.9,77.2,92.9,50.0,97.0,78.0,100.0,100.0,
+O_w < t (leave one video out; 0.347 on all); implausible -> pupil conf < 0.527,121,50.6,85.1,91.2,50.0,97.0,78.0,87.0,100.0,
+O_px < t (leave one video out; 149.196 on all); implausible -> not open,135,56.5,78.5,93.8,75.0,94.0,83.0,100.0,100.0,
+O_px < t (leave one video out; 149.196 on all); implausible -> pupil conf < 0.527,120,50.2,86.7,92.0,75.0,94.0,83.0,87.0,100.0,
+ph_w < t (leave one video out; 0.316 on all); implausible -> not open,133,55.6,76.7,90.3,50.0,91.0,78.0,100.0,97.0,
+ph_w < t (leave one video out; 0.316 on all); implausible -> pupil conf < 0.527,118,49.4,84.7,88.5,50.0,91.0,78.0,87.0,97.0,
+"r < 0.70 OR eyelid implausible (rule D, relative)",72,30.1,75.0,47.8,0.0,0.0,0.0,100.0,100.0,
+r < 0.800 OR ph < 0.925 (leave one video out) OR eyelid implausible,145,60.7,67.6,86.7,50.0,91.0,57.0,100.0,100.0,

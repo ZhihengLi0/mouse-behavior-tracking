@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-06 14:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-06 14:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -101,7 +101,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 4.0–5.8 px); for every point a lower confidence goes with a larger error, but pupil top has 8.0 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 694 test frames of 14 videos the four-point area has a median error of 5.6% against 7.8% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to detect blinks?</b> First round: a frame is closed when the distance between the eyelid points is below 70% of the video's median, and frames with failed eyelid points are assigned by adjacency and pupil confidence; the labeler spot-checked 137 items and 97% of the flagged closures are real, 89% in a later blind sample of 100 new items, with no full closure missed; 512 closure events on the 13 videos. Whether partial closures count, and the finer classes, are not decided (step 10).</li>
+      <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 7 videos (3, 4, 8–12) the eye is not fully open 26–70% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
     </ol>
     <p><b>Status:</b> 14 videos finished (videos 0–13).</p>
   </div>
@@ -756,10 +756,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 10 -->
 <section id="s10">
-  <h2><span class="no">10</span><span lang="en">Blinks, first round: eyelid distance plus eyelid-point failure, 137 items spot-checked, 97% of the flagged closures are real; the finer classes are not defined yet</span></h2>
+  <h2><span class="no">10</span><span lang="en">Blinks, first round: "not open = closed or lid over part of the pupil" defined first; a per-frame absolute-eye-opening rule is 91% accurate on 239 blind frames; 7 videos have the eye not fully open 26–70% of the time</span></h2>
   
   
-  <p class="text" lang="en"><span class="hl">Status: the first round has a result (section 10.1); the finer classes of blinks are not defined yet.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
+  <p class="text" lang="en"><span class="hl">Status: the first-round definition is fixed (not open = closed or partly covered); rule and check in section 10.2; 10.1 is the first version from before the definition, kept as a record. The finer classes of blinks are the next round.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
   <p class="text" lang="en"><span class="tag">First round (agreed with Kaiwen on 2026-10-04):</span>Closure is first judged from the distance between the upper and lower eyelid points (a frame counts as closed when the eye opening is below 70% of the video's median; closure frames less than 5 frames apart form one event); the rule is run on the videos and part of the result is spot-checked by eye; the finer classes (blink, closed, squint) come after this round. The rule has been run on videos 0–12 and the spot check is done; see section 10.1. Script: <code>scripts/blink_by_eyelid_distance.py</code>; results and the spot-check list in <code>results/blink_eyelid_distance/</code>.</p>
   <h3><span lang="en">10.1 First round: the rule, the human spot check and the result</span></h3>
   
@@ -833,6 +833,41 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
+  <h3><span lang="en">10.2 With the first-round definition fixed: a per-frame "not open" rule and its check</span></h3>
+  
+  <div class="text" lang="en">
+    <p><b>Definition (fixed 2026-10-06):</b> the first round distinguishes two states only — <b>open</b>, and <b>not open</b> (the eye is closed, or the eyelid covers part of the pupil). Blink / long closure / squint come in the next round.</p>
+    <p><b>Basic information:</b> videos 0–13, whole-video prediction of each video's plateau-point model. Truth: the labeler's blind verdict on 240 single frames (2026-10-06; 18 per video, drawn at random in five strata of the model's relative eye opening r: r &lt; 0.70, 0.70–0.85, 0.85–1.00, ≥ 1.00 with 4 frames each, 2 frames with implausible eyelid points; no overlap with the two earlier spot checks; the sheet shows the single original frame and no values), one of open / not open / cannot tell. 239 frames judged, 113 not open, no "cannot tell". Frames and verdicts in appendix A2. Scripts: <code>scripts/blink_notopen_frames_sample.py</code> (sample), <code>blink_notopen_frames_eval.py</code> (signal comparison), <code>blink_notopen_rule.py</code> (final rule and whole-video results); results <code>results/blink_eyelid_distance/blink_notopen_*</code>.</p>
+    <p><b>Why the signal had to change:</b> rule D of 10.1 uses the eye opening relative to the video's own median, and its recall in the 0.70–0.85 stratum is 0 — because, frame by frame, almost every frame with r in 0.70–1.00 of videos 3, 8, 9, 10, 11 and 12 was judged not open, while the same frames of videos 0, 5, 7 and 13 were all open (appendix A2 shows it at a glance). "Lid over part of the pupil" is the resting state of those recordings, and a quantity relative to the video's own median cannot see it. The <b>absolute</b> eye opening O ÷ eye width W (W = median corner-to-corner distance of the video; the camera is fixed, so W is similar across videos) separates the two classes well (AUC 0.97; the relative r only 0.85). The per-video medians of O/W agree: 0.30–0.38 in the videos judged mostly not open, 0.41–0.59 in the videos judged open.</p>
+    <p><b>Final rule (per frame):</b> (1) eyelid points plausible and O / W &lt; <b>0.347</b> → not open; (2) frame with implausible eyelid points: not open if the mean confidence of the four pupil points &lt; 0.527, otherwise open ("implausible = closed" of 10.1 was wrong: 13 of 28 implausible frames show an open eye, and the pupil confidence gets 26 of the 28 right); (3) runs of ≥ 3 frames are events, gaps &lt; 5 frames merged. The threshold 0.347 was chosen on these 239 frames (maximizing recall − false-alarm rate); with leave-one-video-out thresholds the conclusion is the same (precision 85%, recall 91%).</p>
+  </div>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="en">The 239 frames</span></th><th><span lang="en">Frames</span></th><th><span lang="en">Judged not open</span></th><th><span lang="en">Rule: not open</span></th><th><span lang="en">Accuracy</span></th><th><span lang="en">Precision</span></th><th><span lang="en">Recall</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="en">all</span></td><td>239</td><td>113</td><td>117</td><td>90.8%</td><td>88.9%</td><td>92.0%</td></tr>
+      <tr><td>r &lt; 0.70</td><td>44</td><td>39</td><td>44</td><td>88.6%</td><td>88.6%</td><td>100%</td></tr>
+      <tr><td>r 0.70–0.85</td><td>56</td><td>32</td><td>35</td><td>94.6%</td><td>91.4%</td><td>100%</td></tr>
+      <tr><td>r 0.85–1.00</td><td>55</td><td>23</td><td>23</td><td>81.8%</td><td>78.3%</td><td>78.3%</td></tr>
+      <tr><td>r ≥ 1.00</td><td>56</td><td>4</td><td>2</td><td>96.4%</td><td>100%</td><td>50%</td></tr>
+      <tr><td><span lang="en">eyelid points implausible</span></td><td>28</td><td>15</td><td>13</td><td>92.9%</td><td>100%</td><td>86.7%</td></tr>
+      <tr><td><span lang="en">for comparison: rule D of 10.1</span></td><td>239</td><td>113</td><td>72</td><td>72.4%</td><td>75.0%</td><td>47.8%</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_notopen.jpg" alt="Not-open frames and events per video under the final rule"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>Left: share of frames the rule calls not open per video (red bars); the grey number on each bar is the video's median O/W; the black dot is the share of the 18 sampled frames the labeler judged not open (the sample is stratified, not proportional, so the dots show the direction only and are not to be compared with the bar heights). Right: not-open events per minute, with the event count and the median duration on the bars.</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion of 10.2:</span>Under the definition "not open = closed or partly covered", the absolute-eye-opening rule is 91% accurate per frame; its main finding is that <b>not-open is a state in these recordings, not an occasional event.</b>
+    <ol>
+      <li><b>Accuracy:</b> 217 of the 239 blind frames are classified correctly (90.8%); 89% of the frames the rule calls not open are, and 92% of the truly not-open frames are found. Most mistakes are in the r 0.85–1.00 stratum (10 of 55), the borderline where the lid just touches the top of the pupil.</li>
+      <li><b>The 14 videos fall into two groups:</b> videos 0, 5, 7 and 13 are open almost throughout (0.2–0.4% not-open frames); videos 1, 2, 6 have 2–12%; <b>videos 3, 4, 8, 9, 10, 11 and 12 have the eye not fully open 26–70% of the time</b>, with single not-open stretches of 44–212 s. In those recordings a half-covered eye is the resting state: median O/W 0.30–0.38 against 0.41–0.59 in the open videos.</li>
+      <li><b>Events:</b> 0.2–12.8 per minute, median duration 100–717 ms. In the half-covered videos most "events" are re-closings after brief openings within the covered state and must not be read as blink counts.</li>
+      <li><b>What it means for blinks:</b> a blink (brief, full closure) is a subset of "not open". Counting blinks needs a further split of this state by depth (how low O/W goes) and duration (how brief) — all 18 full closures of 10.1 lie below r 0.70, so that cut is feasible.</li>
+      <li><b>Limits:</b> one judge; the threshold was chosen on the validation frames (leave-one-video-out gives slightly lower numbers: 85% / 91%); one model per video; the judgement "lid covers part of the pupil" has its own borderline (the r 0.85–1.00 stratum), and the labeler's repeatability on the same frames was not measured.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 11 -->
@@ -913,7 +948,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: videos 11 and 12 are finished, video 13 is in progress, the others are not started. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
-      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first-round closure rule has a result (step 10, section 10.1): 89% of what it flags is a closure in a new blind sample of 100 items and no full closure was missed; but "partly closed" is a common state of these eyes (it occurs even in random segments with r above the median), and whether it counts as a blink, and the finer classes, are not defined.</li>
+      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first round has a rule and its check under the definition "not open = closed or partly covered" (step 10, section 10.2, 91% accurate); still missing are the definition of a blink itself (how deep, how brief) and a rule that separates blinks from long half-covered stretches.</li>
     </ul>
   </div>
 </section>
@@ -1023,6 +1058,25 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video13_batch02.jpg" alt="Video 13 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 13, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video13_batch03.jpg" alt="Video 13 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 13, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video13_batch04.jpg" alt="Video 13 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 13, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+  </div></div></figure>
+  <h3><span lang="en">A2: the single-frame blind check of the first-round blink definition (the labeler's verdicts on the original frames)</span></h3>
+  
+  <p class="text" lang="en">The 240 frames of section 10.2 in step 10 (18 per video, drawn at random in five strata of the model's eye opening, no overlap with the two earlier spot checks). The labeler saw only the single original frame, no values, and judged "open" or "not open (closed, or the lid covers part of the pupil)". Frame border and bottom band: green = open, red = not open; the r on the band (eye opening ÷ the video's median) was added afterwards. One row per video; scroll sideways.</p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/notopen_video00.jpg" alt="notopen video 0" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video01.jpg" alt="notopen video 1" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video02.jpg" alt="notopen video 2" loading="lazy"><div class="cap"><span lang="en">Video 2 (Pluto, 2025-10-31): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video03.jpg" alt="notopen video 3" loading="lazy"><div class="cap"><span lang="en">Video 3 (Pluto, 2025-10-31): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video04.jpg" alt="notopen video 4" loading="lazy"><div class="cap"><span lang="en">Video 4 (Pluto, 2025-10-30): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video05.jpg" alt="notopen video 5" loading="lazy"><div class="cap"><span lang="en">Video 5 (Pluto, 2025-10-29): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video06.jpg" alt="notopen video 6" loading="lazy"><div class="cap"><span lang="en">Video 6 (Pluto, 2025-10-28): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video07.jpg" alt="notopen video 7" loading="lazy"><div class="cap"><span lang="en">Video 7 (Pluto, 2025-10-27): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video08.jpg" alt="notopen video 8" loading="lazy"><div class="cap"><span lang="en">Video 8 (Pluto, 2025-10-24): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video09.jpg" alt="notopen video 9" loading="lazy"><div class="cap"><span lang="en">Video 9 (Pluto, 2025-10-23): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video10.jpg" alt="notopen video 10" loading="lazy"><div class="cap"><span lang="en">Video 10 (Pluto, 2025-10-22): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video11.jpg" alt="notopen video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video12.jpg" alt="notopen video 12" loading="lazy"><div class="cap"><span lang="en">Video 12 (Terra, 2025-10-16): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video13.jpg" alt="notopen video 13" loading="lazy"><div class="cap"><span lang="en">Video 13 (Terra, 2025-10-15): 18 single frames, blind</span></div></div>
   </div></div></figure>
 </section>
 

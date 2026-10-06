@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-06 14:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-06 14:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -103,7 +103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 7 步）。</li>
       <li><b>模型给出的哪些点准，置信度能不能信？</b>瞳孔上点最不准（误差中位数 10.2 px，其余 7 个点 4.0–5.8 px）；每个点都是置信度越低误差越大，但瞳孔上点即使置信度高也有 8.0 px（第 8 步）。</li>
       <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 14 个视频的 694 帧测试帧上，四点法的面积误差中位数是 5.6%，三点法是 7.8%；视频 4 和 8 上面积仍然不准（第 9 步）。</li>
-      <li><b>眨眼怎么判断？</b>第一轮：上下眼睑点的距离低于该视频中位数的 70% 记为闭眼，眼睑点失效的帧按相邻关系和瞳孔置信度并入；标注者抽查 137 项，规则标出的闭眼 97% 是真的，之后 100 项新的盲评里是 89%，完全闭眼没有漏；13 个视频共 512 次闭眼事件。部分闭合算不算眨眼、眨眼的细分，还没有定（第 10 步）。</li>
+      <li><b>眨眼怎么判断？</b>第一轮先定了定义：非睁眼 = 眼睛闭上或眼睑盖住部分瞳孔。按帧的规则"睁开高度 ÷ 眼宽 &lt; 0.347"（眼睑点失效时看瞳孔置信度）在 239 帧单帧盲评上准确率 91%。主要发现：7 个视频（3、4、8–12）有 26–70% 的时间眼睛不是完全睁开的，半掩是那些录像的常态；眨眼是其中的子集，细分放下一轮（第 10 步）。</li>
     </ol>
     <p><b>进度：</b>已完成 14 个视频（视频 0–13）。</p>
   </div>
@@ -130,7 +130,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 4.0–5.8 px); for every point a lower confidence goes with a larger error, but pupil top has 8.0 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 694 test frames of 14 videos the four-point area has a median error of 5.6% against 7.8% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to detect blinks?</b> First round: a frame is closed when the distance between the eyelid points is below 70% of the video's median, and frames with failed eyelid points are assigned by adjacency and pupil confidence; the labeler spot-checked 137 items and 97% of the flagged closures are real, 89% in a later blind sample of 100 new items, with no full closure missed; 512 closure events on the 13 videos. Whether partial closures count, and the finer classes, are not decided (step 10).</li>
+      <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 7 videos (3, 4, 8–12) the eye is not fully open 26–70% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
     </ol>
     <p><b>Status:</b> 14 videos finished (videos 0–13).</p>
   </div>
@@ -939,10 +939,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 10 -->
 <section id="s10">
-  <h2><span class="no">10</span><span lang="zh">眨眼第一轮：眼睑距离加眼睑点失效的规则，人工抽查 137 项，规则标出的闭眼 97% 是真的；眨眼的细分还没有定义</span><span lang="en">Blinks, first round: eyelid distance plus eyelid-point failure, 137 items spot-checked, 97% of the flagged closures are real; the finer classes are not defined yet</span></h2>
-  <p class="text" lang="zh"><span class="hl">现状：第一轮有结果（10.1 节），眨眼的细分还没有定义。</span>要评估眨眼的判断方法，先要有眨眼的定义（眼睛闭到什么程度、持续多久算一次眨眼，半闭算不算）和按这个定义人工标出的真值，这两样现在都没有。下面只是一个初步观察：它检验的是“能不能找出人标不出瞳孔的帧”，不是眨眼。</p>
+  <h2><span class="no">10</span><span lang="zh">眨眼第一轮：先定义"非睁眼 = 闭上或眼睑盖住部分瞳孔"，按帧的绝对睁开高度规则在 239 帧盲评上准确率 91%；7 个视频有 26–70% 的时间眼睛不是完全睁开的</span><span lang="en">Blinks, first round: "not open = closed or lid over part of the pupil" defined first; a per-frame absolute-eye-opening rule is 91% accurate on 239 blind frames; 7 videos have the eye not fully open 26–70% of the time</span></h2>
+  <p class="text" lang="zh"><span class="hl">现状：第一轮的定义已定（非睁眼 = 闭上或部分盖住），规则和验证在 10.2 节；10.1 是定定义之前的第一版，保留作过程记录。眨眼的细分是下一轮。</span>要评估眨眼的判断方法，先要有眨眼的定义（眼睛闭到什么程度、持续多久算一次眨眼，半闭算不算）和按这个定义人工标出的真值，这两样现在都没有。下面只是一个初步观察：它检验的是“能不能找出人标不出瞳孔的帧”，不是眨眼。</p>
   <p class="text" lang="zh"><span class="tag">第一轮做法（2026 年 10 月 4 日和 Kaiwen 商定）：</span>先用上下眼睑两点之间的距离判断闭眼（睁开高度低于该视频中位数的 70% 记为闭眼帧，相隔不到 5 帧的并成一次事件），在各视频上跑，再人工抽查一部分结果；眨眼、闭眼、眯眼的细分放在这一轮之后。规则已在视频 0–12 上跑完，抽查已完成，见 10.1 节。脚本：<code>scripts/blink_by_eyelid_distance.py</code>；结果和抽查表在 <code>results/blink_eyelid_distance/</code>。</p>
-  <p class="text" lang="en"><span class="hl">Status: the first round has a result (section 10.1); the finer classes of blinks are not defined yet.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
+  <p class="text" lang="en"><span class="hl">Status: the first-round definition is fixed (not open = closed or partly covered); rule and check in section 10.2; 10.1 is the first version from before the definition, kept as a record. The finer classes of blinks are the next round.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
   <p class="text" lang="en"><span class="tag">First round (agreed with Kaiwen on 2026-10-04):</span>Closure is first judged from the distance between the upper and lower eyelid points (a frame counts as closed when the eye opening is below 70% of the video's median; closure frames less than 5 frames apart form one event); the rule is run on the videos and part of the result is spot-checked by eye; the finer classes (blink, closed, squint) come after this round. The rule has been run on videos 0–12 and the spot check is done; see section 10.1. Script: <code>scripts/blink_by_eyelid_distance.py</code>; results and the spot-check list in <code>results/blink_eyelid_distance/</code>.</p>
   <h3><span lang="zh">10.1 第一轮的规则、人工抽查和结果</span><span lang="en">10.1 First round: the rule, the human spot check and the result</span></h3>
   <div class="text" lang="zh">
@@ -1047,6 +1047,54 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
+  <h3><span lang="zh">10.2 第一轮的定义定下来之后：按帧的"非睁眼"规则和它的验证</span><span lang="en">10.2 With the first-round definition fixed: a per-frame "not open" rule and its check</span></h3>
+  <div class="text" lang="zh">
+    <p><b>定义（2026 年 10 月 6 日定）：</b>第一轮只分两种状态——<b>睁开</b>，和<b>非睁眼</b>（眼睛闭上，或眼睑盖住了部分瞳孔）。眨眼、长时间闭眼、眯眼的细分放到下一轮。</p>
+    <p><b>基本信息：</b>视频 0–13，各视频平台点模型对整段视频的预测。真值：标注者对 240 帧单帧的盲评（2026 年 10 月 6 日；每个视频 18 帧，按模型的相对睁开高度 r 分五层随机抽：r &lt; 0.70、0.70–0.85、0.85–1.00、≥ 1.00 各 4 帧，眼睑点失效 2 帧；与前两轮抽查不重叠；页面只显示单帧原图，不显示任何数值），三选一：睁开 / 非睁眼 / 看不清。239 帧有判断，113 帧非睁眼，没有"看不清"。原图和判断见附录 2。脚本：<code>scripts/blink_notopen_frames_sample.py</code>（抽样）、<code>blink_notopen_frames_eval.py</code>（信号比较）、<code>blink_notopen_rule.py</code>（最终规则和整段结果）；结果 <code>results/blink_eyelid_distance/blink_notopen_*</code>。</p>
+    <p><b>为什么要换信号：</b>10.1 的规则 D 用的是"睁开高度 ÷ 该视频的中位数"，它在 0.70–0.85 这一层的检出率是 0——因为按帧看，视频 3、8、9、10、11、12 里 r 在 0.70–1.00 的帧几乎全被判为非睁眼，而视频 0、5、7、13 里同样的帧全是睁开的（附录 2 一眼能看出）。也就是说"眼睑盖住部分瞳孔"在这些录像里是整段的常态，相对自己中位数的量看不见它。改用<b>绝对量</b>：睁开高度 O ÷ 眼宽 W（W = 该视频内外眼角距离的中位数，相机固定，各视频接近），它把两类帧分得很开（AUC 0.97；相对量 r 只有 0.85）。每个视频的 O/W 中位数也正好对上：被判为多数非睁眼的视频中位数 0.30–0.38，多数睁开的视频 0.41–0.59。</p>
+    <p><b>最终规则（按帧）：</b>（1）眼睑点正常且 O / W &lt; <b>0.347</b> → 非睁眼；（2）眼睑点失效的帧，四个瞳孔点平均置信度 &lt; 0.527 → 非睁眼，否则睁开（10.1 里"失效一律算闭眼"是错的：28 帧失效里 13 帧眼睛是睁着的，用瞳孔置信度能分对 26 帧）；（3）连续 ≥ 3 帧算一次事件，间隔 &lt; 5 帧的合并。阈值 0.347 是在这 239 帧上选的（最大化"检出率 − 误报率"）；按"留一个视频"选阈值再判，结论相同（准确率 85%、检出率 91%）。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Definition (fixed 2026-10-06):</b> the first round distinguishes two states only — <b>open</b>, and <b>not open</b> (the eye is closed, or the eyelid covers part of the pupil). Blink / long closure / squint come in the next round.</p>
+    <p><b>Basic information:</b> videos 0–13, whole-video prediction of each video's plateau-point model. Truth: the labeler's blind verdict on 240 single frames (2026-10-06; 18 per video, drawn at random in five strata of the model's relative eye opening r: r &lt; 0.70, 0.70–0.85, 0.85–1.00, ≥ 1.00 with 4 frames each, 2 frames with implausible eyelid points; no overlap with the two earlier spot checks; the sheet shows the single original frame and no values), one of open / not open / cannot tell. 239 frames judged, 113 not open, no "cannot tell". Frames and verdicts in appendix A2. Scripts: <code>scripts/blink_notopen_frames_sample.py</code> (sample), <code>blink_notopen_frames_eval.py</code> (signal comparison), <code>blink_notopen_rule.py</code> (final rule and whole-video results); results <code>results/blink_eyelid_distance/blink_notopen_*</code>.</p>
+    <p><b>Why the signal had to change:</b> rule D of 10.1 uses the eye opening relative to the video's own median, and its recall in the 0.70–0.85 stratum is 0 — because, frame by frame, almost every frame with r in 0.70–1.00 of videos 3, 8, 9, 10, 11 and 12 was judged not open, while the same frames of videos 0, 5, 7 and 13 were all open (appendix A2 shows it at a glance). "Lid over part of the pupil" is the resting state of those recordings, and a quantity relative to the video's own median cannot see it. The <b>absolute</b> eye opening O ÷ eye width W (W = median corner-to-corner distance of the video; the camera is fixed, so W is similar across videos) separates the two classes well (AUC 0.97; the relative r only 0.85). The per-video medians of O/W agree: 0.30–0.38 in the videos judged mostly not open, 0.41–0.59 in the videos judged open.</p>
+    <p><b>Final rule (per frame):</b> (1) eyelid points plausible and O / W &lt; <b>0.347</b> → not open; (2) frame with implausible eyelid points: not open if the mean confidence of the four pupil points &lt; 0.527, otherwise open ("implausible = closed" of 10.1 was wrong: 13 of 28 implausible frames show an open eye, and the pupil confidence gets 26 of the 28 right); (3) runs of ≥ 3 frames are events, gaps &lt; 5 frames merged. The threshold 0.347 was chosen on these 239 frames (maximizing recall − false-alarm rate); with leave-one-video-out thresholds the conclusion is the same (precision 85%, recall 91%).</p>
+  </div>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">这 239 帧</span><span lang="en">The 239 frames</span></th><th><span lang="zh">帧数</span><span lang="en">Frames</span></th><th><span lang="zh">标注者判非睁眼</span><span lang="en">Judged not open</span></th><th><span lang="zh">规则判非睁眼</span><span lang="en">Rule: not open</span></th><th><span lang="zh">准确率</span><span lang="en">Accuracy</span></th><th><span lang="zh">规则判非睁眼里真是的</span><span lang="en">Precision</span></th><th><span lang="zh">非睁眼里被找到的</span><span lang="en">Recall</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="zh">全部</span><span lang="en">all</span></td><td>239</td><td>113</td><td>117</td><td>90.8%</td><td>88.9%</td><td>92.0%</td></tr>
+      <tr><td>r &lt; 0.70</td><td>44</td><td>39</td><td>44</td><td>88.6%</td><td>88.6%</td><td>100%</td></tr>
+      <tr><td>r 0.70–0.85</td><td>56</td><td>32</td><td>35</td><td>94.6%</td><td>91.4%</td><td>100%</td></tr>
+      <tr><td>r 0.85–1.00</td><td>55</td><td>23</td><td>23</td><td>81.8%</td><td>78.3%</td><td>78.3%</td></tr>
+      <tr><td>r ≥ 1.00</td><td>56</td><td>4</td><td>2</td><td>96.4%</td><td>100%</td><td>50%</td></tr>
+      <tr><td><span lang="zh">眼睑点失效</span><span lang="en">eyelid points implausible</span></td><td>28</td><td>15</td><td>13</td><td>92.9%</td><td>100%</td><td>86.7%</td></tr>
+      <tr><td><span lang="zh">对照：10.1 的规则 D</span><span lang="en">for comparison: rule D of 10.1</span></td><td>239</td><td>113</td><td>72</td><td>72.4%</td><td>75.0%</td><td>47.8%</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_notopen.jpg" alt="Not-open frames and events per video under the final rule"></div>
+    <figcaption lang="zh"><span class="tag">图 10-4 怎么看：</span>左：每个视频被规则判为非睁眼的帧占多少（红柱），柱顶的灰字是该视频 O/W 的中位数；黑点是标注者在这个视频 18 帧样本里判为非睁眼的比例（样本是分层抽的，不按比例，所以黑点只用来看方向，不和柱子比高低）。右：非睁眼事件每分钟多少次，柱上是事件数和时长中位数。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>Left: share of frames the rule calls not open per video (red bars); the grey number on each bar is the video's median O/W; the black dot is the share of the 18 sampled frames the labeler judged not open (the sample is stratified, not proportional, so the dots show the direction only and are not to be compared with the bar heights). Right: not-open events per minute, with the event count and the median duration on the bars.</figcaption>
+  </figure>
+  <div class="concl" lang="zh"><span class="tag">10.2 的结论：</span>按"非睁眼 = 闭上或部分盖住"的定义，绝对睁开高度的规则在单帧上准确率 91%；它揭示的主要事实是：<b>非睁眼在这些录像里是一种状态，不是偶发事件。</b>
+    <ol>
+      <li><b>准确率：</b>239 帧盲评里规则判对 217 帧（90.8%）；规则判为非睁眼的帧 89% 是真的，真非睁眼的帧 92% 被找到。错得最多的一层是 r 在 0.85–1.00（55 帧错 10 帧），那是眼睑刚碰到瞳孔上缘的边界情况。</li>
+      <li><b>14 个视频分成两类：</b>视频 0、5、7、13 几乎全程睁开（非睁眼帧 0.2–0.4%）；视频 1、2、6 为 2–12%；<b>视频 3、4、8、9、10、11、12 有 26–70% 的时间眼睛不是完全睁开的</b>，最长的一次连续非睁眼持续 44–212 秒。这些录像里眼睛的常态就是半掩的，O/W 的中位数 0.30–0.38（睁开的视频 0.41–0.59）。</li>
+      <li><b>事件数：</b>每分钟 0.2–12.8 次，时长中位数 100–717 毫秒。在半掩为常态的视频里，"事件"大多是半掩状态中间短暂睁开后的再次合上，不能当成眨眼次数。</li>
+      <li><b>对眨眼的含义：</b>眨眼（短暂、完全闭合）只是"非睁眼"的一个子集。要数眨眼，下一轮需要在这个状态判断上再按深度（O/W 低到多少）和时长（多短）切分——10.1 里完全闭眼的 18 项全在 r &lt; 0.70 以下，说明这一刀是切得开的。</li>
+      <li><b>限制：</b>一个人判断；阈值在验证帧上选（留一视频的数字略低：85% / 91%）；每个视频只用一个模型；"眼睑盖住部分瞳孔"的判断本身有边界（r 0.85–1.00 那一层），标注者第二次判同一批帧的一致性没有量过。</li>
+    </ol>
+  </div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 10.2:</span>Under the definition "not open = closed or partly covered", the absolute-eye-opening rule is 91% accurate per frame; its main finding is that <b>not-open is a state in these recordings, not an occasional event.</b>
+    <ol>
+      <li><b>Accuracy:</b> 217 of the 239 blind frames are classified correctly (90.8%); 89% of the frames the rule calls not open are, and 92% of the truly not-open frames are found. Most mistakes are in the r 0.85–1.00 stratum (10 of 55), the borderline where the lid just touches the top of the pupil.</li>
+      <li><b>The 14 videos fall into two groups:</b> videos 0, 5, 7 and 13 are open almost throughout (0.2–0.4% not-open frames); videos 1, 2, 6 have 2–12%; <b>videos 3, 4, 8, 9, 10, 11 and 12 have the eye not fully open 26–70% of the time</b>, with single not-open stretches of 44–212 s. In those recordings a half-covered eye is the resting state: median O/W 0.30–0.38 against 0.41–0.59 in the open videos.</li>
+      <li><b>Events:</b> 0.2–12.8 per minute, median duration 100–717 ms. In the half-covered videos most "events" are re-closings after brief openings within the covered state and must not be read as blink counts.</li>
+      <li><b>What it means for blinks:</b> a blink (brief, full closure) is a subset of "not open". Counting blinks needs a further split of this state by depth (how low O/W goes) and duration (how brief) — all 18 full closures of 10.1 lie below r 0.70, so that cut is feasible.</li>
+      <li><b>Limits:</b> one judge; the threshold was chosen on the validation frames (leave-one-video-out gives slightly lower numbers: 85% / 91%); one model per video; the judgement "lid covers part of the pupil" has its own borderline (the r 0.85–1.00 stratum), and the labeler's repeatability on the same frames was not measured.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 11 -->
@@ -1133,7 +1181,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>视频 4、5、8</b> 误差偏大（视频 8 一直在 25 px 以上）。目前的解释是标注的人的判断：画面比较模糊，肉眼也难以识别点位。这一点还没有用数字验证过：用整幅画面的清晰度（拉普拉斯方差）和亮度去量，这三个视频和其他 Pluto 视频没有差别，所以模糊如果存在，是在瞳孔边缘这样的局部，需要专门去量。</li>
       <li><b>第三只老鼠（Terra，视频 11–18）</b>：视频 11 和 12 已完成，视频 13 进行中，其余还没有做。“换一只新老鼠要标 20 帧”目前只在两次换老鼠上各看到一次（视频 1 和视频 11）。</li>
       <li><b>面积曲线里的跳变</b>（第 11 步）：眼睛睁开时某个瞳孔点在两个位置之间来回跳，闭眼规则标不出来；还没有针对它的规则，也还没有逐个事件对照原视频区分眨眼、眼球转动和跟踪错误。</li>
-      <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：第一轮的闭眼规则有结果（第 10 步 10.1 节）：规则标出的闭眼在新抽的 100 项盲评里 89% 是真的，完全闭眼一次都没漏；但“部分闭合”是这些眼睛的常见状态（连 r 高于中位数的随机片段里都有），算不算眨眼、眨眼的细分，都还没有定义。</li>
+      <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：第一轮按"非睁眼 = 闭上或部分盖住"的定义有了规则和验证（第 10 步 10.2 节，准确率 91%）；还没有的是眨眼本身的定义（多深、多短算一次眨眼）和把眨眼从长时间半掩状态里分出来的规则。</li>
     </ul>
   </div>
   <div class="text" lang="en">
@@ -1143,7 +1191,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: videos 11 and 12 are finished, video 13 is in progress, the others are not started. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
-      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first-round closure rule has a result (step 10, section 10.1): 89% of what it flags is a closure in a new blind sample of 100 items and no full closure was missed; but "partly closed" is a common state of these eyes (it occurs even in random segments with r above the median), and whether it counts as a blink, and the finer classes, are not defined.</li>
+      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first round has a rule and its check under the definition "not open = closed or partly covered" (step 10, section 10.2, 91% accurate); still missing are the definition of a blink itself (how deep, how brief) and a rule that separates blinks from long half-covered stretches.</li>
     </ul>
   </div>
 </section>
@@ -1253,6 +1301,25 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video13_batch02.jpg" alt="Video 13 batch 2" loading="lazy"><div class="cap"><span lang="zh">视频 13 第 2 批（由 20 帧模型的 jump 规则挑）</span><span lang="en">Video 13, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video13_batch03.jpg" alt="Video 13 batch 3" loading="lazy"><div class="cap"><span lang="zh">视频 13 第 3 批（由 40 帧模型的 jump 规则挑）</span><span lang="en">Video 13, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video13_batch04.jpg" alt="Video 13 batch 4" loading="lazy"><div class="cap"><span lang="zh">视频 13 第 4 批（由 60 帧模型的 jump 规则挑）</span><span lang="en">Video 13, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+  </div></div></figure>
+  <h3><span lang="zh">附 2：眨眼第一轮定义的单帧盲评（标注者的判断和原图）</span><span lang="en">A2: the single-frame blind check of the first-round blink definition (the labeler's verdicts on the original frames)</span></h3>
+  <p class="text" lang="zh">第 10 步 10.2 节用到的 240 帧（每个视频 18 帧，按模型给出的睁开高度分五层随机抽，与前两轮抽查不重叠）。标注者只看单帧原图、不看任何数值，判断“睁开”或“非睁眼（闭上，或眼睑盖住部分瞳孔）”。每张小图的边框和底条：绿 = 睁开，红 = 非睁眼；底条上的 r（睁开高度 ÷ 该视频中位数）是事后标上去的。每个视频一行，可左右拖动。</p>
+  <p class="text" lang="en">The 240 frames of section 10.2 in step 10 (18 per video, drawn at random in five strata of the model's eye opening, no overlap with the two earlier spot checks). The labeler saw only the single original frame, no values, and judged "open" or "not open (closed, or the lid covers part of the pupil)". Frame border and bottom band: green = open, red = not open; the r on the band (eye opening ÷ the video's median) was added afterwards. One row per video; scroll sideways.</p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/notopen_video00.jpg" alt="notopen video 0" loading="lazy"><div class="cap"><span lang="zh">视频 0（mouse A，5-min）：18 帧单帧盲评</span><span lang="en">Video 0 (mouse A, 5-min): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video01.jpg" alt="notopen video 1" loading="lazy"><div class="cap"><span lang="zh">视频 1（Pluto，2025-10-31）：18 帧单帧盲评</span><span lang="en">Video 1 (Pluto, 2025-10-31): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video02.jpg" alt="notopen video 2" loading="lazy"><div class="cap"><span lang="zh">视频 2（Pluto，2025-10-31）：18 帧单帧盲评</span><span lang="en">Video 2 (Pluto, 2025-10-31): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video03.jpg" alt="notopen video 3" loading="lazy"><div class="cap"><span lang="zh">视频 3（Pluto，2025-10-31）：18 帧单帧盲评</span><span lang="en">Video 3 (Pluto, 2025-10-31): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video04.jpg" alt="notopen video 4" loading="lazy"><div class="cap"><span lang="zh">视频 4（Pluto，2025-10-30）：18 帧单帧盲评</span><span lang="en">Video 4 (Pluto, 2025-10-30): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video05.jpg" alt="notopen video 5" loading="lazy"><div class="cap"><span lang="zh">视频 5（Pluto，2025-10-29）：18 帧单帧盲评</span><span lang="en">Video 5 (Pluto, 2025-10-29): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video06.jpg" alt="notopen video 6" loading="lazy"><div class="cap"><span lang="zh">视频 6（Pluto，2025-10-28）：18 帧单帧盲评</span><span lang="en">Video 6 (Pluto, 2025-10-28): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video07.jpg" alt="notopen video 7" loading="lazy"><div class="cap"><span lang="zh">视频 7（Pluto，2025-10-27）：18 帧单帧盲评</span><span lang="en">Video 7 (Pluto, 2025-10-27): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video08.jpg" alt="notopen video 8" loading="lazy"><div class="cap"><span lang="zh">视频 8（Pluto，2025-10-24）：18 帧单帧盲评</span><span lang="en">Video 8 (Pluto, 2025-10-24): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video09.jpg" alt="notopen video 9" loading="lazy"><div class="cap"><span lang="zh">视频 9（Pluto，2025-10-23）：18 帧单帧盲评</span><span lang="en">Video 9 (Pluto, 2025-10-23): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video10.jpg" alt="notopen video 10" loading="lazy"><div class="cap"><span lang="zh">视频 10（Pluto，2025-10-22）：18 帧单帧盲评</span><span lang="en">Video 10 (Pluto, 2025-10-22): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video11.jpg" alt="notopen video 11" loading="lazy"><div class="cap"><span lang="zh">视频 11（Terra，2025-10-17）：18 帧单帧盲评</span><span lang="en">Video 11 (Terra, 2025-10-17): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video12.jpg" alt="notopen video 12" loading="lazy"><div class="cap"><span lang="zh">视频 12（Terra，2025-10-16）：18 帧单帧盲评</span><span lang="en">Video 12 (Terra, 2025-10-16): 18 single frames, blind</span></div></div>
+      <div class="item"><img src="assets/notopen_video13.jpg" alt="notopen video 13" loading="lazy"><div class="cap"><span lang="zh">视频 13（Terra，2025-10-15）：18 帧单帧盲评</span><span lang="en">Video 13 (Terra, 2025-10-15): 18 single frames, blind</span></div></div>
   </div></div></figure>
 </section>
 

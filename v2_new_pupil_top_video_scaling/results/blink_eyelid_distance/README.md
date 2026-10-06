@@ -116,3 +116,42 @@ judged by the labeler on 2026-10-06, no "cannot tell".
 4. Limits: one judge, 5 frames per item, 2-3 items per stratum per video; the strata are not proportional to the video,
    so the table gives no overall recall.
 
+## First-round definition fixed; per-frame "not open" rule (2026-10-06)
+
+Definition (user): the first round distinguishes **open** and **not open** (eye closed, or the eyelid covers part of the
+pupil). Truth: 240 single frames drawn blind (`../../scripts/blink_notopen_frames_sample.py`; per video 18 frames in five
+strata of the relative eye opening r: < 0.70, 0.70-0.85, 0.85-1.00, >= 1.00 with 4 each, 2 with implausible eyelid
+points; no overlap with the two spot checks), judged by the labeler as open / not open / cannot tell: 239 judged, 113 not
+open, 0 cannot tell (`blink_notopen_frames_all_videos.csv`, `blink_notopen_frames_verdicts.csv`; contact sheets with the
+verdicts `blink_notopen_sheet_videoNN.png`, made by `blink_notopen_frames_sheet.py`).
+
+Signal comparison (`blink_notopen_frames_eval.py`, `blink_notopen_frames_result.csv`): the relative eye opening r (over
+the video's median) has AUC 0.85 and rule D finds none of the not-open frames above r = 0.70, because in videos 3, 8, 9,
+10, 11, 12 nearly every frame with r in 0.70-1.00 was judged not open while in videos 0, 5, 7, 13 the same frames were
+all open: a half-covered eye is the resting state of those recordings. The **absolute** eye opening O / eye width W
+(W = median corner-to-corner distance) separates the classes: AUC 0.97 (pupil height / W 0.90, eyelid distance in px
+0.98 but camera-dependent). Per-video median O/W: 0.30-0.38 in the videos judged mostly not open, 0.41-0.59 in the
+videos judged open.
+
+**Final rule** (`blink_notopen_rule.py`): trusted frame -> not open iff O / W < 0.347; implausible eyelid points -> not
+open iff mean pupil confidence < 0.527 (13 of the 28 implausible frames show an open eye, so "implausible = closed" of
+rule D was wrong); events = runs >= 3 frames, gaps < 5 merged. The threshold was chosen on the 239 frames (maximizing
+recall - false-alarm rate); leave-one-video-out thresholds give precision 85%, recall 91%.
+
+| frames (`blink_notopen_rule_check.csv`) | n | judged not open | rule not open | accuracy | precision | recall |
+|---|---|---|---|---|---|---|
+| all | 239 | 113 | 117 | 90.8% | 88.9% | 92.0% |
+| r < 0.70 | 44 | 39 | 44 | 88.6% | 88.6% | 100% |
+| r 0.70-0.85 | 56 | 32 | 35 | 94.6% | 91.4% | 100% |
+| r 0.85-1.00 | 55 | 23 | 23 | 81.8% | 78.3% | 78.3% |
+| r >= 1.00 | 56 | 4 | 2 | 96.4% | 100% | 50% |
+| eyelid points implausible | 28 | 15 | 13 | 92.9% | 100% | 86.7% |
+| rule D (relative, 10.1) for comparison | 239 | 113 | 72 | 72.4% | 75.0% | 47.8% |
+
+Whole videos (`blink_notopen_rule_all_videos.csv`, `blink_notopen_rule_events_all_videos.csv`, `blink_notopen_rule_summary.png`):
+not-open frames 0.2-0.4% on videos 0, 5, 7, 13; 2-12% on videos 1, 2, 6; **26-70% on videos 3, 4, 8, 9, 10, 11, 12**
+(longest single not-open stretch 44-212 s). Events 0.2-12.8 per minute, median duration 100-717 ms; in the half-covered
+videos most events are re-closings between brief openings and are not blink counts. Blinks (brief full closures) are a
+subset of this state; separating them by depth and duration is the next round. Limits: one judge; threshold chosen on
+the validation frames; one model per video; the borderline stratum r 0.85-1.00 carries most of the errors.
+

@@ -36,12 +36,14 @@ for rr in PL.itertuples():
     trusted = (O >= 0) & (dx <= DX_FRAC) & (conf >= CONF_MIN) & np.isfinite(r)
     ph = g("pupil_bottom", "y") - g("pupil_top", "y"); pw = np.abs(g("pupil_right", "x") - g("pupil_left", "x"))
     pmean = np.mean([g(b, "likelihood") for b in ("pupil_top", "pupil_bottom", "pupil_left", "pupil_right")], 0)
-    sig[v] = dict(r=r, ph=ph / np.nanmedian(ph), pw=pw / np.nanmedian(pw), asp=(ph / pw) / np.nanmedian(ph / pw), area=(ph * pw) / np.nanmedian(ph * pw), pmean=pmean, trusted=trusted)
-for k in ("r", "ph", "pw", "asp", "area", "pmean", "trusted"):
+    wmed = float(np.nanmedian(np.hypot(g("eye_temporal_corner", "x") - g("eye_nasal_corner", "x"), g("eye_temporal_corner", "y") - g("eye_nasal_corner", "y"))))
+    sig[v] = dict(r=r, ph=ph / np.nanmedian(ph), pw=pw / np.nanmedian(pw), asp=(ph / pw) / np.nanmedian(ph / pw), area=(ph * pw) / np.nanmedian(ph * pw), pmean=pmean, trusted=trusted,
+                  O_w=O / wmed, O_px=O, ph_w=ph / wmed, asp_abs=ph / pw)     # absolute signals: not normalised by the video's median
+for k in ("r", "ph", "pw", "asp", "area", "pmean", "trusted", "O_w", "O_px", "ph_w", "asp_abs"):
     Q[k] = [sig[v][k][f] for v, f in zip(Q.video, Q.frame)]
 Q.to_csv(OUT / "blink_notopen_frames_all_videos.csv", index=False)
-J = Q[(Q.human_verdict != "") & ~Q.human_verdict.str.startswith("cannot")].copy()
-J["notopen"] = J.human_verdict.str.startswith("not open")
+J = Q[Q.human_verdict.notna() & (Q.human_verdict != "") & ~Q.human_verdict.astype(str).str.startswith("cannot")].copy()
+J["notopen"] = J.human_verdict.str.startswith("not open").astype(bool); J["trusted"] = J.trusted.astype(bool)
 print(len(J), "judged frames,", int(J.notopen.sum()), "not open;", int((Q.human_verdict.str.startswith("cannot")).sum()), "cannot tell")
 print(pd.crosstab(J.stratum, J.notopen))
 
@@ -50,8 +52,10 @@ def auc(pos, neg):
     return float((pos[:, None] < neg[None, :]).mean() + 0.5 * (pos[:, None] == neg[None, :]).mean())
 T = J[J.trusted]
 print("\nAUC (lower value = not open), trusted frames only:")
-for k in ("r", "ph", "pw", "asp", "area", "pmean"):
-    print(f"  {k:6s} {auc(T[T.notopen][k], T[~T.notopen][k]):.3f}")
+for k in ("r", "ph", "pw", "asp", "area", "pmean", "O_w", "O_px", "ph_w", "asp_abs"):
+    print(f"  {k:7s} {auc(T[T.notopen][k], T[~T.notopen][k]):.3f}")
+I = J[~J.trusted]
+print(f"\nimplausible-eyelid frames: {len(I)} judged, {int(I.notopen.sum())} not open; AUC of mean pupil confidence (lower = not open) {auc(I[I.notopen].pmean, I[~I.notopen].pmean):.3f}")
 
 def best_t(g, k):
     v = np.unique(g[k].dropna()); cand = (v[:-1] + v[1:]) / 2
@@ -69,9 +73,16 @@ for k in ("r", "ph", "area", "asp"):
     flag = pd.Series(False, index=J.index)
     for v in J.video.unique():
         t = best_t(T[T.video != v], k); m = J.video == v
-        flag[m] = (J.loc[m, k] < t) | ~J.loc[m, "trusted"]
+        flag.loc[m] = ((J.loc[m, k] < t) | ~J.loc[m, "trusted"]).to_numpy()
     t_all = best_t(T, k); rows.append(evaluate(f"{k} < t (leave one video out; {t_all:.3f} on all) OR eyelid implausible", flag))
-rows.append(evaluate("r < 0.70 OR eyelid implausible (first-round rule)", (J.r < 0.70) | ~J.trusted))
+for k in ("O_w", "O_px", "ph_w"):                                        # absolute signals; implausible frames by pupil confidence
+    for imp_name, imp in (("implausible -> not open", lambda m: ~J.loc[m, "trusted"]), ("implausible -> pupil conf < 0.527", lambda m: ~J.loc[m, "trusted"] & (J.loc[m, "pmean"] < 0.527))):
+        flag = pd.Series(False, index=J.index, dtype=bool)
+        for v in J.video.unique():
+            t = best_t(T[T.video != v], k); m = J.video == v
+            flag.loc[m] = (((J.loc[m, k] < t) & J.loc[m, "trusted"]) | imp(m)).to_numpy()
+        t_all = best_t(T, k); rows.append(evaluate(f"{k} < t (leave one video out; {t_all:.3f} on all); {imp_name}", flag))
+rows.append(evaluate("r < 0.70 OR eyelid implausible (rule D, relative)", (J.r < 0.70) | ~J.trusted))
 # two-signal grid r OR ph, leave one video out
 grid_r = np.arange(0.60, 1.01, 0.025); grid_p = np.arange(0.50, 1.01, 0.025)
 def best_pair(g):
@@ -83,8 +94,18 @@ def best_pair(g):
 flag = pd.Series(False, index=J.index)
 for v in J.video.unique():
     a, b = best_pair(T[T.video != v]); m = J.video == v
-    flag[m] = (J.loc[m, "r"] < a) | (J.loc[m, "ph"] < b) | ~J.loc[m, "trusted"]
+    flag.loc[m] = ((J.loc[m, "r"] < a) | (J.loc[m, "ph"] < b) | ~J.loc[m, "trusted"]).to_numpy()
 a, b = best_pair(T); rows.append(evaluate(f"r < {a:.3f} OR ph < {b:.3f} (leave one video out) OR eyelid implausible", flag))
-R = pd.DataFrame(rows); R.to_csv(OUT / "blink_notopen_frames_result.csv", index=False)
+R = pd.DataFrame(rows)
+R["accuracy_pct"] = np.nan
+for i, name in enumerate(R.rule):            # overall accuracy is recomputed below for the rules we can rebuild cheaply
+    pass
+R.to_csv(OUT / "blink_notopen_frames_result.csv", index=False)
+# per-video share of frames judged not open vs the video's median eye opening / eye width
+pv = J.groupby("video").agg(frames=("notopen", "size"), notopen=("notopen", "sum"))
+pv["notopen_share_pct"] = (100 * pv.notopen / pv.frames).round(0)
+pv["median_O_w_video"] = [round(float(np.nanmedian(sig[v]["O_w"])), 3) for v in pv.index]
+pv.to_csv(OUT / "blink_notopen_frames_per_video.csv")
+print("\nper video: share of sampled frames judged not open vs the video's median eye opening / eye width"); print(pv.to_string())
 pd.set_option("display.width", 250); pd.set_option("display.max_columns", 20)
 print("\n", R.to_string(index=False))
