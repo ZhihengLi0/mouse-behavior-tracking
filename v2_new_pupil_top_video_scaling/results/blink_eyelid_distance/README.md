@@ -60,3 +60,32 @@ Closure events by depth: minimum r < 0.40: 14 of 15 fully closed; 0.40-0.55: 13 
    (Kaiwen: the finer classes come after this round).
 4. Limits: 137 items, one judge, 5 frames per item; the sample is random within each video but videos with few events
    contribute fewer items; no estimate of closures that neither the rule nor the untrusted class catches.
+
+## Final rule of the first round and its check against the verdicts (2026-10-05)
+
+Script `../../scripts/blink_final_rule.py`; outputs `blink_final_variants_on_spotcheck.csv`, `blink_final_events_all_videos.csv`,
+`blink_final_summary_all_videos.csv`, `blink_final_summary.png`.
+
+Every frame becomes open or closed: (1) eyelid points plausible and r < 0.70 -> closed; (2) implausible eyelid points
+within 5 frames of such a frame -> closed (same blink: the eye disappeared and the points scattered); (3) an isolated
+run of implausible eyelid points -> closed when the median of the mean pupil confidence over the run is below 0.527
+(the threshold found earlier on the 28 human empty-pupil frames), otherwise open; (4) events = closed runs of at least
+3 frames; "full" when the minimum r < 0.45 or the event contains implausible frames, otherwise "partial".
+
+Variants against the 137 verdicts (closure = fully or partly closed; an item is "predicted closed" when at least half
+of its frames are closed):
+
+| variant | predicted closed | real | precision | recall of the 109 real closures in the sample |
+|---|---|---|---|---|
+| A r < 0.70 (first version) | 92 | 87 | 94.6% | 79.8% |
+| B trusted and r < 0.70 | 66 | 64 | 97.0% | 58.7% |
+| C B + implausible frames next to closed frames | 92 | 90 | 97.8% | 82.6% |
+| **D C + isolated implausible runs by pupil confidence (final)** | 97 | 94 | 96.9% | 86.2% |
+| E as D with "minimum < 0.30" (tuned on these items) | 96 | 94 | 97.9% | 86.2% |
+
+The recall is relative to the closures *in the sample*, which includes the 12 partial closures among the near misses
+(r = 0.70-0.85) that no variant flags; closures that neither the rule nor the implausible class catches are not
+estimated. D is chosen over E because its threshold was fixed before the spot check.
+
+Final rule D on the whole videos: 4-82 closure events per video (0.2-4.1 per minute), median duration 210-410 ms,
+0.2-4.0% of the frames closed; 512 events in all, 323 full and 189 partial.

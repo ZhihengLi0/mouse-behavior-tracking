@@ -1,0 +1,6 @@
+variant,items_predicted_closed,of_which_real_closures,precision_pct,real_closures_in_sample,recall_pct,false_closures,missed_closures
+A: r < 0.70 (first version),92,87,94.6,109,79.8,5,22
+B: trusted and r < 0.70,66,64,97.0,109,58.7,2,45
+C: B + untrusted next to closed frames,92,90,97.8,109,82.6,2,19
+D: C + isolated untrusted by pupil confidence (median < 0.527)  [final],97,94,96.9,109,86.2,3,15
+E: C + isolated untrusted by min pupil confidence < 0.30 (tuned on the sample),96,94,97.9,109,86.2,2,15
