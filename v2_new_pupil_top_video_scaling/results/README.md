@@ -242,7 +242,7 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | `keypoint_confidence_error/` | `keypoint_confidence_error.py` | error and confidence of each of the 8 keypoints; one figure per video (`keypoint_confidence_error_videoNN.png`) and all videos together. Pupil top is the least accurate point (median 10.9 px; the others 3.9-5.8 px) |
 
 | `unreliable_frames/` | `unreliable_frames.py` | check of the jump rule and of the confidence on 910 evenly spaced human-labeled frames (test50 + val20 of videos 0-12): the jump rule flags 12.6% of the frames and finds 20 of the 30 frames above 50 px; lowest confidence < 0.6 finds all 30 but flags 52.9% |
-| `blink_eyelid_distance/` | `blink_by_eyelid_distance.py` | first-round closure rule from the eyelid distance (r < 0.70 of the video median): 733 events on videos 0-12 and a sample of 140 items for the human spot check (not done yet; no conclusion) |
+| `blink_eyelid_distance/` | `blink_by_eyelid_distance.py`, `blink_final_rule.py`, `blink_spotcheck_round2.py` | first-round closure rule from the eyelid distance (r < 0.70 of the video median) with the handling of failed eyelid points; 137-item human spot check (2026-10-05) used to choose the final rule D (precision 96.9%, recall 86.2% among the sampled items); 512 closure events on videos 0-12 (`blink_final_*`); a second, blind 100-item spot check drawn afterwards (`blink_r2_*`, verdicts pending) |
 
 Each folder has its own README with the basic information, the file-to-script table and the results.
 
