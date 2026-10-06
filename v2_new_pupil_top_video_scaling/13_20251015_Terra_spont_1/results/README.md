@@ -28,6 +28,6 @@ Step 2 (40 labels): 9.44 px, no gain over the running best 9.43 px (step 1): one
 from 16.0 to 14.1 px and the share of confident keypoints from 86% to 93%, but the median did not move.
 
 Step 3 (60 labels): 9.67 px, again no gain over the running best 9.43 px (step 1); second flat step in a row, so the
-plateau rule fired at 60 (2026-10-06 02:14). **Plateau point by the rule: 20 labels, 9.43 px; awaiting the user's
-decision** (status stays in progress; batch 4 is selected but not opened for labeling). Batch 3 itself: the labeler kept
+plateau rule fired at 60 (2026-10-06 02:14). **Plateau point: 20 labels, 9.43 px (user decision 2026-10-06)**; batch 4 was
+selected (4740 pool frames flagged) but not labeled. Carried into video 14: batch01 only (20 labels; 600 in total). Batch 3 itself: the labeler kept
 all 160 pre-labeled points unchanged.
