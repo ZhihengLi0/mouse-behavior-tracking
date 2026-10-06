@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Eye closure from the distance between the two eyelid points, with a sample for a human spot check
 (first round agreed with Kaiwen 2026-10-04: "use the distance between upper and lower eyelid, test on a few videos,
-spot-check part of the result by eye"), read-only analysis.
+spot-check part of the result by eye"), read-only analysis. Revised 2026-10-05 after the first sheets showed that about
+half of the "events" were eyelid-point tracking errors with the eye open (user's observation).
 
     python blink_by_eyelid_distance.py
 
@@ -9,19 +10,25 @@ Per finished video (results/labels_to_plateau.csv), model at the plateau point (
 whole-video prediction (final snapshot, no confidence cut-off):
   eye opening      O_t = y(eyelid_bottom) - y(eyelid_top)            (px, image y points down)
   relative opening r_t = O_t / median of O over the whole video
-  closure frame    r_t < THR  (THR = 0.70; chosen before the spot check, to be revised by it)
-  event            closure frames less than GAP = 5 frames (83 ms) apart are merged; start, end, duration, minimum r
+  UNTRUSTED frame  the eyelid points are implausible, so r_t means nothing: O_t < 0 (upper point below the lower one),
+                   or |x(eyelid_top) - x(eyelid_bottom)| > 0.3 x eye width (the two points are not above each other),
+                   or the confidence of either eyelid point < 0.3. Not counted as closed or open.
+  closure frame    trusted and r_t < THR  (THR = 0.70; chosen before the spot check, to be revised by it)
+  closure event    closure frames less than GAP = 5 frames (83 ms) apart are merged; kept only if at least MIN_LEN = 3
+                   frames (50 ms) long. start, end, duration, minimum r.
+  untrusted run    untrusted frames merged the same way (>= 3 frames). Reported separately: a real closure can also make
+                   the eyelid points scatter, so these runs are spot-checked too.
 Outputs in results/blink_eyelid_distance/:
-  blink_eyelid_events_all_videos.csv     every event of every video
-  blink_eyelid_summary_all_videos.csv    per video: events, events per minute, median duration, share of closure frames
+  blink_eyelid_events_all_videos.csv     every closure event and untrusted run of every video (column kind)
+  blink_eyelid_summary_all_videos.csv    per video: closure events, per minute, median duration, share of closure frames,
+                                         untrusted frames and runs, how many raw events the two filters removed
   blink_eyelid_spotcheck_all_videos.csv  the sampled items for the human check (verdict column empty)
   blink_eyelid_spotcheck_videoNN.jpg     one sheet per video; one row per sampled item = 5 frames
                                          (100 ms before the start, start, deepest frame, end, 100 ms after the end),
                                          cyan = predicted eyelid points
   blink_eyelid_spotcheck.html            the same items with buttons; verdicts are kept in the browser and exported as CSV
-Sample per video: up to 8 events spread evenly over the event depth (minimum r), plus up to 3 "near misses":
-the deepest dips with 0.70 <= minimum r < 0.85, which the rule does NOT flag (to look for missed closures).
-Nothing else is modified."""
+Sample per video (random, seed 0): up to 6 closure events, up to 3 untrusted runs, up to 2 "near misses" (trusted dips
+with 0.70 <= minimum r < 0.85 that the rule does NOT flag). Nothing else is modified."""
 import glob
 import sys
 from pathlib import Path
@@ -34,7 +41,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 
-FPS, THR, NEAR, GAP, PAD = 60.0, 0.70, 0.85, 5, 6
+FPS, THR, NEAR, GAP, PAD, MIN_LEN, DX_FRAC, CONF_MIN = 60.0, 0.70, 0.85, 5, 6, 3, 0.3, 0.3
+rng = np.random.default_rng(0)
 OUT = HERE / "results" / "blink_eyelid_distance"
 OUT.mkdir(exist_ok=True)
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv")
@@ -56,29 +64,44 @@ for r in PL.itertuples():
     d = pt.load(h5[-1])
     O = (d["eyelid_bottom"]["y"] - d["eyelid_top"]["y"]).to_numpy(float)
     rel = O / np.nanmedian(O)
-    ev = []
-    for a, b in runs(rel < THR, GAP):
-        k = a + int(np.nanargmin(rel[a:b + 1]))
-        ev.append({"video": int(r.video), "unit": r.unit, "kind": "event", "start": int(a), "end": int(b), "deepest": int(k), "start_s": round(a / FPS, 2),
+    width = float(np.nanmedian(np.hypot(d["eye_temporal_corner"]["x"] - d["eye_nasal_corner"]["x"], d["eye_temporal_corner"]["y"] - d["eye_nasal_corner"]["y"])))
+    dx = np.abs((d["eyelid_top"]["x"] - d["eyelid_bottom"]["x"]).to_numpy(float)) / width
+    conf = np.minimum(d["eyelid_top"]["likelihood"].to_numpy(float), d["eyelid_bottom"]["likelihood"].to_numpy(float))
+    untrusted = (O < 0) | (dx > DX_FRAC) | (conf < CONF_MIN) | ~np.isfinite(rel)
+    closed = ~untrusted & (rel < THR)
+    raw = runs(rel < THR, GAP)                                                 # the rule before the revision, for the count
+    ev, unt = [], []
+    for a, b in runs(closed, GAP):
+        if b - a + 1 < MIN_LEN:
+            continue
+        k = a + int(np.nanargmin(np.where(untrusted[a:b + 1], np.inf, rel[a:b + 1])))
+        ev.append({"video": int(r.video), "unit": r.unit, "kind": "closure event", "start": int(a), "end": int(b), "deepest": int(k), "start_s": round(a / FPS, 2),
                    "duration_ms": round((b - a + 1) / FPS * 1000), "min_rel_opening": round(float(rel[k]), 3)})
-    events += ev
+    for a, b in runs(untrusted, GAP):
+        if b - a + 1 < MIN_LEN:
+            continue
+        unt.append({"video": int(r.video), "unit": r.unit, "kind": "untrusted run (eyelid points implausible)", "start": int(a), "end": int(b), "deepest": int((a + b) // 2),
+                    "start_s": round(a / FPS, 2), "duration_ms": round((b - a + 1) / FPS * 1000), "min_rel_opening": round(float(np.nanmin(rel[a:b + 1])), 3)})
+    events += ev + unt
     dur = [e["duration_ms"] for e in ev]
     summary.append({"video": int(r.video), "unit": r.unit, "mouse": r.mouse, "model_step": step, "frames": len(d), "median_opening_px": round(float(np.nanmedian(O)), 1),
-                    "events": len(ev), "events_per_min": round(len(ev) / (len(d) / FPS / 60), 2), "median_duration_ms": float(np.median(dur)) if dur else np.nan,
-                    "events_shorter_50ms": int(sum(x < 50 for x in dur)), "events_longer_1s": int(sum(x > 1000 for x in dur)),
-                    "closure_frames_pct": round(100 * float((rel < THR).mean()), 2)})
-    # sample for the spot check
+                    "closure_events": len(ev), "events_per_min": round(len(ev) / (len(d) / FPS / 60), 2), "median_duration_ms": float(np.median(dur)) if dur else np.nan,
+                    "closure_frames_pct": round(100 * float(closed.mean()), 2), "untrusted_frames_pct": round(100 * float(untrusted.mean()), 2), "untrusted_runs": len(unt),
+                    "raw_events_before_revision": len(raw), "removed_as_untrusted_or_short": len(raw) - len(ev)})
+    # sample for the spot check (random)
     pick = []
     if ev:
-        order = sorted(ev, key=lambda e: e["min_rel_opening"])
-        pick += [order[i] for i in sorted(set(np.linspace(0, len(order) - 1, min(8, len(order))).round().astype(int)))]
+        pick += [ev[i] for i in sorted(rng.choice(len(ev), min(6, len(ev)), replace=False))]
+    if unt:
+        pick += [unt[i] for i in sorted(rng.choice(len(unt), min(3, len(unt)), replace=False))]
     near = []
-    for a, b in runs((rel >= THR) & (rel < NEAR), GAP):
-        if a > 0 and b < len(rel) - 1 and not (rel[max(0, a - GAP):b + GAP + 1] < THR).any():      # a dip that never crosses THR
+    for a, b in runs(~untrusted & (rel >= THR) & (rel < NEAR), GAP):
+        if b - a + 1 >= MIN_LEN and a > 0 and b < len(rel) - 1 and not (closed[max(0, a - GAP):b + GAP + 1]).any():
             k = a + int(np.nanargmin(rel[a:b + 1]))
             near.append({"video": int(r.video), "unit": r.unit, "kind": "near miss (not flagged)", "start": int(a), "end": int(b), "deepest": int(k), "start_s": round(a / FPS, 2),
                          "duration_ms": round((b - a + 1) / FPS * 1000), "min_rel_opening": round(float(rel[k]), 3)})
-    pick += sorted(near, key=lambda e: e["min_rel_opening"])[:3]
+    if near:
+        pick += [near[i] for i in sorted(rng.choice(len(near), min(2, len(near)), replace=False))]
     if not pick:
         continue
     cap = cv2.VideoCapture(str(HERE / r.unit / f"{r.unit}.mp4"))
@@ -120,7 +143,7 @@ items = "\n".join(
 <style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{margin:0 0 22px;padding:8px;background:#fff;border:1px solid #ddd}}
 img{{max-width:100%;display:block}}.b{{margin-top:6px;display:flex;gap:18px;flex-wrap:wrap}}.done{{border-color:#2a9d8f}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px}}
 button{{font:inherit;padding:4px 12px}}</style>
-<div id="bar"><b>Spot check of the eyelid-distance rule</b> (closure when the eye opening is below {THR:.2f} of the video median). Each row: 100 ms before, start, deepest frame, end, 100 ms after; cyan circles = predicted eyelid points.
+<div id="bar"><b>Spot check of the eyelid-distance rule</b> (closure when the eye opening is below {THR:.2f} of the video median, at least 3 frames, eyelid points plausible; "untrusted run" = the eyelid points were implausible). Each row: 100 ms before, start, deepest frame, end, 100 ms after; cyan circles = predicted eyelid points.
 <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {items}
 <script>
@@ -130,4 +153,4 @@ document.querySelectorAll('input[type=radio]').forEach(r=>{{if(V[r.name]===r.val
 function save(){{const rows=['item,human_verdict'].concat(Object.keys(V).sort().map(k=>k+',"'+V[k]+'"'));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\\n')],{{type:'text/csv'}}));a.download='blink_eyelid_spotcheck_verdicts.csv';a.click()}}
 </script>""", encoding="utf-8")
 pd.set_option("display.width", 220)
-print(S.drop(columns=["unit"]).to_string(index=False)); print(len(E_), "events;", len(Q), "items sampled:", (Q.kind == "event").sum(), "events +", (Q.kind != "event").sum(), "near misses")
+print(S.drop(columns=["unit"]).to_string(index=False)); print(len(E_), "rows;", len(Q), "items sampled:", Q.kind.value_counts().to_dict())
