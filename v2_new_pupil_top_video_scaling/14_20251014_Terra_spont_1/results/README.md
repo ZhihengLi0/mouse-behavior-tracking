@@ -11,6 +11,9 @@ contributed none; 600 in total) + this video's labels; shuffles 1511, 1512, ...
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-13 20-label model 1411, applied unchanged) | 13.33 px | 170.8 | 16% | 71% | – |
+| 20 (shuffle 1511) | 10.83 px | 28.7 | 2% | 88% | pending |
 
 The other Terra models give 11.3-35.4 px on this test set (video-13 40- and 60-label models 11.28 / 11.59 px, video-12
 models 24.5-26.9 px, video-11 models 26.6-35.4 px; `../results/cross_video_matrix.csv`).
+
+Step 1 (20 labels): 10.83 px, 19% better than the 0-label 13.33 px (2026-10-06 15:57); frames > 50 px from 16% to 2%.
