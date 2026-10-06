@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-05 22:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-05 23:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -212,7 +212,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Metric</span></th><td><span lang="en">Median frame RMSE: the RMSE over the 8 points of each frame, then the median over the 100 frames.</span></td></tr>
   </tbody></table></div>
   
-  <p class="text" lang="en"><span class="tag">What was done:</span>The aim is to choose an error-correction algorithm: once a model is trained, an algorithm searches the video for frames where the model is probably wrong, a person corrects only those frames, and the model is retrained. This procedure is called active learning. Three algorithms were compared to see whose picks reduce the error most. Procedure: starting from 80 labels, each round the algorithm picks frames, a person corrects 20 of them, they are added and the model is retrained. Three detectors ran as three branches: low confidence (uncertain), keypoints jumping between consecutive frames (jump), deviation from a smooth trajectory (fitting). 11 rounds, each branch from 80 to 300 labels.</p>
+  <p class="text" lang="en"><span class="tag">What was done:</span>The aim is to choose an error-correction algorithm: once a model is trained, an algorithm searches the video for frames where the model is probably wrong, a person corrects only those frames, and the model is retrained. This procedure is called active learning. Three algorithms were compared to see whose picks reduce the error most. Procedure: starting from 80 labels, each round the algorithm picks frames, a person corrects 20 of them, they are added and the model is retrained. Three detectors ran as three branches, all built into DeepLabCut (<code>extract_outlier_frames</code>) and all working on the model's prediction of every frame of the video: <b>uncertain</b>, frames in which any of the 8 points has confidence below 0.6; <b>jump</b>, frames in which any point moved more than 20 px from the previous frame; <b>fitting</b>, frames in which the 8 points deviate on average by more than 20 px from a time-series model (ARIMA, fitted on the confident frames only) of each point's trajectory. The flagged frames are then clustered into 20 groups by image appearance and one frame per group is given to the labeler. 11 rounds, each branch from 80 to 300 labels.</p>
   <figure>
     <div class="figbox"><img src="assets/fig_active_learning.jpg" alt="Active learning convergence, rounds 0-11"></div>
     
@@ -223,6 +223,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><span class="tag">Conclusion:</span>This step has two conclusions: jump is chosen as the error-correction algorithm, and on this video about 80 labels saturate.</p>
     <ol>
       <li><b>jump is the error-correction algorithm and picks the frames in all later experiments.</b> In this experiment jump has the lowest error: the mean of the median error over the 11 rounds is 16.4 px for jump, 17.0 px for uncertain and 17.0 px for fitting, and jump is the lowest in 8 of the 11 rounds. The lead is about 0.6 px, smaller than the variation when one setting is trained again (0.3–2 px), so we regard the three error-correction algorithms as close, with jump slightly ahead.</li>
+      <li><b>On the jump threshold:</b> this step used a fixed 20 px. From 2026-09-18 on (the main line of step 5) the threshold is 3% of the video's median eye width; the algorithm is unchanged. Reason: in the 5-minute video of this step the eye is about 700 px wide, so 20 px is about 3% of the eye width; in the later videos the eye is only 360–500 px wide and a fixed 20 px would be 4–6% of it, a stricter criterion, so it was made relative to give every video the same standard (about 11–15 px on the later videos). The change is recorded in <code>v1_old_pupil_top/new-video-generalization/FROZEN_PARAMETERS.md</code>.</li>
       <li><b>On this video about 80 labels saturate.</b> From 80 to 300 labels the median error of all three branches stays between 15.7 and 17.5 px, with no decrease.
         <ul>
           <li>This result uses the keypoint definitions from before 2026-09-20.</li>
