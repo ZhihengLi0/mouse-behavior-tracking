@@ -2,7 +2,7 @@
 
 First round agreed with Kaiwen on 2026-10-04: judge closure from the distance between the upper and the lower eyelid
 point, run it on the videos, then spot-check part of the result by eye. The finer classes (blink / closed / squint) come
-after this round. **No conclusion yet: the spot check has not been done.**
+after this round. **Spot check done by the labeler on 2026-10-05 (137 items, one judge); result below.**
 
 **Basic information.** Videos 0-12. Model of a video = the model at its plateau point (plateau at 0 labels: the
 20-label model), ResNet-50, final snapshot, whole-video prediction, no confidence cut-off. Script:
@@ -33,3 +33,30 @@ untrusted run, not as a low opening (e.g. video 11, t = 1129.7 s: closure event 
 closed eye). (2) Some closure events with r = 0.45-0.7 show an eye that looks the same before, during and after (videos 1
 and 11, which have narrow eyes); these may be false positives of the 0.70 threshold. Both are what the spot check has to
 settle; the untrusted runs are therefore part of the sample.
+
+## Result of the human spot check (2026-10-05, 137 items, judged by the labeler from 5 frames per item)
+
+`blink_eyelid_spotcheck_verdicts.csv` (raw verdicts), `blink_eyelid_spotcheck_result.csv` (table below); the verdict is
+also in the `human_verdict` column of the sample file.
+
+| what the rule said | items | eye fully closed | partly closed (lid covers part of the pupil) | eye open (rule wrong) |
+|---|---|---|---|---|
+| closure event (trusted frames, r < 0.70, >= 3 frames) | 72 | 35 (49%) | 35 (49%) | 2 (3%) |
+| untrusted run (eyelid points implausible) | 39 | 26 (67%) | 1 (3%) | 12 (31%) |
+| near miss (trusted dip to 0.70-0.85, not flagged) | 26 | 0 | 12 (46%) | 14 (54%) |
+
+Closure events by depth: minimum r < 0.40: 14 of 15 fully closed; 0.40-0.55: 13 fully / 8 partly; 0.55-0.70: 8 fully /
+26 partly / 2 open. By duration (50-100, 100-300, > 300 ms) the share of real closures is the same (23 / 24, 25 / 25,
+22 / 23).
+
+1. What the rule flags as closure is almost always a closure (70 of 72), about half of them full and half partial;
+   the two mistakes are at r = 0.55-0.70.
+2. Two thirds of the "untrusted" runs are full closures: when the eye closes completely the eyelid points scatter, so
+   the deepest part of a blink is seen by the rule as an implausible frame, not as a small opening. These runs have to
+   be counted as closure candidates, not discarded. The other third (12 of 39) are eyelid-point errors with the eye open
+   (all 3 untrusted runs of video 0 and of video 2 are of this kind).
+3. Below the threshold (r = 0.70-0.85) there are no full closures but about half partial ones, so 0.70 separates full
+   closures well and cuts through the partial ones. Whether a partial closure counts as a blink is a definition question
+   (Kaiwen: the finer classes come after this round).
+4. Limits: 137 items, one judge, 5 frames per item; the sample is random within each video but videos with few events
+   contribute fewer items; no estimate of closures that neither the rule nor the untrusted class catches.
