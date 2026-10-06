@@ -12,6 +12,7 @@ in total) + this video's labels; shuffles 1411, 1412, ...
 |---|---|---|---|---|---|
 | 0 (video-11 40-label model 1212, applied unchanged) | 69.13 px | 116.6 | 56% | 24% | – |
 | 20 (shuffle 1411) | 9.43 px | 16.0 | 0% | 86% | 4260 of 57158 (7.5%) |
+| 40 (shuffle 1412) | 9.44 px | 14.1 | 0% | 93% | pending |
 
 The model that fitted video 12 (the day after, 5.13 px) does not fit this day: 69 px at 0 labels, more than half of
 the test frames above 50 px. The other models of videos 11 and 12 give 31.5-79.4 px on this test set
@@ -21,3 +22,6 @@ the test frames above 50 px. The other models of videos 11 and 12 give 31.5-79.4
 training set otherwise as at the time: the 580 carried labels; shuffles 2131-2134). Size of the first batch only; no
 jump selection followed. So far: 5 labels = 10.46 / 16.03 px (subsets a / b; p90 30.4 / 68.4; 8% / 12% of frames > 50 px) against
 69.13 px at 0 labels and 9.43 px at 20; the two 10-label subsets are queued.
+
+Step 2 (40 labels): 9.44 px, no gain over the running best 9.43 px (step 1): one flat step by the rule (2026-10-05 22:43). The p90 improved
+from 16.0 to 14.1 px and the share of confident keypoints from 86% to 93%, but the median did not move.

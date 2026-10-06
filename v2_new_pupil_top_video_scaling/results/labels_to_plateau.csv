@@ -12,4 +12,4 @@ video,unit,mouse,date,labels_at_plateau,plateau_median_px,zero_label_px,status,n
 10,10_20251022_Pluto1,Pluto,2025-10-22,40,10.32,18.13,final,rule fired at 80
 11,11_20251017_Terra_spont_1,Terra,2025-10-17,40,8.86,25.96,final,rule fired at 80
 12,12_20251016_Terra_spont_2,Terra,2025-10-16,0,5.13,5.13,final,rule fired at 40: the video-11 model already fits this day (20 labels 5.77 px; 40 labels 5.84 px)
-13,13_20251015_Terra_spont_1,Terra,2025-10-15,20,9.43,69.13,in progress,0 labels 69.13 px (56% of frames > 50 px); 20 labels 9.43 px
+13,13_20251015_Terra_spont_1,Terra,2025-10-15,20,9.43,69.13,in progress,0 labels 69.13 px (56% of frames > 50 px); 20 labels 9.43; 40 labels 9.44 (one flat step)
