@@ -89,3 +89,30 @@ estimated. D is chosen over E because its threshold was fixed before the spot ch
 
 Final rule D on the whole videos: 4-82 closure events per video (0.2-4.1 per minute), median duration 210-410 ms,
 0.2-4.0% of the frames closed; 512 events in all, 323 full and 189 partial.
+
+## Second, blind spot check of the final rule (2026-10-06)
+
+Script `../../scripts/blink_spotcheck_round2.py` (sample) and `blink_spotcheck_round2_eval.py` (evaluation); files
+`blink_r2_spotcheck_all_videos.csv` (items, stratum, verdict), `blink_r2_spotcheck_verdicts.csv`, `blink_r2_spotcheck_result.csv`.
+100 new items (no overlap with the first round), drawn by what rule D says and shown blind (no stratum, no values);
+judged by the labeler on 2026-10-06, no "cannot tell".
+
+| stratum (what rule D says) | items | fully closed | partly closed | eye open |
+|---|---|---|---|---|
+| closed (events of rule D) | 35 | 18 | 13 | 4 |
+| open, trusted trough with r in 0.70-0.85 | 26 | 0 | 15 | 11 |
+| open, trusted trough with r in 0.85-1.00 | 13 | 0 | 6 | 7 |
+| open, random 5-frame segment with r >= 1.0 and no closed frame within 30 frames | 26 | 0 | 2 | 24 |
+
+1. **Precision on fresh items: 88.6%** (31 of 35 flagged items are closures, full or partial), against 96.9% on the
+   first-round items that had been used to choose the rule. The 4 mistakes: 3 are failed-eyelid runs (opening negative,
+   counted closed by adjacency or by the pupil confidence) in videos 0 and 11, 1 is a trusted trough at r = 0.57 (video 6).
+2. **Full closures: every one of the 18 in the sample is in the "closed" stratum**; none appears in the three "open"
+   strata. For full closures the rule misses nothing here, and 18 of its 35 flags (51%) are full closures.
+3. **"Partly closed" is not an event the eyelid distance can isolate**: it is the verdict for 15 of 26 troughs at
+   r = 0.70-0.85, 6 of 13 at r = 0.85-1.00 and even 2 of 26 random segments with r above the video median. A partly
+   covered pupil is a common state of these eyes, not a rare dip; any threshold on r cuts through it. Whether a partial
+   closure counts as a blink is therefore the definition question to settle before the second round of rules.
+4. Limits: one judge, 5 frames per item, 2-3 items per stratum per video; the strata are not proportional to the video,
+   so the table gives no overall recall.
+

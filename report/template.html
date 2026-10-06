@@ -103,7 +103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 7 步）。</li>
       <li><b>模型给出的哪些点准，置信度能不能信？</b>瞳孔上点最不准（误差中位数 10.9 px，其余 7 个点 3.9–5.8 px）；每个点都是置信度越低误差越大，但瞳孔上点即使置信度高也有 8.3 px（第 8 步）。</li>
       <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 12 个视频的 594 帧测试帧上，四点法的面积误差中位数是 6.6%，三点法是 8.3%；视频 4 和 8 上面积仍然不准（第 9 步）。</li>
-      <li><b>眨眼怎么判断？</b>第一轮：上下眼睑点的距离低于该视频中位数的 70% 记为闭眼，眼睑点失效的帧按相邻关系和瞳孔置信度并入；标注者抽查 137 项，规则标出的闭眼 97% 是真的；13 个视频共 512 次闭眼事件。部分闭合算不算眨眼、眨眼的细分，还没有定（第 10 步）。</li>
+      <li><b>眨眼怎么判断？</b>第一轮：上下眼睑点的距离低于该视频中位数的 70% 记为闭眼，眼睑点失效的帧按相邻关系和瞳孔置信度并入；标注者抽查 137 项，规则标出的闭眼 97% 是真的，之后 100 项新的盲评里是 89%，完全闭眼没有漏；13 个视频共 512 次闭眼事件。部分闭合算不算眨眼、眨眼的细分，还没有定（第 10 步）。</li>
     </ol>
     <p><b>进度：</b>{{STATUS_ZH}}</p>
   </div>
@@ -130,7 +130,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.9 px; the other 7 points 3.9–5.8 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 594 test frames of 12 videos the four-point area has a median error of 6.6% against 8.3% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to detect blinks?</b> First round: a frame is closed when the distance between the eyelid points is below 70% of the video's median, and frames with failed eyelid points are assigned by adjacency and pupil confidence; the labeler spot-checked 137 items and 97% of the flagged closures are real; 512 closure events on the 13 videos. Whether partial closures count, and the finer classes, are not decided (step 10).</li>
+      <li><b>How to detect blinks?</b> First round: a frame is closed when the distance between the eyelid points is below 70% of the video's median, and frames with failed eyelid points are assigned by adjacency and pupil confidence; the labeler spot-checked 137 items and 97% of the flagged closures are real, 89% in a later blind sample of 100 new items, with no full closure missed; 512 closure events on the 13 videos. Whether partial closures count, and the finer classes, are not decided (step 10).</li>
     </ol>
     <p><b>Status:</b> {{STATUS_EN}}</p>
   </div>
@@ -897,7 +897,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>五种变体的对照：</b>只看 r 的第一版准确率 94.6%、检出率 79.8%；最终规则 D 为 96.9% 和 86.2%。检出率的分母是抽查里的 109 项真闭眼，其中 12 项是 r 在 0.70–0.85 的部分闭合，任何变体都不标出它们。</li>
       <li><b>13 个视频的结果：</b>每个视频 4–82 次闭眼事件（每分钟 0.2–4.1 次），时长中位数 210–410 毫秒，闭眼帧占 0.2–4.0%；共 512 次，323 次完全闭眼、189 次部分闭合。</li>
       <li><b>还没有定的：</b>部分闭合算不算眨眼。70% 的阈值把部分闭合切成两半（70% 以下的算进来，70–85% 的漏掉），要只算完全闭眼可以收紧到约 45–50%。眨眼、闭眼、眯眼的细分是下一轮。</li>
-      <li><b>限制：</b>137 项、一个人判断、每项 5 帧；这 137 项既用来在五个变体里选规则、又用来报它的准确率，所以数字略偏乐观；规则和失效类都没抓到的闭眼没有估计；每个视频只用一个模型。<b>下一步已经准备好：</b>按最终规则重新抽了 100 项新的（每个视频：3 次规则判为闭眼的事件、2 段 r 在 0.70–0.85、1 段 r 在 0.85–1.00、2 段规则判为睁眼且无任何信号的随机片段，与第一轮不重叠），盲评页面不显示来源和数值；标注者判完后用 <code>scripts/blink_spotcheck_round2_eval.py</code> 算一个没有被用来选规则的准确率，并第一次估计完全没有信号的闭眼有多少。</li>
+      <li><b>限制：</b>137 项、一个人判断、每项 5 帧；这 137 项既用来在五个变体里选规则、又用来报它的准确率，所以数字略偏乐观；每个视频只用一个模型。</li>
+      <li><b>第二轮盲评（2026 年 10 月 6 日，100 项新的，与第一轮不重叠）：</b>按最终规则分层抽样（每个视频：3 次规则判为闭眼的事件、2 段 r 在 0.70–0.85 的低谷、1 段 r 在 0.85–1.00 的低谷、2 段规则判为睁眼且 r 高于中位数的随机片段），页面不显示来源和数值，标注者逐项判断。结果：<b>规则判为闭眼的 35 项里 31 项是闭眼（88.6%）</b>，比第一轮的 96.9% 低，是在没参与选规则的数据上的数字；错的 4 项里 3 项是眼睑点失效段（被相邻关系或瞳孔置信度并入）、1 项 r = 0.57。<b>全部 18 次完全闭眼都在规则判为闭眼的那一层</b>，三层“睁眼”里一次完全闭眼都没有。<b>“部分闭合”到处都是</b>：r 在 0.70–0.85 的低谷 26 段里 15 段、0.85–1.00 的 13 段里 6 段、甚至 r 高于中位数的随机片段 26 段里也有 2 段被判为眼睑盖住部分瞳孔——它是这些眼睛的常见状态，不是偶发的事件，任何 r 阈值都切不干净。所以“部分闭合算不算眨眼”是第二轮规则之前必须先定的定义。脚本 <code>scripts/blink_spotcheck_round2.py</code>、<code>blink_spotcheck_round2_eval.py</code>；结果 <code>blink_r2_*</code>。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion of the first round:</span>The eyelid-distance rule with the handling of failed eyelid points can serve as the first-round closure detector; 97% of what it flags is a closure.
@@ -907,7 +908,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Five variants compared:</b> the first version (r only) has 94.6% precision and 79.8% recall; the final rule D 96.9% and 86.2%. The recall is relative to the 109 real closures in the sample, 12 of which are partial closures at r = 0.70–0.85 that no variant flags.</li>
       <li><b>Result on the 13 videos:</b> 4–82 closure events per video (0.2–4.1 per minute), median duration 210–410 ms, 0.2–4.0% of the frames closed; 512 events in all, 323 full and 189 partial.</li>
       <li><b>Not decided:</b> whether a partial closure counts as a blink. The 0.70 threshold cuts the partial closures in two (below 0.70 counted, 0.70–0.85 missed); for full closures only it could be tightened to about 0.45–0.50. The finer classes blink / closed / squint are the next round.</li>
-      <li><b>Limits:</b> 137 items, one judge, 5 frames per item; the same 137 items were used to choose among the five variants and to report the accuracy, so the numbers are slightly optimistic; closures that neither the rule nor the failed class catches are not estimated; one model per video. <b>Next step, prepared:</b> a new sample of 100 items drawn under the final rule (per video: 3 events the rule calls closed, 2 runs with r in 0.70–0.85, 1 run with r in 0.85–1.00, 2 random segments the rule calls open with no signal at all; no overlap with the first round), shown blind (no stratum, no values); once judged, <code>scripts/blink_spotcheck_round2_eval.py</code> gives an accuracy that was not used to choose the rule and a first estimate of the closures with no signal.</li>
+      <li><b>Limits:</b> 137 items, one judge, 5 frames per item; the same 137 items were used to choose among the five variants and to report the accuracy, so the numbers are slightly optimistic; one model per video.</li>
+      <li><b>Second, blind spot check (2026-10-06, 100 new items, no overlap with the first round):</b> stratified by what the final rule says (per video: 3 events the rule calls closed, 2 troughs with r in 0.70–0.85, 1 trough with r in 0.85–1.00, 2 random segments the rule calls open with r above the median), shown without stratum or values, judged item by item by the labeler. Result: <b>31 of the 35 items the rule calls closed are closures (88.6%)</b>, lower than the 96.9% of the first round and measured on items that played no part in choosing the rule; of the 4 mistakes, 3 are failed-eyelid runs (absorbed by adjacency or by the pupil confidence) and 1 is a trough at r = 0.57. <b>All 18 full closures are in the stratum the rule calls closed</b>; none appears in the three "open" strata. <b>"Partly closed" is everywhere</b>: 15 of 26 troughs at r = 0.70–0.85, 6 of 13 at r = 0.85–1.00 and even 2 of 26 random segments with r above the median were judged to have the lid over part of the pupil — it is a common state of these eyes, not an occasional event, and no threshold on r separates it. Whether a partial closure counts as a blink is therefore the definition to settle before the second round of rules. Scripts <code>scripts/blink_spotcheck_round2.py</code>, <code>blink_spotcheck_round2_eval.py</code>; results <code>blink_r2_*</code>.</li>
     </ol>
   </div>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
@@ -1027,7 +1029,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>视频 4、5、8</b> 误差偏大（视频 8 一直在 25 px 以上）。目前的解释是标注的人的判断：画面比较模糊，肉眼也难以识别点位。这一点还没有用数字验证过：用整幅画面的清晰度（拉普拉斯方差）和亮度去量，这三个视频和其他 Pluto 视频没有差别，所以模糊如果存在，是在瞳孔边缘这样的局部，需要专门去量。</li>
       <li><b>第三只老鼠（Terra，视频 11–18）</b>：视频 11 和 12 已完成，视频 13 进行中，其余还没有做。“换一只新老鼠要标 20 帧”目前只在两次换老鼠上各看到一次（视频 1 和视频 11）。</li>
       <li><b>面积曲线里的跳变</b>（第 11 步）：眼睛睁开时某个瞳孔点在两个位置之间来回跳，闭眼规则标不出来；还没有针对它的规则，也还没有逐个事件对照原视频区分眨眼、眼球转动和跟踪错误。</li>
-      <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：第一轮的闭眼规则有结果（第 10 步 10.1 节），但用来选规则的 137 项抽查也就是验证它的数据，所以又抽了 100 项新的盲评（标注者还没有判），而且“部分闭合算不算眨眼”和眨眼的细分还没有定义。</li>
+      <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：第一轮的闭眼规则有结果（第 10 步 10.1 节）：规则标出的闭眼在新抽的 100 项盲评里 89% 是真的，完全闭眼一次都没漏；但“部分闭合”是这些眼睛的常见状态（连 r 高于中位数的随机片段里都有），算不算眨眼、眨眼的细分，都还没有定义。</li>
     </ul>
   </div>
   <div class="text" lang="en">
@@ -1037,7 +1039,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: videos 11 and 12 are finished, video 13 is in progress, the others are not started. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
-      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first-round closure rule has a result (step 10, section 10.1), but the 137-item spot check that validates it is also the one used to choose the rule, so a new blind sample of 100 items has been drawn (not judged yet); whether a partial closure counts as a blink, and the finer classes, are not defined.</li>
+      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first-round closure rule has a result (step 10, section 10.1): 89% of what it flags is a closure in a new blind sample of 100 items and no full closure was missed; but "partly closed" is a common state of these eyes (it occurs even in random segments with r above the median), and whether it counts as a blink, and the finer classes, are not defined.</li>
     </ul>
   </div>
 </section>

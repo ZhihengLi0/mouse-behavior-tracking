@@ -1,0 +1,6 @@
+stratum,rule_D_says,items_judged,fully_closed,partly_closed,eye_open,cannot_tell,closure_share_pct
+closed,closed,35,18,13,4,0,88.6
+near 0.70-0.85,open,26,0,15,11,0,57.7
+near 0.85-1.00,open,13,0,6,7,0,46.2
+open,open,26,0,2,24,0,7.7
+all,,100,18,36,46,0,54.0

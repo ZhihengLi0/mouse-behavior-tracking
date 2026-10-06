@@ -1,101 +1,101 @@
 item,video,unit,stratum,start,end,middle,start_s,duration_ms,min_rel_opening,rule_D_closed,human_verdict
-r2_v00_01,0,0_first5minvedio,closed,11552,11582,11552,192.53,517,-1.301,True,
-r2_v00_02,0,0_first5minvedio,open,15900,15904,15902,265.0,83,1.076,False,
-r2_v00_03,0,0_first5minvedio,near 0.70-0.85,17591,17597,17594,293.18,117,0.794,False,
-r2_v00_04,0,0_first5minvedio,near 0.70-0.85,16464,16466,16464,274.4,50,0.833,False,
-r2_v00_05,0,0_first5minvedio,near 0.85-1.00,2758,2760,2759,45.97,50,0.989,False,
-r2_v00_06,0,0_first5minvedio,open,14949,14953,14951,249.15,83,1.033,False,
-r2_v00_07,0,0_first5minvedio,closed,9615,9639,9634,160.25,417,-1.242,True,
-r2_v01_01,1,1_20251031_Pluto_spont_1,closed,6392,6398,6392,106.53,117,-1.605,True,
-r2_v01_02,1,1_20251031_Pluto_spont_1,closed,50712,50771,50767,845.2,1000,-2.213,True,
-r2_v01_03,1,1_20251031_Pluto_spont_1,open,21762,21766,21764,362.7,83,1.377,False,
-r2_v01_04,1,1_20251031_Pluto_spont_1,closed,45167,45179,45175,752.78,217,0.677,True,
-r2_v01_05,1,1_20251031_Pluto_spont_1,near 0.70-0.85,68423,68428,68426,1140.38,100,0.833,False,
-r2_v01_06,1,1_20251031_Pluto_spont_1,open,13261,13265,13263,221.02,83,1.064,False,
-r2_v01_07,1,1_20251031_Pluto_spont_1,near 0.70-0.85,70386,70393,70390,1173.1,133,0.84,False,
-r2_v01_08,1,1_20251031_Pluto_spont_1,near 0.85-1.00,63636,63642,63641,1060.6,117,0.854,False,
-r2_v02_01,2,2_20251031_Pluto_spont_3,near 0.70-0.85,4423,4495,4442,73.72,1217,0.755,False,
-r2_v02_02,2,2_20251031_Pluto_spont_3,near 0.85-1.00,30958,30960,30958,515.97,50,0.851,False,
-r2_v02_03,2,2_20251031_Pluto_spont_3,closed,37801,37819,37804,630.02,317,0.514,True,
-r2_v02_04,2,2_20251031_Pluto_spont_3,open,14440,14444,14442,240.67,83,1.055,False,
-r2_v02_05,2,2_20251031_Pluto_spont_3,closed,64674,64693,64685,1077.9,333,0.438,True,
-r2_v02_06,2,2_20251031_Pluto_spont_3,open,51131,51135,51133,852.18,83,1.152,False,
-r2_v02_07,2,2_20251031_Pluto_spont_3,near 0.70-0.85,35917,35925,35922,598.62,150,0.831,False,
-r2_v02_08,2,2_20251031_Pluto_spont_3,closed,20202,20209,20202,336.7,133,-0.89,True,
-r2_v03_01,3,3_20251031_Pluto_spont_2,closed,6150,6164,6154,102.5,250,0.567,True,
-r2_v03_02,3,3_20251031_Pluto_spont_2,closed,45447,45462,45453,757.45,267,0.453,True,
-r2_v03_03,3,3_20251031_Pluto_spont_2,near 0.70-0.85,57222,57304,57249,953.7,1383,0.714,False,
-r2_v03_04,3,3_20251031_Pluto_spont_2,near 0.85-1.00,43215,43218,43216,720.25,67,0.993,False,
-r2_v03_05,3,3_20251031_Pluto_spont_2,open,21954,21958,21956,365.9,83,1.425,False,
-r2_v03_06,3,3_20251031_Pluto_spont_2,near 0.70-0.85,51117,51143,51125,851.95,450,0.83,False,
-r2_v03_07,3,3_20251031_Pluto_spont_2,closed,15980,16002,15988,266.33,383,0.612,True,
-r2_v03_08,3,3_20251031_Pluto_spont_2,open,29309,29313,29311,488.48,83,1.241,False,
-r2_v04_01,4,4_20251030_Pluto_spont_1,open,7897,7901,7899,131.62,83,1.394,False,
-r2_v04_02,4,4_20251030_Pluto_spont_1,near 0.70-0.85,57642,57663,57646,960.7,367,0.713,False,
-r2_v04_03,4,4_20251030_Pluto_spont_1,closed,60447,60459,60451,1007.45,217,-2.038,True,
-r2_v04_04,4,4_20251030_Pluto_spont_1,closed,70415,70442,70431,1173.58,467,0.598,True,
-r2_v04_05,4,4_20251030_Pluto_spont_1,near 0.85-1.00,66048,66050,66050,1100.8,50,0.851,False,
-r2_v04_06,4,4_20251030_Pluto_spont_1,near 0.70-0.85,64028,64082,64043,1067.13,917,0.781,False,
-r2_v04_07,4,4_20251030_Pluto_spont_1,closed,41238,41248,41243,687.3,183,0.546,True,
-r2_v04_08,4,4_20251030_Pluto_spont_1,open,21282,21286,21284,354.7,83,1.095,False,
-r2_v05_01,5,5_20251029_Pluto_spont_1,open,2338,2342,2340,38.97,83,1.02,False,
-r2_v05_02,5,5_20251029_Pluto_spont_1,open,65719,65723,65721,1095.32,83,1.024,False,
-r2_v05_03,5,5_20251029_Pluto_spont_1,near 0.85-1.00,46386,46420,46390,773.1,583,0.929,False,
-r2_v05_04,5,5_20251029_Pluto_spont_1,near 0.70-0.85,23177,23493,23187,386.28,5283,0.71,False,
-r2_v05_05,5,5_20251029_Pluto_spont_1,near 0.70-0.85,19051,19059,19051,317.52,150,0.723,False,
-r2_v06_01,6,6_20251028_Pluto_spont_1,closed,27253,27286,27271,454.22,567,0.637,True,
-r2_v06_02,6,6_20251028_Pluto_spont_1,open,67391,67395,67393,1123.18,83,1.088,False,
-r2_v06_03,6,6_20251028_Pluto_spont_1,near 0.85-1.00,55663,55669,55664,927.72,117,0.994,False,
-r2_v06_04,6,6_20251028_Pluto_spont_1,near 0.70-0.85,30885,31321,31257,514.75,7283,0.79,False,
-r2_v06_05,6,6_20251028_Pluto_spont_1,closed,25898,25910,25904,431.63,217,0.568,True,
-r2_v06_06,6,6_20251028_Pluto_spont_1,near 0.70-0.85,37335,37337,37336,622.25,50,0.837,False,
-r2_v06_07,6,6_20251028_Pluto_spont_1,closed,27033,27040,27036,450.55,133,0.447,True,
-r2_v06_08,6,6_20251028_Pluto_spont_1,open,13534,13538,13536,225.57,83,1.041,False,
-r2_v07_01,7,7_20251027_Pluto_spont1,closed,22157,22174,22158,369.28,300,-1.657,True,
-r2_v07_02,7,7_20251027_Pluto_spont1,near 0.70-0.85,55208,55218,55217,920.13,183,0.842,False,
-r2_v07_03,7,7_20251027_Pluto_spont1,open,33214,33218,33216,553.57,83,1.03,False,
-r2_v07_04,7,7_20251027_Pluto_spont1,near 0.70-0.85,57796,57798,57798,963.27,50,0.84,False,
-r2_v07_05,7,7_20251027_Pluto_spont1,open,34551,34555,34553,575.85,83,1.042,False,
-r2_v07_06,7,7_20251027_Pluto_spont1,closed,22186,22199,22198,369.77,233,-2.155,True,
-r2_v07_07,7,7_20251027_Pluto_spont1,near 0.85-1.00,53934,53936,53934,898.9,50,0.859,False,
-r2_v07_08,7,7_20251027_Pluto_spont1,closed,22582,22601,22599,376.37,333,-1.07,True,
-r2_v08_01,8,8_20251024_Pluto_spont1,open,16712,16716,16714,278.53,83,1.375,False,
-r2_v08_02,8,8_20251024_Pluto_spont1,closed,51047,51050,51049,850.78,67,0.696,True,
-r2_v08_03,8,8_20251024_Pluto_spont1,near 0.70-0.85,44733,44735,44733,745.55,50,0.836,False,
-r2_v08_04,8,8_20251024_Pluto_spont1,closed,61146,61153,61146,1019.1,133,0.391,True,
-r2_v08_05,8,8_20251024_Pluto_spont1,closed,51077,51115,51091,851.28,650,0.687,True,
-r2_v08_06,8,8_20251024_Pluto_spont1,near 0.85-1.00,67798,67825,67798,1129.97,467,0.863,False,
-r2_v08_07,8,8_20251024_Pluto_spont1,near 0.70-0.85,51831,53926,52298,863.85,34933,0.705,False,
-r2_v08_08,8,8_20251024_Pluto_spont1,open,29199,29203,29201,486.65,83,1.329,False,
-r2_v09_01,9,9_20251023_Pluto1,open,47317,47321,47319,788.62,83,1.327,False,
-r2_v09_02,9,9_20251023_Pluto1,open,11290,11294,11292,188.17,83,1.765,False,
-r2_v09_03,9,9_20251023_Pluto1,near 0.70-0.85,30301,30306,30302,505.02,100,0.819,False,
-r2_v09_04,9,9_20251023_Pluto1,closed,24245,24264,24259,404.08,333,0.403,True,
-r2_v09_05,9,9_20251023_Pluto1,near 0.70-0.85,38933,39004,38962,648.88,1200,0.798,False,
-r2_v09_06,9,9_20251023_Pluto1,closed,69017,69030,69024,1150.28,233,0.681,True,
-r2_v09_07,9,9_20251023_Pluto1,closed,8554,8570,8557,142.57,283,-2.787,True,
-r2_v09_08,9,9_20251023_Pluto1,near 0.85-1.00,32262,32264,32264,537.7,50,0.989,False,
-r2_v10_01,10,10_20251022_Pluto1,open,13095,13099,13097,218.25,83,1.406,False,
-r2_v10_02,10,10_20251022_Pluto1,closed,40917,40941,40928,681.95,417,0.13,True,
-r2_v10_03,10,10_20251022_Pluto1,closed,39116,39358,39180,651.93,4050,0.645,True,
-r2_v10_04,10,10_20251022_Pluto1,near 0.70-0.85,33174,33208,33191,552.9,583,0.796,False,
-r2_v10_05,10,10_20251022_Pluto1,open,806,810,808,13.43,83,1.343,False,
-r2_v10_06,10,10_20251022_Pluto1,near 0.70-0.85,29297,29302,29299,488.28,100,0.83,False,
-r2_v10_07,10,10_20251022_Pluto1,near 0.85-1.00,54371,54373,54371,906.18,50,0.987,False,
-r2_v10_08,10,10_20251022_Pluto1,closed,28788,28864,28807,479.8,1283,0.477,True,
-r2_v11_01,11,11_20251017_Terra_spont_1,near 0.70-0.85,50928,50945,50936,848.8,300,0.771,False,
-r2_v11_02,11,11_20251017_Terra_spont_1,closed,27892,27894,27892,464.87,50,-2.159,True,
-r2_v11_03,11,11_20251017_Terra_spont_1,near 0.85-1.00,56211,56213,56212,936.85,50,0.991,False,
-r2_v11_04,11,11_20251017_Terra_spont_1,open,71512,71516,71514,1191.87,83,1.022,False,
-r2_v11_05,11,11_20251017_Terra_spont_1,closed,58124,58186,58154,968.73,1050,-2.478,True,
-r2_v11_06,11,11_20251017_Terra_spont_1,open,2485,2489,2487,41.42,83,1.373,False,
-r2_v11_07,11,11_20251017_Terra_spont_1,near 0.70-0.85,65463,65474,65473,1091.05,200,0.778,False,
-r2_v11_08,11,11_20251017_Terra_spont_1,closed,2830,2832,2830,47.17,50,-2.017,True,
-r2_v12_01,12,12_20251016_Terra_spont_2,closed,33114,33137,33137,551.9,400,0.172,True,
-r2_v12_02,12,12_20251016_Terra_spont_2,near 0.70-0.85,23356,23366,23362,389.27,183,0.836,False,
-r2_v12_03,12,12_20251016_Terra_spont_2,open,39819,39823,39821,663.65,83,1.131,False,
-r2_v12_04,12,12_20251016_Terra_spont_2,near 0.85-1.00,34633,34641,34633,577.22,150,0.985,False,
-r2_v12_05,12,12_20251016_Terra_spont_2,near 0.70-0.85,15868,16014,16000,264.47,2450,0.704,False,
-r2_v12_06,12,12_20251016_Terra_spont_2,closed,14059,14079,14059,234.32,350,-2.409,True,
-r2_v12_07,12,12_20251016_Terra_spont_2,closed,20563,20568,20563,342.72,100,0.212,True,
-r2_v12_08,12,12_20251016_Terra_spont_2,open,45159,45163,45161,752.65,83,1.01,False,
+r2_v00_01,0,0_first5minvedio,closed,11552,11582,11552,192.53,517,-1.301,True,eye open
+r2_v00_02,0,0_first5minvedio,open,15900,15904,15902,265.0,83,1.076,False,eye open
+r2_v00_03,0,0_first5minvedio,near 0.70-0.85,17591,17597,17594,293.18,117,0.794,False,eye open
+r2_v00_04,0,0_first5minvedio,near 0.70-0.85,16464,16466,16464,274.4,50,0.833,False,eye open
+r2_v00_05,0,0_first5minvedio,near 0.85-1.00,2758,2760,2759,45.97,50,0.989,False,eye open
+r2_v00_06,0,0_first5minvedio,open,14949,14953,14951,249.15,83,1.033,False,eye open
+r2_v00_07,0,0_first5minvedio,closed,9615,9639,9634,160.25,417,-1.242,True,eye open
+r2_v01_01,1,1_20251031_Pluto_spont_1,closed,6392,6398,6392,106.53,117,-1.605,True,partly closed (lid covers part of the pupil)
+r2_v01_02,1,1_20251031_Pluto_spont_1,closed,50712,50771,50767,845.2,1000,-2.213,True,partly closed (lid covers part of the pupil)
+r2_v01_03,1,1_20251031_Pluto_spont_1,open,21762,21766,21764,362.7,83,1.377,False,eye open
+r2_v01_04,1,1_20251031_Pluto_spont_1,closed,45167,45179,45175,752.78,217,0.677,True,partly closed (lid covers part of the pupil)
+r2_v01_05,1,1_20251031_Pluto_spont_1,near 0.70-0.85,68423,68428,68426,1140.38,100,0.833,False,partly closed (lid covers part of the pupil)
+r2_v01_06,1,1_20251031_Pluto_spont_1,open,13261,13265,13263,221.02,83,1.064,False,eye open
+r2_v01_07,1,1_20251031_Pluto_spont_1,near 0.70-0.85,70386,70393,70390,1173.1,133,0.84,False,eye open
+r2_v01_08,1,1_20251031_Pluto_spont_1,near 0.85-1.00,63636,63642,63641,1060.6,117,0.854,False,eye open
+r2_v02_01,2,2_20251031_Pluto_spont_3,near 0.70-0.85,4423,4495,4442,73.72,1217,0.755,False,eye open
+r2_v02_02,2,2_20251031_Pluto_spont_3,near 0.85-1.00,30958,30960,30958,515.97,50,0.851,False,eye open
+r2_v02_03,2,2_20251031_Pluto_spont_3,closed,37801,37819,37804,630.02,317,0.514,True,eye closed (full closure)
+r2_v02_04,2,2_20251031_Pluto_spont_3,open,14440,14444,14442,240.67,83,1.055,False,eye open
+r2_v02_05,2,2_20251031_Pluto_spont_3,closed,64674,64693,64685,1077.9,333,0.438,True,eye closed (full closure)
+r2_v02_06,2,2_20251031_Pluto_spont_3,open,51131,51135,51133,852.18,83,1.152,False,eye open
+r2_v02_07,2,2_20251031_Pluto_spont_3,near 0.70-0.85,35917,35925,35922,598.62,150,0.831,False,eye open
+r2_v02_08,2,2_20251031_Pluto_spont_3,closed,20202,20209,20202,336.7,133,-0.89,True,partly closed (lid covers part of the pupil)
+r2_v03_01,3,3_20251031_Pluto_spont_2,closed,6150,6164,6154,102.5,250,0.567,True,eye closed (full closure)
+r2_v03_02,3,3_20251031_Pluto_spont_2,closed,45447,45462,45453,757.45,267,0.453,True,eye closed (full closure)
+r2_v03_03,3,3_20251031_Pluto_spont_2,near 0.70-0.85,57222,57304,57249,953.7,1383,0.714,False,partly closed (lid covers part of the pupil)
+r2_v03_04,3,3_20251031_Pluto_spont_2,near 0.85-1.00,43215,43218,43216,720.25,67,0.993,False,partly closed (lid covers part of the pupil)
+r2_v03_05,3,3_20251031_Pluto_spont_2,open,21954,21958,21956,365.9,83,1.425,False,eye open
+r2_v03_06,3,3_20251031_Pluto_spont_2,near 0.70-0.85,51117,51143,51125,851.95,450,0.83,False,partly closed (lid covers part of the pupil)
+r2_v03_07,3,3_20251031_Pluto_spont_2,closed,15980,16002,15988,266.33,383,0.612,True,partly closed (lid covers part of the pupil)
+r2_v03_08,3,3_20251031_Pluto_spont_2,open,29309,29313,29311,488.48,83,1.241,False,eye open
+r2_v04_01,4,4_20251030_Pluto_spont_1,open,7897,7901,7899,131.62,83,1.394,False,eye open
+r2_v04_02,4,4_20251030_Pluto_spont_1,near 0.70-0.85,57642,57663,57646,960.7,367,0.713,False,partly closed (lid covers part of the pupil)
+r2_v04_03,4,4_20251030_Pluto_spont_1,closed,60447,60459,60451,1007.45,217,-2.038,True,eye closed (full closure)
+r2_v04_04,4,4_20251030_Pluto_spont_1,closed,70415,70442,70431,1173.58,467,0.598,True,partly closed (lid covers part of the pupil)
+r2_v04_05,4,4_20251030_Pluto_spont_1,near 0.85-1.00,66048,66050,66050,1100.8,50,0.851,False,partly closed (lid covers part of the pupil)
+r2_v04_06,4,4_20251030_Pluto_spont_1,near 0.70-0.85,64028,64082,64043,1067.13,917,0.781,False,partly closed (lid covers part of the pupil)
+r2_v04_07,4,4_20251030_Pluto_spont_1,closed,41238,41248,41243,687.3,183,0.546,True,eye closed (full closure)
+r2_v04_08,4,4_20251030_Pluto_spont_1,open,21282,21286,21284,354.7,83,1.095,False,eye open
+r2_v05_01,5,5_20251029_Pluto_spont_1,open,2338,2342,2340,38.97,83,1.02,False,eye open
+r2_v05_02,5,5_20251029_Pluto_spont_1,open,65719,65723,65721,1095.32,83,1.024,False,eye open
+r2_v05_03,5,5_20251029_Pluto_spont_1,near 0.85-1.00,46386,46420,46390,773.1,583,0.929,False,eye open
+r2_v05_04,5,5_20251029_Pluto_spont_1,near 0.70-0.85,23177,23493,23187,386.28,5283,0.71,False,eye open
+r2_v05_05,5,5_20251029_Pluto_spont_1,near 0.70-0.85,19051,19059,19051,317.52,150,0.723,False,eye open
+r2_v06_01,6,6_20251028_Pluto_spont_1,closed,27253,27286,27271,454.22,567,0.637,True,partly closed (lid covers part of the pupil)
+r2_v06_02,6,6_20251028_Pluto_spont_1,open,67391,67395,67393,1123.18,83,1.088,False,eye open
+r2_v06_03,6,6_20251028_Pluto_spont_1,near 0.85-1.00,55663,55669,55664,927.72,117,0.994,False,eye open
+r2_v06_04,6,6_20251028_Pluto_spont_1,near 0.70-0.85,30885,31321,31257,514.75,7283,0.79,False,eye open
+r2_v06_05,6,6_20251028_Pluto_spont_1,closed,25898,25910,25904,431.63,217,0.568,True,eye open
+r2_v06_06,6,6_20251028_Pluto_spont_1,near 0.70-0.85,37335,37337,37336,622.25,50,0.837,False,eye open
+r2_v06_07,6,6_20251028_Pluto_spont_1,closed,27033,27040,27036,450.55,133,0.447,True,partly closed (lid covers part of the pupil)
+r2_v06_08,6,6_20251028_Pluto_spont_1,open,13534,13538,13536,225.57,83,1.041,False,eye open
+r2_v07_01,7,7_20251027_Pluto_spont1,closed,22157,22174,22158,369.28,300,-1.657,True,eye closed (full closure)
+r2_v07_02,7,7_20251027_Pluto_spont1,near 0.70-0.85,55208,55218,55217,920.13,183,0.842,False,partly closed (lid covers part of the pupil)
+r2_v07_03,7,7_20251027_Pluto_spont1,open,33214,33218,33216,553.57,83,1.03,False,eye open
+r2_v07_04,7,7_20251027_Pluto_spont1,near 0.70-0.85,57796,57798,57798,963.27,50,0.84,False,eye open
+r2_v07_05,7,7_20251027_Pluto_spont1,open,34551,34555,34553,575.85,83,1.042,False,eye open
+r2_v07_06,7,7_20251027_Pluto_spont1,closed,22186,22199,22198,369.77,233,-2.155,True,partly closed (lid covers part of the pupil)
+r2_v07_07,7,7_20251027_Pluto_spont1,near 0.85-1.00,53934,53936,53934,898.9,50,0.859,False,eye open
+r2_v07_08,7,7_20251027_Pluto_spont1,closed,22582,22601,22599,376.37,333,-1.07,True,eye closed (full closure)
+r2_v08_01,8,8_20251024_Pluto_spont1,open,16712,16716,16714,278.53,83,1.375,False,eye open
+r2_v08_02,8,8_20251024_Pluto_spont1,closed,51047,51050,51049,850.78,67,0.696,True,partly closed (lid covers part of the pupil)
+r2_v08_03,8,8_20251024_Pluto_spont1,near 0.70-0.85,44733,44735,44733,745.55,50,0.836,False,partly closed (lid covers part of the pupil)
+r2_v08_04,8,8_20251024_Pluto_spont1,closed,61146,61153,61146,1019.1,133,0.391,True,eye closed (full closure)
+r2_v08_05,8,8_20251024_Pluto_spont1,closed,51077,51115,51091,851.28,650,0.687,True,partly closed (lid covers part of the pupil)
+r2_v08_06,8,8_20251024_Pluto_spont1,near 0.85-1.00,67798,67825,67798,1129.97,467,0.863,False,partly closed (lid covers part of the pupil)
+r2_v08_07,8,8_20251024_Pluto_spont1,near 0.70-0.85,51831,53926,52298,863.85,34933,0.705,False,partly closed (lid covers part of the pupil)
+r2_v08_08,8,8_20251024_Pluto_spont1,open,29199,29203,29201,486.65,83,1.329,False,eye open
+r2_v09_01,9,9_20251023_Pluto1,open,47317,47321,47319,788.62,83,1.327,False,eye open
+r2_v09_02,9,9_20251023_Pluto1,open,11290,11294,11292,188.17,83,1.765,False,eye open
+r2_v09_03,9,9_20251023_Pluto1,near 0.70-0.85,30301,30306,30302,505.02,100,0.819,False,partly closed (lid covers part of the pupil)
+r2_v09_04,9,9_20251023_Pluto1,closed,24245,24264,24259,404.08,333,0.403,True,eye closed (full closure)
+r2_v09_05,9,9_20251023_Pluto1,near 0.70-0.85,38933,39004,38962,648.88,1200,0.798,False,partly closed (lid covers part of the pupil)
+r2_v09_06,9,9_20251023_Pluto1,closed,69017,69030,69024,1150.28,233,0.681,True,partly closed (lid covers part of the pupil)
+r2_v09_07,9,9_20251023_Pluto1,closed,8554,8570,8557,142.57,283,-2.787,True,eye closed (full closure)
+r2_v09_08,9,9_20251023_Pluto1,near 0.85-1.00,32262,32264,32264,537.7,50,0.989,False,partly closed (lid covers part of the pupil)
+r2_v10_01,10,10_20251022_Pluto1,open,13095,13099,13097,218.25,83,1.406,False,partly closed (lid covers part of the pupil)
+r2_v10_02,10,10_20251022_Pluto1,closed,40917,40941,40928,681.95,417,0.13,True,eye closed (full closure)
+r2_v10_03,10,10_20251022_Pluto1,closed,39116,39358,39180,651.93,4050,0.645,True,partly closed (lid covers part of the pupil)
+r2_v10_04,10,10_20251022_Pluto1,near 0.70-0.85,33174,33208,33191,552.9,583,0.796,False,partly closed (lid covers part of the pupil)
+r2_v10_05,10,10_20251022_Pluto1,open,806,810,808,13.43,83,1.343,False,eye open
+r2_v10_06,10,10_20251022_Pluto1,near 0.70-0.85,29297,29302,29299,488.28,100,0.83,False,partly closed (lid covers part of the pupil)
+r2_v10_07,10,10_20251022_Pluto1,near 0.85-1.00,54371,54373,54371,906.18,50,0.987,False,partly closed (lid covers part of the pupil)
+r2_v10_08,10,10_20251022_Pluto1,closed,28788,28864,28807,479.8,1283,0.477,True,eye closed (full closure)
+r2_v11_01,11,11_20251017_Terra_spont_1,near 0.70-0.85,50928,50945,50936,848.8,300,0.771,False,partly closed (lid covers part of the pupil)
+r2_v11_02,11,11_20251017_Terra_spont_1,closed,27892,27894,27892,464.87,50,-2.159,True,eye closed (full closure)
+r2_v11_03,11,11_20251017_Terra_spont_1,near 0.85-1.00,56211,56213,56212,936.85,50,0.991,False,partly closed (lid covers part of the pupil)
+r2_v11_04,11,11_20251017_Terra_spont_1,open,71512,71516,71514,1191.87,83,1.022,False,eye open
+r2_v11_05,11,11_20251017_Terra_spont_1,closed,58124,58186,58154,968.73,1050,-2.478,True,eye closed (full closure)
+r2_v11_06,11,11_20251017_Terra_spont_1,open,2485,2489,2487,41.42,83,1.373,False,eye open
+r2_v11_07,11,11_20251017_Terra_spont_1,near 0.70-0.85,65463,65474,65473,1091.05,200,0.778,False,partly closed (lid covers part of the pupil)
+r2_v11_08,11,11_20251017_Terra_spont_1,closed,2830,2832,2830,47.17,50,-2.017,True,eye open
+r2_v12_01,12,12_20251016_Terra_spont_2,closed,33114,33137,33137,551.9,400,0.172,True,eye closed (full closure)
+r2_v12_02,12,12_20251016_Terra_spont_2,near 0.70-0.85,23356,23366,23362,389.27,183,0.836,False,partly closed (lid covers part of the pupil)
+r2_v12_03,12,12_20251016_Terra_spont_2,open,39819,39823,39821,663.65,83,1.131,False,eye open
+r2_v12_04,12,12_20251016_Terra_spont_2,near 0.85-1.00,34633,34641,34633,577.22,150,0.985,False,eye open
+r2_v12_05,12,12_20251016_Terra_spont_2,near 0.70-0.85,15868,16014,16000,264.47,2450,0.704,False,eye open
+r2_v12_06,12,12_20251016_Terra_spont_2,closed,14059,14079,14059,234.32,350,-2.409,True,eye closed (full closure)
+r2_v12_07,12,12_20251016_Terra_spont_2,closed,20563,20568,20563,342.72,100,0.212,True,eye closed (full closure)
+r2_v12_08,12,12_20251016_Terra_spont_2,open,45159,45163,45161,752.65,83,1.01,False,partly closed (lid covers part of the pupil)
