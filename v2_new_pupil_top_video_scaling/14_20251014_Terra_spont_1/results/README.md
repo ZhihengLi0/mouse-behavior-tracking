@@ -13,6 +13,7 @@ contributed none; 600 in total) + this video's labels; shuffles 1511, 1512, ...
 | 0 (video-13 20-label model 1411, applied unchanged) | 13.33 px | 170.8 | 16% | 71% | – |
 | 20 (shuffle 1511) | 10.83 px | 28.7 | 2% | 88% | 14576 of 57158 (25.5%) |
 | 40 (shuffle 1512) | 12.41 px | 25.8 | 2% | 90% | 10512 of 57158 (18.4%) |
+| 60 (shuffle 1513) | 10.30 px | 16.1 | 2% | 94% | pending |
 
 The other Terra models give 11.3-35.4 px on this test set (video-13 40- and 60-label models 11.28 / 11.59 px, video-12
 models 24.5-26.9 px, video-11 models 26.6-35.4 px; `../results/cross_video_matrix.csv`).
@@ -21,3 +22,7 @@ Step 1 (20 labels): 10.83 px, 19% better than the 0-label 13.33 px (2026-10-06 1
 
 Step 2 (40 labels): 12.41 px, no gain over the running best 10.83 px (step 1): one flat step by the rule (2026-10-06 19:31). The p90
 improved from 28.7 to 25.8 px; the median did not.
+
+Step 3 (60 labels): 10.30 px, 4.9% better than the running best 10.83 px (step 1), so an improving step by the rule and the
+flat-step count restarts at zero (2026-10-07 01:12); p90 from 25.8 to 16.1 px. Batch 4 is selected from the 60-label model's
+whole-video prediction and opened for labeling.
