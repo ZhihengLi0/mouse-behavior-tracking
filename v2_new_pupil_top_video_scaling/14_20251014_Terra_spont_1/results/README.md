@@ -15,6 +15,7 @@ contributed none; 600 in total) + this video's labels; shuffles 1511, 1512, ...
 | 40 (shuffle 1512) | 12.41 px | 25.8 | 2% | 90% | 10512 of 57158 (18.4%) |
 | 60 (shuffle 1513) | 10.30 px | 16.1 | 2% | 94% | 10420 of 57158 (18.2%) |
 | 80 (shuffle 1514) | 10.45 px | 18.1 | 2% | 92% | 10523 of 57158 (18.4%) |
+| 100 (shuffle 1515) | 10.24 px | 26.5 | 2% | 96% | pending |
 
 The other Terra models give 11.3-35.4 px on this test set (video-13 40- and 60-label models 11.28 / 11.59 px, video-12
 models 24.5-26.9 px, video-11 models 26.6-35.4 px; `../results/cross_video_matrix.csv`).
@@ -37,3 +38,9 @@ more gross errors (subset 5b: 14% of frames > 50 px against 2% at 20 labels); fi
 
 Step 4 (80 labels): 10.45 px, no gain over the running best 10.30 px (step 3): one flat step by the rule (2026-10-07 11:03). Batch 5
 is selected from the 80-label model and opened; the rule fires only if 100 labels also fail to improve by 3%.
+
+Step 5 (100 labels): 10.24 px, 0.6% better than the running best 10.30 px (step 3), below the 3% threshold: second flat step in a
+row, so the plateau rule fired at 100 labels (2026-10-07 15:38). Plateau point = the last improving step, 60 labels (10.30 px).
+The batch-6 window is held; awaiting the user's decision. (Batch 5 was saved with one leftover pre-label point, pupil_bottom of
+img022177 at (930, 33) on a closed eye; it was emptied with the user's approval and step 5 restarted from scratch before any
+result was recorded.)
