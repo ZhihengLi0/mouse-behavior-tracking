@@ -15,7 +15,7 @@ contributed none; 600 in total) + this video's labels; shuffles 1511, 1512, ...
 | 40 (shuffle 1512) | 12.41 px | 25.8 | 2% | 90% | 10512 of 57158 (18.4%) |
 | 60 (shuffle 1513) | 10.30 px | 16.1 | 2% | 94% | 10420 of 57158 (18.2%) |
 | 80 (shuffle 1514) | 10.45 px | 18.1 | 2% | 92% | 10523 of 57158 (18.4%) |
-| 100 (shuffle 1515) | 10.24 px | 26.5 | 2% | 96% | pending |
+| 100 (shuffle 1515) | 10.24 px | 26.5 | 2% | 96% | pending (batch 6 selected, not labeled) |
 
 The other Terra models give 11.3-35.4 px on this test set (video-13 40- and 60-label models 11.28 / 11.59 px, video-12
 models 24.5-26.9 px, video-11 models 26.6-35.4 px; `../results/cross_video_matrix.csv`).
@@ -44,3 +44,7 @@ row, so the plateau rule fired at 100 labels (2026-10-07 15:38). Plateau point =
 The batch-6 window is held; awaiting the user's decision. (Batch 5 was saved with one leftover pre-label point, pupil_bottom of
 img022177 at (930, 33) on a closed eye; it was emptied with the user's approval and step 5 restarted from scratch before any
 result was recorded.)
+
+**Closed 2026-10-07 (user decision): plateau at 60 labels, 10.30 px** (tag `v0.9.16-video14-plateau`). Batches 1-3 (60 labels) are
+carried into the later videos (660 labels go into video 15); batches 4-5 were labeled for the rule only and are not carried;
+batch 6 was selected from the 100-label model but never labeled.
