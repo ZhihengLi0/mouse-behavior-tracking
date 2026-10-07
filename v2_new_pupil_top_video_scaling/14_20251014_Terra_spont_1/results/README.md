@@ -26,3 +26,10 @@ improved from 28.7 to 25.8 px; the median did not.
 Step 3 (60 labels): 10.30 px, 4.9% better than the running best 10.83 px (step 1), so an improving step by the rule and the
 flat-step count restarts at zero (2026-10-07 01:12); p90 from 25.8 to 16.1 px. Batch 4 is selected from the 60-label model's
 whole-video prediction and opened for labeling.
+
+**Fewer-labels study (2026-10-06 to 2026-10-07)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each,
+training set otherwise as at the time: the 600 carried labels; shuffles 2141-2144). Size of the first batch only; no
+jump selection followed. 5 labels = 10.93 / 10.22 px (subsets a / b; p90 16.7 / 169.1; 4% / 14% of frames > 50 px) against
+13.33 px at 0 labels and 10.83 px at 20; 10 labels = 9.82 / 10.06 px (subsets a / b; p90 22.9 / 25.9; 8% / 2% of frames > 50 px).
+On this video the medians of 5 and 10 labels are within 10% of the 20-label 10.83 px (three of the four below it), but with
+more gross errors (subset 5b: 14% of frames > 50 px against 2% at 20 labels); figure `fewer_labels.png`.

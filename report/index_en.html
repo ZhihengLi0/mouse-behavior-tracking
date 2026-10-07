@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-07 01:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-07 08:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -582,7 +582,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>11</td><td>25.96</td><td>9.69 / 9.97</td><td>9.54 / 8.87</td><td>9.24</td></tr>
 <tr><td>12</td><td>5.13</td><td>5.79 / 6.63</td><td>5.99 / 5.96</td><td>5.77</td></tr>
 <tr><td>13</td><td>69.13</td><td>10.46 / 16.03</td><td>11.24 / 10.29</td><td>9.43</td></tr>
-<tr><td>14</td><td>13.33</td><td>10.93 / –</td><td>– / –</td><td>10.83</td></tr>
+<tr><td>14</td><td>13.33</td><td>10.93 / 10.22</td><td>9.82 / 10.06</td><td>10.83</td></tr>
       </tbody>
     </table>
   </div>
@@ -604,6 +604,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/fewer_video11.jpg" alt="fewer video 11" loading="lazy"><div class="cap"><span lang="en">Video 11 (Terra, 2025-10-17)</span></div></div>
       <div class="item"><img src="assets/fewer_video12.jpg" alt="fewer video 12" loading="lazy"><div class="cap"><span lang="en">Video 12 (Terra, 2025-10-16)</span></div></div>
       <div class="item"><img src="assets/fewer_video13.jpg" alt="fewer video 13" loading="lazy"><div class="cap"><span lang="en">Video 13 (Terra, 2025-10-15)</span></div></div>
+      <div class="item"><img src="assets/fewer_video14.jpg" alt="fewer video 14" loading="lazy"><div class="cap"><span lang="en">Video 14 (Terra, 2025-10-14)</span></div></div>
     </div></div>
     
     <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
@@ -1063,11 +1064,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video13_batch03.jpg" alt="Video 13 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 13, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video13_batch04.jpg" alt="Video 13 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 13, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
   </div></div></figure>
-  <p class="text"><b><span lang="en">Video 14 (Terra, 2025-10-14): 3 batches</span></b></p>
+  <p class="text"><b><span lang="en">Video 14 (Terra, 2025-10-14): 4 batches</span></b></p>
   <figure><div class="figbox scroll"><div class="strip tall">
       <div class="item"><img src="assets/selection_video14_batch01.jpg" alt="Video 14 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 14, batch 1 (picked by appearance, no model)</span></div></div>
       <div class="item"><img src="assets/selection_video14_batch02.jpg" alt="Video 14 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 14, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video14_batch03.jpg" alt="Video 14 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 14, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video14_batch04.jpg" alt="Video 14 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 14, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
   </div></div></figure>
   <h3><span lang="en">A2: the single-frame blind check of the first-round blink definition (the labeler's verdicts on the original frames)</span></h3>
   
