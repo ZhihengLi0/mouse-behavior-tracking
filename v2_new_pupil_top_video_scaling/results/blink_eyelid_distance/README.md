@@ -87,8 +87,8 @@ The recall is relative to the closures *in the sample*, which includes the 12 pa
 (r = 0.70-0.85) that no variant flags; closures that neither the rule nor the implausible class catches are not
 estimated. D is chosen over E because its threshold was fixed before the spot check.
 
-Final rule D on the whole videos: 4-82 closure events per video (0.2-4.1 per minute), median duration 210-410 ms,
-0.2-4.0% of the frames closed; 512 events in all, 323 full and 189 partial.
+Final rule D on the whole videos (15 videos 0-14, rerun with video 14 on 2026-10-07): 4-82 closure events per video
+(0.2-4.1 per minute), median duration 100-410 ms, 0.2-4.0% of the frames closed; 584 events in all, 374 full and 210 partial.
 
 ## Second, blind spot check of the final rule (2026-10-06)
 
@@ -149,7 +149,7 @@ recall - false-alarm rate); leave-one-video-out thresholds give precision 85%, r
 | rule D (relative, 10.1) for comparison | 239 | 113 | 72 | 72.4% | 75.0% | 47.8% |
 
 Whole videos (`blink_notopen_rule_all_videos.csv`, `blink_notopen_rule_events_all_videos.csv`, `blink_notopen_rule_summary.png`):
-not-open frames 0.2-0.4% on videos 0, 5, 7, 13; 2-12% on videos 1, 2, 6; **26-70% on videos 3, 4, 8, 9, 10, 11, 12**
+not-open frames 0.2-0.4% on videos 0, 5, 7, 13; 2-12% on videos 1, 2, 6; 23% on video 14 (added in the rerun of 2026-10-07); **26-70% on videos 3, 4, 8, 9, 10, 11, 12**
 (longest single not-open stretch 44-212 s). Events 0.2-12.8 per minute, median duration 100-717 ms; in the half-covered
 videos most events are re-closings between brief openings and are not blink counts. Blinks (brief full closures) are a
 subset of this state; separating them by depth and duration is the next round. Limits: one judge; threshold chosen on

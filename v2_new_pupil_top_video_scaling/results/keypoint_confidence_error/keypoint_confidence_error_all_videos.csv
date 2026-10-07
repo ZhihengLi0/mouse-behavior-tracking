@@ -455,11 +455,51 @@ video,unit,labels_this_video,step,plateau_model,keypoint,n,median_error_px,p90_e
 13,13_20251015_Terra_spont_1,60,3,False,eyelid_bottom,50,7.46,15.97,0.931,0.98,-0.03
 13,13_20251015_Terra_spont_1,60,3,False,eye_nasal_corner,50,3.39,7.88,0.945,1.0,-0.08
 13,13_20251015_Terra_spont_1,60,3,False,eye_temporal_corner,50,9.86,23.93,0.603,0.5,-0.16
-all,all videos pooled (plateau-point models),,,True,pupil_top,697,10.17,33.32,0.752,0.759,-0.39
-all,all videos pooled (plateau-point models),,,True,pupil_bottom,698,4.21,22.52,0.847,0.908,-0.42
-all,all videos pooled (plateau-point models),,,True,pupil_left,696,4.88,37.37,0.758,0.78,-0.57
-all,all videos pooled (plateau-point models),,,True,pupil_right,700,4.83,15.86,0.833,0.944,-0.22
-all,all videos pooled (plateau-point models),,,True,eyelid_top,699,5.81,14.87,0.807,0.898,-0.4
-all,all videos pooled (plateau-point models),,,True,eyelid_bottom,700,3.98,12.97,0.842,0.954,-0.34
-all,all videos pooled (plateau-point models),,,True,eye_nasal_corner,700,4.36,15.28,0.809,0.941,-0.35
-all,all videos pooled (plateau-point models),,,True,eye_temporal_corner,700,4.92,14.74,0.759,0.767,-0.51
+14,14_20251014_Terra_spont_1,20,1,False,pupil_top,49,20.3,34.99,0.7,0.816,0.0
+14,14_20251014_Terra_spont_1,20,1,False,pupil_bottom,49,1.78,12.75,0.89,0.959,-0.24
+14,14_20251014_Terra_spont_1,20,1,False,pupil_left,50,6.57,17.42,0.887,0.86,-0.06
+14,14_20251014_Terra_spont_1,20,1,False,pupil_right,50,9.71,30.4,0.592,0.5,-0.18
+14,14_20251014_Terra_spont_1,20,1,False,eyelid_top,50,5.53,13.42,0.767,1.0,0.08
+14,14_20251014_Terra_spont_1,20,1,False,eyelid_bottom,50,2.48,6.05,0.866,1.0,-0.23
+14,14_20251014_Terra_spont_1,20,1,False,eye_nasal_corner,50,4.58,12.43,0.8,0.94,-0.34
+14,14_20251014_Terra_spont_1,20,1,False,eye_temporal_corner,50,3.8,9.0,0.77,0.98,-0.28
+14,14_20251014_Terra_spont_1,40,2,False,pupil_top,49,11.91,37.33,0.703,0.939,-0.17
+14,14_20251014_Terra_spont_1,40,2,False,pupil_bottom,49,3.48,13.97,0.854,1.0,-0.11
+14,14_20251014_Terra_spont_1,40,2,False,pupil_left,50,6.33,18.94,0.828,0.96,-0.48
+14,14_20251014_Terra_spont_1,40,2,False,pupil_right,50,14.42,54.52,0.596,0.48,-0.12
+14,14_20251014_Terra_spont_1,40,2,False,eyelid_top,50,4.47,15.4,0.853,0.94,-0.25
+14,14_20251014_Terra_spont_1,40,2,False,eyelid_bottom,50,3.21,6.93,0.878,0.98,-0.17
+14,14_20251014_Terra_spont_1,40,2,False,eye_nasal_corner,50,4.26,17.07,0.75,0.9,-0.22
+14,14_20251014_Terra_spont_1,40,2,False,eye_temporal_corner,50,3.86,10.02,0.751,0.98,-0.55
+14,14_20251014_Terra_spont_1,60,3,True,pupil_top,49,11.13,35.64,0.77,0.918,-0.39
+14,14_20251014_Terra_spont_1,60,3,True,pupil_bottom,49,2.26,14.81,0.911,0.98,-0.13
+14,14_20251014_Terra_spont_1,60,3,True,pupil_left,50,5.77,16.98,0.862,0.98,-0.26
+14,14_20251014_Terra_spont_1,60,3,True,pupil_right,50,11.97,26.95,0.664,0.72,-0.33
+14,14_20251014_Terra_spont_1,60,3,True,eyelid_top,50,5.19,13.86,0.88,0.98,-0.2
+14,14_20251014_Terra_spont_1,60,3,True,eyelid_bottom,50,2.89,7.72,0.95,0.98,-0.17
+14,14_20251014_Terra_spont_1,60,3,True,eye_nasal_corner,50,4.1,15.42,0.87,0.98,-0.4
+14,14_20251014_Terra_spont_1,60,3,True,eye_temporal_corner,50,4.04,9.02,0.859,0.98,-0.2
+14,14_20251014_Terra_spont_1,80,4,False,pupil_top,49,12.89,37.67,0.682,0.776,-0.03
+14,14_20251014_Terra_spont_1,80,4,False,pupil_bottom,49,2.83,16.71,0.94,0.918,-0.47
+14,14_20251014_Terra_spont_1,80,4,False,pupil_left,50,6.23,18.18,0.879,0.94,-0.38
+14,14_20251014_Terra_spont_1,80,4,False,pupil_right,50,9.63,23.01,0.667,0.78,-0.11
+14,14_20251014_Terra_spont_1,80,4,False,eyelid_top,50,5.09,14.63,0.971,1.0,-0.24
+14,14_20251014_Terra_spont_1,80,4,False,eyelid_bottom,50,3.23,7.67,0.962,0.98,-0.17
+14,14_20251014_Terra_spont_1,80,4,False,eye_nasal_corner,50,4.52,14.46,0.89,0.98,-0.21
+14,14_20251014_Terra_spont_1,80,4,False,eye_temporal_corner,50,3.24,8.25,0.814,0.98,-0.07
+14,14_20251014_Terra_spont_1,100,5,False,pupil_top,49,14.42,35.33,0.777,0.939,-0.11
+14,14_20251014_Terra_spont_1,100,5,False,pupil_bottom,49,2.26,13.18,0.945,1.0,-0.38
+14,14_20251014_Terra_spont_1,100,5,False,pupil_left,50,5.71,20.86,0.88,0.94,-0.46
+14,14_20251014_Terra_spont_1,100,5,False,pupil_right,50,10.74,32.49,0.743,0.88,-0.41
+14,14_20251014_Terra_spont_1,100,5,False,eyelid_top,50,4.82,13.45,0.956,0.98,-0.07
+14,14_20251014_Terra_spont_1,100,5,False,eyelid_bottom,50,3.28,8.42,0.911,0.98,0.3
+14,14_20251014_Terra_spont_1,100,5,False,eye_nasal_corner,50,4.08,14.46,0.855,0.96,-0.57
+14,14_20251014_Terra_spont_1,100,5,False,eye_temporal_corner,50,3.68,9.03,0.839,0.98,0.0
+all,all videos pooled (plateau-point models),,,True,pupil_top,746,10.21,33.95,0.753,0.769,-0.39
+all,all videos pooled (plateau-point models),,,True,pupil_bottom,747,4.06,21.43,0.851,0.913,-0.41
+all,all videos pooled (plateau-point models),,,True,pupil_left,746,4.93,34.39,0.765,0.794,-0.55
+all,all videos pooled (plateau-point models),,,True,pupil_right,750,5.06,17.9,0.822,0.929,-0.28
+all,all videos pooled (plateau-point models),,,True,eyelid_top,749,5.77,14.87,0.812,0.904,-0.39
+all,all videos pooled (plateau-point models),,,True,eyelid_bottom,750,3.88,12.82,0.849,0.956,-0.35
+all,all videos pooled (plateau-point models),,,True,eye_nasal_corner,750,4.36,15.35,0.813,0.944,-0.35
+all,all videos pooled (plateau-point models),,,True,eye_temporal_corner,750,4.81,14.53,0.766,0.781,-0.5
