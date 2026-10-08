@@ -42,3 +42,7 @@ opened for labeling; the rule fires if 80 labels also fail to improve by 3% on 9
 Step 4 (80 labels): 10.24 px, worse than the running best 9.73 px (step 2): second flat step in a row, so the plateau rule
 fired at 80 labels (2026-10-08 16:28). Plateau point = the last improving step, 40 labels (9.73 px). The batch-5 window is held;
 awaiting the user's decision.
+
+**Closed 2026-10-08 (user decision: "规则触发就标记然后下一个视频"): plateau at 40 labels, 9.73 px** (tag `v0.9.17-video15-plateau`).
+Batches 1-2 (40 labels) are carried into the later videos (700 labels go into video 16); batches 3-4 were labeled for the rule only
+and are not carried; batch 5 was selected from the 80-label model but never labeled.
