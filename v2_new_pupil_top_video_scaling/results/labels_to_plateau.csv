@@ -14,3 +14,4 @@ video,unit,mouse,date,labels_at_plateau,plateau_median_px,zero_label_px,status,n
 12,12_20251016_Terra_spont_2,Terra,2025-10-16,0,5.13,5.13,final,rule fired at 40: the video-11 model already fits this day (20 labels 5.77 px; 40 labels 5.84 px)
 13,13_20251015_Terra_spont_1,Terra,2025-10-15,20,9.43,69.13,final,rule fired at 60 (20 / 40 / 60 = 9.43 / 9.44 / 9.67 px); user decision 2026-10-06
 14,14_20251014_Terra_spont_1,Terra,2025-10-14,60,10.30,13.33,final,user decision 2026-10-07; 0 labels 13.33 px (16% of frames > 50 px); 20 / 40 / 60 / 80 / 100 = 10.83 / 12.41 / 10.30 / 10.45 / 10.24; two flat steps after 60 (80 and 100 within 3% of 10.30)
+15,15_20251013_Terra_spont_1,Terra,2025-10-13,0,10.57,10.57,in progress,0 labels 10.57 px (video-14 60-label model 1513); 20 labels 11.42 (no gain: one flat step); test50 pre-labeled with model 1511 before video 14's plateau was known
