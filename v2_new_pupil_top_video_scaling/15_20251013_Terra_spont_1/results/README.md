@@ -20,7 +20,7 @@ videos 10 and 11 batches 1-2: 40 each; video 13 batch 1: 20; video 14 batches 1-
 |---|---|---|---|---|---|
 | 0 (video-14 60-label model 1513, applied unchanged) | 10.57 px | 28.8 | 0% | 64% | – |
 | 20 (shuffle 1611) | 11.42 px | 26.2 | 0% | 86% | 15807 of 57158 (27.7%) |
-| 40 (shuffle 1612) | 9.73 px | 19.1 | 0% | 94% | pending |
+| 40 (shuffle 1612) | 9.73 px | 19.1 | 0% | 94% | 13953 of 57158 (24.4%) |
 
 The other video-14 models give 10.4-10.8 px on this test set (40 labels 10.40, 80 labels 10.77), the video-12 models
 11.4-16.4 px, the video-13 plateau model 26.5 px (`../results/cross_video_matrix.csv`).
