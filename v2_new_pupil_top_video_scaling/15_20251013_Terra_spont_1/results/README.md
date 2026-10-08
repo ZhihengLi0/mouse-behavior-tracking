@@ -22,6 +22,7 @@ videos 10 and 11 batches 1-2: 40 each; video 13 batch 1: 20; video 14 batches 1-
 | 20 (shuffle 1611) | 11.42 px | 26.2 | 0% | 86% | 15807 of 57158 (27.7%) |
 | 40 (shuffle 1612) | 9.73 px | 19.1 | 0% | 94% | 13953 of 57158 (24.4%) |
 | 60 (shuffle 1613) | 9.61 px | 26.7 | 2% | 91% | 11698 of 57158 (20.5%) |
+| 80 (shuffle 1614) | 10.24 px | 25.4 | 0% | 85% | pending (batch 5 selected, not labeled) |
 
 The other video-14 models give 10.4-10.8 px on this test set (40 labels 10.40, 80 labels 10.77), the video-12 models
 11.4-16.4 px, the video-13 plateau model 26.5 px (`../results/cross_video_matrix.csv`).
@@ -37,3 +38,7 @@ flat-step count restarts at zero (2026-10-08 01:14); p90 from 26.2 to 19.1 px, 9
 Step 3 (60 labels): 9.61 px, 1.2% better than the running best 9.73 px (step 2), below the 3% threshold: one flat step by the
 rule (2026-10-08 12:10); p90 worse (19.1 to 26.7 px), one test frame above 50 px. Batch 4 is selected from the 60-label model and
 opened for labeling; the rule fires if 80 labels also fail to improve by 3% on 9.73 px.
+
+Step 4 (80 labels): 10.24 px, worse than the running best 9.73 px (step 2): second flat step in a row, so the plateau rule
+fired at 80 labels (2026-10-08 16:28). Plateau point = the last improving step, 40 labels (9.73 px). The batch-5 window is held;
+awaiting the user's decision.
