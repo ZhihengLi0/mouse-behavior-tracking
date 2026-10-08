@@ -15,7 +15,7 @@ Paths inside the archive start at `dlc_projects/EyePupilEllipse-Zhiheng-2026-09-
 
 | round | models (shuffle numbers) | videos | size | packed | uploaded to the UMN Drive | copied by Kaiwen | local intermediate snapshots deleted |
 |---|---|---|---|---|---|---|---|
-| 1 | 111-115, 211-217, 225, 311, 321-324, 411, 412, 422, 423, 531-534, 631, 632, 711-713 (31 models, 473 files) | 0-7 | 31 GB | 2026-10-08 11:53 | 2026-10-08 12:55 | – | – |
+| 1 | 111-115, 211-217, 225, 311, 321-324, 411, 412, 422, 423, 531-534, 631, 632, 711-713 (31 models, 473 files) | 0-7 | 31 GB | 2026-10-08 11:53 | 2026-10-08 12:55 | 2026-10-08 13:46 (copies renamed, originals deleted) | – |
 | 2 | 811, 812, 911-913, 951-974 | 8-9 | 31 GB | – | – | – | – |
 | 3 | 1011-1016, 1111-1114, 1211-1214, 1311, 1312, 1411-1413, 1511-1515 | 10-14 | 26 GB | – | – | – | – |
 | 4 | 2061-2064, 2071-2074, 2081-2084, 2091-2094, 2101-2104, 2111-2114, 2121-2124 (fewer-labels subsets) | 6-12 | 30 GB | – | – | – | – |
