@@ -15,7 +15,7 @@ contributed none; 600 in total) + this video's labels; shuffles 1511, 1512, ...
 | 40 (shuffle 1512) | 12.41 px | 25.8 | 2% | 90% | 10512 of 57158 (18.4%) |
 | 60 (shuffle 1513) | 10.30 px | 16.1 | 2% | 94% | 10420 of 57158 (18.2%) |
 | 80 (shuffle 1514) | 10.45 px | 18.1 | 2% | 92% | 10523 of 57158 (18.4%) |
-| 100 (shuffle 1515) | 10.24 px | 26.5 | 2% | 96% | pending (batch 6 selected, not labeled) |
+| 100 (shuffle 1515) | 10.24 px | 26.5 | 2% | 96% | 10360 of 57158 (18.1%; batch 6 selected, not labeled) |
 
 The other Terra models give 11.3-35.4 px on this test set (video-13 40- and 60-label models 11.28 / 11.59 px, video-12
 models 24.5-26.9 px, video-11 models 26.6-35.4 px; `../results/cross_video_matrix.csv`).
