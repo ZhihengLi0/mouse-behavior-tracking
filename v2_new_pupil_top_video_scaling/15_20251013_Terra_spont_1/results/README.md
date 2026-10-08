@@ -20,6 +20,7 @@ videos 10 and 11 batches 1-2: 40 each; video 13 batch 1: 20; video 14 batches 1-
 |---|---|---|---|---|---|
 | 0 (video-14 60-label model 1513, applied unchanged) | 10.57 px | 28.8 | 0% | 64% | – |
 | 20 (shuffle 1611) | 11.42 px | 26.2 | 0% | 86% | 15807 of 57158 (27.7%) |
+| 40 (shuffle 1612) | 9.73 px | 19.1 | 0% | 94% | pending |
 
 The other video-14 models give 10.4-10.8 px on this test set (40 labels 10.40, 80 labels 10.77), the video-12 models
 11.4-16.4 px, the video-13 plateau model 26.5 px (`../results/cross_video_matrix.csv`).
@@ -27,3 +28,7 @@ The other video-14 models give 10.4-10.8 px on this test set (40 labels 10.40, 8
 Step 1 (20 labels): 11.42 px, no gain over the 0-label 10.57 px (the video-14 plateau model already fits this day): one flat
 step by the rule (2026-10-07 21:26). The share of confident keypoints rose from 64% to 86% and the p90 from 28.8 to 26.2 px;
 the median did not improve. Batch 2 is selected from the 20-label model's whole-video prediction and opened for labeling.
+
+Step 2 (40 labels): 9.73 px, 7.9% better than the running best 10.57 px (0 labels), so an improving step by the rule and the
+flat-step count restarts at zero (2026-10-08 01:14); p90 from 26.2 to 19.1 px, 94% of keypoints confident. Batch 3 is selected from the
+40-label model's whole-video prediction and opened for labeling.
