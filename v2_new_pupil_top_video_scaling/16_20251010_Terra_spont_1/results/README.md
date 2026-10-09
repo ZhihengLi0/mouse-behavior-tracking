@@ -1,0 +1,17 @@
+# Video 16: 2025-10-10 Terra spont 1 (mouse C, 19.9 min; index 16) - labeling convention v2
+
+Label scaling under convention v2, continuing the v2 line after video 15 (plateau at 40 labels; its batches 1-2 are
+carried); the sixth video of mouse C (Terra). This video had no earlier human labels: test50, val20 and batch01 were
+extracted on 2026-10-08 with the same model-free rule as every video, pre-labeled with the video-15 plateau model (1612,
+40 labels) and corrected by the labeler on 2026-10-08 (test50: 136 of 400 points moved; val20: 55 of 160; batch01: 76 of
+160; no point left empty), then the test set was frozen. Training set of every step = the carried labels of the earlier
+videos (videos 0-3: 100 + 100 + 60 + 60; video 4 run 2 batches 1-2: 40; videos 5, 6, 8 batch 1: 20 each; video 9 batches
+1-4: 80; videos 10 and 11 batches 1-2: 40 each; video 13 batch 1: 20; video 14 batches 1-3: 60; video 15 batches 1-2: 40;
+videos 7 and 12 contributed none; 700 in total) + this video's labels; shuffles 1711, 1712, ...
+
+| labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
+|---|---|---|---|---|---|
+| 0 (video-15 40-label model 1612, applied unchanged) | 11.35 px | 23.1 | 0% | 76% | – |
+
+The other Terra models give 9.7-14.1 px on this test set (the video-12 20-label model 1311 is the best at 9.70 px, the
+video-15 60-label model 11.52, the video-14 plateau model 12.08; `../results/cross_video_matrix.csv`).
