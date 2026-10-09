@@ -19,3 +19,9 @@ video-15 60-label model 11.52, the video-14 plateau model 12.08; `../results/cro
 
 Step 1 (20 labels): 7.72 px, 32% better than the 0-label 11.35 px (2026-10-08 23:43); p90 from 23.1 to 11.5 px, 96% of
 keypoints confident; one test frame above 50 px. Batch 2 is selected from the 20-label model's whole-video prediction.
+
+**Fewer-labels study (2026-10-09)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training set
+otherwise as at the time: the 700 carried labels; shuffles 2161-2164). Size of the first batch only; no jump selection followed.
+5 labels = 9.18 / 10.42 px (subsets a / b; p90 15.6 / 14.9), 10 labels = 9.35 / 9.18 px (p90 15.3 / 13.8), against 11.35 px at
+0 labels and 7.72 px at 20: every subset improves on the 0-label model, none reaches the 20-label number (19-35% above it);
+figure `fewer_labels.png`.
