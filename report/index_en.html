@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-08 23:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-09 13:27 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -103,7 +103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 793 test frames of 16 videos the four-point area has a median error of 5.8% against 7.8% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
       <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 7 videos (3, 4, 8–12) the eye is not fully open 26–70% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
     </ol>
-    <p><b>Status:</b> 16 videos finished (videos 0–15); video 16 in progress, error at 0 / 20 / 40 / … labels: 11.35 / 7.72 px.</p>
+    <p><b>Status:</b> 16 videos finished (videos 0–15); video 16 in progress, error at 0 / 20 / 40 / … labels: 11.35 / 7.72 / 7.15 px.</p>
   </div>
 
   
@@ -440,6 +440,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video13.jpg" alt="Video 13: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 13 (Terra, 2025-10-15): batch 2</span></div></div>
       <div class="item"><img src="assets/selection_video14.jpg" alt="Video 14: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 14 (Terra, 2025-10-14): batch 2</span></div></div>
       <div class="item"><img src="assets/selection_video15.jpg" alt="Video 15: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 15 (Terra, 2025-10-13): batch 2</span></div></div>
+      <div class="item"><img src="assets/selection_video16.jpg" alt="Video 16: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 16 (Terra, 2025-10-10): batch 2</span></div></div>
     </div></div>
     
     <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>One selection sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Each sheet, from top to bottom: (1) scatter plot at the top left: one dot per candidate frame, placed by the first two principal components of its fingerprint and coloured by cluster; black stars are the 20 picked frames. Bars at the top right: frames per cluster. (2) Second row: when the frames of each cluster occur in the video; stars are the picks. (3) The next rows are traces predicted by the model against time, with a thin vertical line at each of the 20 picks: pupil centre x and y, eye opening, pupil area, lowest pupil confidence. (4) Bottom row: the largest jump in each frame; the red dashed line is the threshold and frames above it are candidates. <b>What to see:</b> the stars are spread over all regions of the scatter plot with one frame in every cluster, so the 20 picks cover the different appearances among the candidates instead of concentrating on one; the vertical lines are also spread over the whole duration instead of bunching at one moment. The sheets of every batch of every video are in the appendix at the end of the page.</figcaption>
@@ -507,7 +508,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>13</td><td>Terra<br>2025-10-15</td><td>580</td><td>69.13 / 9.43 / 9.44 / 9.67</td><td><span lang="en"><b>20 labels, 9.43 px</b></span></td><td>60</td><td>20</td></tr>
 <tr><td>14</td><td>Terra<br>2025-10-14</td><td>600</td><td>13.33 / 10.83 / 12.41 / 10.30 / 10.45 / 10.24</td><td><span lang="en"><b>60 labels, 10.30 px</b></span></td><td>100</td><td>60</td></tr>
 <tr><td>15</td><td>Terra<br>2025-10-13</td><td>660</td><td>10.57 / 11.42 / 9.73 / 9.61 / 10.24</td><td><span lang="en"><b>40 labels, 9.73 px</b></span></td><td>80</td><td>40</td></tr>
-<tr><td>16</td><td>Terra<br>2025-10-10</td><td>700</td><td>11.35 / 7.72</td><td><span lang="en">in progress (best so far: 20 labels, 7.72 px)</span></td><td>20</td><td>–</td></tr>
+<tr><td>16</td><td>Terra<br>2025-10-10</td><td>700</td><td>11.35 / 7.72 / 7.15</td><td><span lang="en">in progress (best so far: 40 labels, 7.15 px)</span></td><td>40</td><td>–</td></tr>
       </tbody>
     </table>
   </div>
@@ -589,6 +590,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>13</td><td>69.13</td><td>10.46 / 16.03</td><td>11.24 / 10.29</td><td>9.43</td></tr>
 <tr><td>14</td><td>13.33</td><td>10.93 / 10.22</td><td>9.82 / 10.06</td><td>10.83</td></tr>
 <tr><td>15</td><td>10.57</td><td>12.55 / 9.82</td><td>11.09 / 9.31</td><td>11.42</td></tr>
+<tr><td>16</td><td>11.35</td><td>9.18 / 10.42</td><td>9.35 / 9.18</td><td>7.72</td></tr>
       </tbody>
     </table>
   </div>
@@ -612,6 +614,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/fewer_video13.jpg" alt="fewer video 13" loading="lazy"><div class="cap"><span lang="en">Video 13 (Terra, 2025-10-15)</span></div></div>
       <div class="item"><img src="assets/fewer_video14.jpg" alt="fewer video 14" loading="lazy"><div class="cap"><span lang="en">Video 14 (Terra, 2025-10-14)</span></div></div>
       <div class="item"><img src="assets/fewer_video15.jpg" alt="fewer video 15" loading="lazy"><div class="cap"><span lang="en">Video 15 (Terra, 2025-10-13)</span></div></div>
+      <div class="item"><img src="assets/fewer_video16.jpg" alt="fewer video 16" loading="lazy"><div class="cap"><span lang="en">Video 16 (Terra, 2025-10-10)</span></div></div>
     </div></div>
     
     <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
@@ -1092,6 +1095,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video15_batch02.jpg" alt="Video 15 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 15, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video15_batch03.jpg" alt="Video 15 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 15, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video15_batch04.jpg" alt="Video 15 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 15, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+  </div></div></figure>
+  <p class="text"><b><span lang="en">Video 16 (Terra, 2025-10-10): 2 batches</span></b></p>
+  <figure><div class="figbox scroll"><div class="strip tall">
+      <div class="item"><img src="assets/selection_video16_batch01.jpg" alt="Video 16 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 1 (picked by appearance, no model)</span></div></div>
+      <div class="item"><img src="assets/selection_video16_batch02.jpg" alt="Video 16 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
   </div></div></figure>
   <h3><span lang="en">A2: the single-frame blind check of the first-round blink definition (the labeler's verdicts on the original frames)</span></h3>
   
