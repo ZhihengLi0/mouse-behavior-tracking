@@ -12,6 +12,10 @@ videos 7 and 12 contributed none; 700 in total) + this video's labels; shuffles 
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-15 40-label model 1612, applied unchanged) | 11.35 px | 23.1 | 0% | 76% | – |
+| 20 (shuffle 1711) | 7.72 px | 11.5 | 2% | 96% | pending |
 
 The other Terra models give 9.7-14.1 px on this test set (the video-12 20-label model 1311 is the best at 9.70 px, the
 video-15 60-label model 11.52, the video-14 plateau model 12.08; `../results/cross_video_matrix.csv`).
+
+Step 1 (20 labels): 7.72 px, 32% better than the 0-label 11.35 px (2026-10-08 23:43); p90 from 23.1 to 11.5 px, 96% of
+keypoints confident; one test frame above 50 px. Batch 2 is selected from the 20-label model's whole-video prediction.
