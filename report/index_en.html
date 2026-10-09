@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-08 19:10 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-08 21:08 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -97,7 +97,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How many labels are enough within one video?</b> It saturates within about 80 labels: the same 5-minute video, relabeled under the keypoint definitions made explicit on 2026-09-20 and redone, gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 5). In phase 1 the same video showed no decrease from 80 to 300 labels either (step 3).</li>
       <li><b>What about a new mouse?</b> It needs its own labels, and 20 of them reach about 10 px. Second mouse (the model had seen one mouse): 208 px at 0 labels, 10.4 px at 20. Third mouse (the model had seen two mice): 26 px at 0 labels, 9.2 px at 20. The second time the mouse changed, the starting error without any labels was far smaller (step 5).</li>
       <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau; 1 of the 9 finished ones needed 80 (step 5).</li>
-      <li><b>20 labels already come close to saturation; could the first batch be cut to 5 or 10?</b> They cannot replace 20: 5 labels are enough on only 4 of the 15 videos and 10 labels on 6, one cannot tell in advance which, and the result depends on which frames happen to be taken. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
+      <li><b>20 labels already come close to saturation; could the first batch be cut to 5 or 10?</b> They cannot replace 20: 5 labels are enough on only 5 of the 16 videos and 10 labels on 7, one cannot tell in advance which, and the result depends on which frames happen to be taken. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 3.8–6.2 px); for every point a lower confidence goes with a larger error, but pupil top has 7.9 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 793 test frames of 16 videos the four-point area has a median error of 5.8% against 7.8% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
@@ -586,7 +586,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>12</td><td>5.13</td><td>5.79 / 6.63</td><td>5.99 / 5.96</td><td>5.77</td></tr>
 <tr><td>13</td><td>69.13</td><td>10.46 / 16.03</td><td>11.24 / 10.29</td><td>9.43</td></tr>
 <tr><td>14</td><td>13.33</td><td>10.93 / 10.22</td><td>9.82 / 10.06</td><td>10.83</td></tr>
-<tr><td>15</td><td>10.57</td><td>12.55 / 9.82</td><td>11.09 / –</td><td>11.42</td></tr>
+<tr><td>15</td><td>10.57</td><td>12.55 / 9.82</td><td>11.09 / 9.31</td><td>11.42</td></tr>
       </tbody>
     </table>
   </div>
@@ -609,6 +609,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/fewer_video12.jpg" alt="fewer video 12" loading="lazy"><div class="cap"><span lang="en">Video 12 (Terra, 2025-10-16)</span></div></div>
       <div class="item"><img src="assets/fewer_video13.jpg" alt="fewer video 13" loading="lazy"><div class="cap"><span lang="en">Video 13 (Terra, 2025-10-15)</span></div></div>
       <div class="item"><img src="assets/fewer_video14.jpg" alt="fewer video 14" loading="lazy"><div class="cap"><span lang="en">Video 14 (Terra, 2025-10-14)</span></div></div>
+      <div class="item"><img src="assets/fewer_video15.jpg" alt="fewer video 15" loading="lazy"><div class="cap"><span lang="en">Video 15 (Terra, 2025-10-13)</span></div></div>
     </div></div>
     
     <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
@@ -616,7 +617,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>5 or 10 labels are enough on a few videos but cannot replace 20.
     <ol>
-      <li><b>The result:</b> of the 15 videos only 4 have both 5-label subsets within 10% of the 20-label model (videos 5, 7, 11, 14), and 6 have both 10-label subsets within 10% (videos 5, 7, 8, 11, 12, 14); on video 3 the difference is only 0.1–0.5 px. On the other videos 5 or 10 labels are worse: e.g. video 0: 79 / 82 px (5 labels) and 20 / 21 px (10) against 12.9 px (20); video 1: 96 / 41 px and 20 / 16 px against 10.4 px. The 20-label model is better than both 5-label subsets on 12 videos and better than both 10-label subsets on 9.</li>
+      <li><b>The result:</b> of the 16 videos only 5 have both 5-label subsets within 10% of the 20-label model (videos 5, 7, 11, 14, 15), and 7 have both 10-label subsets within 10% (videos 5, 7, 8, 11, 12, 14, 15); on video 3 the difference is only 0.1–0.5 px. On the other videos 5 or 10 labels are worse: e.g. video 0: 79 / 82 px (5 labels) and 20 / 21 px (10) against 12.9 px (20); video 1: 96 / 41 px and 20 / 16 px against 10.4 px. The 20-label model is better than both 5-label subsets on 12 videos and better than both 10-label subsets on 9.</li>
       <li><b>Is it enough:</b> on videos already well covered by the earlier videos, yes. Their error is low at 0 labels (videos 3, 5, 7: 4.4, 11.9, 5.4 px at 0 labels), so labels make little difference either way. Video 11 is the exception: the first video of the third mouse, 26 px at 0 labels, 9.7 / 10.0 px with 5 and 9.2 px with 20.</li>
       <li><b>Can it replace 20 labels:</b> no, for three reasons. (a) On most videos the error with 5 or 10 labels is clearly higher than with 20. (b) One cannot tell in advance which kind a new video is: both are a change of mouse, yet 5 labels give 96 / 41 px on video 1 and 9.7 / 10.0 px on video 11. (c) With few frames the result depends on which frames happen to be taken: two 5-label subsets of the same video can differ a lot (video 1: 96 vs 41 px; video 6: 6.7 vs 12.8 px); 20 labels do not have this problem.</li>
       <li><b>Cost against benefit:</b> 5 or 10 labels save only 15 or 10 labels per video, at the price of an unstable result. The regular procedure therefore stays: 20 labels in the first batch of every video, then 20 per step.</li>
