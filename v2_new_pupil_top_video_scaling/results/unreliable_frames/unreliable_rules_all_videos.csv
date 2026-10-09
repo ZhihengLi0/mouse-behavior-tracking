@@ -1,11 +1,11 @@
 rule,wrong_means,frames,wrong,flagged,flagged_pct,flagged_and_wrong,precision_pct,recall_pct
-jump > 0.03 of the eye width (rule of select_frames.py),frame RMSE > 50 px,1050,32,130,12.4,21,16.2,65.6
-jump > 0.03 of the eye width (rule of select_frames.py),frame RMSE > 20 px,1050,135,130,12.4,61,46.9,45.2
-lowest confidence < 0.6,frame RMSE > 50 px,1050,32,575,54.8,32,5.6,100.0
-lowest confidence < 0.6,frame RMSE > 20 px,1050,135,575,54.8,118,20.5,87.4
-mean confidence < t (leave one video out; 0.736 on all frames),frame RMSE > 50 px,1050,32,250,23.8,25,10.0,78.1
-mean confidence < t (leave one video out; 0.736 on all frames),frame RMSE > 20 px,1050,135,250,23.8,69,27.6,51.1
-jump rule OR lowest confidence < 0.6,frame RMSE > 50 px,1050,32,592,56.4,32,5.4,100.0
-jump rule OR lowest confidence < 0.6,frame RMSE > 20 px,1050,135,592,56.4,120,20.3,88.9
-fitting: mean SARIMAX deviation > 20 px (DLC 'fitting' detector),frame RMSE > 50 px,1050,32,27,2.6,23,85.2,71.9
-fitting: mean SARIMAX deviation > 20 px (DLC 'fitting' detector),frame RMSE > 20 px,1050,135,27,2.6,24,88.9,17.8
+jump > 0.03 of the eye width (rule of select_frames.py),frame RMSE > 50 px,1120,32,141,12.6,21,14.9,65.6
+jump > 0.03 of the eye width (rule of select_frames.py),frame RMSE > 20 px,1120,141,141,12.6,63,44.7,44.7
+lowest confidence < 0.6,frame RMSE > 50 px,1120,32,606,54.1,32,5.3,100.0
+lowest confidence < 0.6,frame RMSE > 20 px,1120,141,606,54.1,122,20.1,86.5
+mean confidence < t (leave one video out; 0.736 on all frames),frame RMSE > 50 px,1120,32,267,23.8,27,10.1,84.4
+mean confidence < t (leave one video out; 0.736 on all frames),frame RMSE > 20 px,1120,141,267,23.8,74,27.7,52.5
+jump rule OR lowest confidence < 0.6,frame RMSE > 50 px,1120,32,624,55.7,32,5.1,100.0
+jump rule OR lowest confidence < 0.6,frame RMSE > 20 px,1120,141,624,55.7,124,19.9,87.9
+fitting: mean SARIMAX deviation > 20 px (DLC 'fitting' detector),frame RMSE > 50 px,1120,32,27,2.4,23,85.2,71.9
+fitting: mean SARIMAX deviation > 20 px (DLC 'fitting' detector),frame RMSE > 20 px,1120,141,27,2.4,24,88.9,17.0

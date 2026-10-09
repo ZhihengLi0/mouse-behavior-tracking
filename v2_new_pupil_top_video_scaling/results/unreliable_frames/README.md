@@ -1,14 +1,14 @@
-# Can unreliable frames be found without labels? (2026-10-04; fitting detector added and rerun with video 13 on 2026-10-06; rerun with video 14 on 2026-10-07)
+# Can unreliable frames be found without labels? (2026-10-04; fitting detector added and rerun with video 13 on 2026-10-06; rerun with video 14 on 2026-10-07; rerun with video 15 on 2026-10-08)
 
 Question (Kaiwen, 2026-09-23 and 2026-10-04): are the frames flagged by the jump rule really wrong, how many wrong frames
 does it miss, and is there a robust label-free signal for "this prediction is not reliable"?
 
-**Basic information.** Videos 0-14 (finished videos). Frames: the 50 test frames and the 20 validation frames of each
-video, 1050 in total; they are evenly spaced in time (not picked by any model), human-labeled under the keypoint
+**Basic information.** Videos 0-15 (finished videos). Frames: the 50 test frames and the 20 validation frames of each
+video, 1120 in total; they are evenly spaced in time (not picked by any model), human-labeled under the keypoint
 definitions made explicit on 2026-09-20, and never used for training. Model of a video = the model at its plateau point
 (plateau at 0 labels: the 20-label model), ResNet-50, final snapshot, whole-video prediction, no confidence cut-off.
-Truth: frame RMSE against the human labels (formula of `scale_step.py`); "wrong" = frame RMSE > 50 px (32 frames, 3.0%)
-or > 20 px (135 frames, 12.9%). Script: `../../scripts/unreliable_frames.py` (formulas in its header).
+Truth: frame RMSE against the human labels (formula of `scale_step.py`); "wrong" = frame RMSE > 50 px (32 frames, 2.9%)
+or > 20 px (141 frames, 12.6%). Script: `../../scripts/unreliable_frames.py` (formulas in its header).
 
 | file | content |
 |---|---|
@@ -18,16 +18,16 @@ or > 20 px (135 frames, 12.9%). Script: `../../scripts/unreliable_frames.py` (fo
 | `unreliable_frames_all_videos.png` | jump, lowest confidence and fitting deviation against the frame error; recall and precision of the rules |
 | `fitting_dev_videoNN.npy` (not in git) | cached per-frame fitting deviation of each whole video |
 
-| rule | frames flagged | of the 32 frames > 50 px | flagged frames that are > 50 px | of the 135 frames > 20 px | flagged frames that are > 20 px |
+| rule | frames flagged | of the 32 frames > 50 px | flagged frames that are > 50 px | of the 141 frames > 20 px | flagged frames that are > 20 px |
 |---|---|---|---|---|---|
-| jump > 3% of the eye width (rule of `select_frames.py`) | 130 (12.4%) | 21 found (66%), 11 missed | 16% | 61 found (45%) | 47% |
-| lowest confidence < 0.6 | 575 (54.8%) | 32 found (100%) | 5.6% | 118 found (87%) | 20.5% |
-| mean confidence < t (leave one video out; 0.736) | 250 (23.8%) | 25 found (78%) | 10% | 69 found (51%) | 28% |
-| jump rule OR lowest confidence < 0.6 | 592 (56.4%) | 32 found (100%) | 5.4% | 120 found (89%) | 20% |
-| fitting: mean SARIMAX deviation > 20 px (DLC's `fitting` detector, step 3) | 27 (2.6%) | 23 found (72%), 9 missed | 85% | 24 found (18%) | 89% |
+| jump > 3% of the eye width (rule of `select_frames.py`) | 141 (12.6%) | 21 found (66%), 11 missed | 15% | 63 found (45%) | 45% |
+| lowest confidence < 0.6 | 606 (54.1%) | 32 found (100%) | 5.3% | 122 found (87%) | 20% |
+| mean confidence < t (leave one video out; 0.736) | 267 (23.8%) | 27 found (84%) | 10% | 74 found (52%) | 28% |
+| jump rule OR lowest confidence < 0.6 | 624 (55.7%) | 32 found (100%) | 5.1% | 124 found (88%) | 20% |
+| fitting: mean SARIMAX deviation > 20 px (DLC's `fitting` detector, step 3) | 27 (2.4%) | 23 found (72%), 9 missed | 85% | 24 found (17%) | 89% |
 
 AUC pooled (frames > 50 px against the rest): fitting 0.97, lowest confidence 0.93, mean confidence 0.91, jump 0.84; for
-frames > 20 px: 0.84 / 0.79 / 0.77 / 0.72.
+frames > 20 px: 0.84 / 0.78 / 0.76 / 0.72.
 
 The `fitting` signal is DLC's third outlier detector re-implemented (the three were compared as *selectors of training
 frames* in step 3 of the summary page; here they are measured as *detectors of wrong frames*): per keypoint coordinate a
@@ -36,13 +36,13 @@ SARIMAX has no intercept; without centring the optimizer failed on videos 1, 5 a
 deviation of a keypoint = distance between the one-step prediction and the predicted position, fitting = mean over the 8
 keypoints, flagged above DLC's default epsilon of 20 px.
 
-1. The jump rule is selective but incomplete: it flags 12% of the frames, about half of the flagged frames have an error
+1. The jump rule is selective but incomplete: it flags 13% of the frames, about half of the flagged frames have an error
    above 20 px, and it finds two thirds of the gross errors. It misses 11 of the 32 frames above 50 px: frames in which
    the prediction is wrong but does not move from the previous frame.
-2. The confidence finds every gross error (lowest confidence < 0.6: 32 of 32) but flags 55% of all frames, so 94% of
+2. The confidence finds every gross error (lowest confidence < 0.6: 32 of 32) but flags 54% of all frames, so 95% of
    what it flags is not a gross error.
-3. The fitting detector is the most selective: it flags 2.6% of the frames and 85% of them are gross errors; it finds 23
-   of the 32 (72%), more than the jump rule with a quarter of the flags. It finds gross errors only (18% of the frames
+3. The fitting detector is the most selective: it flags 2.4% of the frames and 85% of them are gross errors; it finds 23
+   of the 32 (72%), more than the jump rule with a quarter of the flags. It finds gross errors only (17% of the frames
    above 20 px); the 9 gross errors it misses are frames where the wrong prediction is smooth in time.
 4. No rule here is both complete and selective. Per video the signals differ a lot (AUC for > 20 px between 0.3 and 1.0
    with 1-38 wrong frames per video), so the pooled numbers should not be read as valid for every video.

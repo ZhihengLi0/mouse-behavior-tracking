@@ -149,13 +149,23 @@ video,unit,model_step,rule,n,median_abs_err_pct,p90_abs_err_pct,median_signed_er
 14,14_20251014_Terra_spont_1,3,four_med5,49,5.55,15.96,-5.42
 14,14_20251014_Terra_spont_1,3,four_med31,49,5.99,15.2,-5.55
 14,14_20251014_Terra_spont_1,human labels,no_top_on_human_labels,49,8.08,14.33,8.08
-all,all videos pooled,,four,743,5.68,33.82,-1.65
-all,all videos pooled,,no_top,743,7.59,36.85,0.35
-all,all videos pooled,,no_bottom,743,10.38,42.42,-4.72
-all,all videos pooled,,no_left,743,11.13,36.63,-5.13
-all,all videos pooled,,no_right,743,9.63,39.4,2.11
-all,all videos pooled,,drop_lowconf,743,8.42,34.06,-0.91
-all,all videos pooled,,four_fallback,743,5.84,33.76,-1.89
-all,all videos pooled,,four_med5,743,5.5,34.1,-1.74
-all,all videos pooled,,four_med31,743,5.74,33.99,-2.23
-all,all videos pooled,,no_top_on_human_labels,743,4.83,12.23,-0.06
+15,15_20251013_Terra_spont_1,2,four,50,11.06,41.02,5.79
+15,15_20251013_Terra_spont_1,2,no_top,50,12.25,35.82,6.27
+15,15_20251013_Terra_spont_1,2,no_bottom,50,11.69,50.0,7.12
+15,15_20251013_Terra_spont_1,2,no_left,50,13.35,43.89,4.57
+15,15_20251013_Terra_spont_1,2,no_right,50,12.59,38.76,8.93
+15,15_20251013_Terra_spont_1,2,drop_lowconf,50,10.12,38.41,7.57
+15,15_20251013_Terra_spont_1,2,four_fallback,50,11.2,38.41,5.65
+15,15_20251013_Terra_spont_1,2,four_med5,50,10.58,45.15,6.04
+15,15_20251013_Terra_spont_1,2,four_med31,50,9.18,47.34,5.84
+15,15_20251013_Terra_spont_1,human labels,no_top_on_human_labels,50,4.17,11.11,0.82
+all,all videos pooled,,four,793,5.76,36.89,-1.31
+all,all videos pooled,,no_top,793,7.79,36.7,0.74
+all,all videos pooled,,no_bottom,793,10.45,43.54,-4.0
+all,all videos pooled,,no_left,793,11.21,38.68,-4.8
+all,all videos pooled,,no_right,793,9.73,39.54,2.67
+all,all videos pooled,,drop_lowconf,793,8.54,35.34,-0.33
+all,all videos pooled,,four_fallback,793,5.94,34.79,-1.54
+all,all videos pooled,,four_med5,793,5.67,37.18,-1.3
+all,all videos pooled,,four_med31,793,5.89,35.83,-1.68
+all,all videos pooled,,no_top_on_human_labels,793,4.82,12.17,0.0

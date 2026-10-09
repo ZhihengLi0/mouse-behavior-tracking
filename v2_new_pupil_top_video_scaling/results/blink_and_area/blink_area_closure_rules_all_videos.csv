@@ -1,9 +1,9 @@
 rule,threshold_all_frames,AUC,hits_of_closed,closed,false_alarms_of_open,open,hit_rate,false_alarm_rate,thresholds
-open_rel5 < t,0.768,0.911,27,31,45,1828,0.871,0.025,leave one video out
-open_relv < t,0.695,0.938,26,31,59,1828,0.839,0.032,leave one video out
-min_conf < t,0.295,0.991,28,31,108,1828,0.903,0.059,leave one video out
-mean_conf < t,0.527,0.995,30,31,66,1828,0.968,0.036,leave one video out
-axes_off > t,0.167,0.948,27,31,117,1828,0.871,0.064,leave one video out
-aspect < t,0.644,0.39,5,31,237,1828,0.161,0.13,leave one video out
-production rule (pupil_trace.py),,,31,31,977,1828,1.0,0.534,fixed
-min_conf < 0.6,,,31,31,897,1828,1.0,0.491,fixed
+open_rel5 < t,0.767,0.889,29,34,50,1955,0.853,0.026,leave one video out
+open_relv < t,0.695,0.913,28,34,81,1955,0.824,0.041,leave one video out
+min_conf < t,0.295,0.992,31,34,110,1955,0.912,0.056,leave one video out
+mean_conf < t,0.527,0.995,33,34,68,1955,0.971,0.035,leave one video out
+axes_off > t,0.167,0.95,30,34,124,1955,0.882,0.063,leave one video out
+aspect < t,0.644,0.416,7,34,185,1955,0.206,0.095,leave one video out
+production rule (pupil_trace.py),,,34,34,1061,1955,1.0,0.543,fixed
+min_conf < 0.6,,,34,34,967,1955,1.0,0.495,fixed
