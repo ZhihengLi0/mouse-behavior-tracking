@@ -46,3 +46,10 @@ awaiting the user's decision.
 **Closed 2026-10-08 (user decision: "规则触发就标记然后下一个视频"): plateau at 40 labels, 9.73 px** (tag `v0.9.17-video15-plateau`).
 Batches 1-2 (40 labels) are carried into the later videos (700 labels go into video 16); batches 3-4 were labeled for the rule only
 and are not carried; the step-4 whole-video prediction was stopped at the user's request, so no batch 5 was selected.
+
+**Fewer-labels study (2026-10-07 to 2026-10-08)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each,
+training set otherwise as at the time: the 660 carried labels; shuffles 2151-2154). Size of the first batch only; no
+jump selection followed. 5 labels = 12.55 / 9.82 px (subsets a / b; p90 31.5 / 26.8; 0% / 0% of frames > 50 px) against
+10.57 px at 0 labels and 11.42 px at 20; 10 labels = 11.09 / 9.31 px (subsets a / b; p90 28.7 / 25.1; 0% / 0%). On this video
+the 20-label step itself did not beat the 0-label model, and three of the four subsets are below 11.42 px (subset 10b, 9.31 px,
+is the best first-batch model of this video); figure `fewer_labels.png`.
