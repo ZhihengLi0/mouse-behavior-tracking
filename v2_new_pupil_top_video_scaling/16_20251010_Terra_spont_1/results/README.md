@@ -13,6 +13,7 @@ videos 7 and 12 contributed none; 700 in total) + this video's labels; shuffles 
 |---|---|---|---|---|---|
 | 0 (video-15 40-label model 1612, applied unchanged) | 11.35 px | 23.1 | 0% | 76% | – |
 | 20 (shuffle 1711) | 7.72 px | 11.5 | 2% | 96% | 464 of 57158 (0.8%) |
+| 40 (shuffle 1712) | 7.15 px | 11.3 | 0% | 98% | pending |
 
 The other Terra models give 9.7-14.1 px on this test set (the video-12 20-label model 1311 is the best at 9.70 px, the
 video-15 60-label model 11.52, the video-14 plateau model 12.08; `../results/cross_video_matrix.csv`).
@@ -25,3 +26,6 @@ otherwise as at the time: the 700 carried labels; shuffles 2161-2164). Size of t
 5 labels = 9.18 / 10.42 px (subsets a / b; p90 15.6 / 14.9), 10 labels = 9.35 / 9.18 px (p90 15.3 / 13.8), against 11.35 px at
 0 labels and 7.72 px at 20: every subset improves on the 0-label model, none reaches the 20-label number (19-35% above it);
 figure `fewer_labels.png`.
+
+Step 2 (40 labels): 7.15 px, 7.4% better than the running best 7.72 px (step 1): an improving step (2026-10-09 13:25); no test
+frame above 50 px, 98% of keypoints confident. Batch 3 is selected from the 40-label model.
