@@ -18,7 +18,7 @@ Paths inside the archive start at `dlc_projects/EyePupilEllipse-Zhiheng-2026-09-
 | 1 | 111-115, 211-217, 225, 311, 321-324, 411, 412, 422, 423, 531-534, 631, 632, 711-713 (31 models, 473 files) | 0-7 | 31 GB | 2026-10-08 11:53 | 2026-10-08 12:55 | 2026-10-08 13:46 (copies renamed, originals deleted; all 8 parts SHA256-verified on the Drive 17:22) | 2026-10-08 15:08 (289 files, 27.7 GB) |
 | 2 | 811, 812, 911-913, 951-974 (29 models, 464 files) | 8-9 | 31 GB | 2026-10-08 15:04 | 2026-10-08 15:45 | 2026-10-08 15:56 (copies renamed, originals deleted) | 2026-10-08 16:00 |
 | 3 | 1011-1016, 1111-1114, 1211-1214, 1311, 1312, 1411-1413, 1511-1515 (24 models, 384 files) | 10-14 | 26 GB | 2026-10-08 16:02 | 2026-10-08 18:00 | 2026-10-08 20:45 (copies renamed, originals deleted) | after the SSD check |
-| 4 | 2061-2064, 2071-2074, 2081-2084, 2091-2094, 2101-2104, 2111-2114, 2121-2124 (fewer-labels subsets; 28 models, 448 files) | 6-12 | 30 GB | 2026-10-08 21:04 (packed straight into the Drive folder, uploading) | – | – | after the SSD check |
+| 4 | 2061-2064, 2071-2074, 2081-2084, 2091-2094, 2101-2104, 2111-2114, 2121-2124 (fewer-labels subsets; 28 models, 448 files) | 6-12 | 30 GB | 2026-10-08 21:04 (packed straight into the Drive folder) | 2026-10-08 22:05 | 2026-10-08 23:20 (user deletes the originals on the web) | after the SSD check |
 | 5 | 1611-..., 2131-2134, 2141-2144, 2151-2154 | 13-15 | ~15 GB | after video 15 closes | – | – | – |
 
 Shuffle numbering: video n step k = (n+1)*10 + k; 951-974 = the detector comparison on video 9; fewer-labels subsets =
@@ -27,4 +27,4 @@ Shuffle numbering: video n step k = (n+1)*10 + k; 951-974 = the detector compari
 ## Other archives in `zhiheng_results/`
 | folder | content | packed | copied by Kaiwen |
 |---|---|---|---|
-| `old_vs_new_test/` | `old_vs_new_test.tar` (511 MB, 801 files) = the local `local_data/` folder: the August test set `eye_last_minute_100` (100 frames + labels placed before the 2026-09-20 definitions) and the `label_review_2026-09-20` contact sheets (old vs new placement); README, SHA256SUMS, filelist inside | 2026-10-08 21:00 | – (then the loose copy `archive/local_data` on the Stanford-account folder is deleted) |
+| `old_vs_new_test/` | `old_vs_new_test.tar` (511 MB, 801 files) = the local `local_data/` folder: the August test set `eye_last_minute_100` (100 frames + labels placed before the 2026-09-20 definitions) and the `label_review_2026-09-20` contact sheets (old vs new placement); README, SHA256SUMS, filelist inside | 2026-10-08 21:00 | 2026-10-08 23:25 (then the loose copy `archive/local_data` on the Stanford-account folder is deleted) |
