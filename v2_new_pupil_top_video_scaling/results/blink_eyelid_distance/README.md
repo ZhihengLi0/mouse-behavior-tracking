@@ -87,8 +87,8 @@ The recall is relative to the closures *in the sample*, which includes the 12 pa
 (r = 0.70-0.85) that no variant flags; closures that neither the rule nor the implausible class catches are not
 estimated. D is chosen over E because its threshold was fixed before the spot check.
 
-Final rule D on the whole videos (16 videos 0-15, rerun with video 15 on 2026-10-08): 4-157 closure events per video
-(0.2-7.9 per minute), median duration 100-408 ms, 0.2-21.1% of the frames closed; 741 events in all, 454 full and 287 partial
+Final rule D on the whole videos (17 videos 0-16, rerun with video 16 on 2026-10-10): 4-157 closure events per video
+(0.2-7.9 per minute), median duration 100-408 ms, 0.2-21.1% of the frames closed; 749 events in all, 455 full and 294 partial
 (video 15: 21.1% of its frames, the relative rule on a recording whose eye is half covered most of the time).
 
 ## Second, blind spot check of the final rule (2026-10-06)
