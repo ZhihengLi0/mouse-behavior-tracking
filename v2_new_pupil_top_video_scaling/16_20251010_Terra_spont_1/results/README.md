@@ -15,8 +15,13 @@ videos 7 and 12 contributed none; 700 in total) + this video's labels; shuffles 
 | 20 (shuffle 1711) | 7.72 px | 11.5 | 2% | 96% | 464 of 57158 (0.8%) |
 | 40 (shuffle 1712) | 7.15 px | 11.3 | 0% | 98% | 347 of 57158 (0.6%) |
 | 60 (shuffle 1713) | 7.26 px | 10.1 | 0% | 98% | 290 of 57158 (0.5%) |
+| 80 (shuffle 1714) | 7.78 px | 12.2 | 0% | 97% | 260 of 57158 (0.5%) |
 
 Step 3 (60 labels, 2026-10-09 18:14): 7.26 px, 1.5% worse than the running best 7.15 px (40 labels): the first step without a gain above 3%. p90 improved from 11.3 to 10.1 px. By the rule one more non-improving step is needed, so batch 4 was selected and is being labeled; step 4 (80 labels) counts as improving below 6.94 px.
+
+Step 4 (80 labels, 2026-10-10 02:23): 7.78 px, worse than the running best 7.15 px (step 2): second flat step in a row, so the plateau rule
+fired at 80 labels. Plateau point = the last improving step, 40 labels (7.15 px). Batch 5 was selected automatically (260 pool frames flagged) but its window is held;
+awaiting the user's decision.
 
 The other Terra models give 9.7-14.1 px on this test set (the video-12 20-label model 1311 is the best at 9.70 px, the
 video-15 60-label model 11.52, the video-14 plateau model 12.08; `../results/cross_video_matrix.csv`).
