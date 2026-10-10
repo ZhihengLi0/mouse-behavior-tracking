@@ -1,3 +1,5 @@
 label,unit,seed,training_frames_this_video,median_frame_rmse_px,median_frame_mean_abs_px,overall_rmse_px,p90_frame_rmse_px,frac_frames_rmse_gt_50px,frac_points_conf_ge_0.6,n_test_frames,n_test_points,snapshot_rule,median_pupil_top_px,median_pupil_bottom_px,median_pupil_left_px,median_pupil_right_px,median_eyelid_top_px,median_eyelid_bottom_px,median_eye_nasal_corner_px,median_eye_temporal_corner_px
 x020_step01_final,17_20251009_Terra_spont_1,42,20,4.75,3.86,5.19,6.65,0.0,0.965,50,400,final snapshot (120),5.25,2.5,3.42,3.77,5.65,1.32,2.16,2.95
 x020_step01_mAPlate,17_20251009_Terra_spont_1,42,20,4.69,3.75,5.08,6.76,0.0,0.95,50,400,best validation mAP among epochs >= 96 (100),5.66,2.13,2.83,3.25,6.39,2.2,2.77,2.5
+x040_step02_final,17_20251009_Terra_spont_1,42,40,4.47,3.71,4.83,6.15,0.0,0.948,50,400,final snapshot (120),5.46,3.54,2.91,4.04,6.12,2.12,2.9,1.47
+x040_step02_mAPlate,17_20251009_Terra_spont_1,42,40,4.99,4.09,5.32,6.97,0.0,0.907,50,400,best validation mAP among epochs >= 96 (100),5.17,2.85,3.2,3.29,6.98,1.68,3.33,2.2
