@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-10 03:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-10 10:52 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -105,7 +105,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 16 个视频的 793 帧测试帧上，四点法的面积误差中位数是 5.8%，三点法是 7.8%；视频 4 和 8 上面积仍然不准（第 9 步）。</li>
       <li><b>眨眼怎么判断？</b>第一轮先定了定义：非睁眼 = 眼睛闭上或眼睑盖住部分瞳孔。按帧的规则"睁开高度 ÷ 眼宽 &lt; 0.347"（眼睑点失效时看瞳孔置信度）在 239 帧单帧盲评上准确率 91%。主要发现：7 个视频（3、4、8–12）有 26–70% 的时间眼睛不是完全睁开的，半掩是那些录像的常态；眨眼是其中的子集，细分放下一轮（第 10 步）。</li>
     </ol>
-    <p><b>进度：</b>已完成 16 个视频（视频 0–15）；视频 16 进行中，按 0 / 20 / 40 / … 帧的误差为 11.35 / 7.72 / 7.15 / 7.26 / 7.78 px。</p>
+    <p><b>进度：</b>已完成 17 个视频（视频 0–16）。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Task:</b> DeepLabCut finds 8 points on every frame of a mouse-eye video: pupil top, bottom, left, right; upper and lower eyelid; nasal and temporal eye corner. From these we get pupil size, eye opening and blinks, to be aligned with brain recordings later.</p>
@@ -132,7 +132,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 793 test frames of 16 videos the four-point area has a median error of 5.8% against 7.8% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
       <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 7 videos (3, 4, 8–12) the eye is not fully open 26–70% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
     </ol>
-    <p><b>Status:</b> 16 videos finished (videos 0–15); video 16 in progress, error at 0 / 20 / 40 / … labels: 11.35 / 7.72 / 7.15 / 7.26 / 7.78 px.</p>
+    <p><b>Status:</b> 17 videos finished (videos 0–16).</p>
   </div>
 
   <div class="text" lang="zh">
@@ -590,7 +590,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/scale_video13.jpg" alt="Video 13: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 13（Terra，2025-10-15）：平台点 20 帧，9.43 px</span><span lang="en">Video 13 (Terra, 2025-10-15): plateau at 20 labels, 9.43 px</span></div></div>
       <div class="item"><img src="assets/scale_video14.jpg" alt="Video 14: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 14（Terra，2025-10-14）：平台点 60 帧，10.30 px</span><span lang="en">Video 14 (Terra, 2025-10-14): plateau at 60 labels, 10.30 px</span></div></div>
       <div class="item"><img src="assets/scale_video15.jpg" alt="Video 15: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 15（Terra，2025-10-13）：平台点 40 帧，9.73 px</span><span lang="en">Video 15 (Terra, 2025-10-13): plateau at 40 labels, 9.73 px</span></div></div>
-      <div class="item"><img src="assets/scale_video16.jpg" alt="Video 16: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 16（Terra，2025-10-10）：进行中</span><span lang="en">Video 16 (Terra, 2025-10-10): in progress</span></div></div>
+      <div class="item"><img src="assets/scale_video16.jpg" alt="Video 16: error vs own labels" loading="lazy"><div class="cap"><span lang="zh">视频 16（Terra，2025-10-10）：平台点 40 帧，7.15 px</span><span lang="en">Video 16 (Terra, 2025-10-10): plateau at 40 labels, 7.15 px</span></div></div>
     </div></div>
     <figcaption lang="zh"><span class="tag">图 5-3 怎么看：</span>每个视频自己的曲线排成一行，从视频 0 到最新的视频，可以左右拖动；每张图下面注明视频、老鼠、日期和平台点。三幅小图的读法以视频 9 为例。左图：横轴是这个视频自己的标注帧数，纵轴是误差；20 帧 10.4 px，40 帧 8.6 px，80 帧 8.2 px，之后两步（9.4、8.6 px）都没有再改善，规则在 120 帧触发，平台点记为 80 帧。中图：8 个点各自的误差，瞳孔下点（蓝）最难。右图：不需要标注的指标，紫线是整段视频里被跳动规则标出的帧的比例，随标注增加从 18% 降到 9%。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 5-3, how to read:</span>The curves of every video in one row, from video 0 to the newest; scroll sideways. Under each figure: video, mouse, date and plateau point. How to read the three panels, with video 9 as the example. Left: x = this video's own labels, y = error; 10.4 px at 20 labels, 8.6 px at 40, 8.2 px at 80, then two steps without a gain (9.4, 8.6 px), so the rule fired at 120 and the plateau point is 80. Middle: error of each of the 8 points; pupil bottom (blue) is the hardest. Right: label-free signals; the purple line is the share of video frames flagged by the jump rule, falling from 18% to 9% as labels are added.</figcaption>
@@ -630,7 +630,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>13</td><td>Terra<br>2025-10-15</td><td>580</td><td>69.13 / 9.43 / 9.44 / 9.67</td><td><span lang="zh"><b>20 帧，9.43 px</b></span><span lang="en"><b>20 labels, 9.43 px</b></span></td><td>60</td><td>20</td></tr>
 <tr><td>14</td><td>Terra<br>2025-10-14</td><td>600</td><td>13.33 / 10.83 / 12.41 / 10.30 / 10.45 / 10.24</td><td><span lang="zh"><b>60 帧，10.30 px</b></span><span lang="en"><b>60 labels, 10.30 px</b></span></td><td>100</td><td>60</td></tr>
 <tr><td>15</td><td>Terra<br>2025-10-13</td><td>660</td><td>10.57 / 11.42 / 9.73 / 9.61 / 10.24</td><td><span lang="zh"><b>40 帧，9.73 px</b></span><span lang="en"><b>40 labels, 9.73 px</b></span></td><td>80</td><td>40</td></tr>
-<tr><td>16</td><td>Terra<br>2025-10-10</td><td>700</td><td>11.35 / 7.72 / 7.15 / 7.26 / 7.78</td><td><span lang="zh">进行中（目前最好：40 帧，7.15 px）</span><span lang="en">in progress (best so far: 40 labels, 7.15 px)</span></td><td>80</td><td>–</td></tr>
+<tr><td>16</td><td>Terra<br>2025-10-10</td><td>700</td><td>11.35 / 7.72 / 7.15 / 7.26 / 7.78</td><td><span lang="zh"><b>40 帧，7.15 px</b></span><span lang="en"><b>40 labels, 7.15 px</b></span></td><td>80</td><td>40</td></tr>
       </tbody>
     </table>
   </div>
