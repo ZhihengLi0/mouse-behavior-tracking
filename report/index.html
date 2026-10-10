@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-10 12:50 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-10 12:51 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -461,7 +461,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>视频 0：</b>第一只老鼠的 5 分钟视频。</li>
       <li><b>视频 1、2、3：</b>第二只老鼠 Pluto，同一天（2025-10-31）录的三段，每段 19.9 分钟。</li>
       <li><b>视频 4–10：</b>Pluto，每个录制日一段，日期从近到远：10-30、10-29、10-28、10-27、10-24、10-23、10-22（我们手里没有 10-26、10-25 的视频）。</li>
-      <li><b>视频 11 起：</b>第三只老鼠 Terra，每个录制日一段，日期从近到远：视频 11 是 2025-10-17，视频 12 是 10-16，之后依次是 10-15、10-14、10-13、10-10、10-09、10-08（视频 13–18，还没有做）。</li>
+      <li><b>视频 11 起：</b>第三只老鼠 Terra，每个录制日一段，日期从近到远：视频 11 是 2025-10-17，视频 12 是 10-16，之后依次是 10-15、10-14、10-13、10-10、10-09、10-08（视频 13–18；视频 17、18 还没有做完）。</li>
     </ul>
     <p>每个视频的流程相同：</p>
     <ol>
@@ -478,7 +478,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Video 0:</b> the 5-minute video of the first mouse.</li>
       <li><b>Videos 1, 2, 3:</b> the second mouse, Pluto; three recordings of the same day (2025-10-31), 19.9 minutes each.</li>
       <li><b>Videos 4–10:</b> Pluto, one recording per recording day, from the most recent backwards: 10-30, 10-29, 10-28, 10-27, 10-24, 10-23, 10-22 (there is no video of 10-26 or 10-25 in our set).</li>
-      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18, not done yet).</li>
+      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18; videos 17 and 18 are not finished yet).</li>
     </ul>
     <p>Every video follows the same steps:</p>
     <ol>
@@ -1068,13 +1068,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="zh">10.2 第一轮的定义定下来之后：按帧的"非睁眼"规则和它的验证</span><span lang="en">10.2 With the first-round definition fixed: a per-frame "not open" rule and its check</span></h3>
   <div class="text" lang="zh">
     <p><b>定义（2026 年 10 月 6 日定）：</b>第一轮只分两种状态——<b>睁开</b>，和<b>非睁眼</b>（眼睛闭上，或眼睑盖住了部分瞳孔）。眨眼、长时间闭眼、眯眼的细分放到下一轮。</p>
-    <p><b>基本信息：</b>视频 0–15，各视频平台点模型对整段视频的预测（盲评样本抽自视频 0–13）。真值：标注者对 240 帧单帧的盲评（2026 年 10 月 6 日；每个视频 18 帧，按模型的相对睁开高度 r 分五层随机抽：r &lt; 0.70、0.70–0.85、0.85–1.00、≥ 1.00 各 4 帧，眼睑点失效 2 帧；与前两轮抽查不重叠；页面只显示单帧原图，不显示任何数值），三选一：睁开 / 非睁眼 / 看不清。239 帧有判断，113 帧非睁眼，没有"看不清"。原图和判断见附录 2。脚本：<code>scripts/blink_notopen_frames_sample.py</code>（抽样）、<code>blink_notopen_frames_eval.py</code>（信号比较）、<code>blink_notopen_rule.py</code>（最终规则和整段结果）；结果 <code>results/blink_eyelid_distance/blink_notopen_*</code>。</p>
+    <p><b>基本信息：</b>视频 0–16，各视频平台点模型对整段视频的预测（盲评样本抽自视频 0–13）。真值：标注者对 240 帧单帧的盲评（2026 年 10 月 6 日；每个视频 18 帧，按模型的相对睁开高度 r 分五层随机抽：r &lt; 0.70、0.70–0.85、0.85–1.00、≥ 1.00 各 4 帧，眼睑点失效 2 帧；与前两轮抽查不重叠；页面只显示单帧原图，不显示任何数值），三选一：睁开 / 非睁眼 / 看不清。239 帧有判断，113 帧非睁眼，没有"看不清"。原图和判断见附录 2。脚本：<code>scripts/blink_notopen_frames_sample.py</code>（抽样）、<code>blink_notopen_frames_eval.py</code>（信号比较）、<code>blink_notopen_rule.py</code>（最终规则和整段结果）；结果 <code>results/blink_eyelid_distance/blink_notopen_*</code>。</p>
     <p><b>为什么要换信号：</b>10.1 的规则 D 用的是"睁开高度 ÷ 该视频的中位数"，它在 0.70–0.85 这一层的检出率是 0——因为按帧看，视频 3、8、9、10、11、12 里 r 在 0.70–1.00 的帧几乎全被判为非睁眼，而视频 0、5、7、13 里同样的帧全是睁开的（附录 2 一眼能看出）。也就是说"眼睑盖住部分瞳孔"在这些录像里是整段的常态，相对自己中位数的量看不见它。改用<b>绝对量</b>：睁开高度 O ÷ 眼宽 W（W = 该视频内外眼角距离的中位数，相机固定，各视频接近），它把两类帧分得很开（AUC 0.97；相对量 r 只有 0.85）。每个视频的 O/W 中位数也正好对上：被判为多数非睁眼的视频中位数 0.30–0.38，多数睁开的视频 0.41–0.59。</p>
     <p><b>最终规则（按帧）：</b>（1）眼睑点正常且 O / W &lt; <b>0.347</b> → 非睁眼；（2）眼睑点失效的帧，四个瞳孔点平均置信度 &lt; 0.527 → 非睁眼，否则睁开（10.1 里"失效一律算闭眼"是错的：28 帧失效里 13 帧眼睛是睁着的，用瞳孔置信度能分对 26 帧）；（3）连续 ≥ 3 帧算一次事件，间隔 &lt; 5 帧的合并。阈值 0.347 是在这 239 帧上选的（最大化"检出率 − 误报率"）；按"留一个视频"选阈值再判，结论相同（准确率 85%、检出率 91%）。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Definition (fixed 2026-10-06):</b> the first round distinguishes two states only — <b>open</b>, and <b>not open</b> (the eye is closed, or the eyelid covers part of the pupil). Blink / long closure / squint come in the next round.</p>
-    <p><b>Basic information:</b> videos 0–15, whole-video prediction of each video's plateau-point model (the blind sample was drawn from videos 0–13). Truth: the labeler's blind verdict on 240 single frames (2026-10-06; 18 per video, drawn at random in five strata of the model's relative eye opening r: r &lt; 0.70, 0.70–0.85, 0.85–1.00, ≥ 1.00 with 4 frames each, 2 frames with implausible eyelid points; no overlap with the two earlier spot checks; the sheet shows the single original frame and no values), one of open / not open / cannot tell. 239 frames judged, 113 not open, no "cannot tell". Frames and verdicts in appendix A2. Scripts: <code>scripts/blink_notopen_frames_sample.py</code> (sample), <code>blink_notopen_frames_eval.py</code> (signal comparison), <code>blink_notopen_rule.py</code> (final rule and whole-video results); results <code>results/blink_eyelid_distance/blink_notopen_*</code>.</p>
+    <p><b>Basic information:</b> videos 0–16, whole-video prediction of each video's plateau-point model (the blind sample was drawn from videos 0–13). Truth: the labeler's blind verdict on 240 single frames (2026-10-06; 18 per video, drawn at random in five strata of the model's relative eye opening r: r &lt; 0.70, 0.70–0.85, 0.85–1.00, ≥ 1.00 with 4 frames each, 2 frames with implausible eyelid points; no overlap with the two earlier spot checks; the sheet shows the single original frame and no values), one of open / not open / cannot tell. 239 frames judged, 113 not open, no "cannot tell". Frames and verdicts in appendix A2. Scripts: <code>scripts/blink_notopen_frames_sample.py</code> (sample), <code>blink_notopen_frames_eval.py</code> (signal comparison), <code>blink_notopen_rule.py</code> (final rule and whole-video results); results <code>results/blink_eyelid_distance/blink_notopen_*</code>.</p>
     <p><b>Why the signal had to change:</b> rule D of 10.1 uses the eye opening relative to the video's own median, and its recall in the 0.70–0.85 stratum is 0 — because, frame by frame, almost every frame with r in 0.70–1.00 of videos 3, 8, 9, 10, 11 and 12 was judged not open, while the same frames of videos 0, 5, 7 and 13 were all open (appendix A2 shows it at a glance). "Lid over part of the pupil" is the resting state of those recordings, and a quantity relative to the video's own median cannot see it. The <b>absolute</b> eye opening O ÷ eye width W (W = median corner-to-corner distance of the video; the camera is fixed, so W is similar across videos) separates the two classes well (AUC 0.97; the relative r only 0.85). The per-video medians of O/W agree: 0.30–0.38 in the videos judged mostly not open, 0.41–0.59 in the videos judged open.</p>
     <p><b>Final rule (per frame):</b> (1) eyelid points plausible and O / W &lt; <b>0.347</b> → not open; (2) frame with implausible eyelid points: not open if the mean confidence of the four pupil points &lt; 0.527, otherwise open ("implausible = closed" of 10.1 was wrong: 13 of 28 implausible frames show an open eye, and the pupil confidence gets 26 of the 28 right); (3) runs of ≥ 3 frames are events, gaps &lt; 5 frames merged. The threshold 0.347 was chosen on these 239 frames (maximizing recall − false-alarm rate); with leave-one-video-out thresholds the conclusion is the same (precision 85%, recall 91%).</p>
   </div>
@@ -1098,7 +1098,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="zh"><span class="tag">10.2 的结论：</span>按"非睁眼 = 闭上或部分盖住"的定义，绝对睁开高度的规则在单帧上准确率 91%；它揭示的主要事实是：<b>非睁眼在这些录像里是一种状态，不是偶发事件。</b>
     <ol>
       <li><b>准确率：</b>239 帧盲评里规则判对 217 帧（90.8%）；规则判为非睁眼的帧 89% 是真的，真非睁眼的帧 92% 被找到。错得最多的一层是 r 在 0.85–1.00（55 帧错 10 帧），那是眼睑刚碰到瞳孔上缘的边界情况。</li>
-      <li><b>16 个视频分成两类：</b>视频 0、5、7、13 几乎全程睁开（非睁眼帧 0.2–0.4%）；视频 1、2、6 为 2–12%，视频 14 为 23%；<b>视频 3、4、8、9、10、11、12、15 有 26–70% 的时间眼睛不是完全睁开的</b>，最长的一次连续非睁眼持续 44–212 秒。这些录像里眼睛的常态就是半掩的，O/W 的中位数 0.30–0.38（睁开的视频 0.41–0.59）。</li>
+      <li><b>17 个视频分成两类：</b>视频 0、5、7、13、16 几乎全程睁开（非睁眼帧 0.2–0.4%）；视频 1、2、6 为 2–12%，视频 14 为 23%；<b>视频 3、4、8、9、10、11、12、15 有 26–70% 的时间眼睛不是完全睁开的</b>，最长的一次连续非睁眼持续 44–212 秒。这些录像里眼睛的常态就是半掩的，O/W 的中位数 0.30–0.38（睁开的视频 0.41–0.59）。</li>
       <li><b>事件数：</b>每分钟 0.2–12.8 次，时长中位数 100–717 毫秒。在半掩为常态的视频里，"事件"大多是半掩状态中间短暂睁开后的再次合上，不能当成眨眼次数。</li>
       <li><b>对眨眼的含义：</b>眨眼（短暂、完全闭合）只是"非睁眼"的一个子集。要数眨眼，下一轮需要在这个状态判断上再按深度（O/W 低到多少）和时长（多短）切分——10.1 里完全闭眼的 18 项全在 r &lt; 0.70 以下，说明这一刀是切得开的。</li>
       <li><b>限制：</b>一个人判断；阈值在验证帧上选（留一视频的数字略低：85% / 91%）；每个视频只用一个模型；"眼睑盖住部分瞳孔"的判断本身有边界（r 0.85–1.00 那一层），标注者第二次判同一批帧的一致性没有量过。</li>
@@ -1107,7 +1107,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="en"><span class="tag">Conclusion of 10.2:</span>Under the definition "not open = closed or partly covered", the absolute-eye-opening rule is 91% accurate per frame; its main finding is that <b>not-open is a state in these recordings, not an occasional event.</b>
     <ol>
       <li><b>Accuracy:</b> 217 of the 239 blind frames are classified correctly (90.8%); 89% of the frames the rule calls not open are, and 92% of the truly not-open frames are found. Most mistakes are in the r 0.85–1.00 stratum (10 of 55), the borderline where the lid just touches the top of the pupil.</li>
-      <li><b>The 16 videos fall into two groups:</b> videos 0, 5, 7 and 13 are open almost throughout (0.2–0.4% not-open frames); videos 1, 2, 6 have 2–12% and video 14 23%; <b>videos 3, 4, 8, 9, 10, 11, 12 and 15 have the eye not fully open 26–70% of the time</b>, with single not-open stretches of 44–212 s. In those recordings a half-covered eye is the resting state: median O/W 0.30–0.38 against 0.41–0.59 in the open videos.</li>
+      <li><b>The 17 videos fall into two groups:</b> videos 0, 5, 7, 13 and 16 are open almost throughout (0.2–0.4% not-open frames); videos 1, 2, 6 have 2–12% and video 14 23%; <b>videos 3, 4, 8, 9, 10, 11, 12 and 15 have the eye not fully open 26–70% of the time</b>, with single not-open stretches of 44–212 s. In those recordings a half-covered eye is the resting state: median O/W 0.30–0.38 against 0.41–0.59 in the open videos.</li>
       <li><b>Events:</b> 0.2–12.8 per minute, median duration 100–717 ms. In the half-covered videos most "events" are re-closings after brief openings within the covered state and must not be read as blink counts.</li>
       <li><b>What it means for blinks:</b> a blink (brief, full closure) is a subset of "not open". Counting blinks needs a further split of this state by depth (how low O/W goes) and duration (how brief) — all 18 full closures of 10.1 lie below r 0.70, so that cut is feasible.</li>
       <li><b>Limits:</b> one judge; the threshold was chosen on the validation frames (leave-one-video-out gives slightly lower numbers: 85% / 91%); one model per video; the judgement "lid covers part of the pupil" has its own borderline (the r 0.85–1.00 stratum), and the labeler's repeatability on the same frames was not measured.</li>
