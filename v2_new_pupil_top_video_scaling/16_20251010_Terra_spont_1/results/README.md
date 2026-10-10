@@ -23,6 +23,10 @@ Step 4 (80 labels, 2026-10-10 02:23): 7.78 px, worse than the running best 7.15 
 fired at 80 labels. Plateau point = the last improving step, 40 labels (7.15 px). Batch 5 was selected automatically (260 pool frames flagged) but its window is held;
 awaiting the user's decision.
 
+**Closed 2026-10-10 (user decision: "达到规则就下一个视频"): plateau at 40 labels, 7.15 px** (tag `v0.9.18-video16-plateau`).
+Batches 1-2 (40 labels) are carried into the later videos (740 labels go into video 17); batches 3-4 were labeled for the rule only
+and are not carried; batch 5 was selected automatically but not labeled.
+
 The other Terra models give 9.7-14.1 px on this test set (the video-12 20-label model 1311 is the best at 9.70 px, the
 video-15 60-label model 11.52, the video-14 plateau model 12.08; `../results/cross_video_matrix.csv`).
 
