@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-09 23:53 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-10 03:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -103,7 +103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 793 test frames of 16 videos the four-point area has a median error of 5.8% against 7.8% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
       <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 7 videos (3, 4, 8–12) the eye is not fully open 26–70% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
     </ol>
-    <p><b>Status:</b> 16 videos finished (videos 0–15); video 16 in progress, error at 0 / 20 / 40 / … labels: 11.35 / 7.72 / 7.15 / 7.26 px.</p>
+    <p><b>Status:</b> 16 videos finished (videos 0–15); video 16 in progress, error at 0 / 20 / 40 / … labels: 11.35 / 7.72 / 7.15 / 7.26 / 7.78 px.</p>
   </div>
 
   
@@ -508,7 +508,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 <tr><td>13</td><td>Terra<br>2025-10-15</td><td>580</td><td>69.13 / 9.43 / 9.44 / 9.67</td><td><span lang="en"><b>20 labels, 9.43 px</b></span></td><td>60</td><td>20</td></tr>
 <tr><td>14</td><td>Terra<br>2025-10-14</td><td>600</td><td>13.33 / 10.83 / 12.41 / 10.30 / 10.45 / 10.24</td><td><span lang="en"><b>60 labels, 10.30 px</b></span></td><td>100</td><td>60</td></tr>
 <tr><td>15</td><td>Terra<br>2025-10-13</td><td>660</td><td>10.57 / 11.42 / 9.73 / 9.61 / 10.24</td><td><span lang="en"><b>40 labels, 9.73 px</b></span></td><td>80</td><td>40</td></tr>
-<tr><td>16</td><td>Terra<br>2025-10-10</td><td>700</td><td>11.35 / 7.72 / 7.15 / 7.26</td><td><span lang="en">in progress (best so far: 40 labels, 7.15 px)</span></td><td>60</td><td>–</td></tr>
+<tr><td>16</td><td>Terra<br>2025-10-10</td><td>700</td><td>11.35 / 7.72 / 7.15 / 7.26 / 7.78</td><td><span lang="en">in progress (best so far: 40 labels, 7.15 px)</span></td><td>80</td><td>–</td></tr>
       </tbody>
     </table>
   </div>
@@ -1096,12 +1096,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video15_batch03.jpg" alt="Video 15 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 15, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video15_batch04.jpg" alt="Video 15 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 15, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
   </div></div></figure>
-  <p class="text"><b><span lang="en">Video 16 (Terra, 2025-10-10): 4 batches</span></b></p>
+  <p class="text"><b><span lang="en">Video 16 (Terra, 2025-10-10): 5 batches</span></b></p>
   <figure><div class="figbox scroll"><div class="strip tall">
       <div class="item"><img src="assets/selection_video16_batch01.jpg" alt="Video 16 batch 1" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 1 (picked by appearance, no model)</span></div></div>
       <div class="item"><img src="assets/selection_video16_batch02.jpg" alt="Video 16 batch 2" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 2 (picked by the jump rule of the 20-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video16_batch03.jpg" alt="Video 16 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video16_batch04.jpg" alt="Video 16 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
+      <div class="item"><img src="assets/selection_video16_batch05.jpg" alt="Video 16 batch 5" loading="lazy"><div class="cap"><span lang="en">Video 16, batch 5 (picked by the jump rule of the 80-label model)</span></div></div>
   </div></div></figure>
   <h3><span lang="en">A2: the single-frame blind check of the first-round blink definition (the labeler's verdicts on the original frames)</span></h3>
   
