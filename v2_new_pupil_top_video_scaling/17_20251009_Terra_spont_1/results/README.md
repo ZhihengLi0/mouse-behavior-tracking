@@ -16,8 +16,11 @@ limit of 320 px (eye width 495 px in that frame; kept as labeled).
 |---|---|---|---|---|---|
 | 0 (video-16 40-label model 1712, applied unchanged) | 6.38 px | 8.7 | 0% | 82% | – |
 | 20 (shuffle 1811) | 4.75 px | 6.7 | 0% | 96% | 4916 of 57158 (8.6%) |
+| 40 (shuffle 1812) | 4.47 px | 6.2 | 0% | 95% | pending |
 
 The other Terra models give 6.9-91 px on this test set (the video-15 60-label model 1513 is the next best at 6.88 px,
 the video-15 plateau model 1512 7.13, the video-16 60-label model 1713 7.28; `../results/cross_video_matrix.csv`).
 Step 1 (20 labels, 2026-10-10 14:59): 4.75 px, 26% better than the 0-label 6.38 px; p90 from 8.7 to 6.7 px, 96% of
-keypoints confident. Batch 2 is being selected from the 20-label model's whole-video prediction.
+keypoints confident. Step 2 (40 labels, 2026-10-10 18:52): 4.47 px, 5.9% better than 20 labels, above the 3% bar, so it counts as an
+improving step (running best 4.47 px; the next step improves if it is below 4.34 px). Batch 3 is being selected from
+the 40-label model's whole-video prediction.
