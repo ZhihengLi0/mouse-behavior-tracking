@@ -18,6 +18,7 @@ limit of 320 px (eye width 495 px in that frame; kept as labeled).
 | 20 (shuffle 1811) | 4.75 px | 6.7 | 0% | 96% | 4916 of 57158 (8.6%) |
 | 40 (shuffle 1812) | 4.47 px | 6.2 | 0% | 95% | 4165 of 57158 (7.3%) |
 | 60 (shuffle 1813) | 4.89 px | 7.0 | 0% | 96% | 2726 of 57158 (4.8%) |
+| 80 (shuffle 1814) | 4.50 px | 6.4 | 0% | 100% | pending |
 
 The other Terra models give 6.9-91 px on this test set (the video-15 60-label model 1513 is the next best at 6.88 px,
 the video-15 plateau model 1512 7.13, the video-16 60-label model 1713 7.28; `../results/cross_video_matrix.csv`).
@@ -30,3 +31,10 @@ of more than 3%. The rule needs two such steps in a row, so one more step is run
 (`img003154.png`, eye closed) had its top, bottom and right pupil points removed by the labeler while the pre-label
 `pupil_left` (confidence 0.20, about 400 px from the eye) was still there; with the labeler's confirmation that point
 was removed before training, so the frame has no pupil points.
+
+Step 4 (80 labels, 2026-10-11 11:27): 4.50 px, not more than 3% better than the running best of 4.47 px (it would have
+had to be below 4.34 px): the second step in a row without such a gain, so the plateau rule fired. **Plateau point: 40
+labels, 4.47 px** (shuffle 1812). Under the standing rule (user, 2026-10-10: when the rule fires the video is closed and the
+next one starts) the video was closed on 2026-10-11, tag `v0.9.19-video17-plateau`. Batches 1-2 (40 labels) are carried:
+780 labels go into video 18. Batches 3-4 stay in this folder and are not carried. In batch04 one frame (`img001101.png`)
+has a pupil width of 324 px, above the QC limit of 320 px (kept as labeled); three frames have no pupil points (eye closed).
