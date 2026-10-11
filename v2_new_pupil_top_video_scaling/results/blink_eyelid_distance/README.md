@@ -87,8 +87,8 @@ The recall is relative to the closures *in the sample*, which includes the 12 pa
 (r = 0.70-0.85) that no variant flags; closures that neither the rule nor the implausible class catches are not
 estimated. D is chosen over E because its threshold was fixed before the spot check.
 
-Final rule D on the whole videos (17 videos 0-16, rerun with video 16 on 2026-10-10): 4-157 closure events per video
-(0.2-7.9 per minute), median duration 100-408 ms, 0.2-21.1% of the frames closed; 749 events in all, 455 full and 294 partial
+Final rule D on the whole videos (18 videos 0-17, rerun with video 17 on 2026-10-11): 4-157 closure events per video
+(0.2-7.9 per minute), median duration 100-408 ms, 0.2-21.1% of the frames closed; 777 events in all, 476 full and 301 partial
 (video 15: 21.1% of its frames, the relative rule on a recording whose eye is half covered most of the time).
 
 ## Second, blind spot check of the final rule (2026-10-06)
@@ -150,7 +150,7 @@ recall - false-alarm rate); leave-one-video-out thresholds give precision 85%, r
 | rule D (relative, 10.1) for comparison | 239 | 113 | 72 | 72.4% | 75.0% | 47.8% |
 
 Whole videos (`blink_notopen_rule_all_videos.csv`, `blink_notopen_rule_events_all_videos.csv`, `blink_notopen_rule_summary.png`):
-not-open frames 0.2-0.4% on videos 0, 5, 7, 13 and 16 (video 16: 0.4%, added in the rerun of 2026-10-10); 2-12% on videos 1, 2, 6; 23% on video 14; **26-70% on videos 3, 4, 8, 9, 10, 11, 12 and 15** (video 15: 48%, added in the rerun of 2026-10-08)
+not-open frames 0.2-0.4% on videos 0, 5, 7, 13 and 16 (video 16: 0.4%, added in the rerun of 2026-10-10); 1.7-12% on videos 1, 2, 6 and 17 (video 17: 1.7%, added in the rerun of 2026-10-11); 23% on video 14; **26-70% on videos 3, 4, 8, 9, 10, 11, 12 and 15** (video 15: 48%, added in the rerun of 2026-10-08)
 (longest single not-open stretch 44-212 s). Events 0.2-12.8 per minute, median duration 100-717 ms; in the half-covered
 videos most events are re-closings between brief openings and are not blink counts. Blinks (brief full closures) are a
 subset of this state; separating them by depth and duration is the next round. Limits: one judge; threshold chosen on
