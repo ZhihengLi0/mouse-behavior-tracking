@@ -1,6 +1,6 @@
-# One eye-opening threshold per mouse - first look (2026-10-10)
+# One eye-opening threshold per mouse - first look (2026-10-10; rerun 2026-10-11 with video 17)
 
-**Basic information.** Videos 0-16 (17 finished videos: mouse A 1, Pluto 10, Terra 6). Input: the whole-video prediction of
+**Basic information.** Videos 0-17 (18 finished videos: mouse A 1, Pluto 10, Terra 7). Input: the whole-video prediction of
 each video's plateau model (final snapshot). Truth for choosing a threshold: the 239 blind single-frame verdicts of
 2026-10-06 (videos 0-13 only; 211 of them on frames with plausible eyelid points). Script:
 `../../../scripts/blink_per_mouse_threshold.py`. No model was trained and no existing result was changed. This folder is
@@ -28,7 +28,7 @@ Chosen on the trusted judged frames of each mouse by the criterion of the first 
 
 - The pooled optimum is a flat range: 0.347 (the first-round value) and 0.365 give the same accuracy (90.5%).
 - Pluto and Terra come out different (0.365 against 0.299), but Terra's value rests on 48 frames of 3 videos and moves
-  between 0.296 and 0.356 when one video is left out. It is not settled; verdicts on videos 14-16 would be needed.
+  between 0.296 and 0.356 when one video is left out. It is not settled; verdicts on videos 14-17 would be needed.
 - Mouse A has one video and no judged not-open frame; the pooled 0.347 is used for it in the tables below.
 
 ## Share of frames with a small opening (`small_opening_share_per_video.csv`)
@@ -52,6 +52,7 @@ Chosen on the trusted judged frames of each mouse by the criterion of the first 
 | 14 | Terra | 0.387 | 6.5% | 23.0% | 59.8% | 6.4% |
 | 15 | Terra | 0.357 | 35.1% | 47.7% | 59.4% | 34.8% |
 | 16 | Terra | 0.459 | 0.1% | 0.4% | 2.2% | 0.1% |
+| 17 | Terra | 0.426 | 0.7% | 1.7% | 13.7% | 0.7% |
 
 The share depends strongly on the threshold wherever the video's median r is close to it: video 11 has 8% of its frames
 below 0.299 and 54% below 0.347. On such videos a threshold splits the bulk of the distribution, so the continuous r
