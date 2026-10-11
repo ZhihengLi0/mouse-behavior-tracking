@@ -16,11 +16,11 @@ Label QC notes: in test50, 14 points with pre-label confidence below 0.6 were le
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
 | 0 (video-17 40-label model 1812, applied unchanged) | 38.24 px | 57.5 | 22% | 59% | – |
-| 20 (shuffle 1911) | 13.13 px | 37.3 | 0% | 72% | pending |
+| 20 (shuffle 1911) | 13.13 px | 37.3 | 0% | 72% | 17664 of 57158 (31%) |
 
 The 0-label point is the worst of the Terra videos since video 13 (69 px): the eyelid points are fine (median 0-6 px) but
 every pupil point is 38-54 px off, and the model is confident on only 59% of the points. No existing model does well on
 this day: the best is the video-17 80-label model 1814 at 24.3 px, then the video-12 40-label model 1312 at 25.8 px; the
 other Terra models give 34-40 px and above (`../results/cross_video_matrix.csv`). Step 1 (20 labels, 2026-10-11 16:18): 13.13 px, 66% better than the 0-label 38.24 px; p90 from 57.5 to 37.3 px, no test
 frame above 50 px, 72% of keypoints confident (running best 13.13 px; the next step improves if it is below 12.74 px).
-Batch 2 is being selected from the 20-label model's whole-video prediction.
+Batch 2 (20 frames, `selection_sheets/selection_040_frames.png`, window opened 2026-10-11 17:40) was selected from the 20-label model's whole-video prediction: the jump rule (eps 13.3 px = 0.03 x the median eye width of this video) flags 17664 of the 57158 pool frames (31%), far more than on video 17 (8.6% at the same step), consistent with the 20-label model still being 13 px off on this day (`jump_flagged.csv`).
