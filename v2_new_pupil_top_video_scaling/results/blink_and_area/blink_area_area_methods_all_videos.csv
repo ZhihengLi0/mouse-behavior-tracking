@@ -179,13 +179,23 @@ video,unit,model_step,rule,n,median_abs_err_pct,p90_abs_err_pct,median_signed_er
 17,17_20251009_Terra_spont_1,2,four_med5,50,1.86,4.1,1.21
 17,17_20251009_Terra_spont_1,2,four_med31,50,1.82,4.51,1.29
 17,17_20251009_Terra_spont_1,human labels,no_top_on_human_labels,50,6.89,10.87,6.89
-all,all videos pooled,,four,893,5.18,32.87,-1.02
-all,all videos pooled,,no_top,893,8.28,32.58,1.86
-all,all videos pooled,,no_bottom,893,10.17,38.39,-5.15
-all,all videos pooled,,no_left,893,10.82,35.34,-5.13
-all,all videos pooled,,no_right,893,9.17,37.34,3.62
-all,all videos pooled,,drop_lowconf,893,8.83,32.86,1.14
-all,all videos pooled,,four_fallback,893,5.54,31.87,-1.1
-all,all videos pooled,,four_med5,893,4.97,32.99,-0.93
-all,all videos pooled,,four_med31,893,5.1,32.53,-1.36
-all,all videos pooled,,no_top_on_human_labels,893,5.1,12.09,0.89
+18,18_20251008_Terra_spont_1,2,four,47,10.45,38.06,-0.51
+18,18_20251008_Terra_spont_1,2,no_top,47,10.59,37.18,-0.84
+18,18_20251008_Terra_spont_1,2,no_bottom,47,12.41,37.5,-2.18
+18,18_20251008_Terra_spont_1,2,no_left,47,17.81,35.46,-8.76
+18,18_20251008_Terra_spont_1,2,no_right,47,13.02,38.35,5.2
+18,18_20251008_Terra_spont_1,2,drop_lowconf,47,13.81,37.5,-2.18
+18,18_20251008_Terra_spont_1,2,four_fallback,47,13.81,36.42,-0.51
+18,18_20251008_Terra_spont_1,2,four_med5,47,9.29,36.83,-0.65
+18,18_20251008_Terra_spont_1,2,four_med31,47,9.69,35.95,-2.08
+18,18_20251008_Terra_spont_1,human labels,no_top_on_human_labels,47,4.68,10.14,2.29
+all,all videos pooled,,four,940,5.4,33.57,-1.0
+all,all videos pooled,,no_top,940,8.38,32.9,1.76
+all,all videos pooled,,no_bottom,940,10.21,38.48,-5.09
+all,all videos pooled,,no_left,940,11.02,35.41,-5.32
+all,all videos pooled,,no_right,940,9.65,37.4,3.69
+all,all videos pooled,,drop_lowconf,940,8.97,33.07,0.9
+all,all videos pooled,,four_fallback,940,5.76,32.75,-1.05
+all,all videos pooled,,four_med5,940,5.16,33.58,-0.92
+all,all videos pooled,,four_med31,940,5.28,33.26,-1.4
+all,all videos pooled,,no_top_on_human_labels,940,5.05,12.07,0.92
