@@ -15,6 +15,7 @@ Important changes (a video finished, a protocol or label-convention change, a ne
 
 | tag | date | what it marks |
 |---|---|---|
+| `v0.9.20-video18-plateau` | 2026-10-12 | Video 18 (Terra, 2025-10-08; the last video of the set) finished: plateau at 40 labels, 12.38 px (0 / 20 / 40 / 60 / 80 = 38.24 / 13.13 / 12.38 / 12.27 / 13.96 px; rule fired at 80; closed under the standing rule). All 19 videos are now at their plateau. |
 | `v0.9.19-video17-plateau` | 2026-10-11 | Video 17 (Terra, 2025-10-09) finished: plateau at 40 labels, 4.47 px (0 / 20 / 40 / 60 / 80 = 6.38 / 4.75 / 4.47 / 4.89 / 4.50 px; rule fired at 80; closed under the standing rule); batches 1-2 carried, 780 labels into video 18. Video 18 (the last video) started. |
 | `v0.9.18-video16-plateau` | 2026-10-10 | Video 16 (Terra, 2025-10-10) finished: plateau at 40 labels, 7.15 px (0 / 20 / 40 / 60 / 80 = 11.35 / 7.72 / 7.15 / 7.26 / 7.78 px; rule fired at 80; user decision); batches 1-2 carried, 740 labels into video 17. Video 17 started. |
 | `v0.9.17-video15-plateau` | 2026-10-08 | Video 15 (Terra, 2025-10-13) finished: plateau at 40 labels, 9.73 px (0 / 20 / 40 / 60 / 80 = 10.57 / 11.42 / 9.73 / 9.61 / 10.24 px; rule fired at 80; user decision); batches 1-2 carried, 700 labels into video 16. Video 16 started (frames extracted, pre-labels from model 1612). |

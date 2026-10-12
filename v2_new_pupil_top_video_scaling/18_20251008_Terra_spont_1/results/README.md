@@ -20,6 +20,7 @@ of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner poi
 | 20 (shuffle 1911) | 13.13 px | 37.3 | 0% | 72% | 17664 of 57158 (31%) |
 | 40 (shuffle 1912) | 12.38 px | 33.9 | 0% | 88% | 15378 of 57158 (27%) |
 | 60 (shuffle 1913) | 12.27 px | 34.5 | 0% | 87% | 14786 of 57158 (26%) |
+| 80 (shuffle 1914) | 13.96 px | 33.5 | 0% | 84% | not run (plateau) |
 
 The 0-label point is the worst of the Terra videos since video 13 (69 px): the eyelid points are fine (median 0-6 px) but
 every pupil point is 38-54 px off, and the model is confident on only 59% of the points. No existing model does well on
@@ -42,4 +43,11 @@ nasal corner 13.6, eyelids 5.3 / 5.6, temporal corner 2.5 px. Batch 4 (20 frames
 60-label model's whole-video prediction: the jump rule (eps 13.0 px) flags 14786 of the 57158 pool frames (26%; 31% and 27%
 at the two earlier steps; video 17 had 4.8% at the same step).
 
-Step 4 (80 labels, shuffle 1914) is training (started 2026-10-12 12:04); it improves if its median is below 12.01 px, otherwise the plateau rule fires at 40 labels.
+Step 4 (80 labels, 2026-10-12 14:48): 13.96 px, 12.8% worse than the running best of 12.38 px (it had to be below 12.01 px
+to count), so the second flat step in a row and the plateau rule fires: **plateau = 40 labels, 12.38 px (shuffle 1912)**.
+p90 33.5 px, 84% of keypoints confident. Per-point medians at 80 labels: pupil top 11.8, bottom 13.7, right 9.2, left 5.0 px;
+nasal corner 18.3, eyelids 4.6 / 5.3, temporal corner 4.7 px (the nasal corner and the pupil bottom got worse). The
+whole-video prediction of the 80-label model was stopped (no batch 5 is needed; the battery guard had already paused it at
+17:12), so the last row of the table has no flagged count. Video 18 closed on 2026-10-12 under the standing rule (the rule
+fires, the video closes). This is the last video of the set, so nothing is carried further; batches 1-2 (40 labels) are the
+plateau labels of this video, and the set of labels a future video would start from is 780 + 40 = 820.
