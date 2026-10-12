@@ -19,7 +19,7 @@ of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner poi
 | 0 (video-17 40-label model 1812, applied unchanged) | 38.24 px | 57.5 | 22% | 59% | – |
 | 20 (shuffle 1911) | 13.13 px | 37.3 | 0% | 72% | 17664 of 57158 (31%) |
 | 40 (shuffle 1912) | 12.38 px | 33.9 | 0% | 88% | 15378 of 57158 (27%) |
-| 60 (shuffle 1913) | 12.27 px | 34.5 | 0% | 87% | pending |
+| 60 (shuffle 1913) | 12.27 px | 34.5 | 0% | 87% | 14786 of 57158 (26%) |
 
 The 0-label point is the worst of the Terra videos since video 13 (69 px): the eyelid points are fine (median 0-6 px) but
 every pupil point is 38-54 px off, and the model is confident on only 59% of the points. No existing model does well on
@@ -38,5 +38,6 @@ Step 3 (60 labels, 2026-10-12 10:32): 12.27 px, only 0.9% better than the runnin
 12.01 px to count), so this is the first flat step; the running best stays at 12.38 px and step 4 still has to be below
 12.01 px to count as an improvement. If step 4 is also flat the plateau rule fires and the plateau is 40 labels. p90 34.5 px
 (33.9 at 40 labels), 87% of keypoints confident. Per-point medians: pupil top 10.9, bottom 11.4, right 8.3, left 5.8 px;
-nasal corner 13.6, eyelids 5.3 / 5.6, temporal corner 2.5 px. Batch 4 is being selected from the 60-label model's
-whole-video prediction.
+nasal corner 13.6, eyelids 5.3 / 5.6, temporal corner 2.5 px. Batch 4 (20 frames, `selection_sheets/selection_080_frames.png`, window opened 2026-10-12 11:54) was selected from the
+60-label model's whole-video prediction: the jump rule (eps 13.0 px) flags 14786 of the 57158 pool frames (26%; 31% and 27%
+at the two earlier steps; video 17 had 4.8% at the same step).
