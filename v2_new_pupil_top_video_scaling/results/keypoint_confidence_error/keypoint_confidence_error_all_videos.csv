@@ -591,11 +591,43 @@ video,unit,labels_this_video,step,plateau_model,keypoint,n,median_error_px,p90_e
 17,17_20251009_Terra_spont_1,80,4,False,eyelid_bottom,50,1.56,4.44,0.972,1.0,-0.19
 17,17_20251009_Terra_spont_1,80,4,False,eye_nasal_corner,50,2.51,6.97,0.901,1.0,0.13
 17,17_20251009_Terra_spont_1,80,4,False,eye_temporal_corner,50,2.75,4.75,0.822,1.0,0.39
-all,all videos pooled (plateau-point models),,,True,pupil_top,896,9.96,32.62,0.746,0.779,-0.32
-all,all videos pooled (plateau-point models),,,True,pupil_bottom,897,3.79,18.67,0.86,0.924,-0.39
-all,all videos pooled (plateau-point models),,,True,pupil_left,896,4.47,26.62,0.793,0.828,-0.51
-all,all videos pooled (plateau-point models),,,True,pupil_right,900,5.1,17.93,0.82,0.927,-0.31
-all,all videos pooled (plateau-point models),,,True,eyelid_top,899,6.15,15.49,0.817,0.912,-0.34
-all,all videos pooled (plateau-point models),,,True,eyelid_bottom,900,3.4,11.73,0.862,0.962,-0.38
-all,all videos pooled (plateau-point models),,,True,eye_nasal_corner,900,4.08,13.0,0.826,0.95,-0.36
-all,all videos pooled (plateau-point models),,,True,eye_temporal_corner,900,4.13,13.52,0.773,0.816,-0.42
+18,18_20251008_Terra_spont_1,20,1,False,pupil_top,48,10.69,37.17,0.597,0.479,-0.07
+18,18_20251008_Terra_spont_1,20,1,False,pupil_bottom,49,13.94,35.04,0.505,0.224,-0.32
+18,18_20251008_Terra_spont_1,20,1,False,pupil_left,49,5.59,26.27,0.709,0.714,-0.47
+18,18_20251008_Terra_spont_1,20,1,False,pupil_right,49,8.49,51.91,0.779,0.918,0.08
+18,18_20251008_Terra_spont_1,20,1,False,eyelid_top,50,4.32,12.5,0.933,0.98,-0.38
+18,18_20251008_Terra_spont_1,20,1,False,eyelid_bottom,50,5.82,15.5,0.736,0.96,0.03
+18,18_20251008_Terra_spont_1,20,1,False,eye_nasal_corner,50,16.53,33.48,0.694,0.74,0.07
+18,18_20251008_Terra_spont_1,20,1,False,eye_temporal_corner,50,2.24,4.48,0.687,0.74,0.27
+18,18_20251008_Terra_spont_1,40,2,True,pupil_top,48,12.92,35.74,0.756,0.896,0.05
+18,18_20251008_Terra_spont_1,40,2,True,pupil_bottom,49,10.96,31.84,0.628,0.571,-0.3
+18,18_20251008_Terra_spont_1,40,2,True,pupil_left,49,5.58,26.15,0.782,0.857,-0.31
+18,18_20251008_Terra_spont_1,40,2,True,pupil_right,49,8.9,49.62,0.769,0.939,-0.11
+18,18_20251008_Terra_spont_1,40,2,True,eyelid_top,50,3.59,10.47,0.922,0.98,-0.23
+18,18_20251008_Terra_spont_1,40,2,True,eyelid_bottom,50,6.92,14.32,0.709,0.92,0.11
+18,18_20251008_Terra_spont_1,40,2,True,eye_nasal_corner,50,14.58,33.99,0.699,0.86,0.19
+18,18_20251008_Terra_spont_1,40,2,True,eye_temporal_corner,50,3.64,5.64,0.805,0.98,0.16
+18,18_20251008_Terra_spont_1,60,3,False,pupil_top,48,10.91,41.94,0.703,0.729,-0.02
+18,18_20251008_Terra_spont_1,60,3,False,pupil_bottom,49,11.38,30.83,0.648,0.776,-0.23
+18,18_20251008_Terra_spont_1,60,3,False,pupil_left,49,5.75,28.15,0.792,0.898,-0.52
+18,18_20251008_Terra_spont_1,60,3,False,pupil_right,49,8.31,53.03,0.721,0.837,-0.02
+18,18_20251008_Terra_spont_1,60,3,False,eyelid_top,50,5.27,11.21,0.942,0.98,-0.19
+18,18_20251008_Terra_spont_1,60,3,False,eyelid_bottom,50,5.64,15.38,0.852,0.98,-0.19
+18,18_20251008_Terra_spont_1,60,3,False,eye_nasal_corner,50,13.56,32.58,0.684,0.78,0.2
+18,18_20251008_Terra_spont_1,60,3,False,eye_temporal_corner,50,2.49,4.04,0.75,0.96,-0.01
+18,18_20251008_Terra_spont_1,80,4,False,pupil_top,48,11.82,37.7,0.759,0.875,-0.18
+18,18_20251008_Terra_spont_1,80,4,False,pupil_bottom,49,13.66,29.61,0.633,0.694,-0.34
+18,18_20251008_Terra_spont_1,80,4,False,pupil_left,49,4.99,25.42,0.748,0.878,-0.44
+18,18_20251008_Terra_spont_1,80,4,False,pupil_right,49,9.2,53.39,0.717,0.816,-0.05
+18,18_20251008_Terra_spont_1,80,4,False,eyelid_top,50,4.55,10.46,0.881,1.0,-0.27
+18,18_20251008_Terra_spont_1,80,4,False,eyelid_bottom,50,5.26,14.76,0.8,0.98,0.07
+18,18_20251008_Terra_spont_1,80,4,False,eye_nasal_corner,50,18.29,36.2,0.606,0.46,-0.08
+18,18_20251008_Terra_spont_1,80,4,False,eye_temporal_corner,50,4.66,6.39,0.857,1.0,-0.24
+all,all videos pooled (plateau-point models),,,True,pupil_top,944,10.15,32.78,0.747,0.785,-0.3
+all,all videos pooled (plateau-point models),,,True,pupil_bottom,946,4.09,19.92,0.848,0.906,-0.43
+all,all videos pooled (plateau-point models),,,True,pupil_left,945,4.56,26.63,0.792,0.83,-0.51
+all,all videos pooled (plateau-point models),,,True,pupil_right,949,5.25,18.81,0.817,0.927,-0.31
+all,all videos pooled (plateau-point models),,,True,eyelid_top,949,6.0,15.41,0.822,0.916,-0.35
+all,all videos pooled (plateau-point models),,,True,eyelid_bottom,950,3.52,11.79,0.854,0.96,-0.39
+all,all videos pooled (plateau-point models),,,True,eye_nasal_corner,950,4.33,16.1,0.82,0.945,-0.39
+all,all videos pooled (plateau-point models),,,True,eye_temporal_corner,950,4.08,13.3,0.775,0.824,-0.4
