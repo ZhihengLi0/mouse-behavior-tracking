@@ -31,4 +31,4 @@ Step 2 (40 labels, 2026-10-12 01:20): 12.38 px, 5.7% better than the running bes
 to count), so the running best moves to 12.38 px; the next step improves if it is below 12.01 px. p90 from 37.3 to 33.9 px,
 88% of keypoints confident (72% at 20 labels). What is left is the pupil (per-point medians: pupil top 12.9, bottom 11.0,
 right 8.9, left 5.6 px) and the nasal corner (14.6 px); the eyelid points and the temporal corner are at 3.6-6.9 px.
-Batch 3 (20 frames, `selection_sheets/selection_060_frames.png`, window opened 2026-10-12 02:41) was selected from the 40-label model's whole-video prediction: the jump rule (eps 13.1 px) flags 15378 of the 57158 pool frames (27%, down from 31% at 20 labels; video 17 had 7.0% at the same step).
+Batch 3 (20 frames, `selection_sheets/selection_060_frames.png`, window opened 2026-10-12 02:41) was selected from the 40-label model's whole-video prediction: the jump rule (eps 13.1 px) flags 15378 of the 57158 pool frames (27%, down from 31% at 20 labels; video 17 had 7.3% at the same step).
