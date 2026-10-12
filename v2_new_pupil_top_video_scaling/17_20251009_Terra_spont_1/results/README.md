@@ -38,3 +38,9 @@ labels, 4.47 px** (shuffle 1812). Under the standing rule (user, 2026-10-10: whe
 next one starts) the video was closed on 2026-10-11, tag `v0.9.19-video17-plateau`. Batches 1-2 (40 labels) are carried:
 780 labels go into video 18. Batches 3-4 stay in this folder and are not carried. In batch04 one frame (`img001101.png`)
 has a pupil width of 324 px, above the QC limit of 320 px (kept as labeled); three frames have no pupil points (eye closed).
+
+**Fewer-labels study (2026-10-11)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training set
+otherwise as at the time: the 740 carried labels; shuffles 2171-2174). Size of the first batch only; no jump selection followed.
+5 labels = 5.02 / 6.16 px (subsets a / b; p90 8.1 / 8.2), 10 labels = 4.75 / 5.24 px (p90 6.7 / 6.7), against 6.38 px at
+0 labels and 4.75 px at 20: every subset improves on the 0-label model; subset 10a equals the 20-label number, 5a and 10b
+are 6% and 10% above it, 5b 30% above; figure `fewer_labels.png`.
