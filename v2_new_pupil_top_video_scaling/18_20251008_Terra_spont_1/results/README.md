@@ -12,7 +12,7 @@ video's labels; shuffles 1911, 1912, ...
 Label QC notes: in test50, 14 points with pre-label confidence below 0.6 were left at the pre-label; three test frames
 (eye nearly closed) keep only some of the pupil points (1, 3 and 3 of 4), as labeled; in batch01 one frame
 (`img014960.png`) has a pupil width of 325 px, above the QC limit of 320 px (kept as labeled). Batch02 (saved 2026-10-11 22:49: 96 points moved, 7 emptied, 57 left at the pre-label) passed the geometry QC; 17
-of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner points, 1 eyelid, 4 pupil points). Batch03 (saved 2026-10-12 07:57: 56 points moved, 8 emptied, 96 left at the pre-label) passed the geometry QC; 25 of its unchanged points have a pre-label confidence below 0.6 (10 eye-corner points, 1 eyelid, 14 pupil points).
+of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner points, 1 eyelid, 4 pupil points). Batch03 (saved 2026-10-12 07:57: 56 points moved, 8 emptied, 96 left at the pre-label) passed the geometry QC; 25 of its unchanged points have a pre-label confidence below 0.6 (10 eye-corner points, 1 eyelid, 14 pupil points). Batch04 (saved 2026-10-12 12:02: 65 points moved, 5 emptied, 90 left at the pre-label) passed the geometry QC; 16 of its unchanged points have a pre-label confidence below 0.6 (5 eye-corner points, 1 eyelid, 10 pupil points).
 
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
@@ -38,6 +38,8 @@ Step 3 (60 labels, 2026-10-12 10:32): 12.27 px, only 0.9% better than the runnin
 12.01 px to count), so this is the first flat step; the running best stays at 12.38 px and step 4 still has to be below
 12.01 px to count as an improvement. If step 4 is also flat the plateau rule fires and the plateau is 40 labels. p90 34.5 px
 (33.9 at 40 labels), 87% of keypoints confident. Per-point medians: pupil top 10.9, bottom 11.4, right 8.3, left 5.8 px;
-nasal corner 13.6, eyelids 5.3 / 5.6, temporal corner 2.5 px. Batch 4 (20 frames, `selection_sheets/selection_080_frames.png`, window opened 2026-10-12 11:54) was selected from the
+nasal corner 13.6, eyelids 5.3 / 5.6, temporal corner 2.5 px. Batch 4 (20 frames, `selection_sheets/selection_080_frames.png`, window opened 2026-10-12 11:54, labeled 12:02) was selected from the
 60-label model's whole-video prediction: the jump rule (eps 13.0 px) flags 14786 of the 57158 pool frames (26%; 31% and 27%
 at the two earlier steps; video 17 had 4.8% at the same step).
+
+Step 4 (80 labels, shuffle 1914) is training (started 2026-10-12 12:04); it improves if its median is below 12.01 px, otherwise the plateau rule fires at 40 labels.
