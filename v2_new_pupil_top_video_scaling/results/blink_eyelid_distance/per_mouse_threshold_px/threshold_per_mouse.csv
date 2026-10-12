@@ -1,0 +1,5 @@
+mouse,videos_with_verdicts,trusted_judged_frames,judged_not_open,threshold_px,best_range_low_px,best_range_high_px,leave_one_video_out_min_px,leave_one_video_out_max_px,accuracy_at_threshold_pct,accuracy_at_120px_pct,accuracy_at_140px_pct,accuracy_at_160px_pct,accuracy_at_180px_pct
+all mice pooled,14,211,98,149.0,149.0,149.0,147.5,156.5,91.9,80.1,88.6,90.5,77.7
+mouse A,1,12,0,,,,,,,100.0,100.0,100.0,100.0
+Pluto,10,151,77,147.5,147.0,148.0,147.5,160.5,94.0,78.1,90.1,93.4,78.8
+Terra,3,48,21,132.0,130.0,134.0,131.0,159.5,89.6,81.2,81.2,79.2,68.8
