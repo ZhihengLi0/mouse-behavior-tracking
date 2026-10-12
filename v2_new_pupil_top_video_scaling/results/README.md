@@ -231,6 +231,7 @@ time (earlier videos only, never later ones), same recipe, same frozen test set 
 | 14 (Terra; added 2026-10-07) | 13.33 (16%) | 10.9 / 10.2 (4% / 14%) | 9.8 / 10.1 (8% / 2%) | 10.83 (2%) |
 | 15 (Terra; added 2026-10-08) | 10.57 (0%) | 12.6 / 9.8 (0% / 0%) | 11.1 / 9.3 (0% / 0%) | 11.42 (0%) |
 | 16 (Terra; added 2026-10-09) | 11.35 (0%) | 9.2 / 10.4 | 9.4 / 9.2 | 7.72 (2%) |
+| 17 (Terra; added 2026-10-11) | 6.38 (0%) | 5.0 / 6.2 | 4.8 / 5.2 | 4.75 (0%) |
 
 - What this study compares: the size of the FIRST batch. The 5 and 10 labels are taken out of the 20 batch01 labels that were
   already made (appearance-based, model-free, like batch01 itself). It is not a procedure of 5 labels per step (label 5,
