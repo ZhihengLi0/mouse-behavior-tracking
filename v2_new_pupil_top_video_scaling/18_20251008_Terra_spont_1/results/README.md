@@ -12,7 +12,7 @@ video's labels; shuffles 1911, 1912, ...
 Label QC notes: in test50, 14 points with pre-label confidence below 0.6 were left at the pre-label; three test frames
 (eye nearly closed) keep only some of the pupil points (1, 3 and 3 of 4), as labeled; in batch01 one frame
 (`img014960.png`) has a pupil width of 325 px, above the QC limit of 320 px (kept as labeled). Batch02 (saved 2026-10-11 22:49: 96 points moved, 7 emptied, 57 left at the pre-label) passed the geometry QC; 17
-of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner points, 1 eyelid, 4 pupil points).
+of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner points, 1 eyelid, 4 pupil points). Batch03 (saved 2026-10-12 07:57: 56 points moved, 8 emptied, 96 left at the pre-label) passed the geometry QC; 25 of its unchanged points have a pre-label confidence below 0.6 (10 eye-corner points, 1 eyelid, 14 pupil points).
 
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
@@ -31,4 +31,6 @@ Step 2 (40 labels, 2026-10-12 01:20): 12.38 px, 5.7% better than the running bes
 to count), so the running best moves to 12.38 px; the next step improves if it is below 12.01 px. p90 from 37.3 to 33.9 px,
 88% of keypoints confident (72% at 20 labels). What is left is the pupil (per-point medians: pupil top 12.9, bottom 11.0,
 right 8.9, left 5.6 px) and the nasal corner (14.6 px); the eyelid points and the temporal corner are at 3.6-6.9 px.
-Batch 3 (20 frames, `selection_sheets/selection_060_frames.png`, window opened 2026-10-12 02:41) was selected from the 40-label model's whole-video prediction: the jump rule (eps 13.1 px) flags 15378 of the 57158 pool frames (27%, down from 31% at 20 labels; video 17 had 7.3% at the same step).
+Batch 3 (20 frames, `selection_sheets/selection_060_frames.png`, window opened 2026-10-12 02:41, labeled 07:57) was selected from the 40-label model's whole-video prediction: the jump rule (eps 13.1 px) flags 15378 of the 57158 pool frames (27%, down from 31% at 20 labels; video 17 had 7.3% at the same step).
+
+Step 3 (60 labels, shuffle 1913) is training (started 2026-10-12 07:58); it improves if its median is below 12.01 px.
