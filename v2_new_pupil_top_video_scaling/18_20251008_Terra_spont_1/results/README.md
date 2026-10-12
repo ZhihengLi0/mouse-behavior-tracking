@@ -11,7 +11,8 @@ video's labels; shuffles 1911, 1912, ...
 
 Label QC notes: in test50, 14 points with pre-label confidence below 0.6 were left at the pre-label; three test frames
 (eye nearly closed) keep only some of the pupil points (1, 3 and 3 of 4), as labeled; in batch01 one frame
-(`img014960.png`) has a pupil width of 325 px, above the QC limit of 320 px (kept as labeled).
+(`img014960.png`) has a pupil width of 325 px, above the QC limit of 320 px (kept as labeled). Batch02 (saved 2026-10-11 22:49: 96 points moved, 7 emptied, 57 left at the pre-label) passed the geometry QC; 17
+of its unchanged points have a pre-label confidence below 0.6 (12 eye-corner points, 1 eyelid, 4 pupil points).
 
 | labels of this video | median | p90 | frames > 50 px | keypoints conf >= 0.6 | pool frames flagged by the jump rule |
 |---|---|---|---|---|---|
