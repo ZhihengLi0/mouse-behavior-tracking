@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-12 23:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-13 00:08 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -101,7 +101,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 3.5–6.0 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 940 test frames of 19 videos the four-point area has a median error of 5.4% against 8.4% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 9 videos (3, 4, 8–12, 15, 18) the eye is not fully open 26–74% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
+      <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 9 videos (3, 4, 8–12, 15, 18) the eye is not fully open 26–74% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10). At Kaiwen's request a pixel threshold per mouse (eyelid distance) was also derived: Pluto 148 px, Terra 150 px, chosen on 327 blind frames and nearly equal for the two mice (section 10.3); the 0.347 rule is 93% accurate on the 88 later blind frames of new videos.</li>
     </ol>
     <p><b>Status:</b> 19 videos finished (videos 0–18).</p>
   </div>
@@ -382,7 +382,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Video 0:</b> the 5-minute video of the first mouse.</li>
       <li><b>Videos 1, 2, 3:</b> the second mouse, Pluto; three recordings of the same day (2025-10-31), 19.9 minutes each.</li>
       <li><b>Videos 4–10:</b> Pluto, one recording per recording day, from the most recent backwards: 10-30, 10-29, 10-28, 10-27, 10-24, 10-23, 10-22 (there is no video of 10-26 or 10-25 in our set).</li>
-      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18; video 18 is not finished yet).</li>
+      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18).</li>
     </ul>
     <p>Every video follows the same steps:</p>
     <ol>
@@ -450,7 +450,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 5-2, how to read:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60, video 1 (first video of the new mouse) 20, most later videos 20, video 7 none, video 9 80; the hatched bar is the video still in progress. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-2, how to read:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60, video 1 (first video of the new mouse) 20, most later videos 20, video 7 none, video 9 80. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -786,7 +786,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 10 -->
 <section id="s10">
-  <h2><span class="no">10</span><span lang="en">Blinks, first round: "not open = closed or lid over part of the pupil" defined first; a per-frame absolute-eye-opening rule is 91% accurate on 239 blind frames; 9 videos have the eye not fully open 26–74% of the time</span></h2>
+  <h2><span class="no">10</span><span lang="en">Blinks, first round: "not open = closed or lid over part of the pupil" defined first; a per-frame absolute-eye-opening rule is 91% accurate on 239 blind frames; 9 videos have the eye not fully open 26–74% of the time; one pixel threshold per mouse: Pluto 148, Terra 150 px</span></h2>
   
   
   <p class="text" lang="en"><span class="hl">Status: the first-round definition is fixed (not open = closed or partly covered); rule and check in section 10.2; 10.1 is the first version from before the definition, kept as a record. The finer classes of blinks are the next round.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
@@ -898,6 +898,75 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Limits:</b> one judge; the threshold was chosen on the validation frames (leave-one-video-out gives slightly lower numbers: 85% / 91%); one model per video; the judgement "lid covers part of the pupil" has its own borderline (the r 0.85–1.00 stratum), and the labeler's repeatability on the same frames was not measured.</li>
     </ol>
   </div>
+  <h3><span lang="en">10.3 One threshold per mouse, in pixels: below which eyelid distance is the eye "small"</span></h3>
+  
+  <div class="text" lang="en">
+    <p><b>Why:</b> what Kaiwen wants (Slack, 10-07 and 10-11) is to know when the eye is relatively small, not the blink movement itself, and he prefers the pixel distance between the two eyelid points directly, not divided by the eye width: the mouse is placed at the same position every day, so one fixed pixel value per mouse; candidates 120 / 140 / 160 / 180 px, with a few example frames closest to each candidate to look at together before deciding.</p>
+    <p><b>Basic information:</b> videos 0–18, whole-video prediction of each video's plateau-point model; per frame O = y(eyelid bottom) − y(eyelid top) in pixels; frames with implausible eyelid points (0.02–1.6% per video) are still judged by the mean pupil confidence &lt; 0.527. Truth: the labeler's blind single-frame verdicts, 327 frames in two samples — 239 frames of videos 0–13 on 2026-10-06 (section 10.2) plus 88 frames of videos 14–18 on 2026-10-12 (same sampling and sheet; 90 drawn, 2 left unjudged); the 289 frames with plausible eyelid points are used for the threshold. For each mouse every threshold from 60 to 300 px in steps of 1 px is tried on that mouse's frames and the value maximizing recall − false-alarm rate is taken (the criterion of 10.2), with a leave-one-video-out check. Scripts: <code>scripts/blink_notopen_frames_sample_r2.py</code> (second sample), <code>blink_notopen_frames_r2_eval.py</code> (check of the 0.347 rule on the new frames), <code>blink_per_mouse_threshold_px_v2.py</code> (thresholds, distributions, example sheets); results in <code>results/blink_eyelid_distance/results/every_mouse/px/</code>, verdicts in <code>results/blink_eyelid_distance/labels/frames/</code>.</p>
+    <p><b>The premise "same position every day" was checked first:</b> with the midpoint of the two eye corners as the eye position, Pluto's seven later days (10-27 to 10-31) lie within 10 px in x and 21 px in y of each other, Terra's eight days within 35 / 24 px, and the movement inside a video is only ±10–15 px, which is stable against openings of 120–180 px. The exception is Pluto's three earliest days (10-22, 10-23, 10-24): the eye sits 45–60 px to the lower right, the eye width is the smallest (392–428 px against 417–468 px on the other days) and so is the median opening (117–156 px). The points alone cannot tell a different head position or camera distance from the mouse really keeping its eye narrower on those days.</p>
+  </div>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="en">Mouse</span></th><th><span lang="en">Videos / frames judged (not open)</span></th><th><span lang="en">Threshold (px)</span></th><th><span lang="en">Best range</span></th><th><span lang="en">Leave-one-video-out</span></th><th><span lang="en">Accuracy at the threshold</span></th><th>120 px</th><th>140 px</th><th>160 px</th><th>180 px</th></tr></thead>
+    <tbody>
+      <tr><td>Pluto</td><td>10 / 151 (77)</td><td><b>148</b></td><td>147–148</td><td>147.5–160.5</td><td>94.0%</td><td>78.1%</td><td>90.1%</td><td>93.4%</td><td>78.8%</td></tr>
+      <tr><td>Terra</td><td>8 / 126 (64)</td><td><b>150.5</b></td><td>150–151</td><td>143.5–154.5</td><td>88.9%</td><td>74.6%</td><td>85.7%</td><td>86.5%</td><td>77.0%</td></tr>
+      <tr><td>mouse A</td><td>1 / 12 (0)</td><td><span lang="en">none (no not-open frame)</span></td><td>–</td><td>–</td><td>–</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td></tr>
+      <tr><td><span lang="en">all pooled</span></td><td>19 / 289 (141)</td><td>156</td><td>156</td><td>149–156</td><td>91.7%</td><td>77.5%</td><td>88.6%</td><td>90.7%</td><td>78.9%</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the blind single-frame verdicts"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 10-5, how to read:</span>One panel per mouse (the first pools all three). x = candidate threshold T in pixels; blue = share of the judged frames on which "opening &lt; T → not open" agrees with the labeler, orange = recall minus false-alarm rate; the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_examples_terra.jpg" alt="Terra: example frames at each candidate threshold"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 10-6, how to read (Terra):</span>One row per candidate threshold (120, 140, 150 = the chosen value, 160, 180 px); the six frames of a row are frames of the whole-video predictions whose opening equals that value (±3 px), one from each video; yellow circles are the predicted eyelid points, blue the eye corners. These are frames picked from the predictions, not labeled frames, meant for checking by eye whether the 150-px row is the intended "small" eye. Only six columns fit, so videos 17 and 18 are not shown.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_examples_pluto.jpg" alt="Pluto: example frames at each candidate threshold"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 10-7, how to read (Pluto):</span>As Figure 10-6; Pluto's threshold row is 148 px.</figcaption>
+  </figure>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Mouse</span></th><th><span lang="en">Date</span></th><th><span lang="en">Median opening (px)</span></th><th><span lang="en">Mouse threshold</span></th><th><span lang="en">Frames below it</span></th><th>&lt; 140 px</th><th>&lt; 160 px</th><th><span lang="en">for comparison: not open by the 0.347 rule</span></th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>mouse A</td><td>5-min</td><td>289</td><td>156</td><td>0.3%</td><td>0.3%</td><td>0.3%</td><td>0.3%</td></tr>
+      <tr><td>1</td><td>Pluto</td><td>2025-10-31</td><td>180</td><td>148</td><td>9.1%</td><td>4.9%</td><td>24.1%</td><td>11.8%</td></tr>
+      <tr><td>2</td><td>Pluto</td><td>2025-10-31</td><td>185</td><td>148</td><td>3.3%</td><td>1.3%</td><td>14.8%</td><td>9.7%</td></tr>
+      <tr><td>3</td><td>Pluto</td><td>2025-10-31</td><td>148</td><td>148</td><td>48.8%</td><td>36.1%</td><td>66.2%</td><td>43.6%</td></tr>
+      <tr><td>4</td><td>Pluto</td><td>2025-10-30</td><td>166</td><td>148</td><td>20.5%</td><td>10.8%</td><td>42.2%</td><td>26.1%</td></tr>
+      <tr><td>5</td><td>Pluto</td><td>2025-10-29</td><td>229</td><td>148</td><td>0.1%</td><td>0.1%</td><td>0.2%</td><td>0.2%</td></tr>
+      <tr><td>6</td><td>Pluto</td><td>2025-10-28</td><td>215</td><td>148</td><td>0.8%</td><td>0.6%</td><td>3.0%</td><td>2.2%</td></tr>
+      <tr><td>7</td><td>Pluto</td><td>2025-10-27</td><td>203</td><td>148</td><td>0.3%</td><td>0.2%</td><td>0.4%</td><td>0.3%</td></tr>
+      <tr><td>8</td><td>Pluto</td><td>2025-10-24</td><td>156</td><td>148</td><td>44.6%</td><td>36.8%</td><td>53.3%</td><td>45.5%</td></tr>
+      <tr><td>9</td><td>Pluto</td><td>2025-10-23</td><td>136</td><td>148</td><td>59.5%</td><td>53.6%</td><td>69.2%</td><td>56.6%</td></tr>
+      <tr><td>10</td><td>Pluto</td><td>2025-10-22</td><td>117</td><td>148</td><td>79.4%</td><td>72.6%</td><td>90.7%</td><td>69.6%</td></tr>
+      <tr><td>11</td><td>Terra</td><td>2025-10-17</td><td>144</td><td>150</td><td>68.9%</td><td>39.6%</td><td>81.6%</td><td>54.2%</td></tr>
+      <tr><td>12</td><td>Terra</td><td>2025-10-16</td><td>164</td><td>150</td><td>37.1%</td><td>18.1%</td><td>46.1%</td><td>38.7%</td></tr>
+      <tr><td>13</td><td>Terra</td><td>2025-10-15</td><td>203</td><td>150</td><td>0.3%</td><td>0.3%</td><td>0.4%</td><td>0.4%</td></tr>
+      <tr><td>14</td><td>Terra</td><td>2025-10-14</td><td>175</td><td>150</td><td>14.2%</td><td>8.0%</td><td>26.5%</td><td>23.0%</td></tr>
+      <tr><td>15</td><td>Terra</td><td>2025-10-13</td><td>153</td><td>150</td><td>48.9%</td><td>41.6%</td><td>54.5%</td><td>47.7%</td></tr>
+      <tr><td>16</td><td>Terra</td><td>2025-10-10</td><td>214</td><td>150</td><td>0.2%</td><td>0.1%</td><td>0.3%</td><td>0.4%</td></tr>
+      <tr><td>17</td><td>Terra</td><td>2025-10-09</td><td>196</td><td>150</td><td>1.1%</td><td>0.8%</td><td>1.7%</td><td>1.7%</td></tr>
+      <tr><td>18</td><td>Terra</td><td>2025-10-08</td><td>135</td><td>150</td><td>72.2%</td><td>55.4%</td><td>83.6%</td><td>73.9%</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_opening_terra.jpg" alt="Terra: eye opening over time per video with the mouse threshold"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 10-8, how to read:</span>One row per Terra video; x = time in minutes, the line is the median eye opening of each 10 s, the band reaches down to the 10th percentile, the black line is the mouse threshold 150 px. Where the line is above the black line the eye is open (13, 16, 17 almost throughout), where it is below the eye is narrowed (11 and 18 most of the time). Reading this line without any threshold is what Kaiwen called using the opening as a continuous variable. The same figures for Pluto and mouse A are in the results folder.</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion of 10.3:</span>In pixels the two mice come out almost the same: <b>Pluto 148 px, Terra 150 px</b>; a value of about 150 px would serve both. This is as far as the data go; the final value is to be settled with Kaiwen over the example sheets (Figures 10-6, 10-7).
+    <ol>
+      <li><b>Terra's value now holds:</b> on the 48 frames of 10-06 alone it was 132 px and jumped to 160 when one video was left out; with the 78 frames of 10-12 added it is 150.5 px and the leave-one-video-out range is 143.5–154.5. Pluto's optimum is flat (93–94% from 147 to 160 px), Terra's sharper, and its accuracy (88.9%) is lower than Pluto's (94.0%) because on the two half-covered days (videos 11, 18) many frames sit right at the threshold.</li>
+      <li><b>The 0.347 rule holds on new videos:</b> chosen on videos 0–13, it is 93.2% accurate on the 88 new blind frames of videos 14–18 (precision 90.7%, recall 98.0%), in line with its 91%; the errors are still in the r 0.85–1.00 stratum. The two rules also give matching per-video "small eye" shares (last two columns of the table); they differ on days whose median sits near the threshold (videos 3, 11, 12, 15, 18), where 10–20 px of threshold can double the share.</li>
+      <li><b>Day by day:</b> on the clearly open days (videos 5, 6, 7, 13, 16, 17) under 1.1% of the frames fall below the threshold; Pluto's 10-22, 10-23, 10-24 and Terra's 10-17 (video 11) and 10-08 (video 18) have 60–79% below it, i.e. a narrowed eye all day. This agrees with 10.2: narrowing is a state in these recordings, not an event.</li>
+      <li><b>Limits:</b> (a) one judge, repeatability not measured. (b) The sample is stratified by the model's opening, with the borderline strata over-represented, so the accuracies are those of the stratified sample, not per-frame accuracies of whole videos. (c) The threshold is chosen and scored on the same frames; leave-one-video-out is the only guard. (d) The opening is model output: eyelid points have a median error of about 5 px, worse at closure, so part of the errors near the threshold are tracking errors, and one example tile has the eyelid points on fur. (e) A pixel threshold assumes a fixed camera scale, which Pluto's first three days violate; on those days 45–79% of the frames are below the pixel threshold against 51–75% with the width-normalized first look — same direction, video 8 on the border. (f) All 17 judged frames of video 18 are not open, so Terra's threshold is driven mainly by which days are narrowed all day, not by an open / narrowed boundary within a day. (g) Mouse A cannot be set. (h) The example sheet has six columns, so Terra's videos 17 and 18 are missing; 2 frames unjudged. (i) Two rules now exist (the global 0.347 and the per-mouse pixel value); which one is the production rule is undecided.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 11 -->
@@ -988,7 +1057,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: all 8 videos are finished, plateau points at 20–60 labels. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
-      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first round has a rule and its check under the definition "not open = closed or partly covered" (step 10, section 10.2, 91% accurate); still missing are the definition of a blink itself (how deep, how brief) and a rule that separates blinks from long half-covered stretches.</li>
+      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first round has a rule and its check under the definition "not open = closed or partly covered" (step 10, section 10.2, 91% accurate); a pixel threshold per mouse has also been derived (section 10.3: Pluto 148, Terra 150 px); it still has to be settled with Kaiwen over the example sheets, together with which rule is the production one (the global 0.347 rule or the per-mouse pixel threshold); still missing are the definition of a blink itself (how deep, how brief) and a rule that separates blinks from long half-covered stretches.</li>
     </ul>
   </div>
 </section>

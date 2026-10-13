@@ -103,7 +103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 7 步）。</li>
       <li><b>模型给出的哪些点准，置信度能不能信？</b>瞳孔上点最不准（误差中位数 10.2 px，其余 7 个点 3.5–6.0 px）；每个点都是置信度越低误差越大，但瞳孔上点即使置信度高也有 8.3 px（第 8 步）。</li>
       <li><b>瞳孔面积怎么算？</b>按 2026 年 9 月 20 日明确的定义，瞳孔四个点都是椭圆端点，在 19 个视频的 940 帧测试帧上，四点法的面积误差中位数是 5.4%，三点法是 8.4%；视频 4 和 8 上面积仍然不准（第 9 步）。</li>
-      <li><b>眨眼怎么判断？</b>第一轮先定了定义：非睁眼 = 眼睛闭上或眼睑盖住部分瞳孔。按帧的规则"睁开高度 ÷ 眼宽 &lt; 0.347"（眼睑点失效时看瞳孔置信度）在 239 帧单帧盲评上准确率 91%。主要发现：9 个视频（3、4、8–12、15、18）有 26–74% 的时间眼睛不是完全睁开的，半掩是那些录像的常态；眨眼是其中的子集，细分放下一轮（第 10 步）。</li>
+      <li><b>眨眼怎么判断？</b>第一轮先定了定义：非睁眼 = 眼睛闭上或眼睑盖住部分瞳孔。按帧的规则"睁开高度 ÷ 眼宽 &lt; 0.347"（眼睑点失效时看瞳孔置信度）在 239 帧单帧盲评上准确率 91%。主要发现：9 个视频（3、4、8–12、15、18）有 26–74% 的时间眼睛不是完全睁开的，半掩是那些录像的常态；眨眼是其中的子集，细分放下一轮（第 10 步）。按 Kaiwen 的要求另外算了每只老鼠一个像素阈值（上下眼睑距离）：Pluto 148 px、Terra 150 px，在 327 帧盲评上选出，两只几乎相同（10.3 节）；0.347 的规则在后补的 88 帧新视频盲评上准确率 93%。</li>
     </ol>
     <p><b>进度：</b>{{STATUS_ZH}}</p>
   </div>
@@ -130,7 +130,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 3.5–6.0 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 940 test frames of 19 videos the four-point area has a median error of 5.4% against 8.4% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 9 videos (3, 4, 8–12, 15, 18) the eye is not fully open 26–74% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10).</li>
+      <li><b>How to detect blinks?</b> The first round fixed a definition first: not open = the eye is closed or the lid covers part of the pupil. The per-frame rule "eye opening ÷ eye width &lt; 0.347" (pupil confidence when the eyelid points fail) is 91% accurate on 239 blind single frames. Main finding: in 9 videos (3, 4, 8–12, 15, 18) the eye is not fully open 26–74% of the time — a half-covered eye is the resting state of those recordings; blinks are a subset, and the finer classes come next (step 10). At Kaiwen's request a pixel threshold per mouse (eyelid distance) was also derived: Pluto 148 px, Terra 150 px, chosen on 327 blind frames and nearly equal for the two mice (section 10.3); the 0.347 rule is 93% accurate on the 88 later blind frames of new videos.</li>
     </ol>
     <p><b>Status:</b> {{STATUS_EN}}</p>
   </div>
@@ -461,7 +461,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>视频 0：</b>第一只老鼠的 5 分钟视频。</li>
       <li><b>视频 1、2、3：</b>第二只老鼠 Pluto，同一天（2025-10-31）录的三段，每段 19.9 分钟。</li>
       <li><b>视频 4–10：</b>Pluto，每个录制日一段，日期从近到远：10-30、10-29、10-28、10-27、10-24、10-23、10-22（我们手里没有 10-26、10-25 的视频）。</li>
-      <li><b>视频 11 起：</b>第三只老鼠 Terra，每个录制日一段，日期从近到远：视频 11 是 2025-10-17，视频 12 是 10-16，之后依次是 10-15、10-14、10-13、10-10、10-09、10-08（视频 13–18；视频 18 还没有做完）。</li>
+      <li><b>视频 11 起：</b>第三只老鼠 Terra，每个录制日一段，日期从近到远：视频 11 是 2025-10-17，视频 12 是 10-16，之后依次是 10-15、10-14、10-13、10-10、10-09、10-08（视频 13–18）。</li>
     </ul>
     <p>每个视频的流程相同：</p>
     <ol>
@@ -478,7 +478,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Video 0:</b> the 5-minute video of the first mouse.</li>
       <li><b>Videos 1, 2, 3:</b> the second mouse, Pluto; three recordings of the same day (2025-10-31), 19.9 minutes each.</li>
       <li><b>Videos 4–10:</b> Pluto, one recording per recording day, from the most recent backwards: 10-30, 10-29, 10-28, 10-27, 10-24, 10-23, 10-22 (there is no video of 10-26 or 10-25 in our set).</li>
-      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18; video 18 is not finished yet).</li>
+      <li><b>From video 11:</b> the third mouse, Terra, one recording per recording day, from the most recent backwards: video 11 is 2025-10-17, video 12 is 10-16, then 10-15, 10-14, 10-13, 10-10, 10-09, 10-08 (videos 13–18).</li>
     </ul>
     <p>Every video follows the same steps:</p>
     <ol>
@@ -553,8 +553,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>
-    <figcaption lang="zh"><span class="tag">图 5-2 怎么看：</span>左图：每个视频到平台时用了多少帧自己的标注。视频 0 用了 60 帧，视频 1（新老鼠的第一个视频）20 帧，之后大多是 20 帧，视频 7 是 0 帧，视频 9 是 80 帧；斜线柱是还在进行中的视频。右图：灰色虚线是 0 帧时的误差（上一个模型直接用），红线是到平台时的误差。两条线之间的距离就是这个视频自己的标注带来的改善。视频 1 的 0 帧误差是 208 px（超出图的范围），因为换了老鼠。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 5-2, how to read:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60, video 1 (first video of the new mouse) 20, most later videos 20, video 7 none, video 9 80; the hatched bar is the video still in progress. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 5-2 怎么看：</span>左图：每个视频到平台时用了多少帧自己的标注。视频 0 用了 60 帧，视频 1（新老鼠的第一个视频）20 帧，之后大多是 20 帧，视频 7 是 0 帧，视频 9 是 80 帧。右图：灰色虚线是 0 帧时的误差（上一个模型直接用），红线是到平台时的误差。两条线之间的距离就是这个视频自己的标注带来的改善。视频 1 的 0 帧误差是 208 px（超出图的范围），因为换了老鼠。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-2, how to read:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60, video 1 (first video of the new mouse) 20, most later videos 20, video 7 none, video 9 80. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -861,7 +861,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 10 -->
 <section id="s10">
-  <h2><span class="no">10</span><span lang="zh">眨眼第一轮：先定义"非睁眼 = 闭上或眼睑盖住部分瞳孔"，按帧的绝对睁开高度规则在 239 帧盲评上准确率 91%；9 个视频有 26–74% 的时间眼睛不是完全睁开的</span><span lang="en">Blinks, first round: "not open = closed or lid over part of the pupil" defined first; a per-frame absolute-eye-opening rule is 91% accurate on 239 blind frames; 9 videos have the eye not fully open 26–74% of the time</span></h2>
+  <h2><span class="no">10</span><span lang="zh">眨眼第一轮：先定义"非睁眼 = 闭上或眼睑盖住部分瞳孔"，按帧的绝对睁开高度规则在 239 帧盲评上准确率 91%；9 个视频有 26–74% 的时间眼睛不是完全睁开的；每只老鼠一个像素阈值：Pluto 148、Terra 150 px</span><span lang="en">Blinks, first round: "not open = closed or lid over part of the pupil" defined first; a per-frame absolute-eye-opening rule is 91% accurate on 239 blind frames; 9 videos have the eye not fully open 26–74% of the time; one pixel threshold per mouse: Pluto 148, Terra 150 px</span></h2>
   <p class="text" lang="zh"><span class="hl">现状：第一轮的定义已定（非睁眼 = 闭上或部分盖住），规则和验证在 10.2 节；10.1 是定定义之前的第一版，保留作过程记录。眨眼的细分是下一轮。</span>要评估眨眼的判断方法，先要有眨眼的定义（眼睛闭到什么程度、持续多久算一次眨眼，半闭算不算）和按这个定义人工标出的真值，这两样现在都没有。下面只是一个初步观察：它检验的是“能不能找出人标不出瞳孔的帧”，不是眨眼。</p>
   <p class="text" lang="zh"><span class="tag">第一轮做法（2026 年 10 月 4 日和 Kaiwen 商定）：</span>先用上下眼睑两点之间的距离判断闭眼（睁开高度低于该视频中位数的 70% 记为闭眼帧，相隔不到 5 帧的并成一次事件），在各视频上跑，再人工抽查一部分结果；眨眼、闭眼、眯眼的细分放在这一轮之后。规则已在视频 0–12 上跑完，抽查已完成，见 10.1 节。脚本：<code>scripts/blink_by_eyelid_distance.py</code>；结果和抽查表在 <code>results/blink_eyelid_distance/</code>。</p>
   <p class="text" lang="en"><span class="hl">Status: the first-round definition is fixed (not open = closed or partly covered); rule and check in section 10.2; 10.1 is the first version from before the definition, kept as a record. The finer classes of blinks are the next round.</span> Evaluating a blink detector needs a definition of a blink (how far the eye must close and for how long, whether half-closed counts) and a human truth labeled by that definition; neither exists yet. What follows is only a preliminary observation: it tests whether the frames in which a person could not label the pupil can be found, not blinks.</p>
@@ -1017,6 +1017,86 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Limits:</b> one judge; the threshold was chosen on the validation frames (leave-one-video-out gives slightly lower numbers: 85% / 91%); one model per video; the judgement "lid covers part of the pupil" has its own borderline (the r 0.85–1.00 stratum), and the labeler's repeatability on the same frames was not measured.</li>
     </ol>
   </div>
+  <h3><span lang="zh">10.3 每只老鼠一个像素阈值：上下眼睑距离低于多少像素算"睁得小"</span><span lang="en">10.3 One threshold per mouse, in pixels: below which eyelid distance is the eye "small"</span></h3>
+  <div class="text" lang="zh">
+    <p><b>为什么做：</b>Kaiwen（Slack，10 月 7 日和 11 日）要的是"知道老鼠什么时候眼睛睁得比较小"，不是眨眼动作本身，而且他希望直接用上下眼睑两点的像素距离，不除以眼宽：老鼠每天放在同一位置，所以一只老鼠可以用一个固定的像素数；候选值 120 / 140 / 160 / 180 px，每个候选值下挑几帧最接近的例子，一起肉眼看后再定。</p>
+    <p><b>基本信息：</b>视频 0–18，各视频平台点模型对整段视频的预测，每帧的量是 O = 下眼睑点 y − 上眼睑点 y（像素）；眼睑点失效的帧（每视频 0.02–1.6%）仍按瞳孔平均置信度 &lt; 0.527 判。真值：标注者的单帧盲评两次合计 327 帧——10 月 6 日视频 0–13 的 239 帧（10.2 节），加 10 月 12 日视频 14–18 的 88 帧（同样的抽法和页面，90 帧抽出，2 帧未判）；眼睑点正常的 289 帧用于选阈值。每只老鼠在自己的帧上从 60 到 300 px 逐像素试阈值，取"检出率 − 误报率"最大的值（和 10.2 相同的准则），并做留一视频检验。脚本：<code>scripts/blink_notopen_frames_sample_r2.py</code>（第二批抽样）、<code>blink_notopen_frames_r2_eval.py</code>（0.347 规则在新帧上的检验）、<code>blink_per_mouse_threshold_px_v2.py</code>（阈值、分布、例子图）；结果 <code>results/blink_eyelid_distance/results/every_mouse/px/</code>，标注 <code>results/blink_eyelid_distance/labels/frames/</code>。</p>
+    <p><b>先检查了前提"位置固定"：</b>以两个眼角的中点为眼睛位置，Pluto 的 7 个较晚的日子（10-27 到 10-31）在 x 方向相差 10 px、y 方向 21 px 以内，Terra 的 8 天相差 35 / 24 px 以内，视频内部的移动也只有 ±10–15 px，相对 120–180 px 的睁开高度算稳定。例外是 Pluto 最早的三天（10-22、10-23、10-24）：眼睛位置向右下偏了 45–60 px，眼宽也最小（392–428 px，其他日子 417–468 px），睁开高度中位数也最小（117–156 px）。单看点位分不清是头的位置、相机距离变了，还是这三天老鼠真的眯得更厉害。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Why:</b> what Kaiwen wants (Slack, 10-07 and 10-11) is to know when the eye is relatively small, not the blink movement itself, and he prefers the pixel distance between the two eyelid points directly, not divided by the eye width: the mouse is placed at the same position every day, so one fixed pixel value per mouse; candidates 120 / 140 / 160 / 180 px, with a few example frames closest to each candidate to look at together before deciding.</p>
+    <p><b>Basic information:</b> videos 0–18, whole-video prediction of each video's plateau-point model; per frame O = y(eyelid bottom) − y(eyelid top) in pixels; frames with implausible eyelid points (0.02–1.6% per video) are still judged by the mean pupil confidence &lt; 0.527. Truth: the labeler's blind single-frame verdicts, 327 frames in two samples — 239 frames of videos 0–13 on 2026-10-06 (section 10.2) plus 88 frames of videos 14–18 on 2026-10-12 (same sampling and sheet; 90 drawn, 2 left unjudged); the 289 frames with plausible eyelid points are used for the threshold. For each mouse every threshold from 60 to 300 px in steps of 1 px is tried on that mouse's frames and the value maximizing recall − false-alarm rate is taken (the criterion of 10.2), with a leave-one-video-out check. Scripts: <code>scripts/blink_notopen_frames_sample_r2.py</code> (second sample), <code>blink_notopen_frames_r2_eval.py</code> (check of the 0.347 rule on the new frames), <code>blink_per_mouse_threshold_px_v2.py</code> (thresholds, distributions, example sheets); results in <code>results/blink_eyelid_distance/results/every_mouse/px/</code>, verdicts in <code>results/blink_eyelid_distance/labels/frames/</code>.</p>
+    <p><b>The premise "same position every day" was checked first:</b> with the midpoint of the two eye corners as the eye position, Pluto's seven later days (10-27 to 10-31) lie within 10 px in x and 21 px in y of each other, Terra's eight days within 35 / 24 px, and the movement inside a video is only ±10–15 px, which is stable against openings of 120–180 px. The exception is Pluto's three earliest days (10-22, 10-23, 10-24): the eye sits 45–60 px to the lower right, the eye width is the smallest (392–428 px against 417–468 px on the other days) and so is the median opening (117–156 px). The points alone cannot tell a different head position or camera distance from the mouse really keeping its eye narrower on those days.</p>
+  </div>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">有判断的视频 / 帧（其中非睁眼）</span><span lang="en">Videos / frames judged (not open)</span></th><th><span lang="zh">阈值（px）</span><span lang="en">Threshold (px)</span></th><th><span lang="zh">并列最好的范围</span><span lang="en">Best range</span></th><th><span lang="zh">留一视频的范围</span><span lang="en">Leave-one-video-out</span></th><th><span lang="zh">阈值处准确率</span><span lang="en">Accuracy at the threshold</span></th><th>120 px</th><th>140 px</th><th>160 px</th><th>180 px</th></tr></thead>
+    <tbody>
+      <tr><td>Pluto</td><td>10 / 151 (77)</td><td><b>148</b></td><td>147–148</td><td>147.5–160.5</td><td>94.0%</td><td>78.1%</td><td>90.1%</td><td>93.4%</td><td>78.8%</td></tr>
+      <tr><td>Terra</td><td>8 / 126 (64)</td><td><b>150.5</b></td><td>150–151</td><td>143.5–154.5</td><td>88.9%</td><td>74.6%</td><td>85.7%</td><td>86.5%</td><td>77.0%</td></tr>
+      <tr><td>mouse A</td><td>1 / 12 (0)</td><td><span lang="zh">定不了（没有一帧非睁眼）</span><span lang="en">none (no not-open frame)</span></td><td>–</td><td>–</td><td>–</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td></tr>
+      <tr><td><span lang="zh">三只合并</span><span lang="en">all pooled</span></td><td>19 / 289 (141)</td><td>156</td><td>156</td><td>149–156</td><td>91.7%</td><td>77.5%</td><td>88.6%</td><td>90.7%</td><td>78.9%</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the blind single-frame verdicts"></div>
+    <figcaption lang="zh"><span class="tag">图 10-5 怎么看：</span>每格一只老鼠（第一格是三只合并）。横轴是候选阈值 T（像素），蓝线是"睁开高度 &lt; T 判非睁眼"和标注者判断一致的比例，橙线是检出率减误报率；橙色竖线是选出的阈值，橙色阴影是并列最好的范围，灰虚线是 120 / 140 / 160 / 180 px 四个候选。看三点：顶点在哪（阈值），顶有多宽（Pluto 147–160 几乎一样高，Terra 的顶更尖），两只老鼠的顶点是否接近（148 对 150）。mouse A 那格没有信息：12 帧全是睁开，阈值再高也只会把睁大的眼误判成没睁开。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-5, how to read:</span>One panel per mouse (the first pools all three). x = candidate threshold T in pixels; blue = share of the judged frames on which "opening &lt; T → not open" agrees with the labeler, orange = recall minus false-alarm rate; the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_examples_terra.jpg" alt="Terra: example frames at each candidate threshold"></div>
+    <figcaption lang="zh"><span class="tag">图 10-6 怎么看（Terra）：</span>每一行一个候选阈值（120、140、150 = 选出的值、160、180 px），行内 6 帧是整段预测里睁开高度正好等于这个值（±3 px）的帧，从不同视频各取一帧；黄圈是模型预测的上下眼睑点，蓝圈是眼角。这是模型预测里挑出来的帧，不是标注过的帧，用来肉眼确认"150 px 这一档是不是想要的'睁得小'"。图里只排了 6 列，视频 17、18 没有进来。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-6, how to read (Terra):</span>One row per candidate threshold (120, 140, 150 = the chosen value, 160, 180 px); the six frames of a row are frames of the whole-video predictions whose opening equals that value (±3 px), one from each video; yellow circles are the predicted eyelid points, blue the eye corners. These are frames picked from the predictions, not labeled frames, meant for checking by eye whether the 150-px row is the intended "small" eye. Only six columns fit, so videos 17 and 18 are not shown.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_examples_pluto.jpg" alt="Pluto: example frames at each candidate threshold"></div>
+    <figcaption lang="zh"><span class="tag">图 10-7 怎么看（Pluto）：</span>同图 10-6，Pluto 的阈值行是 148 px。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-7, how to read (Pluto):</span>As Figure 10-6; Pluto's threshold row is 148 px.</figcaption>
+  </figure>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">日期</span><span lang="en">Date</span></th><th><span lang="zh">睁开高度中位数（px）</span><span lang="en">Median opening (px)</span></th><th><span lang="zh">该老鼠的阈值</span><span lang="en">Mouse threshold</span></th><th><span lang="zh">低于阈值的帧</span><span lang="en">Frames below it</span></th><th>&lt; 140 px</th><th>&lt; 160 px</th><th><span lang="zh">对照：0.347 规则判非睁眼</span><span lang="en">for comparison: not open by the 0.347 rule</span></th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>mouse A</td><td>5-min</td><td>289</td><td>156</td><td>0.3%</td><td>0.3%</td><td>0.3%</td><td>0.3%</td></tr>
+      <tr><td>1</td><td>Pluto</td><td>2025-10-31</td><td>180</td><td>148</td><td>9.1%</td><td>4.9%</td><td>24.1%</td><td>11.8%</td></tr>
+      <tr><td>2</td><td>Pluto</td><td>2025-10-31</td><td>185</td><td>148</td><td>3.3%</td><td>1.3%</td><td>14.8%</td><td>9.7%</td></tr>
+      <tr><td>3</td><td>Pluto</td><td>2025-10-31</td><td>148</td><td>148</td><td>48.8%</td><td>36.1%</td><td>66.2%</td><td>43.6%</td></tr>
+      <tr><td>4</td><td>Pluto</td><td>2025-10-30</td><td>166</td><td>148</td><td>20.5%</td><td>10.8%</td><td>42.2%</td><td>26.1%</td></tr>
+      <tr><td>5</td><td>Pluto</td><td>2025-10-29</td><td>229</td><td>148</td><td>0.1%</td><td>0.1%</td><td>0.2%</td><td>0.2%</td></tr>
+      <tr><td>6</td><td>Pluto</td><td>2025-10-28</td><td>215</td><td>148</td><td>0.8%</td><td>0.6%</td><td>3.0%</td><td>2.2%</td></tr>
+      <tr><td>7</td><td>Pluto</td><td>2025-10-27</td><td>203</td><td>148</td><td>0.3%</td><td>0.2%</td><td>0.4%</td><td>0.3%</td></tr>
+      <tr><td>8</td><td>Pluto</td><td>2025-10-24</td><td>156</td><td>148</td><td>44.6%</td><td>36.8%</td><td>53.3%</td><td>45.5%</td></tr>
+      <tr><td>9</td><td>Pluto</td><td>2025-10-23</td><td>136</td><td>148</td><td>59.5%</td><td>53.6%</td><td>69.2%</td><td>56.6%</td></tr>
+      <tr><td>10</td><td>Pluto</td><td>2025-10-22</td><td>117</td><td>148</td><td>79.4%</td><td>72.6%</td><td>90.7%</td><td>69.6%</td></tr>
+      <tr><td>11</td><td>Terra</td><td>2025-10-17</td><td>144</td><td>150</td><td>68.9%</td><td>39.6%</td><td>81.6%</td><td>54.2%</td></tr>
+      <tr><td>12</td><td>Terra</td><td>2025-10-16</td><td>164</td><td>150</td><td>37.1%</td><td>18.1%</td><td>46.1%</td><td>38.7%</td></tr>
+      <tr><td>13</td><td>Terra</td><td>2025-10-15</td><td>203</td><td>150</td><td>0.3%</td><td>0.3%</td><td>0.4%</td><td>0.4%</td></tr>
+      <tr><td>14</td><td>Terra</td><td>2025-10-14</td><td>175</td><td>150</td><td>14.2%</td><td>8.0%</td><td>26.5%</td><td>23.0%</td></tr>
+      <tr><td>15</td><td>Terra</td><td>2025-10-13</td><td>153</td><td>150</td><td>48.9%</td><td>41.6%</td><td>54.5%</td><td>47.7%</td></tr>
+      <tr><td>16</td><td>Terra</td><td>2025-10-10</td><td>214</td><td>150</td><td>0.2%</td><td>0.1%</td><td>0.3%</td><td>0.4%</td></tr>
+      <tr><td>17</td><td>Terra</td><td>2025-10-09</td><td>196</td><td>150</td><td>1.1%</td><td>0.8%</td><td>1.7%</td><td>1.7%</td></tr>
+      <tr><td>18</td><td>Terra</td><td>2025-10-08</td><td>135</td><td>150</td><td>72.2%</td><td>55.4%</td><td>83.6%</td><td>73.9%</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_opening_terra.jpg" alt="Terra: eye opening over time per video with the mouse threshold"></div>
+    <figcaption lang="zh"><span class="tag">图 10-8 怎么看：</span>Terra 的 8 个视频各一行，横轴是时间（分钟），线是每 10 秒睁开高度的中位数，阴影向下到第 10 百分位，黑线是这只老鼠的阈值 150 px。线在黑线之上的时段眼睛睁着（13、16、17 几乎全程），在黑线之下的时段眼睛是眯着的（11、18 大半段）。不用阈值、直接看这条线，就是 Kaiwen 说的"当连续变量用"。Pluto 和 mouse A 的同样的图在结果文件夹里。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-8, how to read:</span>One row per Terra video; x = time in minutes, the line is the median eye opening of each 10 s, the band reaches down to the 10th percentile, the black line is the mouse threshold 150 px. Where the line is above the black line the eye is open (13, 16, 17 almost throughout), where it is below the eye is narrowed (11 and 18 most of the time). Reading this line without any threshold is what Kaiwen called using the opening as a continuous variable. The same figures for Pluto and mouse A are in the results folder.</figcaption>
+  </figure>
+  <div class="concl" lang="zh"><span class="tag">10.3 的结论：</span>按像素定，两只老鼠的阈值几乎相同：<b>Pluto 148 px、Terra 150 px</b>，一个 150 px 左右的值两只都能用；数据上就定到这里，最后的取值等和 Kaiwen 看过例子图（图 10-6、10-7）再定。
+    <ol>
+      <li><b>Terra 的值现在站得住：</b>只有 10 月 6 日的 48 帧时是 132 px，留一视频会跳到 160；加上 10 月 12 日的 78 帧后是 150.5 px，留一视频只在 143.5–154.5 之间。Pluto 的最优很平（147–160 px 准确率都在 93–94%），Terra 的更尖，准确率 88.9% 也低于 Pluto 的 94.0%，因为视频 11、18 这两个半掩的日子里很多帧正好骑在阈值附近。</li>
+      <li><b>0.347 的规则在新视频上成立：</b>它是在视频 0–13 上选的，在视频 14–18 的 88 帧新盲评上准确率 93.2%（精度 90.7%、检出率 98.0%），和当初的 91% 一致；错的仍集中在 r 0.85–1.00 这一层。两条规则给每个视频的"睁得小"比例也基本对应（上表最后两列），差别出在中位数靠近阈值的日子（视频 3、11、12、15、18），那里换 10–20 px 的阈值，比例能差一倍。</li>
+      <li><b>每天的情况：</b>睁得清楚的日子（视频 5、6、7、13、16、17）低于阈值的帧不到 1.1%；Pluto 的 10-22、10-23、10-24 和 Terra 的 10-17（视频 11）、10-08（视频 18）有 60–79% 的帧低于阈值，是整天眯着。这和 10.2 的结论一致：眯眼在这些录像里是状态，不是事件。</li>
+      <li><b>限制：</b>（a）真值是一个人判的，重复性没量过。（b）样本按模型的睁开程度分层抽，边界档占比高于真实比例，所以表里的准确率是分层样本上的，不等于整段视频按帧的准确率。（c）阈值在这些帧上选、也在这些帧上打分，只有留一视频一道防线。（d）睁开高度是模型输出：眼睑点中位误差约 5 px，闭眼时更差，阈值附近的错一部分是跟踪错，例子图里也有一帧眼睑点落在毛上的。（e）像素阈值假设相机尺度不变，Pluto 最早三天不满足，这三天按像素有 45–79% 的帧低于阈值，按眼宽归一的第一版是 51–75%，方向相同但视频 8 在边界上。（f）视频 18 抽到的 17 帧标注者全判非睁眼，所以 Terra 的阈值主要由"哪些天整天眯着"决定，不是同一天内睁、眯的分界。（g）mouse A 定不了。（h）例子图只排 6 列，Terra 的 17、18 没进去；2 帧未判。（i）现在有两条规则（全局 0.347，和每只老鼠的像素值），正式用哪一条还没定。</li>
+    </ol>
+  </div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 10.3:</span>In pixels the two mice come out almost the same: <b>Pluto 148 px, Terra 150 px</b>; a value of about 150 px would serve both. This is as far as the data go; the final value is to be settled with Kaiwen over the example sheets (Figures 10-6, 10-7).
+    <ol>
+      <li><b>Terra's value now holds:</b> on the 48 frames of 10-06 alone it was 132 px and jumped to 160 when one video was left out; with the 78 frames of 10-12 added it is 150.5 px and the leave-one-video-out range is 143.5–154.5. Pluto's optimum is flat (93–94% from 147 to 160 px), Terra's sharper, and its accuracy (88.9%) is lower than Pluto's (94.0%) because on the two half-covered days (videos 11, 18) many frames sit right at the threshold.</li>
+      <li><b>The 0.347 rule holds on new videos:</b> chosen on videos 0–13, it is 93.2% accurate on the 88 new blind frames of videos 14–18 (precision 90.7%, recall 98.0%), in line with its 91%; the errors are still in the r 0.85–1.00 stratum. The two rules also give matching per-video "small eye" shares (last two columns of the table); they differ on days whose median sits near the threshold (videos 3, 11, 12, 15, 18), where 10–20 px of threshold can double the share.</li>
+      <li><b>Day by day:</b> on the clearly open days (videos 5, 6, 7, 13, 16, 17) under 1.1% of the frames fall below the threshold; Pluto's 10-22, 10-23, 10-24 and Terra's 10-17 (video 11) and 10-08 (video 18) have 60–79% below it, i.e. a narrowed eye all day. This agrees with 10.2: narrowing is a state in these recordings, not an event.</li>
+      <li><b>Limits:</b> (a) one judge, repeatability not measured. (b) The sample is stratified by the model's opening, with the borderline strata over-represented, so the accuracies are those of the stratified sample, not per-frame accuracies of whole videos. (c) The threshold is chosen and scored on the same frames; leave-one-video-out is the only guard. (d) The opening is model output: eyelid points have a median error of about 5 px, worse at closure, so part of the errors near the threshold are tracking errors, and one example tile has the eyelid points on fur. (e) A pixel threshold assumes a fixed camera scale, which Pluto's first three days violate; on those days 45–79% of the frames are below the pixel threshold against 51–75% with the width-normalized first look — same direction, video 8 on the border. (f) All 17 judged frames of video 18 are not open, so Terra's threshold is driven mainly by which days are narrowed all day, not by an open / narrowed boundary within a day. (g) Mouse A cannot be set. (h) The example sheet has six columns, so Terra's videos 17 and 18 are missing; 2 frames unjudged. (i) Two rules now exist (the global 0.347 and the per-mouse pixel value); which one is the production rule is undecided.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 11 -->
@@ -1077,7 +1157,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>视频 4、5、8</b> 误差偏大（视频 8 一直在 25 px 以上）。目前的解释是标注的人的判断：画面比较模糊，肉眼也难以识别点位。这一点还没有用数字验证过：用整幅画面的清晰度（拉普拉斯方差）和亮度去量，这三个视频和其他 Pluto 视频没有差别，所以模糊如果存在，是在瞳孔边缘这样的局部，需要专门去量。</li>
       <li><b>第三只老鼠（Terra，视频 11–18）</b>：8 个视频全部完成，平台点 20–60 帧。“换一只新老鼠要标 20 帧”目前只在两次换老鼠上各看到一次（视频 1 和视频 11）。</li>
       <li><b>面积曲线里的跳变</b>（第 11 步）：眼睛睁开时某个瞳孔点在两个位置之间来回跳，闭眼规则标不出来；还没有针对它的规则，也还没有逐个事件对照原视频区分眨眼、眼球转动和跟踪错误。</li>
-      <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：第一轮按"非睁眼 = 闭上或部分盖住"的定义有了规则和验证（第 10 步 10.2 节，准确率 91%）；还没有的是眨眼本身的定义（多深、多短算一次眨眼）和把眨眼从长时间半掩状态里分出来的规则。</li>
+      <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：第一轮按"非睁眼 = 闭上或部分盖住"的定义有了规则和验证（第 10 步 10.2 节，准确率 91%）；每只老鼠一个像素阈值也已算出（10.3 节：Pluto 148、Terra 150 px），还要和 Kaiwen 对着例子图定下来，并决定正式用哪一条规则（0.347 的全局规则，还是每只老鼠的像素阈值）；还没有的是眨眼本身的定义（多深、多短算一次眨眼）和把眨眼从长时间半掩状态里分出来的规则。</li>
     </ul>
   </div>
   <div class="text" lang="en">
@@ -1087,7 +1167,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: all 8 videos are finished, plateau points at 20–60 labels. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
       <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
-      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first round has a rule and its check under the definition "not open = closed or partly covered" (step 10, section 10.2, 91% accurate); still missing are the definition of a blink itself (how deep, how brief) and a rule that separates blinks from long half-covered stretches.</li>
+      <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the first round has a rule and its check under the definition "not open = closed or partly covered" (step 10, section 10.2, 91% accurate); a pixel threshold per mouse has also been derived (section 10.3: Pluto 148, Terra 150 px); it still has to be settled with Kaiwen over the example sheets, together with which rule is the production one (the global 0.347 rule or the per-mouse pixel threshold); still missing are the definition of a blink itself (how deep, how brief) and a rule that separates blinks from long half-covered stretches.</li>
     </ul>
   </div>
 </section>
