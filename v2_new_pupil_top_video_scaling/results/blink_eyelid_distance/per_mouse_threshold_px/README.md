@@ -1,4 +1,9 @@
-# One eye-opening threshold per mouse, in pixels - second look (2026-10-11)
+# One eye-opening threshold per mouse, in pixels - second look (2026-10-11), third look (2026-10-12)
+
+> The files in this folder are now those of the **third look** (2026-10-12, `blink_per_mouse_threshold_px_v2.py`: all 19
+> videos, truth = both blind samples, 327 verdicts); see the last section. The text of the second look below is kept as
+> written (18 videos, 239 verdicts); its numbers are in git history (commit a13addb).
+
 
 **Basic information.** Videos 0-17 (18 finished videos: mouse A 1, Pluto 10, Terra 7). Input: the whole-video prediction of
 each video's plateau model (final snapshot), the same files as the first look in `../per_mouse_threshold/`. Truth for
@@ -95,3 +100,34 @@ pass the plausibility test, a reminder that a few of the "small opening" frames 
 - Pluto's three earliest days (position shift, smaller width, smaller opening): whether one pixel threshold applies there
   unchanged is a decision, not a measurement.
 - The verdicts cover videos 0-13; Terra's threshold needs more judged frames before it is used.
+
+## Third look (2026-10-12): second blind sample added, all 19 videos
+
+**Basic information.** Videos 0-18 (19 finished videos: mouse A 1, Pluto 10, Terra 8); input as before (plateau model's
+whole-video prediction, final snapshot; video 18 added with its 40-label model 1912). Truth: the 239 verdicts of 2026-10-06
+(videos 0-13) plus the 88 verdicts of 2026-10-12 on videos 14-18 (`../blink_notopen_frames_combined_all_videos.csv`; 289 of
+the 327 on frames with plausible eyelid points). Script `../../../scripts/blink_per_mouse_threshold_px_v2.py` (the second-look
+script with the combined truth file); same criterion, same grid, same candidates.
+
+| mouse | videos with verdicts | frames (judged not open) | threshold (px) | best range | leave-one-video-out range | accuracy at the threshold | at 120 px | at 140 px | at 160 px | at 180 px |
+|---|---|---|---|---|---|---|---|---|---|---|
+| all pooled | 19 | 289 (141) | 156 | 156 | 149-156 | 91.7% | 77.5% | 88.6% | 90.7% | 78.9% |
+| mouse A | 1 | 12 (0) | none (no not-open frame judged) | - | - | - | 100% | 100% | 100% | 100% |
+| Pluto | 10 | 151 (77) | 148 (unchanged) | 147-148 | 147.5-160.5 | 94.0% | 78.1% | 90.1% | 93.4% | 78.8% |
+| Terra | 8 | 126 (64) | **150.5** (was 132 on 48 frames) | 150-151 | 143.5-154.5 | 88.9% | 74.6% | 85.7% | 86.5% | 77.0% |
+
+- With 126 instead of 48 judged frames Terra's threshold moves from 132 to 150.5 px and its leave-one-video-out range
+  narrows from 131-160 to 143.5-154.5 px: it is settled now, and it is the same as Pluto's (148 px) within 3 px. One
+  threshold of about 150 px would serve both mice; the pooled optimum is 156 px with accuracy 91.7% (90.7% at 160 px).
+- Terra's accuracy at its threshold (88.9%) is lower than Pluto's (94.0%) because the two half-covered Terra days (11, 18)
+  put many judged frames right at the border.
+- Share of frames below the mouse threshold, Terra at 150.5 px (Pluto rows unchanged, see `small_opening_share_per_video.csv`):
+  video 11 68.9%, 12 37.1%, 13 0.3%, 14 14.2%, 15 48.9%, 16 0.2%, 17 1.1%, **18 72.2%** (median opening 135 px, the
+  narrowest Terra day; 55% of its frames below 140 px, 84% below 160 px). At 132 px these were 20.8 / 11.3 / 0.3 / 4.9 /
+  36.8 / 0.1 / 0.6%, so for the borderline days (11, 12, 15, 18) the share depends strongly on the threshold.
+- Example sheets `examples_Terra.png` / `examples_Pluto.png` redrawn with the new rows (120, 140, 160, 180 px and the
+  mouse's own 150.5 / 147.5 px).
+
+Open points: the threshold is now a data-based proposal for both mice (about 150 px); Kaiwen's look at the example sheets
+remains the agreed step before it is used. Pluto's three earliest days (position shift) are unchanged.
+
