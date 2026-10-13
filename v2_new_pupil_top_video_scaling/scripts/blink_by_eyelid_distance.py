@@ -43,8 +43,9 @@ from scale_step import HERE  # noqa: E402
 
 FPS, THR, NEAR, GAP, PAD, MIN_LEN, DX_FRAC, CONF_MIN = 60.0, 0.70, 0.85, 5, 6, 3, 0.3, 0.3
 rng = np.random.default_rng(0)
-OUT = HERE / "results" / "blink_eyelid_distance"
-OUT.mkdir(exist_ok=True)
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv")
 PL = PL[PL.status == "final"]
 
@@ -124,22 +125,22 @@ for r in PL.itertuples():
         cv2.putText(head, f"{item}  video {int(r.video)}  {e['kind']}  t = {e['start_s']} s  duration {e['duration_ms']} ms  minimum opening {e['min_rel_opening']:.2f} of the video median",
                     (8, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 255), 2, cv2.LINE_AA)
         strip = np.vstack([head, row])
-        cv2.imwrite(str(OUT / f"item_{item}.jpg"), strip, [cv2.IMWRITE_JPEG_QUALITY, 82])
+        cv2.imwrite(str(LAB_SEG / f"item_{item}.jpg"), strip, [cv2.IMWRITE_JPEG_QUALITY, 82])
         rows_img.append(strip)
         sample.append({"item": item, **e, "human_verdict": ""})
     cap.release()
-    cv2.imwrite(str(OUT / f"blink_eyelid_spotcheck_video{int(r.video):02d}.jpg"), np.vstack(rows_img), [cv2.IMWRITE_JPEG_QUALITY, 80])
+    cv2.imwrite(str(LAB_SEG / f"blink_eyelid_spotcheck_video{int(r.video):02d}.jpg"), np.vstack(rows_img), [cv2.IMWRITE_JPEG_QUALITY, 80])
 
 E_ = pd.DataFrame(events); S = pd.DataFrame(summary); Q = pd.DataFrame(sample)
-E_.to_csv(OUT / "blink_eyelid_events_all_videos.csv", index=False)
-S.to_csv(OUT / "blink_eyelid_summary_all_videos.csv", index=False)
-Q.to_csv(OUT / "blink_eyelid_spotcheck_all_videos.csv", index=False)
+E_.to_csv(RES_EV / "blink_eyelid_events_all_videos.csv", index=False)
+S.to_csv(RES_EV / "blink_eyelid_summary_all_videos.csv", index=False)
+Q.to_csv(LAB_SEG / "blink_eyelid_spotcheck_all_videos.csv", index=False)
 
 OPTS = ["eye closed (full closure)", "partly closed (lid covers part of the pupil)", "eye open: the rule is wrong", "cannot tell"]
 items = "\n".join(
     f'<div class="it" data-item="{q.item}"><img src="item_{q.item}.jpg" loading="lazy"><div class="b">' +
     "".join(f'<label><input type="radio" name="{q.item}" value="{o}"> {o}</label>' for o in OPTS) + "</div></div>" for q in Q.itertuples())
-(OUT / "blink_eyelid_spotcheck.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Blink spot check</title>
+(LAB_SEG / "blink_eyelid_spotcheck.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Blink spot check</title>
 <style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{margin:0 0 22px;padding:8px;background:#fff;border:1px solid #ddd}}
 img{{max-width:100%;display:block}}.b{{margin-top:6px;display:flex;gap:18px;flex-wrap:wrap}}.done{{border-color:#2a9d8f}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px}}
 button{{font:inherit;padding:4px 12px}}</style>

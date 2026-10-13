@@ -17,11 +17,13 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scale_step import HERE  # noqa: E402
 
-OUT = HERE / "results" / "blink_eyelid_distance"
-Q = pd.read_csv(OUT / "blink_r2_spotcheck_all_videos.csv")
-V = pd.read_csv(OUT / "blink_r2_spotcheck_verdicts.csv")
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
+Q = pd.read_csv(LAB_SEG / "blink_r2_spotcheck_all_videos.csv")
+V = pd.read_csv(LAB_SEG / "blink_r2_spotcheck_verdicts.csv")
 Q["human_verdict"] = Q.item.map(dict(zip(V.item, V.human_verdict))).fillna("")
-Q.to_csv(OUT / "blink_r2_spotcheck_all_videos.csv", index=False)
+Q.to_csv(LAB_SEG / "blink_r2_spotcheck_all_videos.csv", index=False)
 J = Q[Q.human_verdict != ""].copy()
 J["closure"] = J.human_verdict.str.startswith(("eye closed", "partly"))
 J["full"] = J.human_verdict.str.startswith("eye closed")
@@ -36,7 +38,7 @@ for s in order + ["all"]:
                  "fully_closed": int(g.full.sum()), "partly_closed": int((g.closure & ~g.full).sum()), "eye_open": int((u.closure == False).sum()),
                  "cannot_tell": int((~g.usable).sum()), "closure_share_pct": round(100 * u.closure.mean(), 1) if len(u) else float("nan")})
 R = pd.DataFrame(rows)
-R.to_csv(OUT / "blink_r2_spotcheck_result.csv", index=False)
+R.to_csv(LAB_SEG / "blink_r2_spotcheck_result.csv", index=False)
 pd.set_option("display.width", 200)
 print(R.to_string(index=False))
 u = J[J.usable]

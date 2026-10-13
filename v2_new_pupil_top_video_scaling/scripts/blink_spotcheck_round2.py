@@ -30,7 +30,9 @@ import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 # the rule itself is copied from blink_final_rule.py (that script runs its analysis on import)
 FPS, THR, GAP, MIN_LEN, DX_FRAC, CONF_MIN, PUPIL_THR, FULL_R = 60.0, 0.70, 5, 3, 0.3, 0.3, 0.527, 0.45
-OUT = HERE / "results" / "blink_eyelid_distance"
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv")
 PL = PL[PL.status == "final"]
 P4 = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
@@ -78,7 +80,7 @@ def events(closed, r, trusted):
 PAD, SEED = 6, 1
 N_CLOSED, N_NEAR_LO, N_NEAR_HI, N_OPEN = 3, 2, 1, 2
 rng = np.random.default_rng(SEED)
-R1 = pd.read_csv(OUT / "blink_eyelid_spotcheck_all_videos.csv")
+R1 = pd.read_csv(LAB_SEG / "blink_eyelid_spotcheck_all_videos.csv")
 
 
 def overlaps_round1(video, a, b):
@@ -139,21 +141,21 @@ for rr in PL.itertuples():
         cv2.putText(head, f"{item}  video {v}  t = {a / FPS:.2f} s  frames {a}-{b} ({round((b - a + 1) / FPS * 1000)} ms)",
                     (8, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 255), 2, cv2.LINE_AA)
         strip = np.vstack([head, row])
-        cv2.imwrite(str(OUT / f"item_{item}.jpg"), strip, [cv2.IMWRITE_JPEG_QUALITY, 82])
+        cv2.imwrite(str(LAB_SEG / f"item_{item}.jpg"), strip, [cv2.IMWRITE_JPEG_QUALITY, 82])
         strips.append(strip)
         sample.append({"item": item, "video": v, "unit": rr.unit, "stratum": key, "start": int(a), "end": int(b), "middle": int(k), "start_s": round(a / FPS, 2),
                        "duration_ms": round((b - a + 1) / FPS * 1000), "min_rel_opening": mr, "rule_D_closed": key == "closed", "human_verdict": ""})
     cap.release()
     if strips:
-        cv2.imwrite(str(OUT / f"blink_r2_spotcheck_video{v:02d}.jpg"), np.vstack(strips), [cv2.IMWRITE_JPEG_QUALITY, 80])
+        cv2.imwrite(str(LAB_SEG / f"blink_r2_spotcheck_video{v:02d}.jpg"), np.vstack(strips), [cv2.IMWRITE_JPEG_QUALITY, 80])
 
 Q = pd.DataFrame(sample)
-Q.to_csv(OUT / "blink_r2_spotcheck_all_videos.csv", index=False)
+Q.to_csv(LAB_SEG / "blink_r2_spotcheck_all_videos.csv", index=False)
 OPTS = ["eye closed (full closure)", "partly closed (lid covers part of the pupil)", "eye open", "cannot tell"]
 items = "\n".join(
     f'<div class="it" data-item="{q.item}"><img src="item_{q.item}.jpg" loading="lazy"><div class="b">' +
     "".join(f'<label><input type="radio" name="{q.item}" value="{o}"> {o}</label>' for o in OPTS) + "</div></div>" for q in Q.itertuples())
-(OUT / "blink_r2_spotcheck.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Blink spot check, round 2</title>
+(LAB_SEG / "blink_r2_spotcheck.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Blink spot check, round 2</title>
 <style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{margin:0 0 22px;padding:8px;background:#fff;border:1px solid #ddd}}
 img{{max-width:100%;display:block}}.b{{margin-top:6px;display:flex;gap:18px;flex-wrap:wrap}}.done{{border-color:#2a9d8f}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px}}
 button{{font:inherit;padding:4px 12px}}</style>

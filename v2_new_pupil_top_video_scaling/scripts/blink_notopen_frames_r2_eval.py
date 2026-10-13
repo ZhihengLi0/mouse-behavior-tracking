@@ -18,9 +18,11 @@ import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 
 DX_FRAC, CONF_MIN, OW_THR, PUPIL_THR = 0.3, 0.3, 0.347, 0.527
-OUT = HERE / "results" / "blink_eyelid_distance"
-Q = pd.read_csv(OUT / "blink_notopen_frames_r2_all_videos.csv")
-V = pd.read_csv(OUT / "blink_notopen_frames_r2_verdicts.csv")
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
+Q = pd.read_csv(LAB_FR / "blink_notopen_frames_r2_all_videos.csv")
+V = pd.read_csv(LAB_FR / "blink_notopen_frames_r2_verdicts.csv")
 Q["human_verdict"] = Q.item.map(dict(zip(V.item, V.human_verdict))).fillna("")
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv"); PL = PL[(PL.status == "final") & PL.video.isin(Q.video.unique())]
 sig = {}
@@ -39,7 +41,7 @@ for rr in PL.itertuples():
 for k in ("r", "ph", "pw", "asp", "area", "pmean", "trusted", "O_w", "O_px", "ph_w", "asp_abs"):
     Q[k] = [sig[v][k][f] for v, f in zip(Q.video, Q.frame)]
 Q["notopen"] = Q.human_verdict.astype(str).str.startswith("not open")
-Q.to_csv(OUT / "blink_notopen_frames_r2_all_videos.csv", index=False)
+Q.to_csv(LAB_FR / "blink_notopen_frames_r2_all_videos.csv", index=False)
 J = Q[(Q.human_verdict != "") & ~Q.human_verdict.astype(str).str.startswith("cannot")].copy(); J["trusted"] = J.trusted.astype(bool)
 print(len(J), "judged of", len(Q), "frames;", int(J.notopen.sum()), "not open;", int(Q.human_verdict.astype(str).str.startswith("cannot").sum()), "cannot tell; unjudged:", list(Q[Q.human_verdict == ""].item))
 J["rule"] = np.where(J.trusted, J.O_w < OW_THR, J.pmean < PUPIL_THR)
@@ -51,12 +53,12 @@ def ev(g, name):
 rows = [ev(J, "all new frames (videos 14-18)")]
 rows += [ev(J[J.stratum == s], f"stratum {s}") for s in ["r<0.70", "0.70-0.85", "0.85-1.00", "r>=1.00", "eyelid points implausible"]]
 rows += [ev(J[J.video == v], f"video {v}") for v in sorted(J.video.unique())]
-R = pd.DataFrame(rows); R.to_csv(OUT / "blink_notopen_frames_r2_result.csv", index=False)
+R = pd.DataFrame(rows); R.to_csv(RES_ONE / "blink_notopen_frames_r2_result.csv", index=False)
 pd.set_option("display.width", 200); print(R.to_string(index=False))
 # combined table of both samples
-Q1 = pd.read_csv(OUT / "blink_notopen_frames_all_videos.csv"); Q1["sample"] = "2026-10-06 (videos 0-13)"; Q["sample"] = "2026-10-12 (videos 14-18)"
+Q1 = pd.read_csv(LAB_FR / "blink_notopen_frames_all_videos.csv"); Q1["sample"] = "2026-10-06 (videos 0-13)"; Q["sample"] = "2026-10-12 (videos 14-18)"
 C = pd.concat([Q1, Q[[c for c in Q1.columns if c in Q.columns]]], ignore_index=True)
-C.to_csv(OUT / "blink_notopen_frames_combined_all_videos.csv", index=False)
+C.to_csv(LAB_FR / "blink_notopen_frames_combined_all_videos.csv", index=False)
 JC = C[C.human_verdict.notna() & (C.human_verdict.astype(str) != "") & ~C.human_verdict.astype(str).str.startswith("cannot")].copy()
 JC["notopen"] = JC.human_verdict.astype(str).str.startswith("not open"); JC["rule"] = np.where(JC.trusted.astype(bool), JC.O_w < OW_THR, JC.pmean < PUPIL_THR)
 print("\ncombined:", len(JC), "judged frames,", int(JC.notopen.sum()), "not open; rule accuracy", round(100 * float((JC.rule == JC.notopen).mean()), 1), "%")

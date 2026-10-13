@@ -26,7 +26,9 @@ import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 
 FPS, T_OPEN, PUPIL_THR, DX_FRAC, CONF_MIN, GAP, MIN_LEN = 60.0, 0.347, 0.527, 0.3, 0.3, 5, 3
-OUT = HERE / "results" / "blink_eyelid_distance"
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv"); PL = PL[PL.status == "final"]
 P4 = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
 
@@ -48,7 +50,7 @@ def frame_states(d):
     notopen = np.where(trusted, np.nan_to_num(ow, nan=np.inf) < T_OPEN, pmean < PUPIL_THR)
     return notopen, ow, trusted, pmean
 
-Q = pd.read_csv(OUT / "blink_notopen_frames_all_videos.csv")
+Q = pd.read_csv(LAB_FR / "blink_notopen_frames_all_videos.csv")
 J = Q[Q.human_verdict.notna() & (Q.human_verdict != "") & ~Q.human_verdict.astype(str).str.startswith("cannot")].copy()
 J["notopen"] = J.human_verdict.str.startswith("not open")
 rows, ev_rows, pred = [], [], {}
@@ -64,8 +66,8 @@ for rr in PL.itertuples():
                      notopen_frames_pct=round(100 * float(no.mean()), 1), implausible_frames_pct=round(100 * float((~trusted).mean()), 2),
                      events=len(ev), events_per_min=round(len(ev) / (len(d) / FPS / 60), 2), median_event_ms=round(float(np.median(dur))) if dur else np.nan,
                      longest_event_s=round(max(dur) / 1000, 1) if dur else np.nan))
-S = pd.DataFrame(rows); S.to_csv(OUT / "blink_notopen_rule_all_videos.csv", index=False)
-pd.DataFrame(ev_rows).to_csv(OUT / "blink_notopen_rule_events_all_videos.csv", index=False)
+S = pd.DataFrame(rows); S.to_csv(RES_ONE / "blink_notopen_rule_all_videos.csv", index=False)
+pd.DataFrame(ev_rows).to_csv(RES_ONE / "blink_notopen_rule_events_all_videos.csv", index=False)
 J["rule"] = J.item.map(pred)
 def check(g, name):
     tp = int((g.rule & g.notopen).sum()); fl = int(g.rule.sum()); pos = int(g.notopen.sum())
@@ -73,7 +75,7 @@ def check(g, name):
                 precision_pct=round(100 * tp / max(1, fl), 1), recall_pct=round(100 * tp / max(1, pos), 1))
 C = pd.DataFrame([check(J, "all judged frames")] + [check(J[J.stratum == s], f"stratum {s}") for s in ["r<0.70", "0.70-0.85", "0.85-1.00", "r>=1.00", "eyelid points implausible"]]
                  + [check(J[J.video == v], f"video {v}") for v in sorted(J.video.unique())])
-C.to_csv(OUT / "blink_notopen_rule_check.csv", index=False)
+C.to_csv(RES_ONE / "blink_notopen_rule_check.csv", index=False)
 pd.set_option("display.width", 250); print(C.to_string(index=False)); print(); print(S.to_string(index=False))
 
 # figure: per-video share of not-open frames (rule) with the judged share of the sample, and events per minute
@@ -89,4 +91,4 @@ for xi, (e, d_) in enumerate(zip(S.events, S.median_event_ms)): ax[1].text(xi, S
 ax[1].set_xticks(x); ax[1].set_xticklabels([f"v{v}" for v in S.video], fontsize=8); ax[1].set_ylabel("not-open events per minute"); ax[1].grid(axis="y", alpha=0.3)
 ax[1].set_title("B. Not-open events (runs >= 3 frames, gaps < 5 frames merged): count and median duration", fontsize=10.5)
 fig.suptitle("First-round 'not open' rule (eye opening / eye width < 0.347; implausible eyelid points -> pupil confidence < 0.527) on the 14 finished videos", fontsize=12)
-fig.savefig(OUT / "blink_notopen_rule_summary.png", dpi=125)
+fig.savefig(RES_ONE / "blink_notopen_rule_summary.png", dpi=125)

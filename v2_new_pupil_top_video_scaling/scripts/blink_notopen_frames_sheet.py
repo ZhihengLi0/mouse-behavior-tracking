@@ -7,13 +7,15 @@ from pathlib import Path
 import cv2, numpy as np, pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scale_step import HERE  # noqa: E402
-OUT = HERE / "results" / "blink_eyelid_distance"
-Q = pd.read_csv(OUT / "blink_notopen_frames_all_videos.csv")
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
+Q = pd.read_csv(LAB_FR / "blink_notopen_frames_all_videos.csv")
 COL = {"eye open": (60, 160, 60), "not open": (40, 40, 220), "cannot": (140, 140, 140)}
 for v, g in Q.groupby("video"):
     tiles = []
     for q in g.itertuples():
-        im = cv2.imread(str(OUT / f"{q.item}.jpg"))
+        im = cv2.imread(str(LAB_FR / f"{q.item}.jpg"))
         if im is None: continue
         im = cv2.resize(im, (420, int(im.shape[0] * 420 / im.shape[1])))
         verdict = str(q.human_verdict); key = "eye open" if verdict.startswith("eye open") else ("not open" if verdict.startswith("not open") else "cannot")
@@ -27,5 +29,5 @@ for v, g in Q.groupby("video"):
     sheet = np.vstack(rows_); head = np.full((44, sheet.shape[1], 3), 255, np.uint8)
     n_no = sum(str(x).startswith("not open") for x in g.human_verdict)
     cv2.putText(head, f"Video {v}: {len(g)} single frames judged blind; {n_no} not open, {len(g) - n_no} open (green = open, red = not open)", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
-    cv2.imwrite(str(OUT / f"blink_notopen_sheet_video{v:02d}.png"), np.vstack([head, sheet]))
+    cv2.imwrite(str(LAB_FR / f"blink_notopen_sheet_video{v:02d}.png"), np.vstack([head, sheet]))
 print("sheets written")

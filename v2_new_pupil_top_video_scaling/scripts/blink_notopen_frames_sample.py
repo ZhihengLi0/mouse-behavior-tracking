@@ -19,11 +19,13 @@ import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 
 THR, DX_FRAC, CONF_MIN, SEED, N_PER, MIN_SEP = 0.70, 0.3, 0.3, 2, 4, 60
-OUT = HERE / "results" / "blink_eyelid_distance"
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv"); PL = PL[PL.status == "final"]
 rng = np.random.default_rng(SEED)
-prev = pd.concat([pd.read_csv(OUT / "blink_eyelid_spotcheck_all_videos.csv")[["video", "start", "end"]],
-                  pd.read_csv(OUT / "blink_r2_spotcheck_all_videos.csv")[["video", "start", "end"]]])
+prev = pd.concat([pd.read_csv(LAB_SEG / "blink_eyelid_spotcheck_all_videos.csv")[["video", "start", "end"]],
+                  pd.read_csv(LAB_SEG / "blink_r2_spotcheck_all_videos.csv")[["video", "start", "end"]]])
 rows = []
 for rr in PL.itertuples():
     v = int(rr.video); step = max(1, int(rr.labels_at_plateau) // 20)
@@ -56,14 +58,14 @@ for rr in PL.itertuples():
         crop = im[y0:y1, x0:x1]; crop = cv2.resize(crop, (crop.shape[1] * 2, crop.shape[0] * 2), interpolation=cv2.INTER_CUBIC)
         item = f"nf_v{v:02d}_{j + 1:02d}"
         cv2.putText(crop, f"{item}  video {v}  frame {f}  t = {f / 60:.1f} s", (8, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2, cv2.LINE_AA)
-        cv2.imwrite(str(OUT / f"{item}.jpg"), crop, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        cv2.imwrite(str(LAB_FR / f"{item}.jpg"), crop, [cv2.IMWRITE_JPEG_QUALITY, 85])
         rows.append(dict(item=item, video=v, unit=rr.unit, frame=f, stratum=name, r=round(float(r[f]), 3), trusted=bool(trusted[f]), human_verdict=""))
     cap.release()
-Q = pd.DataFrame(rows); Q.to_csv(OUT / "blink_notopen_frames_all_videos.csv", index=False)
+Q = pd.DataFrame(rows); Q.to_csv(LAB_FR / "blink_notopen_frames_all_videos.csv", index=False)
 OPTS = ["eye open", "not open (closed, or the lid covers part of the pupil)", "cannot tell"]
 items = "\n".join(f'<div class="it" data-item="{q.item}"><img src="{q.item}.jpg" loading="lazy"><div class="b">' +
                   "".join(f'<label><input type="radio" name="{q.item}" value="{o}"> {o}</label>' for o in OPTS) + "</div></div>" for q in Q.itertuples())
-(OUT / "blink_notopen_frames.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Not-open frames, blind</title>
+(LAB_FR / "blink_notopen_frames.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Not-open frames, blind</title>
 <style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{display:inline-block;vertical-align:top;margin:0 14px 18px 0;padding:8px;background:#fff;border:1px solid #ddd;width:560px}}
 img{{max-width:100%;display:block}}.b{{margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}}.done{{border-color:#2a9d8f}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px}}button{{font:inherit;padding:4px 12px}}</style>
 <div id="bar"><b>Single frames, blind.</b> Definition of the first round: a frame is <b>not open</b> when the eye is closed or the eyelid covers part of the pupil; otherwise <b>open</b>. Judge each frame on its own. <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>

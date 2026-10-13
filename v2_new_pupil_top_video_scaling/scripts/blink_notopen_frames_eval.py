@@ -20,9 +20,11 @@ import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 
 DX_FRAC, CONF_MIN = 0.3, 0.3
-OUT = HERE / "results" / "blink_eyelid_distance"
-Q = pd.read_csv(OUT / "blink_notopen_frames_all_videos.csv")
-V = pd.read_csv(OUT / "blink_notopen_frames_verdicts.csv")
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
+Q = pd.read_csv(LAB_FR / "blink_notopen_frames_all_videos.csv")
+V = pd.read_csv(LAB_FR / "blink_notopen_frames_verdicts.csv")
 Q["human_verdict"] = Q.item.map(dict(zip(V.item, V.human_verdict))).fillna("")
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv"); PL = PL[PL.status == "final"]
 sig = {}
@@ -41,7 +43,7 @@ for rr in PL.itertuples():
                   O_w=O / wmed, O_px=O, ph_w=ph / wmed, asp_abs=ph / pw)     # absolute signals: not normalised by the video's median
 for k in ("r", "ph", "pw", "asp", "area", "pmean", "trusted", "O_w", "O_px", "ph_w", "asp_abs"):
     Q[k] = [sig[v][k][f] for v, f in zip(Q.video, Q.frame)]
-Q.to_csv(OUT / "blink_notopen_frames_all_videos.csv", index=False)
+Q.to_csv(LAB_FR / "blink_notopen_frames_all_videos.csv", index=False)
 J = Q[Q.human_verdict.notna() & (Q.human_verdict != "") & ~Q.human_verdict.astype(str).str.startswith("cannot")].copy()
 J["notopen"] = J.human_verdict.str.startswith("not open").astype(bool); J["trusted"] = J.trusted.astype(bool)
 print(len(J), "judged frames,", int(J.notopen.sum()), "not open;", int((Q.human_verdict.str.startswith("cannot")).sum()), "cannot tell")
@@ -100,12 +102,12 @@ R = pd.DataFrame(rows)
 R["accuracy_pct"] = np.nan
 for i, name in enumerate(R.rule):            # overall accuracy is recomputed below for the rules we can rebuild cheaply
     pass
-R.to_csv(OUT / "blink_notopen_frames_result.csv", index=False)
+R.to_csv(RES_ONE / "blink_notopen_frames_result.csv", index=False)
 # per-video share of frames judged not open vs the video's median eye opening / eye width
 pv = J.groupby("video").agg(frames=("notopen", "size"), notopen=("notopen", "sum"))
 pv["notopen_share_pct"] = (100 * pv.notopen / pv.frames).round(0)
 pv["median_O_w_video"] = [round(float(np.nanmedian(sig[v]["O_w"])), 3) for v in pv.index]
-pv.to_csv(OUT / "blink_notopen_frames_per_video.csv")
+pv.to_csv(RES_ONE / "blink_notopen_frames_per_video.csv")
 print("\nper video: share of sampled frames judged not open vs the video's median eye opening / eye width"); print(pv.to_string())
 pd.set_option("display.width", 250); pd.set_option("display.max_columns", 20)
 print("\n", R.to_string(index=False))

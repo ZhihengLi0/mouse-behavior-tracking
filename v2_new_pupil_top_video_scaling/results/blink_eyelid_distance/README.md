@@ -1,4 +1,17 @@
-# Eye closure from the eyelid distance: first round, waiting for the human spot check (2026-10-05, revised)
+# Eye closure from the eyelid distance
+
+**Folder layout (2026-10-12; the files below are named without their folder in the older sections):**
+
+| folder | content |
+|---|---|
+| `labels/segments/` | the labeler's verdicts on 237 five-frame segments (closed / partly closed / open): item tables, verdict csvs, the two review pages (`blink_eyelid_spotcheck.html`, `blink_r2_spotcheck.html`) and their crops (git-excluded) |
+| `labels/frames/` | the labeler's verdicts on 327 single frames (open / not open): frame tables (`blink_notopen_frames_all_videos.csv` videos 0-13, `..._r2_...` videos 14-18, `..._combined_...` both), verdict csvs, the two review pages, crops (git-excluded), contact sheets with the verdicts (`blink_notopen_sheet_videoNN.png`) |
+| `results/every_video/` | the relative rule (eye opening / the video's own median < 0.70, rule D): events and summaries on every video, variants on the segments |
+| `results/one_threshold/` | the absolute rule used on the summary page (eye opening / eye width < 0.347, one value for all videos): per-video results, events, its checks against the frame verdicts |
+| `results/every_mouse/ratio/` | one threshold per mouse on eye opening / eye width (first look) |
+| `results/every_mouse/px/` | one threshold per mouse on the eye opening in pixels (current: Pluto 148 px, Terra 150 px) |
+
+## Eye closure from the eyelid distance: first round, waiting for the human spot check (2026-10-05, revised)
 
 First round agreed with Kaiwen on 2026-10-04: judge closure from the distance between the upper and the lower eyelid
 point, run it on the videos, then spot-check part of the result by eye. The finer classes (blink / closed / squint) come

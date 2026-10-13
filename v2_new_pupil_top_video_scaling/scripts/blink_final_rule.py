@@ -42,7 +42,9 @@ import pupil_trace as pt  # noqa: E402
 from scale_step import HERE  # noqa: E402
 
 FPS, THR, GAP, MIN_LEN, DX_FRAC, CONF_MIN, PUPIL_THR, FULL_R = 60.0, 0.70, 5, 3, 0.3, 0.3, 0.527, 0.45
-OUT = HERE / "results" / "blink_eyelid_distance"
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv")
 PL = PL[PL.status == "final"]
 P4 = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
@@ -95,7 +97,7 @@ def events(closed, r, trusted):
     return out
 
 
-items = list(csv.DictReader(open(OUT / "blink_eyelid_spotcheck_all_videos.csv")))
+items = list(csv.DictReader(open(LAB_SEG / "blink_eyelid_spotcheck_all_videos.csv")))
 truth = {it["item"]: it["human_verdict"] for it in items}
 rows_ev, rows_sum, pred = [], [], {k: {} for k in "ABCDE"}
 for rr in PL.itertuples():
@@ -118,8 +120,8 @@ for rr in PL.itertuples():
                      "closed_frames_pct": round(100 * float(st["D"].mean()), 2), "untrusted_frames_pct": round(100 * float((~trusted).mean()), 2),
                      "untrusted_frames_counted_closed_pct": round(100 * float((~trusted & st["D"]).mean()), 2)})
 EV, SM = pd.DataFrame(rows_ev), pd.DataFrame(rows_sum)
-EV.to_csv(OUT / "blink_final_events_all_videos.csv", index=False)
-SM.to_csv(OUT / "blink_final_summary_all_videos.csv", index=False)
+EV.to_csv(RES_EV / "blink_final_events_all_videos.csv", index=False)
+SM.to_csv(RES_EV / "blink_final_summary_all_videos.csv", index=False)
 
 # ---- variants against the verdicts ----
 closure_truth = {k: v.startswith(("eye closed", "partly")) for k, v in truth.items()}
@@ -136,7 +138,7 @@ for k in "ABCDE":
                  "real_closures_in_sample": all_true, "recall_pct": round(100 * tp / all_true, 1),
                  "false_closures": len(flagged) - tp, "missed_closures": all_true - tp})
 V = pd.DataFrame(rows)
-V.to_csv(OUT / "blink_final_variants_on_spotcheck.csv", index=False)
+V.to_csv(RES_EV / "blink_final_variants_on_spotcheck.csv", index=False)
 pd.set_option("display.width", 250)
 print(V.to_string(index=False)); print(); print(SM.to_string(index=False))
 
@@ -157,4 +159,4 @@ ax[1].set_xticks(xv); ax[1].set_xticklabels([f"v{v}" for v in SM.video]); ax[1].
 for xi, (n, pm) in enumerate(zip(SM.closure_events, SM.per_minute)):
     ax[1].text(xi, n + 1, f"{pm:.1f}/min", ha="center", fontsize=8)
 ax[1].set_title("Final rule D on the whole videos: closure events per video", fontsize=10.5)
-fig.savefig(OUT / "blink_final_summary.png", dpi=130)
+fig.savefig(RES_EV / "blink_final_summary.png", dpi=130)

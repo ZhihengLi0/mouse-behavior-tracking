@@ -37,7 +37,10 @@ from scale_step import HERE  # noqa: E402
 FPS, PUPIL_THR, DX_FRAC, CONF_MIN = 60.0, 0.527, 0.3, 0.3
 CAND = [120, 140, 160, 180]                       # px
 GRID = np.arange(60, 301, 1.0)                     # px
-SRC = HERE / "results" / "blink_eyelid_distance"; OUT = SRC / "per_mouse_threshold_px"; OUT.mkdir(exist_ok=True)
+ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
+LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
+RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
+SRC = LAB_FR; OUT = RES_MOUSE / "px"; OUT.mkdir(parents=True, exist_ok=True)
 PL = pd.read_csv(HERE / "results" / "labels_to_plateau.csv"); PL = PL[PL.status == "final"]
 P4 = ["pupil_top", "pupil_bottom", "pupil_left", "pupil_right"]
 KEY = {"mouse A": "mouseA", "Pluto": "Pluto", "Terra": "Terra"}

@@ -42,8 +42,8 @@ FIGURES = [
     (V2 / "results/blink_and_area/blink_area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
     (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
     (V2 / "results/unreliable_frames/unreliable_frames_all_videos.png", "fig_unreliable.jpg", 2625),
-    (V2 / "results/blink_eyelid_distance/blink_final_summary.png", "fig_blink_final.jpg", 2210),
-    (V2 / "results/blink_eyelid_distance/blink_notopen_rule_summary.png", "fig_blink_notopen.jpg", 1875),
+    (V2 / "results/blink_eyelid_distance/results/every_video/blink_final_summary.png", "fig_blink_final.jpg", 2210),
+    (V2 / "results/blink_eyelid_distance/results/one_threshold/blink_notopen_rule_summary.png", "fig_blink_notopen.jpg", 1875),
     (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
@@ -162,7 +162,7 @@ for r in pl.itertuples():
                         f'  <figure><div class="figbox scroll"><div class="strip tall">\n' + "\n".join(items) + '\n  </div></div></figure>')
 
 # appendix: the single-frame "not open" spot check, one contact sheet per video (the labeler's verdicts on the original frames)
-notopen_strip = strip_of(lambda r: V2 / f"results/blink_eyelid_distance/blink_notopen_sheet_video{int(r.video):02d}.png", "notopen", 1700, "：18 帧单帧盲评", ": 18 single frames, blind")
+notopen_strip = strip_of(lambda r: V2 / f"results/blink_eyelid_distance/labels/frames/blink_notopen_sheet_video{int(r.video):02d}.png", "notopen", 1700, "：18 帧单帧盲评", ": 18 single frames, blind")
 
 if in_progress:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）；视频 {in_progress[0]} 进行中，按 0 / 20 / 40 / … 帧的误差为 {' / '.join(in_progress[1])} px。"
