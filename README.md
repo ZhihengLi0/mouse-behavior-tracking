@@ -17,7 +17,7 @@ per-frame predictions stay local; git carries code, documentation and audited ag
 | Videos done | video 0 (mouse A, 5 min), videos 1-3 (mouse B "Pluto", 2025-10-31) |
 | Finished | **video 4 run 2** (Pluto, 2025-10-30, convention v2): plateau at **40 labels, 15.01 px** (0/20/40/60/80 = 32.11/24.64/15.01/16.82/17.54 px). Run 1 (v1): 140 labels, 14.74 px (archived, tag `v0.8.0-video4-convention1`). Open: the v2 labels mark a much smaller pupil (width 92 vs 215 px) |
 | Finished | **video 5** (Pluto, 2025-10-29, convention v2): plateau at **20 labels, 15.85 px** (0/20/40 = 11.90/15.85/16.58 px; the 0-label model is > 50 px off on 12% of frames, 20 labels remove all of them) |
-| Finished | **fewer-labels study** (videos 0-5, step 1 retrained with 5 or 10 of its 20 labels, training set otherwise as at that time): 5 labels were enough only on videos 3 and 5; on videos 0, 1, 2 and 4, 5 or 10 labels fall short of 20 (video 4: 10 labels worse than none). 20 labels is the smallest batch that worked on every video; table in `v2_new_pupil_top_video_scaling/results/README.md` |
+| Finished | **fewer-labels study** (videos 0-5, step 1 retrained with 5 or 10 of its 20 labels, training set otherwise as at that time): 5 labels were enough only on videos 3 and 5; on videos 0, 1, 2 and 4, 5 or 10 labels fall short of 20 (video 4: 10 labels worse than none). 20 labels is the smallest batch that worked on every video; table in `v2_new_pupil_top_video_scaling/results/README.md`. Later extended to every video (19 videos): 5 labels are enough on 5 of them, 10 labels on 7; the 20-label model beats both 5-label subsets on 15 and both 10-label subsets on 11 |
 | Finished | **video 6** (Pluto, 2025-10-28, v2 line continued): test set relabeled under v2 and frozen; 0 labels (video-5 model 631) = 9.36 px, 20 labels = 6.75 px (p90 11.2), 40 labels = 8.46 px, 60 labels = 10.68 px (p90 14.9): finished at **20 labels, 6.75 px** (rule fired at 60; user decision 2026-09-29). |
 | Finished | **video 7** (Pluto, 2025-10-27, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 5.36 px, 20 labels = 5.86 px, 40 labels = 5.84 px: finished at **0 labels, 5.36 px** - the video-6 model already fits this day (user decision 2026-09-29). |
 | Finished | **video 8** (Pluto, 2025-10-24, v2 line): test set relabeled under v2 and frozen; 0 labels (video-6 model 711) = 27.46 px, 20 labels = 25.34 px, 40 labels = 30.03 px (p90 ~50, 12-14% of frames > 50 px - a hard day, 3 days after video 7); 60 labels = 33.77 px: finished at **20 labels, 25.34 px** (rule fired at 60; 12-16% of frames > 50 px at every step - this day is hard). |
@@ -58,7 +58,8 @@ Labels needed per video (plateau = two consecutive 20-label steps that improve t
 | 14 | Terra (mouse C), 2025-10-14 | 600 | 13.33 / 10.83 / 12.41 / 10.30 / 10.45 / 10.24 px (v2) | 60 labels, 10.3 px (rule fired at 100) |
 | 15 | Terra (mouse C), 2025-10-13 | 660 | 10.57 / 11.42 / 9.73 / 9.61 / 10.24 px (v2) | 40 labels, 9.7 px (rule fired at 80) |
 | 16 | Terra (mouse C), 2025-10-10 | 700 | 11.35 / 7.72 / 7.15 / 7.26 / 7.78 px (v2) | 40 labels, 7.2 px (rule fired at 80) |
-| 17 | Terra (mouse C), 2025-10-09 | 740 | 6.38 / 4.75 px (v2, in progress) | – |
+| 17 | Terra (mouse C), 2025-10-09 | 740 | 6.38 / 4.75 / 4.47 / 4.89 / 4.50 px (v2) | 40 labels, 4.47 px (rule fired at 80) |
+| 18 | Terra (mouse C), 2025-10-08 (last video) | 780 | 38.24 / 13.13 / 12.38 / 12.27 / 13.96 px (v2) | 40 labels, 12.38 px (rule fired at 80) |
 
 What the numbers say:
 
@@ -132,6 +133,13 @@ comparison between later videos is not affected.
 | 9 | 120 | 80 | 80 |
 | 10 | 80 | 40 | 40 |
 | 11 | 80 | 40 | 40 |
+| 12 | 40 | 0 | 0 |
+| 13 | 80 | 20 | 20 |
+| 14 | 120 | 60 | 60 |
+| 15 | 80 | 40 | 40 |
+| 16 | 100 | 40 | 40 |
+| 17 | 100 | 40 | 40 |
+| 18 | 80 | 40 | – (last video; 820 labels would be carried into a next one) |
 
 Every number in a README comes from one script with one formula; if a definition changes, the whole series is
 recomputed rather than mixed.
