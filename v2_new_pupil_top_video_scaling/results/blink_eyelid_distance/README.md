@@ -156,3 +156,30 @@ videos most events are re-closings between brief openings and are not blink coun
 subset of this state; separating them by depth and duration is the next round. Limits: one judge; threshold chosen on
 the validation frames; one model per video; the borderline stratum r 0.85-1.00 carries most of the errors.
 
+## Second blind sample: videos 14-18 (2026-10-12)
+
+The 2026-10-06 verdicts cover videos 0-13 only, so Terra had 3 videos (48 trusted frames) of truth and its per-mouse
+threshold was not settled. On 2026-10-12 the labeler judged a second blind sample drawn the same way
+(`../../scripts/blink_notopen_frames_sample_r2.py`, seed 3: per video 4 + 4 + 4 + 4 frames in the four r strata and 2 with
+implausible eyelid points; crops only, no values): 90 frames of videos 14-18, 88 judged (`nf2_v16_09` and `nf2_v18_06`
+were left blank), 50 not open, 0 cannot tell (`blink_notopen_frames_r2_all_videos.csv`, `blink_notopen_frames_r2_verdicts.csv`).
+
+Check of the first-round rule (O / W < 0.347; implausible eyelid points -> pupil confidence < 0.527) on these fresh frames,
+which were not used to choose it (`../../scripts/blink_notopen_frames_r2_eval.py`, `blink_notopen_frames_r2_result.csv`):
+
+| frames | n | judged not open | rule not open | accuracy | precision | recall |
+|---|---|---|---|---|---|---|
+| all new frames (videos 14-18) | 88 | 50 | 54 | 93.2% | 90.7% | 98.0% |
+| r < 0.70 | 20 | 20 | 20 | 100% | 100% | 100% |
+| r 0.70-0.85 | 20 | 13 | 15 | 90.0% | 86.7% | 100% |
+| r 0.85-1.00 | 18 | 6 | 9 | 83.3% | 66.7% | 100% |
+| r >= 1.00 | 20 | 4 | 3 | 95.0% | 100% | 75.0% |
+| eyelid points implausible | 10 | 7 | 7 | 100% | 100% | 100% |
+| video 14 / 15 / 16 / 17 / 18 | 18 / 18 / 17 / 18 / 17 | 9 / 12 / 5 / 7 / 17 | 12 / 13 / 5 / 8 / 16 | 83 / 94 / 100 / 94 / 94% | | |
+
+So the rule holds on new videos at the accuracy it had on the frames it was fitted on (93% against 91%); as before, the
+errors sit in the borderline stratum r 0.85-1.00 (3 of the 4 false alarms). Video 18, the most half-covered video of the
+set, has 17 of 17 judged frames not open and the rule finds 16. Both samples together: 327 judged frames, 163 not open,
+rule accuracy 91.4% (`blink_notopen_frames_combined_all_videos.csv`); the per-mouse pixel threshold was redone on this
+combined truth (`per_mouse_threshold_px/`, third look).
+
