@@ -51,3 +51,12 @@ whole-video prediction of the 80-label model was stopped (no batch 5 is needed; 
 17:12), so the last row of the table has no flagged count. Video 18 closed on 2026-10-12 under the standing rule (the rule
 fires, the video closes). This is the last video of the set, so nothing is carried further; batches 1-2 (40 labels) are the
 plateau labels of this video, and the set of labels a future video would start from is 780 + 40 = 820.
+
+**Fewer-labels study (2026-10-12)**: step 1 retrained with 5 or 10 of batch01's 20 labels (two subsets each, training set
+otherwise as at the time: the 780 carried labels; shuffles 2181-2184; 5a / 5b share no frame, 10a / 10b share 2).
+5 labels = 28.41 / 30.94 px (subsets a / b; p90 43.2 / 44.9; 6% / 4% of test frames > 50 px), 10 labels = 23.45 / 22.97 px
+(p90 42.3 / 37.5; 0% > 50 px), against 38.24 px at 0 labels and 13.13 px at 20: every subset improves on the 0-label model
+(by 19-40%), but all four stay far above the 20-label number (5 labels 2.2-2.4 times it, 10 labels 1.7-1.8 times), and only
+54-60% of the keypoints are confident against 72% at 20 labels. The nasal corner is the weakest point of the subset models
+(median 36 px for subset 10b against 14 px at 20 labels). So on this video, as on video 13, the first 20 labels were needed;
+figure `fewer_labels.png`.
