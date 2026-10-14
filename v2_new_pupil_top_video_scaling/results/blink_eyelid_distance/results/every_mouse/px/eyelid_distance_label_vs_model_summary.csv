@@ -1,0 +1,9 @@
+mouse,test_frames,median_absdiff_px,p90_absdiff_px,max_absdiff_px,median_bias_px,threshold_px,different_side,different_side_pct,near_frames,near_different_side,near_different_side_pct,opening_band_px
+mouse A,50,6.8,14.3,23.9,5.5,,,,,,,
+Pluto,499,1.9,6.3,45.5,0.1,147.5,12.0,2.4,150.0,12.0,8.0,
+Terra,400,2.2,6.2,33.6,-0.1,150.5,14.0,3.5,140.0,14.0,10.0,
+,56,3.4,6.4,,,,,,,,,"(0, 100]"
+,354,2.3,7.0,,,,,,,,,"(100, 150]"
+,285,2.0,6.3,,,,,,,,,"(150, 200]"
+,196,1.3,4.1,,,,,,,,,"(200, 250]"
+,58,5.2,13.9,,,,,,,,,"(250, 400]"

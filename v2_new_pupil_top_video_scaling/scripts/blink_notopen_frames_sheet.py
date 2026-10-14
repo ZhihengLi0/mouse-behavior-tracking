@@ -10,7 +10,7 @@ from scale_step import HERE  # noqa: E402
 ROOT = HERE / "results" / "blink_eyelid_distance"   # folder layout since 2026-10-12: labels/{segments,frames} = the labeler's verdicts; results/{every_video,one_threshold,every_mouse}
 LAB_SEG, LAB_FR = ROOT / "labels" / "segments", ROOT / "labels" / "frames"
 RES_EV, RES_ONE, RES_MOUSE = ROOT / "results" / "every_video", ROOT / "results" / "one_threshold", ROOT / "results" / "every_mouse"
-Q = pd.read_csv(LAB_FR / "blink_notopen_frames_all_videos.csv")
+Q = pd.read_csv(LAB_FR / "blink_notopen_frames_combined_all_videos.csv")   # since 2026-10-13: both samples (videos 0-13 of 10-06 and 14-18 of 10-12), so sheets for all 19 videos
 COL = {"eye open": (60, 160, 60), "not open": (40, 40, 220), "cannot": (140, 140, 140)}
 for v, g in Q.groupby("video"):
     tiles = []

@@ -131,3 +131,22 @@ script with the combined truth file); same criterion, same grid, same candidates
 Open points: the threshold is now a data-based proposal for both mice (about 150 px); Kaiwen's look at the example sheets
 remains the agreed step before it is used. Pluto's three earliest days (position shift) are unchanged.
 
+
+**Decision and two checks (2026-10-13).** Kaiwen, having seen `threshold_scan_per_mouse.png`, settled on this method: one
+pixel threshold per mouse (Pluto 147.5, Terra 150.5 px) is the rule to use; the 0.347 ratio rule stays as the comparison.
+Script `../../../scripts/blink_px_validation.py` then added two checks:
+
+- `opening_distribution_with_verdicts.png`: histogram of O over every frame of the mouse with the 289 judged frames
+  underneath (red = judged not open, green = open). Terra is bimodal with the valley at about 150 px (hence its sharp
+  optimum), Pluto one broad hump (hence its flat optimum). Every misjudged frame lies within 20 px of the line (Pluto 3 + 6,
+  Terra 9 + 5), none further away.
+- `eyelid_distance_label_vs_model.png/.csv` + `_summary.csv`: O from the labeler's own eyelid points against O from the
+  plateau model on the 50 frozen test frames of every video (949 frames with both points labeled, never trained on).
+  |model − label| median 1.9 px (Pluto, 499 frames) and 2.2 px (Terra, 400), 90th percentile 6.3 / 6.2 px, no bias
+  (±0.1 px); frames put on different sides of the threshold by the model's error: 12 of 499 (2.4%) and 14 of 400 (3.5%),
+  all within 20 px of the line (8–10% of that band). Mouse A (20 labels): 6.8 px, +5.5 px bias, irrelevant (eye always
+  open). So most of the errors near the threshold are not the model's; they are borderline frames that are ambiguous in
+  themselves and what a single pixel number cannot capture of the labeler's judgment.
+- Position check with the labels only (no model): Pluto's 10-23 / 10-22 eye centre is 42 / 59 px right and 17 / 34 px lower
+  than on 10-28..10-31 (10-24: 13 / 7 px). A translation does not change a pixel distance, so the threshold is unaffected;
+  the 5–10% smaller eye width on those days cannot be told from narrowing and the same threshold is used.
