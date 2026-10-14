@@ -48,6 +48,8 @@ FIGURES = [
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/examples_Terra.png", "fig_blink_examples_terra.jpg", 2520),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/examples_Pluto.png", "fig_blink_examples_pluto.jpg", 2520),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/opening_timeseries_Terra.png", "fig_blink_opening_terra.jpg", 1800),
+    (V2 / "results/blink_eyelid_distance/results/every_mouse/px/opening_distribution_with_verdicts.png", "fig_blink_dist.jpg", 1980),
+    (V2 / "results/blink_eyelid_distance/results/every_mouse/px/eyelid_distance_label_vs_model.png", "fig_blink_labelcheck.jpg", 1980),
     (ROOT / "keypoint_definitions/figures/fig1_all_keypoints.jpg", "kp_all_keypoints.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig8_construction_pupil.jpg", "kp_construction_pupil.jpg", 2000),
     (ROOT / "keypoint_definitions/figures/fig7_construction_corners.jpg", "kp_construction_corners.jpg", 2000),
