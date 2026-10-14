@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-13 22:51 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-13 23:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -880,7 +880,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
     </ol>
   </div>
-  <h3><span lang="zh">8.1 能不能不靠标注找出预测不可信的帧</span><span lang="en">8.1 Can unreliable frames be found without labels</span></h3>
+  <h3><span lang="zh">8.1 模型训练饱和后，如何有效选出不可信的帧：比较三种纠错算法的适用场景</span><span lang="en">8.1 After training has saturated, how to pick out unreliable frames: the three outlier algorithms by use case</span></h3>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>用每个视频（视频 0–18）的 50 帧测试帧和 20 帧验证帧，共 1330 帧。这些帧是按时间等间隔取的，不是任何模型挑的，都有人工标注，模型没有用它们训练。对每一帧，用该视频平台点的模型算出帧 RMSE（公式见页面开头），并算三个不需要标注的信号：跳动（8 个点里相对上一帧移动最远的那个点的位移 ÷ 眼宽，第 5 步 5.1 节的 jump 规则在它大于 0.03 时标出这一帧）、8 个点里的最低置信度，以及 DLC 的 fitting 检测器（第 3 步比较过的三种纠错算法里的第三种：对每个点的每个坐标在整段视频上拟合 SARIMAX(3,0,1) 时间序列模型，置信度低于 0.01 的点当缺失，序列先去均值；一个点的偏差 = 预测位置和一步预测之差的距离，fitting = 8 个点偏差的平均，DLC 默认超过 20 px 标出）。第 3 步比的是它们作为<i>挑训练帧的办法</i>的效果，这里量的是它们作为<i>找错帧的办法</i>的效果。然后看这些信号能找出多少真正错了的帧。“错”有两档：帧 RMSE 超过 50 px（32 帧，2.5%）和超过 20 px（155 帧，11.7%）。脚本：<code>scripts/unreliable_frames.py</code>；结果在 <code>results/unreliable_frames/</code>。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>The 50 test frames and 20 validation frames of every video (videos 0–18), 1330 frames. They are evenly spaced in time, not picked by any model, human-labeled and never trained on. For each frame the frame RMSE of the video's plateau-point model was computed (formula at the top of the page), together with three label-free signals: the jump (displacement of the keypoint that moved farthest from the previous frame ÷ eye width; the jump rule of section 5.1 flags the frame when it exceeds 0.03), the lowest confidence of the 8 points, and DLC's fitting detector (the third of the three outlier algorithms compared in step 3: per keypoint coordinate a SARIMAX(3,0,1) time-series model is fitted to the whole video, points with confidence below 0.01 treated as missing, series centred; deviation of a keypoint = distance between its predicted position and the one-step prediction, fitting = mean over the 8 keypoints, flagged above DLC's default 20 px). Step 3 compared them as <i>selectors of training frames</i>; here they are measured as <i>detectors of wrong frames</i>. The question is how many truly wrong frames these signals find. "Wrong" has two levels: frame RMSE above 50 px (32 frames, 2.5%) and above 20 px (155 frames, 11.7%). Script: <code>scripts/unreliable_frames.py</code>; results in <code>results/unreliable_frames/</code>.</p>
   <figure>
@@ -888,24 +888,26 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">图 8-3 怎么看：</span>A：每个点是一帧，横轴是跳动，纵轴是这一帧的误差（都是对数刻度）；灰色是误差不超过 20 px 的帧，橙色 20–50 px，红色超过 50 px；竖虚线是 jump 规则的阈值，线右边的帧被标出。B：同样的画法，横轴换成最低置信度，线左边（低于 0.6）的帧被标出。C：横轴换成 fitting 偏差（对数刻度），竖虚线是 DLC 默认的 20 px，线右边的帧被标出。D：五条规则的检出率（实心：错的帧里有多少被标出）和准确率（斜线：被标出的帧里有多少是错的），红色对应超过 50 px，橙色对应超过 20 px；横轴下面写着每条规则标出了多少帧。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 8-3, how to read:</span>A: one dot per frame, x = jump, y = error of the frame (both log scale); grey = error up to 20 px, orange 20–50 px, red above 50 px; the dashed line is the threshold of the jump rule, frames to its right are flagged. B: the same with the lowest confidence on x; frames to the left of the line (below 0.6) are flagged. C: the same with the fitting deviation on x (log scale); the dashed line is DLC's default 20 px, frames to its right are flagged. D: recall (solid: share of the wrong frames that are flagged) and precision (hatched: share of the flagged frames that are wrong) of five rules; red = above 50 px, orange = above 20 px; the share of frames each rule flags is written under the axis.</figcaption>
   </figure>
-  <div class="concl" lang="zh"><span class="tag">结论：</span>找明显错误（超过 50 px）最准的是 fitting 检测器；目前没有一条规则既能找全错的帧、又不标出太多对的帧。
+  <div class="concl" lang="zh"><span class="tag">结论：</span>三种算法各有适用场景：人工复核用 fitting，挑训练帧用 jump，直接舍弃现在没有够用的规则。
     <ol>
-      <li><b>jump 规则挑得准但找不全：</b>它标出 11.7% 的帧（156 帧），其中 44% 误差超过 20 px。32 帧明显错误（超过 50 px）里它找到 21 帧（66%），漏掉 11 帧。漏掉的是预测错了、但和上一帧相比没有移动的帧。</li>
-      <li><b>置信度找得全但标得太多：</b>最低置信度低于 0.6 能找出全部 32 帧明显错误，但同时标出了 51.9% 的帧，被标出的帧里只有 4.6% 是明显错误。</li>
-      <li>两者合用（任一条件成立就标）和只用置信度几乎一样。按“留一个视频”选阈值的平均置信度规则居中：标出 33.2% 的帧，找到 32 帧里的 30 帧。</li>
-      <li><b>fitting 检测器标得最准：</b>只标出 2.0% 的帧（27 帧），其中 85% 是明显错误；32 帧明显错误里找到 23 帧（72%），比 jump 规则多，而标出的帧只有它的四分之一。它只找明显错误（超过 20 px 的 155 帧里只找到 16%）；漏掉的 9 帧是预测错了但在时间上平滑的帧。区分明显错误的 AUC：fitting 0.97、最低置信度 0.94、平均置信度 0.91、跳动 0.85。</li>
-      <li>各视频差别很大：每个视频误差超过 20 px 的帧从 0 帧（视频 17）到 38 帧不等，同一个信号的区分能力（AUC）在不同视频上从 0.3 到 1.0。合并的数字不能当作对每个视频都成立。</li>
-      <li>限制：明显错误只有 32 帧，其中 17 帧来自视频 1 和 8；每个视频只用了一个模型；这里看的是单帧，连续多帧都错的情况没有按“事件”来评估。</li>
+      <li><b>人工复核：用 fitting。</b>它只标出 2.0% 的帧（27 帧），其中 85% 是明显错误（超过 50 px），32 帧明显错误里找到 23 帧（72%）。复核要的是少而准，三种里只有它够准。漏掉的 9 帧是预测错了但在时间上平滑的帧。</li>
+      <li><b>挑训练帧（主动学习）：用 jump，第 3 步的选择成立。</b>它标出 11.7% 的帧（156 帧），其中 44% 误差超过 20 px，32 帧明显错误里找到 21 帧（66%）。挑训练帧只要求标出的帧多数是错的，不要求找全。fitting 也可以，第 3 步实测两者挑帧的效果差不多。</li>
+      <li><b>直接舍弃（算面积、眨眼前剔除）：现在没有够用的规则。</b>要找全就得扔太多：最低置信度低于 0.6 找全 32 帧明显错误，但扔掉 51.9% 的帧；平均置信度低于 0.79（阈值按留一个视频选）找到 30 帧，扔 33.2%；jump 只扔 11.7%，但漏掉 11 帧，都是预测错了却没有跳动的帧。jump 和置信度合用（任一成立就标）和只用置信度几乎一样。</li>
+      <li><b>中等偏差（20–50 px）三种都找不好。</b>误差超过 20 px 的 155 帧里，fitting 只找到 16%，jump 44%，最低置信度 88% 但代价仍是扔一半的帧。这一档只能靠降低模型误差本身。</li>
+      <li><b>排序不依赖阈值。</b>区分明显错误的 AUC：fitting 0.97、最低置信度 0.94、平均置信度 0.91、跳动 0.85。阈值里 jump 的 3% 是 DLC 默认 20 px 按眼宽换算的，置信度 0.6 和 fitting 20 px 是 DLC 默认，只有平均置信度的 0.79 是在这些帧上选的（留一个视频打分）。</li>
+      <li><b>各视频差别很大。</b>每个视频误差超过 20 px 的帧从 0 帧（视频 17）到 38 帧，同一个信号的 AUC 在不同视频上从 0.3 到 1.0，合并的数字不能当作对每个视频都成立。</li>
+      <li><b>限制：</b>明显错误只有 32 帧，其中 17 帧来自视频 1 和 8；每个视频只用了一个模型；看的是单帧，连续多帧都错的情况没有按"事件"评估；几种信号合用只试了 jump 加置信度。</li>
     </ol>
   </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion:</span>The fitting detector is the most precise finder of gross errors (above 50 px); so far no rule both finds all wrong frames and avoids flagging many correct ones.
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>Each algorithm has its use: fitting for human review, jump for picking training frames, and for discarding frames outright no rule is good enough yet.
     <ol>
-      <li><b>The jump rule is selective but incomplete:</b> it flags 11.7% of the frames (156), 44% of which have an error above 20 px. Of the 32 gross errors (above 50 px) it finds 21 (66%) and misses 11: frames in which the prediction is wrong but did not move from the previous frame.</li>
-      <li><b>The confidence is complete but flags too much:</b> lowest confidence below 0.6 finds all 32 gross errors but flags 51.9% of all frames; only 4.6% of the flagged frames are gross errors.</li>
-      <li>Using both (flag if either holds) is almost the same as the confidence alone. A mean-confidence rule with a leave-one-video-out threshold lies in between: 33.2% of the frames flagged, 30 of the 32 found.</li>
-      <li><b>The fitting detector is the most precise:</b> it flags only 2.0% of the frames (27), 85% of which are gross errors; it finds 23 of the 32 gross errors (72%), more than the jump rule with a quarter of the flags. It finds gross errors only (16% of the 155 frames above 20 px); the 9 it misses are wrong predictions that are smooth in time. AUC for gross errors: fitting 0.97, lowest confidence 0.94, mean confidence 0.91, jump 0.85.</li>
-      <li>Videos differ a lot: 0 (video 17) to 38 frames above 20 px per video, and the AUC of the same signal ranges from 0.3 to 1.0 across videos. The pooled numbers should not be read as valid for every video.</li>
-      <li>Limits: only 32 gross-error frames, 17 of them from videos 1 and 8; one model per video; single frames are evaluated, runs of consecutive wrong frames are not evaluated as events.</li>
+      <li><b>Human review: use fitting.</b> It flags only 2.0% of the frames (27), 85% of which are gross errors (above 50 px), and finds 23 of the 32 gross errors (72%). Review needs few and precise flags; of the three only fitting is precise enough. The 9 it misses are wrong predictions that are smooth in time.</li>
+      <li><b>Picking training frames (active learning): use jump; the choice of step 3 stands.</b> It flags 11.7% of the frames (156), 44% of which have an error above 20 px, and finds 21 of the 32 gross errors (66%). Picking training frames only requires that most flagged frames be wrong, not that all wrong frames be found. Fitting would do as well; step 3 measured no real difference between them as frame pickers.</li>
+      <li><b>Discarding outright (before area or blink analysis): no rule is good enough yet.</b> Finding everything costs too many frames: lowest confidence below 0.6 finds all 32 gross errors but discards 51.9% of the frames; mean confidence below 0.79 (threshold chosen leave-one-video-out) finds 30 and discards 33.2%; jump discards only 11.7% but misses 11, all wrong predictions without a jump. Jump and confidence combined (flag if either holds) is almost the same as the confidence alone.</li>
+      <li><b>Moderate errors (20–50 px) are found poorly by all three.</b> Of the 155 frames above 20 px, fitting finds 16%, jump 44%, lowest confidence 88% but still at the cost of half the frames. For this level only a lower model error helps.</li>
+      <li><b>The ranking does not depend on the thresholds.</b> AUC for gross errors: fitting 0.97, lowest confidence 0.94, mean confidence 0.91, jump 0.85. Of the thresholds, jump's 3% is DLC's default 20 px converted to a share of the eye width, confidence 0.6 and fitting 20 px are DLC defaults, and only the mean-confidence 0.79 was chosen on these frames (scored leave-one-video-out).</li>
+      <li><b>Videos differ a lot.</b> 0 (video 17) to 38 frames above 20 px per video, and the AUC of the same signal ranges from 0.3 to 1.0 across videos; the pooled numbers should not be read as valid for every video.</li>
+      <li><b>Limits:</b> only 32 gross-error frames, 17 of them from videos 1 and 8; one model per video; single frames are evaluated, runs of consecutive wrong frames are not evaluated as events; of the combinations only jump plus confidence was tried.</li>
     </ol>
   </div>
 </section>
