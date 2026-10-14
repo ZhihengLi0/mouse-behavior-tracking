@@ -247,7 +247,8 @@ def plot(m):
     fig.savefig(R / "cross_video_curves.png", dpi=130)
     # heatmap
     piv = m.pivot(index="test_unit", columns="model_idx", values="median_frame_rmse_px").reindex(units)
-    fig, ax = plt.subplots(figsize=(19, 4.2), constrained_layout=True)
+    # width grows with the number of models (0.30 in per column) so the cell numbers stay readable; 149 models -> about 48 in
+    fig, ax = plt.subplots(figsize=(max(19, 0.30 * piv.shape[1] + 3.5), 0.32 * piv.shape[0] + 1.6), constrained_layout=True)
     im = ax.imshow(np.log10(piv.to_numpy()), aspect="auto", cmap="viridis_r")
     for i in range(piv.shape[0]):
         for j in range(piv.shape[1]):
@@ -257,7 +258,7 @@ def plot(m):
     ax.set_yticks(range(len(units))); ax.set_yticklabels([short[u] for u in units], fontsize=9)
     ax.set_xticks(mods.model_idx); ax.set_xticklabels([f"{r.model_unit.split('_')[0]}:{r.subset or r.labels_this_video}" for r in mods.itertuples()], fontsize=7, rotation=90)
     ax.set_xlabel("model (video index : labels of that video)"); ax.set_title("median frame RMSE (px) of each model on each test set", fontsize=11)
-    fig.colorbar(im, ax=ax, label="log10 px", fraction=0.02)
+    fig.colorbar(im, ax=ax, label="log10 px", fraction=0.008, pad=0.005)
     fig.savefig(R / "cross_video_matrix.png", dpi=130)
     print("saved", R / "cross_video_curves.png", R / "cross_video_matrix.png")
 

@@ -33,7 +33,7 @@ FIGURES = [
     (V2 / "results/all_videos_view_main.png", "all_view_main.jpg", 3380),
     (V2 / "results/all_videos_view_fewer.png", "all_view_fewer.jpg", 3380),
     (V2 / "results/all_videos_view_backtest.png", "all_view_backtest.jpg", 3380),
-    (V2 / "results/cross_video_matrix.png", "cross_video_matrix.jpg", 2470),
+    (V2 / "results/cross_video_matrix.png", "cross_video_matrix.jpg", 6265),   # 149 models: native width, the page scrolls sideways
     (V2 / "results/pupil_area_variants.png", "fig_area_variants.jpg", 2000),
     (V2 / "results/blink_area_consistency.png", "fig_blink_area.jpg", 2400),
     (V2 / "results/blink_and_area/blink_area_area_methods_all_videos.png", "fig_eye_area.jpg", 2400),

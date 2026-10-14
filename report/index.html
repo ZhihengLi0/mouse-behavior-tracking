@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-13 22:47 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-13 22:51 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -810,9 +810,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 7-1, how to read:</span>The same figure as Figure 5-4, here with the back-test emphasized. One colour per video: its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block and grey before its own block (its labels not yet in the training set). Two things to see: (1) the bold lines are essentially flat: adding other videos later does not make an earlier video worse. (2) At the far left, with labels of the first mouse only, every Pluto video (grey) is at 170–350 px; as soon as video 1's labels enter, all drop below a few tens of px. The figure is wide; scroll sideways.</figcaption>
   </figure>
   <figure>
-    <div class="figbox scroll"><img src="assets/cross_video_matrix.jpg" alt="Error of each model on each test set" style="width:2400px"></div>
-    <figcaption lang="zh"><span class="tag">图 7-2 怎么看：</span>同样的数据用表格显示：行是测试视频，列是模型，格子里是误差 (px)，颜色越黄越好、越紫越差。左边一片紫色是只有第一只老鼠标注的模型；往右每一行颜色稳定，没有重新变紫。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 7-2, how to read:</span>The same data as a table: rows = test videos, columns = models, cells = error (px); yellow is good, purple is bad. The purple block on the left is the models with labels of the first mouse only; to the right each row keeps its colour and never turns purple again.</figcaption>
+    <div class="figbox scroll"><img src="assets/cross_video_matrix.jpg" alt="Error of each model on each test set" style="width:6265px"></div>
+    <figcaption lang="zh"><span class="tag">图 7-2 怎么看：</span>同样的数据用表格显示：行是测试视频，列是模型，格子里是误差 (px)，颜色越黄越好、越紫越差。左边一片紫色是只有第一只老鼠标注的模型；往右每一行颜色稳定，没有重新变紫。149 个模型并排，图很宽，横向滚动看。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 7-2, how to read:</span>The same data as a table: rows = test videos, columns = models, cells = error (px); yellow is good, purple is bad. The purple block on the left is the models with labels of the first mouse only; to the right each row keeps its colour and never turns purple again. With 149 models side by side the figure is wide; scroll sideways.</figcaption>
   </figure>
   <p class="concl" lang="zh"><span class="tag">结论：</span>一个模型可以一直累加视频，旧视频不会变差。同一天的视频可以互相直接用（视频 3 在没有自己标注时就已经 4.4 px）；换一天则要重新看 0 帧误差再决定标多少。只看单个模型的 0 帧成绩不可靠，个别模型会突然差很多。</p>
   <p class="concl" lang="en"><span class="tag">Conclusion:</span>One model can keep accumulating videos without hurting the old ones. Videos of the same day transfer directly (video 3 was at 4.4 px before any of its own labels); a new day needs its 0-label error checked before deciding how much to label. A 0-label score from a single model is not reliable; individual models can be far off.</p>
