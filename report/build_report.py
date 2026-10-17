@@ -39,7 +39,7 @@ FIGURES = [
     (V2 / "results/blink_and_area/blink_area_area_methods_all_videos.png", "fig_eye_area.jpg", 2400),
     (V2 / "results/blink_and_area/blink_area_closure_signals_all_videos.png", "fig_eye_blink.jpg", 2600),
     (V2 / "results/blink_and_area/blink_area_closed_frames_all_videos.jpg", "fig_closed_frames.jpg", 2784),
-    (V2 / "results/blink_and_area/blink_area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
+    (V2 / "results/area_timeseries/area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
     (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
     (V2 / "results/unreliable_frames/unreliable_frames_all_videos.png", "fig_unreliable.jpg", 2625),
     (V2 / "results/blink_eyelid_distance/results/every_video/blink_final_summary.png", "fig_blink_final.jpg", 2210),
@@ -146,7 +146,7 @@ def strip_of(pattern, prefix, width, cap_zh, cap_en):
 
 fewer_strip = strip_of(lambda r: V2 / r.unit / "results/fewer_labels.png", "fewer", 1500, "", "")
 kp_strip = strip_of(lambda r: V2 / f"results/keypoint_confidence_error/keypoint_confidence_error_video{int(r.video):02d}.png", "kpconf", 1700, "", "")
-ts_strip = strip_of(lambda r: V2 / f"results/blink_and_area/blink_area_timeseries_video{int(r.video):02d}.png", "eyets", 1700, "", "")
+ts_strip = strip_of(lambda r: V2 / f"results/area_timeseries/area_timeseries_video{int(r.video):02d}.png", "eyets", 1700, "", "")
 
 # appendix: every selection sheet of every video, one scrolling row per video
 appendix = []
@@ -177,17 +177,6 @@ else:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）。"
     en_status = f"{n_final} videos finished (videos 0–{n_final - 1})."
 
-ts = pd.read_csv(V2 / "results/blink_and_area/blink_area_timeseries_all_videos.csv")
-am = pd.read_csv(V2 / "results/blink_and_area/blink_area_area_methods_all_videos.csv")
-cs = pd.read_csv(V2 / "results/blink_and_area/blink_area_closure_signals_all_videos.csv").astype({"video": str}).set_index("video")
-eye = []
-for r in ts.itertuples():
-    a = am[am.video.astype(str) == str(r.video)].set_index("rule").median_abs_err_pct
-    c = cs.loc[str(r.video)]
-    eye.append(f"<tr><td>{r.video}</td><td>{r.mouse}</td><td>{a['four']:.1f} / {a['no_top']:.1f}</td><td>{int(c.closed_frames)} / {int(c.open_frames)}</td>"
-               f"<td>{r.flagged_frames_pct:.2f}</td><td>{r.events} ({r.events_per_min:.1f})</td><td>{r.median_event_ms:.0f}</td>"
-               f"<td>{r.production_flagged_pct:.1f}</td><td>{r.area_rel_spread_pct:.1f}</td><td>{r.corr_area_opening:.2f}</td></tr>")
-
 FILL = {
     "{{FEWER_STRIP}}": fewer_strip,
     "{{KP_STRIP}}": kp_strip,
@@ -196,7 +185,6 @@ FILL = {
     "{{APPENDIX_NOTOPEN}}": notopen_strip,
     "{{SELECTION_STRIP}}": "\n".join(sel_strip),
     "{{SCALE_STRIP}}": "\n".join(strip),
-    "{{EYE_ROWS}}": "\n".join(eye),
     "{{VIDEO_ROWS}}": "\n".join(rows),
     "{{FEWER_ROWS}}": "\n".join(fewer),
     "{{STATUS_ZH}}": zh_status,

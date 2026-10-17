@@ -1024,50 +1024,29 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 11 -->
 <section id="s11">
-  <h2><span class="no">11</span><span lang="zh">整段视频的时序：面积曲线里还有没解决的跳变</span><span lang="en">Time series of the whole videos: the area traces still contain unresolved jumps</span></h2>
+  <h2><span class="no">11</span><span lang="zh">整段视频的时序：每一帧的瞳孔面积、睁开高度和置信度随时间的变化</span><span lang="en">Time series of the whole videos: pupil area, eye opening and confidence of every frame over time</span></h2>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="zh">视频</span><span lang="en">Videos</span></th><td><span lang="zh">全部 19 个视频（视频 0–18；老鼠 A 1 个，Pluto 10 个，Terra 8 个）。</span><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra).</span></td></tr>
+    <tr><th><span lang="zh">视频</span><span lang="en">Videos</span></th><td><span lang="zh">全部 19 个视频（视频 0–18；老鼠 A 1 个，Pluto 10 个，Terra 8 个）。视频 0 长 5 分钟，其余 19.9 分钟（71,748 帧，60 帧/秒）。</span><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra). Video 0 is 5 min long, the others 19.9 min (71,748 frames at 60 frames/s).</span></td></tr>
     <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">2026 年 9 月 20 日明确的点位定义（第 4 步）。</span><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
-    <tr><th><span lang="zh">模型</span><span lang="en">Model</span></th><td><span lang="zh">每个视频用它自己平台点的那个模型（第 5 步的表；视频 7 的平台点是 0 帧，用它的 20 帧模型）。ResNet-50，batch 2，120 epochs，取最后一个快照；对整段视频每一帧做预测，不按置信度筛点。</span><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off.</span></td></tr>
-    <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><span lang="zh"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code>（C 部分）；结果在 <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>；每个视频的时序图是其中的 <code>blink_area_timeseries_videoNN.png</code>。</span><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code> (part C); results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>; the time series of each video is <code>blink_area_timeseries_videoNN.png</code> there.</span></td></tr>
+    <tr><th><span lang="zh">模型</span><span lang="en">Model</span></th><td><span lang="zh">每个视频用它自己平台点的那个模型（第 5 步的表；视频 7 的平台点是 0 帧，用它的 20 帧模型）。ResNet-50，batch 2，120 epochs，取最后一个快照；对整段视频每一帧做预测，不按置信度筛点，不做任何平滑或剔除。</span><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off, no smoothing and no frame removed.</span></td></tr>
+    <tr><th><span lang="zh">每帧的量</span><span lang="en">Per-frame quantities</span></th><td><span lang="zh">四点法面积 = π/4 × |x(瞳孔右) − x(瞳孔左)| × |y(瞳孔下) − y(瞳孔上)|（第 9 步的定义）；睁开高度 O = y(下眼睑) − y(上眼睑)（第 10 步的定义）；瞳孔点最低置信度 = 四个瞳孔点置信度的最小值；瞳孔中心 = (左右点 x 的平均, 上下点 y 的平均)，图上画它减去整段视频中位位置的差。</span><span lang="en">Four-point area = π/4 × |x(pupil right) − x(pupil left)| × |y(pupil bottom) − y(pupil top)| (definition of step 9); eye opening O = y(eyelid bottom) − y(eyelid top) (definition of step 10); lowest pupil confidence = minimum of the four pupil points' confidence; pupil centre = (mean x of left and right, mean y of top and bottom), drawn minus its median position over the video.</span></td></tr>
+    <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><span lang="zh"><code>v2_new_pupil_top_video_scaling/scripts/area_timeseries.py</code>；结果在 <code>v2_new_pupil_top_video_scaling/results/area_timeseries/</code>；每个视频的时序图是其中的 <code>area_timeseries_videoNN.png</code>，每个视频的帧数和面积中位数在 <code>area_timeseries_all_videos.csv</code>。</span><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/area_timeseries.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/area_timeseries/</code>; the time series of each video is <code>area_timeseries_videoNN.png</code> there, the frame count and median area of each video are in <code>area_timeseries_all_videos.csv</code>.</span></td></tr>
   </tbody></table></div>
-  <p class="text" lang="zh"><span class="tag">做了什么：</span>对每个视频的每一帧算四点法面积、睁开高度和瞳孔点平均置信度；用第 10 步的规则（平均置信度 &lt; 0.412）标出闭眼帧，相隔不到 0.25 秒（15 帧）的并成一次事件。表里的“面积的相对波动”是未标记帧上 1.4826 × 面积的绝对中位差 ÷ 面积中位数；“面积与睁开高度的相关”是未标记帧上两者的相关系数。</p>
-  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of step 10 (mean confidence &lt; 0.412) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
+  <p class="text" lang="zh"><span class="tag">范围：</span>本节只把每一帧的量按时间画出来，不下结论。闭眼帧按第 10 步的判据逐帧判，图上不标；眨眼的时间过程（一次眨眼从开始到结束、时长、频率）另做。</p>
+  <p class="text" lang="en"><span class="tag">Scope:</span>This section only plots the per-frame quantities against time and draws no conclusion. Closed frames are judged frame by frame by the rule of step 10 and are not marked here; the time course of blinks (start to end of a blink, duration, frequency) is a separate analysis.</p>
   <figure>
     <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
-    <figcaption lang="zh"><span class="tag">图 11-1 怎么看：</span>每一行是一个视频（视频 0 长 5 分钟，其余 19.9 分钟）。蓝线是四点法面积除以该视频的面积中位数，红色竖条是被判为闭眼的帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 11-1, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 11-1 怎么看：</span>每一行是一个视频，纵轴是四点法面积除以该视频的面积中位数（1 = 中位数，范围 0–2），横轴是时间（秒）。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-1, how to read:</span>One row per video; y = four-point area divided by the video's median area (1 = median, range 0–2), x = time (s).</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
 {{TS_STRIP}}
     </div></div>
-    <figcaption lang="zh"><span class="tag">图 11-2 怎么看：</span>每个视频各一张时序图，排成一行，可以左右拖动。每张图从上到下：四点法面积、睁开高度、瞳孔点最低置信度、瞳孔中心相对中位位置的偏移；横轴是时间（秒），红色是被判为“瞳孔看不到”的帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 11-2, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; x = time (s), red = frames flagged as "pupil not visible".</figcaption>
+    <figcaption lang="zh"><span class="tag">图 11-2 怎么看：</span>每个视频各一张时序图，排成一行，可以左右拖动。每张图从上到下：四点法面积（px²）、睁开高度 O（px）、瞳孔点最低置信度、瞳孔中心相对中位位置的偏移（px，蓝 x、黄 y）；横轴是时间（秒）。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-2, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area (px²), eye opening O (px), lowest pupil confidence, pupil centre relative to its median position (px, blue x, yellow y); x = time (s).</figcaption>
   </figure>
-  <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">面积误差：四点法 / 三点法（%）</span><span lang="en">Area error: four-point / three-point (%)</span></th><th><span lang="zh">闭眼 / 睁眼帧数（人工）</span><span lang="en">Closed / open frames (human)</span></th><th><span lang="zh">判为闭眼的帧（%）</span><span lang="en">Frames flagged closed (%)</span></th><th><span lang="zh">事件数（每分钟）</span><span lang="en">Events (per min)</span></th><th><span lang="zh">事件时长中位数（ms）</span><span lang="en">Median event (ms)</span></th><th><span lang="zh">目前脚本标为不可信（%）</span><span lang="en">Untrusted by the current script (%)</span></th><th><span lang="zh">面积的相对波动（%）</span><span lang="en">Relative spread of the area (%)</span></th><th><span lang="zh">面积与睁开高度的相关</span><span lang="en">Correlation of area and opening</span></th></tr></thead>
-    <tbody>
-{{EYE_ROWS}}
-    </tbody>
-  </table></div>
-  <div class="concl" lang="zh"><span class="tag">时序的结论：</span>闭眼规则在各视频上给出的比例合理，但面积曲线里还有闭眼规则管不到的跳变，这部分还没有解决。
-    <ol>
-      <li>按新规则（阈值 0.412），19 个视频被判为闭眼的帧在 0.0–1.6% 之间，每分钟 0–5.3 次事件，最多的是视频 18（1.6%）和视频 8（1.5%）。用视频 16 为止的阈值 0.527 时，视频 8 是 12.9%、视频 15 是 3.7%。目前脚本的规则在同样的视频上标掉 4–84% 的帧。</li>
-      <li>视频 1、2、4、6、8 的面积曲线里有成段的相邻帧来回跳变，这些帧眼睛是睁开的，没有被闭眼规则标出；这是模型的某个瞳孔点在两个位置之间跳，属于跟踪错误，不是眨眼。</li>
-      <li>在 19 个视频上，面积和睁开高度的相关系数在 0.65–0.94 之间（视频 1 是 0.36）。只凭这个数分不清是瞳孔和眼睑真的一起变化，还是上眼睑遮挡让面积跟着变小。</li>
-      <li>还没做的：给第 2 点的跳变定一条规则并用人工标注帧检验；像之前在 5 分钟视频上那样，逐个事件对照原视频确认它是眨眼、眼动还是跟踪错误。</li>
-    </ol>
-  </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion on the time series:</span>The closure rule gives plausible shares on every video, but the area traces still contain jumps that the closure rule does not cover; this part is not solved yet.
-    <ol>
-      <li>With the new rule (threshold 0.412) the 19 videos have 0.0–1.6% of their frames flagged as closed, 0–5.3 events per minute; the most are video 18 with 1.6% and video 8 with 1.5%. With the threshold 0.527 used up to video 16, video 8 had 12.9% and video 15 3.7%. The rule of the current script removes 4–84% of the frames of the same videos.</li>
-      <li>The area traces of videos 1, 2, 4, 6 and 8 contain stretches in which neighbouring frames jump back and forth; the eye is open in these frames and the closure rule does not flag them. This is one pupil point of the model alternating between two positions: a tracking error, not a blink.</li>
-      <li>On 19 videos the correlation of area and eye opening is 0.65–0.94 (0.36 on video 1). This number alone cannot tell whether pupil and eyelid really change together or the upper eyelid covers the pupil and makes the area smaller.</li>
-      <li>Not done yet: a rule for the jumps of point 2, checked against human-labeled frames; and, as was done earlier on the 5-minute video, an event-by-event check against the original video of whether each event is a blink, an eye movement or a tracking error.</li>
-    </ol>
-  </div>
 </section>
 
 <!-- 12 -->
@@ -1079,7 +1058,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>怎么找出预测不可信的帧</b>（第 8 步 8.1 节）：fitting 检测器找明显错误最准（标 2% 的帧，找到 72%），jump 规则找到三分之二，置信度能找全但要标出一半的帧；还没有既全又准的规则，各视频之间差别也大；几种信号合用还没有试。</li>
       <li><b>视频 4、5、8</b> 误差偏大（视频 8 一直在 25 px 以上）。目前的解释是标注的人的判断：画面比较模糊，肉眼也难以识别点位。这一点还没有用数字验证过：用整幅画面的清晰度（拉普拉斯方差）和亮度去量，这三个视频和其他 Pluto 视频没有差别，所以模糊如果存在，是在瞳孔边缘这样的局部，需要专门去量。</li>
       <li><b>第三只老鼠（Terra，视频 11–18）</b>：8 个视频全部完成，平台点 20–60 帧。“换一只新老鼠要标 20 帧”目前只在两次换老鼠上各看到一次（视频 1 和视频 11）。</li>
-      <li><b>面积曲线里的跳变</b>（第 11 步）：眼睛睁开时某个瞳孔点在两个位置之间来回跳，闭眼规则标不出来；还没有针对它的规则，也还没有逐个事件对照原视频区分眨眼、眼球转动和跟踪错误。</li>
+      <li><b>面积曲线里的跳变</b>：第 11 步的时序图上，部分视频在眼睛睁开时面积在相邻帧之间来回跳（某个瞳孔点在两个位置之间跳）；还没有针对它的规则，也还没有逐段对照原视频区分眨眼、眼球转动和跟踪错误。</li>
       <li><b>面积</b>：正式的面积脚本目前仍是三点法，是否换成四点法，待定。<b>眨眼</b>：静态按帧分析按"非睁眼 = 闭上或部分盖住"的定义有了判据和验证（第 10 步）：每只老鼠一个像素阈值（Pluto 147.5、Terra 150.5 px，图 10-1 的选法），盲评准确率 94% / 89%，并在 949 张测试帧上验证了模型的眼睑距离误差只有 2 px（图 10-5、10-6）；还没有的是眨眼本身的定义和把眨眼从长时间半掩状态里分出来的规则，Kaiwen 给的方向是"眼睑高度先降后升算一次，更严格的版本要求有完全闭上的瞬间"。</li>
     </ul>
   </div>
@@ -1089,7 +1068,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to find unreliable frames</b> (step 8, section 8.1): the fitting detector is the most precise for gross errors (flags 2% of the frames, finds 72%), the jump rule finds two thirds, the confidence finds all of them but flags half of the frames; there is no rule yet that is both complete and selective, videos differ a lot, and combinations of the signals have not been tried.</li>
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: all 8 videos are finished, plateau points at 20–60 labels. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
-      <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
+      <li><b>Jumps in the area traces</b>: in the time series of step 11, in some videos the area jumps back and forth between neighbouring frames while the eye is open (one pupil point alternating between two positions); there is no rule for this yet, and no segment-by-segment check against the original video to tell blinks, eye movements and tracking errors apart.</li>
       <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the static per-frame analysis has a criterion and its check under the definition "not open = closed or partly covered" (step 10): one pixel threshold per mouse (Pluto 147.5, Terra 150.5 px, the method of Figure 10-1), 94% / 89% accurate on the blind frames, with the model's eyelid-distance error verified on 949 test frames at 2 px (Figures 10-5, 10-6); still missing are the definition of a blink itself and a rule that separates blinks from long half-covered stretches; Kaiwen's direction is "the eyelid height goes down and comes back up = one blink, a stricter version requires a moment of full closure".</li>
     </ul>
   </div>

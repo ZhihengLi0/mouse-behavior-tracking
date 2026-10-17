@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-15 23:16 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:19 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -916,20 +916,21 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 11 -->
 <section id="s11">
-  <h2><span class="no">11</span><span lang="en">Time series of the whole videos: the area traces still contain unresolved jumps</span></h2>
+  <h2><span class="no">11</span><span lang="en">Time series of the whole videos: pupil area, eye opening and confidence of every frame over time</span></h2>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra).</span></td></tr>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra). Video 0 is 5 min long, the others 19.9 min (71,748 frames at 60 frames/s).</span></td></tr>
     <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
-    <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off.</span></td></tr>
-    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/blink_and_area.py</code> (part C); results in <code>v2_new_pupil_top_video_scaling/results/blink_and_area/</code>; the time series of each video is <code>blink_area_timeseries_videoNN.png</code> there.</span></td></tr>
+    <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; video 7, whose plateau is at 0 labels, uses its 20-label model). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off, no smoothing and no frame removed.</span></td></tr>
+    <tr><th><span lang="en">Per-frame quantities</span></th><td><span lang="en">Four-point area = π/4 × |x(pupil right) − x(pupil left)| × |y(pupil bottom) − y(pupil top)| (definition of step 9); eye opening O = y(eyelid bottom) − y(eyelid top) (definition of step 10); lowest pupil confidence = minimum of the four pupil points' confidence; pupil centre = (mean x of left and right, mean y of top and bottom), drawn minus its median position over the video.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/area_timeseries.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/area_timeseries/</code>; the time series of each video is <code>area_timeseries_videoNN.png</code> there, the frame count and median area of each video are in <code>area_timeseries_all_videos.csv</code>.</span></td></tr>
   </tbody></table></div>
   
-  <p class="text" lang="en"><span class="tag">What was done:</span>For every frame of every video: four-point area, eye opening and mean pupil confidence; closed frames are flagged with the rule of step 10 (mean confidence &lt; 0.412) and flagged frames less than 0.25 s (15 frames) apart are merged into one event. In the table, "relative spread of the area" = 1.4826 × median absolute deviation ÷ median of the area on unflagged frames; "correlation of area and opening" is their correlation coefficient on unflagged frames.</p>
+  <p class="text" lang="en"><span class="tag">Scope:</span>This section only plots the per-frame quantities against time and draws no conclusion. Closed frames are judged frame by frame by the rule of step 10 and are not marked here; the time course of blinks (start to end of a blink, duration, frequency) is a separate analysis.</p>
   <figure>
     <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 11-1, how to read:</span>One row per video (video 0 is 5 min long, the others 19.9 min). Blue = four-point area divided by the video's median area; red bars = frames flagged as closed.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-1, how to read:</span>One row per video; y = four-point area divided by the video's median area (1 = median, range 0–2), x = time (s).</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -954,41 +955,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/eyets_video18.jpg" alt="eyets video 18" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 11-2, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area, eye opening, lowest pupil confidence, pupil centre relative to its median position; x = time (s), red = frames flagged as "pupil not visible".</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-2, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area (px²), eye opening O (px), lowest pupil confidence, pupil centre relative to its median position (px, blue x, yellow y); x = time (s).</figcaption>
   </figure>
-  <div class="tablebox"><table>
-    <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Mouse</span></th><th><span lang="en">Area error: four-point / three-point (%)</span></th><th><span lang="en">Closed / open frames (human)</span></th><th><span lang="en">Frames flagged closed (%)</span></th><th><span lang="en">Events (per min)</span></th><th><span lang="en">Median event (ms)</span></th><th><span lang="en">Untrusted by the current script (%)</span></th><th><span lang="en">Relative spread of the area (%)</span></th><th><span lang="en">Correlation of area and opening</span></th></tr></thead>
-    <tbody>
-<tr><td>0</td><td>mouse A</td><td>2.6 / 6.0</td><td>0 / 148</td><td>0.00</td><td>0 (0.0)</td><td>nan</td><td>10.3</td><td>8.1</td><td>0.71</td></tr>
-<tr><td>1</td><td>Pluto</td><td>9.5 / 6.0</td><td>2 / 184</td><td>0.60</td><td>26 (1.3)</td><td>200</td><td>83.8</td><td>17.2</td><td>0.36</td></tr>
-<tr><td>2</td><td>Pluto</td><td>5.3 / 3.9</td><td>4 / 119</td><td>0.43</td><td>29 (1.5)</td><td>133</td><td>40.1</td><td>22.9</td><td>0.88</td></tr>
-<tr><td>3</td><td>Pluto</td><td>2.2 / 14.8</td><td>4 / 101</td><td>0.59</td><td>31 (1.6)</td><td>183</td><td>40.2</td><td>31.0</td><td>0.91</td></tr>
-<tr><td>4</td><td>Pluto</td><td>43.8 / 50.9</td><td>6 / 122</td><td>0.43</td><td>27 (1.4)</td><td>167</td><td>49.8</td><td>85.9</td><td>0.83</td></tr>
-<tr><td>5</td><td>Pluto</td><td>10.7 / 2.4</td><td>1 / 88</td><td>0.04</td><td>2 (0.1)</td><td>358</td><td>15.5</td><td>29.1</td><td>0.73</td></tr>
-<tr><td>6</td><td>Pluto</td><td>2.7 / 8.8</td><td>1 / 107</td><td>0.19</td><td>14 (0.7)</td><td>150</td><td>42.2</td><td>35.1</td><td>0.84</td></tr>
-<tr><td>7</td><td>Pluto</td><td>5.6 / 2.4</td><td>4 / 86</td><td>0.19</td><td>7 (0.3)</td><td>333</td><td>10.8</td><td>54.8</td><td>0.71</td></tr>
-<tr><td>8</td><td>Pluto</td><td>24.0 / 38.2</td><td>1 / 108</td><td>1.51</td><td>106 (5.3)</td><td>133</td><td>64.7</td><td>59.6</td><td>0.90</td></tr>
-<tr><td>9</td><td>Pluto</td><td>7.6 / 13.7</td><td>5 / 163</td><td>0.82</td><td>37 (1.9)</td><td>217</td><td>38.0</td><td>35.0</td><td>0.85</td></tr>
-<tr><td>10</td><td>Pluto</td><td>13.3 / 13.8</td><td>0 / 128</td><td>1.37</td><td>51 (2.6)</td><td>183</td><td>44.1</td><td>18.3</td><td>0.82</td></tr>
-<tr><td>11</td><td>Terra</td><td>3.9 / 5.0</td><td>0 / 130</td><td>0.11</td><td>11 (0.6)</td><td>83</td><td>30.6</td><td>14.7</td><td>0.80</td></tr>
-<tr><td>12</td><td>Terra</td><td>1.5 / 3.0</td><td>0 / 88</td><td>0.57</td><td>31 (1.6)</td><td>317</td><td>25.4</td><td>23.9</td><td>0.86</td></tr>
-<tr><td>13</td><td>Terra</td><td>3.3 / 10.9</td><td>0 / 110</td><td>0.21</td><td>20 (1.0)</td><td>100</td><td>11.5</td><td>13.5</td><td>0.87</td></tr>
-<tr><td>14</td><td>Terra</td><td>6.1 / 7.2</td><td>3 / 146</td><td>0.52</td><td>20 (1.0)</td><td>242</td><td>63.4</td><td>28.3</td><td>0.83</td></tr>
-<tr><td>15</td><td>Terra</td><td>11.1 / 12.2</td><td>3 / 127</td><td>1.33</td><td>68 (3.4)</td><td>183</td><td>63.8</td><td>68.0</td><td>0.94</td></tr>
-<tr><td>16</td><td>Terra</td><td>3.6 / 7.0</td><td>0 / 130</td><td>0.01</td><td>1 (0.1)</td><td>233</td><td>4.4</td><td>31.0</td><td>0.65</td></tr>
-<tr><td>17</td><td>Terra</td><td>1.8 / 10.9</td><td>5 / 124</td><td>0.55</td><td>21 (1.1)</td><td>217</td><td>15.1</td><td>31.7</td><td>0.74</td></tr>
-<tr><td>18</td><td>Terra</td><td>10.4 / 10.6</td><td>4 / 119</td><td>1.59</td><td>71 (3.6)</td><td>200</td><td>82.2</td><td>55.9</td><td>0.93</td></tr>
-    </tbody>
-  </table></div>
-  
-  <div class="concl" lang="en"><span class="tag">Conclusion on the time series:</span>The closure rule gives plausible shares on every video, but the area traces still contain jumps that the closure rule does not cover; this part is not solved yet.
-    <ol>
-      <li>With the new rule (threshold 0.412) the 19 videos have 0.0–1.6% of their frames flagged as closed, 0–5.3 events per minute; the most are video 18 with 1.6% and video 8 with 1.5%. With the threshold 0.527 used up to video 16, video 8 had 12.9% and video 15 3.7%. The rule of the current script removes 4–84% of the frames of the same videos.</li>
-      <li>The area traces of videos 1, 2, 4, 6 and 8 contain stretches in which neighbouring frames jump back and forth; the eye is open in these frames and the closure rule does not flag them. This is one pupil point of the model alternating between two positions: a tracking error, not a blink.</li>
-      <li>On 19 videos the correlation of area and eye opening is 0.65–0.94 (0.36 on video 1). This number alone cannot tell whether pupil and eyelid really change together or the upper eyelid covers the pupil and makes the area smaller.</li>
-      <li>Not done yet: a rule for the jumps of point 2, checked against human-labeled frames; and, as was done earlier on the 5-minute video, an event-by-event check against the original video of whether each event is a blink, an eye movement or a tracking error.</li>
-    </ol>
-  </div>
 </section>
 
 <!-- 12 -->
@@ -1001,7 +969,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>How to find unreliable frames</b> (step 8, section 8.1): the fitting detector is the most precise for gross errors (flags 2% of the frames, finds 72%), the jump rule finds two thirds, the confidence finds all of them but flags half of the frames; there is no rule yet that is both complete and selective, videos differ a lot, and combinations of the signals have not been tried.</li>
       <li><b>Videos 4, 5 and 8</b> have larger errors (video 8 stays above 25 px). The present explanation is the labeler's judgement: the image is blurry and the points are hard to identify even by eye. This has not been confirmed by a number: whole-image sharpness (variance of the Laplacian) and brightness do not differ between these three and the other Pluto videos, so any blur is local (e.g. at the pupil edge) and would need a dedicated measurement.</li>
       <li><b>The third mouse (Terra, videos 11–18)</b>: all 8 videos are finished, plateau points at 20–60 labels. "A new mouse needs 20 labels" has so far been seen once at each of the two changes of mouse (videos 1 and 11).</li>
-      <li><b>Jumps in the area traces</b> (step 11): with the eye open, one pupil point alternates between two positions and the closure rule does not flag it; there is no rule for this yet, and no event-by-event check against the original video to tell blinks, eye movements and tracking errors apart.</li>
+      <li><b>Jumps in the area traces</b>: in the time series of step 11, in some videos the area jumps back and forth between neighbouring frames while the eye is open (one pupil point alternating between two positions); there is no rule for this yet, and no segment-by-segment check against the original video to tell blinks, eye movements and tracking errors apart.</li>
       <li><b>Area</b>: the production area script still uses the three-point rule; the switch to the four-point rule is undecided. <b>Blinks</b>: the static per-frame analysis has a criterion and its check under the definition "not open = closed or partly covered" (step 10): one pixel threshold per mouse (Pluto 147.5, Terra 150.5 px, the method of Figure 10-1), 94% / 89% accurate on the blind frames, with the model's eyelid-distance error verified on 949 test frames at 2 px (Figures 10-5, 10-6); still missing are the definition of a blink itself and a rule that separates blinks from long half-covered stretches; Kaiwen's direction is "the eyelid height goes down and comes back up = one blink, a stricter version requires a moment of full closure".</li>
     </ul>
   </div>
