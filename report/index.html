@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-17 15:53 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-17 15:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1146,8 +1146,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
-    <figcaption lang="zh"><span class="tag">图 10-4 怎么看：</span>一点一张测试帧，横坐标是标注者两个眼睑点算出的距离，纵坐标是模型两个眼睑点算出的距离，黑斜线是两者相等，点线是 ±10 px，虚线是该老鼠的阈值。点贴着斜线说明模型在这个数上基本不出错：Pluto 499 帧中位差 1.9 px、Terra 400 帧 2.2 px，90% 的帧差不到 6.3 px，没有系统偏差（中位偏差 ±0.1 px）。因为模型误差而跑到阈值另一边的帧，Pluto 12 帧（2.4%）、Terra 14 帧（3.5%），全是离线 20 px 以内的帧，那一档里约 8–10% 的帧被换到另一边。mouse A 只有一个视频，模型只见过它的 60 帧标注，差 6.8 px，偏大 5.5 px，但它的眼全程睁大，不影响。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame; x = the distance from the labeler's two eyelid points, y = the distance from the model's two points; the black diagonal is equality, dotted lines ±10 px, dashed lines the mouse threshold. The dots hug the diagonal, so the model hardly errs on this quantity: median difference 1.9 px on Pluto's 499 frames and 2.2 px on Terra's 400, 90% of the frames within 6.3 px, no bias (median ±0.1 px). Frames that the model's error puts on the other side of the threshold: 12 for Pluto (2.4%), 14 for Terra (3.5%), all within 20 px of the line, where about 8–10% of the frames change side. Mouse A has one video and its model saw only that video's 60 labels; it differs by 6.8 px and reads 5.5 px large, but that eye is wide open throughout, so it does not matter.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 10-4 怎么看：</span>一点一张测试帧。横坐标 = 标注者两个眼睑点的距离，纵坐标 = 模型两个眼睑点的距离。黑斜线 = 两者相等，点线 = ±10 px，虚线 = 该老鼠的阈值。
+      <ul>
+        <li>点贴着斜线：模型在这个数上基本不出错。中位差 Pluto 1.9 px（499 帧）、Terra 2.2 px（400 帧），90% 的帧差不到 6.3 px，没有系统偏差。</li>
+        <li>因为模型误差被换到阈值另一边的帧：Pluto 12 帧（2.4%）、Terra 14 帧（3.5%），都是离阈值 20 px 以内的帧。</li>
+        <li>mouse A 差 6.8 px、偏大 5.5 px（模型只见过它一个视频的 60 帧标注），但它的眼全程睁大，不影响。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame. x = the distance between the labeler's two eyelid points, y = the distance between the model's two. Black diagonal = equal, dotted lines = ±10 px, dashed line = the mouse threshold.
+      <ul>
+        <li>The dots hug the diagonal: the model hardly errs on this quantity. Median difference Pluto 1.9 px (499 frames), Terra 2.2 px (400 frames), 90% of the frames within 6.3 px, no bias.</li>
+        <li>Frames moved to the other side of the threshold by the model's error: Pluto 12 (2.4%), Terra 14 (3.5%), all within 20 px of the threshold.</li>
+        <li>Mouse A differs by 6.8 px and reads 5.5 px large (its model saw only the 60 labels of its one video), but that eye is wide open throughout, so it does not matter.</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">测试帧</span><span lang="en">Test frames</span></th><th><span lang="zh">|模型 − 标注| 中位</span><span lang="en">Median |model − label|</span></th><th><span lang="zh">90% 的帧不超过</span><span lang="en">90th percentile</span></th><th><span lang="zh">最大</span><span lang="en">Max</span></th><th><span lang="zh">系统偏差（中位）</span><span lang="en">Bias (median)</span></th><th><span lang="zh">阈值两侧不一致</span><span lang="en">On different sides of the threshold</span></th><th><span lang="zh">其中离线 20 px 以内</span><span lang="en">Among frames within 20 px of the line</span></th></tr></thead>

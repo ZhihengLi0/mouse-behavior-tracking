@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:53 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -900,7 +900,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame; x = the distance from the labeler's two eyelid points, y = the distance from the model's two points; the black diagonal is equality, dotted lines ±10 px, dashed lines the mouse threshold. The dots hug the diagonal, so the model hardly errs on this quantity: median difference 1.9 px on Pluto's 499 frames and 2.2 px on Terra's 400, 90% of the frames within 6.3 px, no bias (median ±0.1 px). Frames that the model's error puts on the other side of the threshold: 12 for Pluto (2.4%), 14 for Terra (3.5%), all within 20 px of the line, where about 8–10% of the frames change side. Mouse A has one video and its model saw only that video's 60 labels; it differs by 6.8 px and reads 5.5 px large, but that eye is wide open throughout, so it does not matter.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame. x = the distance between the labeler's two eyelid points, y = the distance between the model's two. Black diagonal = equal, dotted lines = ±10 px, dashed line = the mouse threshold.
+      <ul>
+        <li>The dots hug the diagonal: the model hardly errs on this quantity. Median difference Pluto 1.9 px (499 frames), Terra 2.2 px (400 frames), 90% of the frames within 6.3 px, no bias.</li>
+        <li>Frames moved to the other side of the threshold by the model's error: Pluto 12 (2.4%), Terra 14 (3.5%), all within 20 px of the threshold.</li>
+        <li>Mouse A differs by 6.8 px and reads 5.5 px large (its model saw only the 60 labels of its one video), but that eye is wide open throughout, so it does not matter.</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Mouse</span></th><th><span lang="en">Test frames</span></th><th><span lang="en">Median |model − label|</span></th><th><span lang="en">90th percentile</span></th><th><span lang="en">Max</span></th><th><span lang="en">Bias (median)</span></th><th><span lang="en">On different sides of the threshold</span></th><th><span lang="en">Among frames within 20 px of the line</span></th></tr></thead>
