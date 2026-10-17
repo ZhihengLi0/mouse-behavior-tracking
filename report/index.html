@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-17 15:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-17 15:56 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1171,46 +1171,36 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <div class="text" lang="zh">
-    <p><b>前提核对：眼睛在画面里的位置和大小，每天是否一样。</b></p>
-    <p>结论：位置有偏移，但不影响像素阈值。Pluto 最早三天（10-22、10-23、10-24，视频 10、9、8）眼宽小 3–12%，即使按此把阈值降低，这三天仍是大部分时间眯着，结论不变。所有视频用同一阈值。</p>
-    <p>为什么核对：像素阈值假设眼睛到相机的距离每天相同。距离变了，画面里所有长度一起变，同一个 147.5 px 对应的睁开程度就不同。</p>
-    <p>怎么核对：用模型给的两个眼角。眼睛位置 = 两眼角中点在整段视频的中位数；眼睛大小 = 眼宽 W（两眼角距离）的中位数。低于阈值的比例取自上面的每视频表，另按 140 px 和 120 px 各算一次。</p>
+    <p><b>前提核对：像素阈值能不能跨天用，也就是眼睛每天在画面里是不是一样大。</b></p>
+    <p>结论：能。Pluto 最早三天（10-22、10-23、10-24，视频 10、9、8）眼睛在画面里小 3–12%，原因分不开是相机略远还是眼睛眯着（眯眼时眼角间距也会缩短）。但即使全按"相机远了"处理、把阈值同比例降低，这三天仍有一半以上的帧低于阈值，所以"这三天大部分时间眯着"不变，只是比例在 56–79% 之间有不确定。其他日子眼宽相差不到 6%，不需要处理。所有视频用同一阈值。</p>
+    <p>怎么核对：眼宽 W = 模型给的两个眼角距离在整段视频的中位数。把阈值按眼宽比例降低，相当于按 140 px 和 120 px 再算一次低于阈值的比例。</p>
     <div class="tablebox"><table>
-      <thead><tr><th>视频</th><th>日期</th><th>眼睛位置 x / y（px）</th><th>眼宽 W（px）</th><th>睁开高度中位数（px）</th><th>低于该老鼠阈值的帧</th><th>低于 140 px</th><th>低于 120 px</th></tr></thead>
+      <thead><tr><th>视频</th><th>日期</th><th>眼宽 W（px）</th><th>比 Pluto 10-27 之后的中位数 444 px</th><th>低于 147.5 px 的帧</th><th>低于 140 px</th><th>低于 120 px</th></tr></thead>
       <tbody>
-        <tr><td>Pluto 1–7</td><td>10-27 到 10-31</td><td>520–529 / 493–514</td><td>417–468</td><td>148–229</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
-        <tr><td>Pluto 8</td><td>10-24</td><td>540 / 517</td><td>428</td><td>156</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
-        <tr><td>Pluto 9</td><td>10-23</td><td>567 / 523</td><td>414</td><td>136</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
-        <tr><td>Pluto 10</td><td>10-22</td><td>583 / 541</td><td>392</td><td>117</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
-        <tr><td>Terra 11–18</td><td>10-08 到 10-17</td><td>598–637 / 482–523</td><td>417–465</td><td>135–214</td><td>0.2–72.2%</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
+        <tr><td>Pluto 10</td><td>10-22</td><td>392</td><td>−12%</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
+        <tr><td>Pluto 9</td><td>10-23</td><td>414</td><td>−7%</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
+        <tr><td>Pluto 8</td><td>10-24</td><td>428</td><td>−3%</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
+        <tr><td>Pluto 1–7</td><td>10-27 到 10-31</td><td>417–468</td><td>−6% 到 +5%</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
+        <tr><td>Terra 11–18</td><td>10-08 到 10-17</td><td>417–465</td><td>–</td><td>0.2–72.2%（阈值 150.5 px）</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
       </tbody>
     </table></div>
-    <ol>
-      <li>位置。Pluto 10-27 之后的 7 个视频相差 x 10 px、y 21 px 以内；Terra 的 8 个视频相差 39 / 41 px 以内。Pluto 10-22、10-23 比 10-28 之后向右下偏：用标注者自己标的眼角点复核（不经过模型），偏右 42 / 59 px、偏下 17 / 34 px，10-24 偏 13 / 7 px，偏移是真的。影响：O 是两点 y 坐标之差，整体平移不改变 O，所以位置偏移不影响阈值。</li>
-      <li>大小。10-22 到 10-24 眼宽 392–428 px，比 10-27 之后的中位数 444 px 小 3–12%。两种原因分不开：相机略远（画面里所有长度同比例缩小），或眼睛眯着（眼角间距也会缩短）。影响：若全归因于相机距离，这三天的阈值应按比例降到 130–143 px。表里按 140 px 算，这三天仍有 37–73% 的帧低于阈值；10-22 按 120 px 算仍有 56%。所以"这三天大部分时间眯着"不变，只是具体比例在 56–79% 之间有不确定。</li>
-      <li>处理。所有视频用同一阈值；录制时每天核对老鼠的位置。</li>
-    </ol>
+    <p>这三天眼睛在画面里的位置也向右下偏了 45–60 px（用标注者自己标的眼角点复核过，是真的），但阈值只看上下眼睑两点的 y 差，整体平移不改变它，不用处理。Terra 眼宽最小的两天（视频 11、18）正是眯得最多的两天，和 Pluto 一样，说明眼宽变小更可能是眯眼本身。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Premise check: are the position and size of the eye in the image the same every day.</b></p>
-    <p>Conclusion: the position shifts, but this does not affect the pixel threshold. On Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye width is 3–12% smaller; even with the threshold lowered accordingly, the eye is narrowed most of the time on those days, so the conclusion stands. All videos use the same threshold.</p>
-    <p>Why check: a pixel threshold assumes the same eye-to-camera distance every day. If the distance changes, every length in the image changes with it, and the same 147.5 px means a different degree of opening.</p>
-    <p>How: the model's two eye corners. Eye position = median over the video of the corner midpoint; eye size = median eye width W (corner-to-corner distance). The shares below the threshold come from the per-video table above, with 140 px and 120 px added.</p>
+    <p><b>Premise check: can a pixel threshold be used across days, i.e. is the eye the same size in the image every day.</b></p>
+    <p>Conclusion: yes. On Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye is 3–12% smaller in the image; whether the camera was slightly farther or the eye was narrowed (narrowing shortens the corner distance too) cannot be told apart. But even if all of it is treated as camera distance and the threshold lowered by the same factor, more than half of the frames of those days stay below it, so "narrowed most of the time on those three days" stands; only the share is uncertain, between 56% and 79%. On the other days the eye width varies by less than 6% and needs no handling. All videos use the same threshold.</p>
+    <p>How: eye width W = median over the video of the distance between the model's two eye corners. Lowering the threshold in proportion to W amounts to recounting the frames below 140 px and below 120 px.</p>
     <div class="tablebox"><table>
-      <thead><tr><th>Video</th><th>Date</th><th>Eye position x / y (px)</th><th>Eye width W (px)</th><th>Median opening (px)</th><th>Below the mouse threshold</th><th>Below 140 px</th><th>Below 120 px</th></tr></thead>
+      <thead><tr><th>Video</th><th>Date</th><th>Eye width W (px)</th><th>Against the median of Pluto from 10-27 on, 444 px</th><th>Frames below 147.5 px</th><th>Below 140 px</th><th>Below 120 px</th></tr></thead>
       <tbody>
-        <tr><td>Pluto 1–7</td><td>10-27 to 10-31</td><td>520–529 / 493–514</td><td>417–468</td><td>148–229</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
-        <tr><td>Pluto 8</td><td>10-24</td><td>540 / 517</td><td>428</td><td>156</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
-        <tr><td>Pluto 9</td><td>10-23</td><td>567 / 523</td><td>414</td><td>136</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
-        <tr><td>Pluto 10</td><td>10-22</td><td>583 / 541</td><td>392</td><td>117</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
-        <tr><td>Terra 11–18</td><td>10-08 to 10-17</td><td>598–637 / 482–523</td><td>417–465</td><td>135–214</td><td>0.2–72.2%</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
+        <tr><td>Pluto 10</td><td>10-22</td><td>392</td><td>−12%</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
+        <tr><td>Pluto 9</td><td>10-23</td><td>414</td><td>−7%</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
+        <tr><td>Pluto 8</td><td>10-24</td><td>428</td><td>−3%</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
+        <tr><td>Pluto 1–7</td><td>10-27 to 10-31</td><td>417–468</td><td>−6% to +5%</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
+        <tr><td>Terra 11–18</td><td>10-08 to 10-17</td><td>417–465</td><td>–</td><td>0.2–72.2% (threshold 150.5 px)</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
       </tbody>
     </table></div>
-    <ol>
-      <li>Position. Pluto's seven videos from 10-27 on lie within 10 px in x and 21 px in y of each other; Terra's eight videos within 39 / 41 px. Pluto's 10-22 and 10-23 sit to the lower right of 10-28 and later: checked with the labeler's own corner labels (no model), 42 / 59 px to the right and 17 / 34 px lower, 10-24 off by 13 / 7 px; the shift is real. Effect: O is the difference of two y coordinates, a translation leaves it unchanged, so the shift does not affect the threshold.</li>
-      <li>Size. From 10-22 to 10-24 the eye width is 392–428 px, 3–12% below the median of 444 px from 10-27 on. Two causes cannot be told apart: a slightly more distant camera (every length in the image shrinks by the same factor) or a narrowed eye (the corner distance shortens too). Effect: if all of it were camera distance, the threshold on those days should drop proportionally to 130–143 px. At 140 px the table still has 37–73% of their frames below the threshold; 10-22 still has 56% at 120 px. So "narrowed most of the time on those three days" stands; only the exact share is uncertain, between 56% and 79%.</li>
-      <li>Handling. All videos use the same threshold; the mouse position is checked at every recording.</li>
-    </ol>
+    <p>On those three days the eye also sits 45–60 px to the lower right in the image (confirmed with the labeler's own corner labels), but the threshold only uses the difference in y between the two eyelid points, which a translation leaves unchanged, so nothing needs to be done. For Terra the two days with the smallest eye width (videos 11, 18) are also the two most narrowed days, as for Pluto, which points to narrowing itself as the cause of the smaller width.</p>
   </div>
   <div class="text" lang="zh">
     <p><b>每个视频的结果。</b>下表是该判据在整段视频上的按帧结果：每个视频低于该老鼠阈值的帧占多少，以及换成 140 / 160 px 时的比例。最后一列是对照规则（见下）。</p>

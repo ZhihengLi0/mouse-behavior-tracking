@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:56 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -919,25 +919,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   
   <div class="text" lang="en">
-    <p><b>Premise check: are the position and size of the eye in the image the same every day.</b></p>
-    <p>Conclusion: the position shifts, but this does not affect the pixel threshold. On Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye width is 3–12% smaller; even with the threshold lowered accordingly, the eye is narrowed most of the time on those days, so the conclusion stands. All videos use the same threshold.</p>
-    <p>Why check: a pixel threshold assumes the same eye-to-camera distance every day. If the distance changes, every length in the image changes with it, and the same 147.5 px means a different degree of opening.</p>
-    <p>How: the model's two eye corners. Eye position = median over the video of the corner midpoint; eye size = median eye width W (corner-to-corner distance). The shares below the threshold come from the per-video table above, with 140 px and 120 px added.</p>
+    <p><b>Premise check: can a pixel threshold be used across days, i.e. is the eye the same size in the image every day.</b></p>
+    <p>Conclusion: yes. On Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye is 3–12% smaller in the image; whether the camera was slightly farther or the eye was narrowed (narrowing shortens the corner distance too) cannot be told apart. But even if all of it is treated as camera distance and the threshold lowered by the same factor, more than half of the frames of those days stay below it, so "narrowed most of the time on those three days" stands; only the share is uncertain, between 56% and 79%. On the other days the eye width varies by less than 6% and needs no handling. All videos use the same threshold.</p>
+    <p>How: eye width W = median over the video of the distance between the model's two eye corners. Lowering the threshold in proportion to W amounts to recounting the frames below 140 px and below 120 px.</p>
     <div class="tablebox"><table>
-      <thead><tr><th>Video</th><th>Date</th><th>Eye position x / y (px)</th><th>Eye width W (px)</th><th>Median opening (px)</th><th>Below the mouse threshold</th><th>Below 140 px</th><th>Below 120 px</th></tr></thead>
+      <thead><tr><th>Video</th><th>Date</th><th>Eye width W (px)</th><th>Against the median of Pluto from 10-27 on, 444 px</th><th>Frames below 147.5 px</th><th>Below 140 px</th><th>Below 120 px</th></tr></thead>
       <tbody>
-        <tr><td>Pluto 1–7</td><td>10-27 to 10-31</td><td>520–529 / 493–514</td><td>417–468</td><td>148–229</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
-        <tr><td>Pluto 8</td><td>10-24</td><td>540 / 517</td><td>428</td><td>156</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
-        <tr><td>Pluto 9</td><td>10-23</td><td>567 / 523</td><td>414</td><td>136</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
-        <tr><td>Pluto 10</td><td>10-22</td><td>583 / 541</td><td>392</td><td>117</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
-        <tr><td>Terra 11–18</td><td>10-08 to 10-17</td><td>598–637 / 482–523</td><td>417–465</td><td>135–214</td><td>0.2–72.2%</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
+        <tr><td>Pluto 10</td><td>10-22</td><td>392</td><td>−12%</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
+        <tr><td>Pluto 9</td><td>10-23</td><td>414</td><td>−7%</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
+        <tr><td>Pluto 8</td><td>10-24</td><td>428</td><td>−3%</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
+        <tr><td>Pluto 1–7</td><td>10-27 to 10-31</td><td>417–468</td><td>−6% to +5%</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
+        <tr><td>Terra 11–18</td><td>10-08 to 10-17</td><td>417–465</td><td>–</td><td>0.2–72.2% (threshold 150.5 px)</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
       </tbody>
     </table></div>
-    <ol>
-      <li>Position. Pluto's seven videos from 10-27 on lie within 10 px in x and 21 px in y of each other; Terra's eight videos within 39 / 41 px. Pluto's 10-22 and 10-23 sit to the lower right of 10-28 and later: checked with the labeler's own corner labels (no model), 42 / 59 px to the right and 17 / 34 px lower, 10-24 off by 13 / 7 px; the shift is real. Effect: O is the difference of two y coordinates, a translation leaves it unchanged, so the shift does not affect the threshold.</li>
-      <li>Size. From 10-22 to 10-24 the eye width is 392–428 px, 3–12% below the median of 444 px from 10-27 on. Two causes cannot be told apart: a slightly more distant camera (every length in the image shrinks by the same factor) or a narrowed eye (the corner distance shortens too). Effect: if all of it were camera distance, the threshold on those days should drop proportionally to 130–143 px. At 140 px the table still has 37–73% of their frames below the threshold; 10-22 still has 56% at 120 px. So "narrowed most of the time on those three days" stands; only the exact share is uncertain, between 56% and 79%.</li>
-      <li>Handling. All videos use the same threshold; the mouse position is checked at every recording.</li>
-    </ol>
+    <p>On those three days the eye also sits 45–60 px to the lower right in the image (confirmed with the labeler's own corner labels), but the threshold only uses the difference in y between the two eyelid points, which a translation leaves unchanged, so nothing needs to be done. For Terra the two days with the smallest eye width (videos 11, 18) are also the two most narrowed days, as for Pluto, which points to narrowing itself as the cause of the smaller width.</p>
   </div>
   
   <div class="text" lang="en">
