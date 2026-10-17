@@ -1031,10 +1031,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p><b>验证二：模型的眼睑距离和标注者自己标的差多少（图 10-4）。</b>数据：每个视频留出的 50 张测试帧（第 5 步起留出、模型没训练过，19 个视频共 949 帧），同一帧上标注的两个眼睑点算出的距离，对模型算出的距离。结论：中位差 2 px，无偏差，只把 2–4% 的测试帧换到阈值另一边，所以阈值附近的错大部分不是模型的。</p>
+    <p><b>验证二：模型的眼睑距离和标注者自己标的差多少（图 10-4）。</b>数据：每个视频留出的 50 张测试帧（模型没训练过，19 个视频共 949 帧），同一帧上标注的两个眼睑点算出的距离，对模型算出的距离。结论：中位差 2 px，无偏差，只把 2–4% 的测试帧换到阈值另一边，所以阈值附近的错大部分不是模型的。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Check two: how far the model's eyelid distance is from the labeler's own labels (Figure 10-4).</b> Data: the 50 test frames held out per video (held out since step 5, never trained on, 949 frames over the 19 videos), the distance from the labeled eyelid points against the distance from the model's points on the same frame. Conclusion: median difference 2 px, no bias, only 2–4% of the test frames change side of the threshold, so most errors near the threshold are not the model's.</p>
+    <p><b>Check two: how far the model's eyelid distance is from the labeler's own labels (Figure 10-4).</b> Data: the 50 test frames held out per video (never trained on, 949 frames over the 19 videos), the distance from the labeled eyelid points against the distance from the model's points on the same frame. Conclusion: median difference 2 px, no bias, only 2–4% of the test frames change side of the threshold, so most errors near the threshold are not the model's.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
