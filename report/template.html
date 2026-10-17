@@ -915,6 +915,34 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>眼睑点失效的帧（每个视频 0.02–1.6%）：算不出可用的 O，改看瞳孔。模型四个瞳孔点置信度的平均值 &lt; 0.527 → 非睁眼，否则睁开。依据：眼睛闭着时瞳孔不可见，模型对瞳孔点的置信度低。</li>
     </ol>
     <p>0.527 的选法和 T 相同：在标注过、模型没训练过的帧上，以“标注者看不清瞳孔、四个点全留空”为真值非睁眼、“四个点都标了”为真值睁开，逐个试阈值，取检出率 − 误报率最大的值（<code>scripts/blink_and_area.py</code> B 部分）。它选在视频 0–16 的帧上；在全部 19 个视频的 2371 帧（43 帧全空、2328 帧都标）上同一准则给出 0.412。两者只影响眼睑点失效的 0.02–1.6% 帧，各脚本沿用 0.527。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Definition.</b> Each frame is in one of two states: <b>open</b>, or <b>not open</b> (the eye is closed, or the eyelid covers part of the pupil). Blink / long closure / squint come with the systematic analysis of the dynamics later.</p>
+    <p><b>Why a pixel distance and one value per mouse.</b> The question is when the eye is narrowed.</p>
+    <ul>
+      <li>The camera is fixed and the mouse is placed at the same position every day (checked below), so the pixel distance between the two eyelid points is itself comparable across days and needs no division by the eye width.</li>
+      <li>Eye size differs between mice, so each mouse gets its own threshold.</li>
+    </ul>
+    <p>Example frames at the threshold and at 180 px were drawn so that the eye opening at the threshold can be checked by eye (Figure 10-2).</p>
+    <p><b>Criterion (per frame).</b> One threshold T per mouse: <b>Pluto 147.5 px, Terra 150.5 px</b> (shown as 148 / 150 in the figures). Mouse A cannot be set: all 12 of its judged frames are open.</p>
+    <ol>
+      <li>Frames with plausible eyelid points: O &lt; T → not open; O ≥ T → open.</li>
+      <li>Frames with implausible eyelid points (0.02–1.6% of each video): no usable O, so the pupil is used instead. Mean confidence of the model's four pupil points &lt; 0.527 → not open, otherwise open. Basis: when the eye is closed the pupil is not visible and the model's confidence in the pupil points is low.</li>
+    </ol>
+    <p>0.527 was chosen the same way as T: on human-labeled frames the model was not trained on, with "the labeler could not see the pupil and left all four points empty" as truth not open and "all four labeled" as truth open, every threshold was tried and the one with the largest recall − false-alarm rate taken (part B of <code>scripts/blink_and_area.py</code>). It was chosen on the frames of videos 0–16; on the 2371 frames of all 19 videos (43 all empty, 2328 all labeled) the same criterion gives 0.412. The two values differ only on the 0.02–1.6% of frames with implausible eyelid points; the scripts keep 0.527.</p>
+  </div>
+  <div class="text" lang="zh">
+    <p><b>阈值定在哪（图 10-1）。</b>结论：Pluto 147.5 px、Terra 150.5 px，取"检出率 − 误报率"最高的候选值；留一视频检验的范围 Pluto 147.5–160.5 px、Terra 143.5–154.5 px。怎么算见图下。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Where the threshold is (Figure 10-1).</b> Conclusion: Pluto 147.5 px, Terra 150.5 px, the candidate with the highest recall − false-alarm rate; leave-one-video-out ranges Pluto 147.5–160.5 px, Terra 143.5–154.5 px. The computation follows the figure.</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the judged frames"></div>
+    <figcaption lang="zh"><span class="tag">图 10-1 怎么看：</span>每格一只老鼠（第一格是三只合并，仅供参考，阈值按单只老鼠定）。横轴是候选阈值 T（像素），蓝线是一致率（"O &lt; T 判非睁眼"和标注者判断一致的帧占全部帧的比例），橙线是检出率减误报率（公式见上文"阈值怎么选"）；橙色竖线是选出的阈值，橙色阴影是并列最好的范围，灰虚线是 120 / 140 / 160 / 180 px 四个候选。看三点：顶点在哪（阈值），顶有多宽（Pluto 147–160 几乎一样高，Terra 的顶更尖），两只老鼠的顶点是否接近（148 对 150）。mouse A 那格没有信息：12 帧全是睁开，阈值再高也只会把睁大的眼误判成没睁开。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-1, how to read:</span>One panel per mouse (the first pools all three, for reference only; thresholds are set per mouse). x = candidate threshold T in pixels; blue = agreement (share of all judged frames on which "O &lt; T → not open" agrees with the labeler), orange = recall minus false-alarm rate (formulas under "How the threshold is chosen" above); the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
+  </figure>
+  <div class="text" lang="zh">
     <p><b>阈值怎么选（图 10-1）。</b>每只老鼠只用自己的判断帧。候选 T 从 60 px 到 300 px，每 1 px 试一次。</p>
     <p>每个 T 把帧分成四格：</p>
     <ul>
@@ -937,40 +965,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Pluto，151 帧（非睁眼 77、睁开 74）。T = 147.5：抓对 71、漏掉 6、误报 3、对 71。检出率 71 ÷ 77 = 92.2%，误报率 3 ÷ 74 = 4.1%，橙线 92.2 − 4.1 = 88.2，一致率 (71 + 71) ÷ 151 = 94.0%。</li>
     </ul>
     <p>稳定性：留一视频检验。轮流拿掉一个视频的帧重新选 T，看 T 的范围（结果见本节结论）。</p>
-    <p><b>前提核对：眼睛在画面里的位置和大小，每天是否一样。</b></p>
-    <p>结论：位置有偏移，但不影响像素阈值。Pluto 最早三天（10-22、10-23、10-24，视频 10、9、8）眼宽小 3–12%，即使按此把阈值降低，这三天仍是大部分时间眯着，结论不变。所有视频用同一阈值。</p>
-    <p>为什么核对：像素阈值假设眼睛到相机的距离每天相同。距离变了，画面里所有长度一起变，同一个 147.5 px 对应的睁开程度就不同。</p>
-    <p>怎么核对：用模型给的两个眼角。眼睛位置 = 两眼角中点在整段视频的中位数；眼睛大小 = 眼宽 W（两眼角距离）的中位数。低于阈值的比例取自上面的每视频表，另按 140 px 和 120 px 各算一次。</p>
-    <div class="tablebox"><table>
-      <thead><tr><th>视频</th><th>日期</th><th>眼睛位置 x / y（px）</th><th>眼宽 W（px）</th><th>睁开高度中位数（px）</th><th>低于该老鼠阈值的帧</th><th>低于 140 px</th><th>低于 120 px</th></tr></thead>
-      <tbody>
-        <tr><td>Pluto 1–7</td><td>10-27 到 10-31</td><td>520–529 / 493–514</td><td>417–468</td><td>148–229</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
-        <tr><td>Pluto 8</td><td>10-24</td><td>540 / 517</td><td>428</td><td>156</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
-        <tr><td>Pluto 9</td><td>10-23</td><td>567 / 523</td><td>414</td><td>136</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
-        <tr><td>Pluto 10</td><td>10-22</td><td>583 / 541</td><td>392</td><td>117</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
-        <tr><td>Terra 11–18</td><td>10-08 到 10-17</td><td>598–637 / 482–523</td><td>417–465</td><td>135–214</td><td>0.2–72.2%</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
-      </tbody>
-    </table></div>
-    <ol>
-      <li>位置。Pluto 10-27 之后的 7 个视频相差 x 10 px、y 21 px 以内；Terra 的 8 个视频相差 39 / 41 px 以内。Pluto 10-22、10-23 比 10-28 之后向右下偏：用标注者自己标的眼角点复核（不经过模型），偏右 42 / 59 px、偏下 17 / 34 px，10-24 偏 13 / 7 px，偏移是真的。影响：O 是两点 y 坐标之差，整体平移不改变 O，所以位置偏移不影响阈值。</li>
-      <li>大小。10-22 到 10-24 眼宽 392–428 px，比 10-27 之后的中位数 444 px 小 3–12%。两种原因分不开：相机略远（画面里所有长度同比例缩小），或眼睛眯着（眼角间距也会缩短）。影响：若全归因于相机距离，这三天的阈值应按比例降到 130–143 px。表里按 140 px 算，这三天仍有 37–73% 的帧低于阈值；10-22 按 120 px 算仍有 56%。所以"这三天大部分时间眯着"不变，只是具体比例在 56–79% 之间有不确定。</li>
-      <li>处理。所有视频用同一阈值；录制时每天核对老鼠的位置。</li>
-    </ol>
   </div>
   <div class="text" lang="en">
-    <p><b>Definition.</b> Each frame is in one of two states: <b>open</b>, or <b>not open</b> (the eye is closed, or the eyelid covers part of the pupil). Blink / long closure / squint come with the systematic analysis of the dynamics later.</p>
-    <p><b>Why a pixel distance and one value per mouse.</b> The question is when the eye is narrowed.</p>
-    <ul>
-      <li>The camera is fixed and the mouse is placed at the same position every day (checked below), so the pixel distance between the two eyelid points is itself comparable across days and needs no division by the eye width.</li>
-      <li>Eye size differs between mice, so each mouse gets its own threshold.</li>
-    </ul>
-    <p>Example frames at the threshold and at 180 px were drawn so that the eye opening at the threshold can be checked by eye (Figure 10-2).</p>
-    <p><b>Criterion (per frame).</b> One threshold T per mouse: <b>Pluto 147.5 px, Terra 150.5 px</b> (shown as 148 / 150 in the figures). Mouse A cannot be set: all 12 of its judged frames are open.</p>
-    <ol>
-      <li>Frames with plausible eyelid points: O &lt; T → not open; O ≥ T → open.</li>
-      <li>Frames with implausible eyelid points (0.02–1.6% of each video): no usable O, so the pupil is used instead. Mean confidence of the model's four pupil points &lt; 0.527 → not open, otherwise open. Basis: when the eye is closed the pupil is not visible and the model's confidence in the pupil points is low.</li>
-    </ol>
-    <p>0.527 was chosen the same way as T: on human-labeled frames the model was not trained on, with "the labeler could not see the pupil and left all four points empty" as truth not open and "all four labeled" as truth open, every threshold was tried and the one with the largest recall − false-alarm rate taken (part B of <code>scripts/blink_and_area.py</code>). It was chosen on the frames of videos 0–16; on the 2371 frames of all 19 videos (43 all empty, 2328 all labeled) the same criterion gives 0.412. The two values differ only on the 0.02–1.6% of frames with implausible eyelid points; the scripts keep 0.527.</p>
     <p><b>How the threshold is chosen (Figure 10-1).</b> Each mouse uses only its own judged frames. Candidate T runs from 60 to 300 px in steps of 1 px.</p>
     <p>Each T splits the frames into four cells:</p>
     <ul>
@@ -993,6 +989,79 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Pluto, 151 frames (77 not open, 74 open). T = 147.5: hits 71, misses 6, false alarms 3, correct rejections 71. Recall 71 ÷ 77 = 92.2%, false-alarm rate 3 ÷ 74 = 4.1%, orange 92.2 − 4.1 = 88.2, agreement (71 + 71) ÷ 151 = 94.0%.</li>
     </ul>
     <p>Stability: leave-one-video-out. The choice is repeated with each video's frames removed in turn, and the range of T is reported (see the conclusion of this step).</p>
+  </div>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">有判断的视频 / 帧（其中非睁眼）</span><span lang="en">Videos / frames judged (not open)</span></th><th><span lang="zh">阈值（px）</span><span lang="en">Threshold (px)</span></th><th><span lang="zh">并列最好的范围</span><span lang="en">Best range</span></th><th><span lang="zh">留一视频的范围</span><span lang="en">Leave-one-video-out</span></th><th><span lang="zh">阈值处准确率</span><span lang="en">Accuracy at the threshold</span></th><th>120 px</th><th>140 px</th><th>160 px</th><th>180 px</th></tr></thead>
+    <tbody>
+      <tr><td>Pluto</td><td>10 / 151 (77)</td><td><b>147.5</b></td><td>147–148</td><td>147.5–160.5</td><td>94.0%</td><td>78.1%</td><td>90.1%</td><td>93.4%</td><td>78.8%</td></tr>
+      <tr><td>Terra</td><td>8 / 126 (64)</td><td><b>150.5</b></td><td>150–151</td><td>143.5–154.5</td><td>88.9%</td><td>74.6%</td><td>85.7%</td><td>86.5%</td><td>77.0%</td></tr>
+      <tr><td>mouse A</td><td>1 / 12 (0)</td><td><span lang="zh">定不了（没有一帧非睁眼）</span><span lang="en">none (no not-open frame)</span></td><td>–</td><td>–</td><td>–</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td></tr>
+    </tbody>
+  </table></div>
+  <div class="text" lang="zh">
+    <p><b>阈值处的眼睛是什么样（图 10-2）。</b>结论：上眼睑已盖住瞳孔上缘，符合非睁眼的定义；180 px 时眼睛完全睁开。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>What the eye looks like at the threshold (Figure 10-2).</b> Conclusion: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open.</p>
+  </div>
+  <figure>
+    <div class="figbox scroll"><img src="assets/fig_blink_examples.jpg" style="width:4200px;max-width:none" alt="The eye at the mouse threshold and at 180 px, one frame per video"></div>
+    <figcaption lang="zh"><span class="tag">图 10-2 怎么看：</span>阈值处的眼睛：上眼睑已盖住瞳孔上缘，符合非睁眼的定义；180 px 时眼睛完全睁开。每只老鼠两行（阈值行 Terra 150 px、Pluto 148 px；180 px 行），每个视频一帧，取整段预测里睁开高度等于该值 ±3 px 的帧；黄圈 = 上下眼睑点，蓝圈 = 眼角。可左右拖动。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-2, how to read:</span>The eye at the threshold: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open. Two rows per mouse (threshold row, Terra 150 px and Pluto 148 px; 180 px row), one frame per video whose opening in the whole-video predictions is within 3 px of that value; yellow = eyelid points, blue = eye corners. Scroll sideways.</figcaption>
+  </figure>
+  <div class="text" lang="zh">
+    <p><b>验证一：判断帧放回该老鼠全部帧的睁开高度分布上，两类分不分得开（图 10-3）。</b>结论：分得开，判错的帧几乎都在阈值两侧 20 px 以内（Terra 有 1 帧例外）。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Check one: do the judged frames separate on the distribution of the eye opening over all frames of the mouse (Figure 10-3).</b> Conclusion: they do; the misjudged frames almost all lie within 20 px of the threshold (one Terra frame excepted).</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_dist.jpg" alt="Eye opening distribution per mouse with the judged frames overlaid"></div>
+    <figcaption lang="zh"><span class="tag">图 10-3 怎么看：</span>一列一只老鼠。上排灰色是这只老鼠所有视频全部帧的睁开高度直方图（Pluto 71 万帧、Terra 57 万帧），虚线是它的阈值。Terra 是明显的双峰，谷底正好在 150 px 附近，阈值落在谷里，所以图 10-1 里 Terra 的顶是尖的；Pluto 是一个宽的单峰，没有天然的谷，阈值切在峰的左坡上，所以 Pluto 的顶是平的、147–160 差别不大。下排是标注者判过的帧，红点判"非睁眼"、绿点判"睁开"，横坐标是模型给这帧的睁开高度。红点几乎都在线左边、绿点几乎都在线右边；判错的帧里，Pluto 的 9 帧（3 个绿点在左、6 个红点在右）都在线两侧 14 px 以内；Terra 的 14 帧（9 个绿点在左、5 个红点在右）有 13 帧在 17 px 以内，1 帧离线 37 px（视频 11 第 57329 帧，模型给 114 px，标注者判睁开）。mouse A 的 12 帧全是睁开，没有分界可画。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse. Top row, gray: histogram of the eye opening over every frame of all the mouse's videos (Pluto 714k frames, Terra 570k), dashed line = its threshold. Terra is clearly bimodal with the valley right around 150 px and the threshold in the valley, which is why Terra's peak in Figure 10-1 is sharp; Pluto is one broad hump with no natural valley, the threshold cuts its left slope, which is why Pluto's peak is flat and 147–160 hardly differ. Bottom row: the judged frames, red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots are left of the line and almost all green ones right of it; of the misjudged frames, Pluto's 9 (3 green on the left, 6 red on the right) all lie within 14 px of the line; of Terra's 14 (9 green on the left, 5 red on the right), 13 lie within 17 px and one is 37 px off (video 11, frame 57329, model 114 px, judged open). Mouse A's 12 frames are all open, so there is no boundary to draw.</figcaption>
+  </figure>
+  <div class="text" lang="zh">
+    <p><b>验证二：模型的眼睑距离和标注者自己标的差多少（图 10-4）。</b>数据：每个视频留出的 50 张测试帧（第 5 步起留出、模型没训练过，19 个视频共 949 帧），同一帧上标注的两个眼睑点算出的距离，对模型算出的距离。结论：中位差 2 px，无偏差，只把 2–4% 的测试帧换到阈值另一边，所以阈值附近的错大部分不是模型的。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Check two: how far the model's eyelid distance is from the labeler's own labels (Figure 10-4).</b> Data: the 50 test frames held out per video (held out since step 5, never trained on, 949 frames over the 19 videos), the distance from the labeled eyelid points against the distance from the model's points on the same frame. Conclusion: median difference 2 px, no bias, only 2–4% of the test frames change side of the threshold, so most errors near the threshold are not the model's.</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
+    <figcaption lang="zh"><span class="tag">图 10-4 怎么看：</span>一点一张测试帧，横坐标是标注者两个眼睑点算出的距离，纵坐标是模型两个眼睑点算出的距离，黑斜线是两者相等，点线是 ±10 px，虚线是该老鼠的阈值。点贴着斜线说明模型在这个数上基本不出错：Pluto 499 帧中位差 1.9 px、Terra 400 帧 2.2 px，90% 的帧差不到 6.3 px，没有系统偏差（中位偏差 ±0.1 px）。因为模型误差而跑到阈值另一边的帧，Pluto 12 帧（2.4%）、Terra 14 帧（3.5%），全是离线 20 px 以内的帧，那一档里约 8–10% 的帧被换到另一边。mouse A 只有一个视频，模型只见过它的 60 帧标注，差 6.8 px，偏大 5.5 px，但它的眼全程睁大，不影响。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame; x = the distance from the labeler's two eyelid points, y = the distance from the model's two points; the black diagonal is equality, dotted lines ±10 px, dashed lines the mouse threshold. The dots hug the diagonal, so the model hardly errs on this quantity: median difference 1.9 px on Pluto's 499 frames and 2.2 px on Terra's 400, 90% of the frames within 6.3 px, no bias (median ±0.1 px). Frames that the model's error puts on the other side of the threshold: 12 for Pluto (2.4%), 14 for Terra (3.5%), all within 20 px of the line, where about 8–10% of the frames change side. Mouse A has one video and its model saw only that video's 60 labels; it differs by 6.8 px and reads 5.5 px large, but that eye is wide open throughout, so it does not matter.</figcaption>
+  </figure>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">测试帧</span><span lang="en">Test frames</span></th><th><span lang="zh">|模型 − 标注| 中位</span><span lang="en">Median |model − label|</span></th><th><span lang="zh">90% 的帧不超过</span><span lang="en">90th percentile</span></th><th><span lang="zh">最大</span><span lang="en">Max</span></th><th><span lang="zh">系统偏差（中位）</span><span lang="en">Bias (median)</span></th><th><span lang="zh">阈值两侧不一致</span><span lang="en">On different sides of the threshold</span></th><th><span lang="zh">其中离线 20 px 以内</span><span lang="en">Among frames within 20 px of the line</span></th></tr></thead>
+    <tbody>
+      <tr><td>Pluto</td><td>499</td><td>1.9 px</td><td>6.3 px</td><td>45 px</td><td>+0.1 px</td><td>12 (2.4%)</td><td>12 / 150 (8%)</td></tr>
+      <tr><td>Terra</td><td>400</td><td>2.2 px</td><td>6.2 px</td><td>34 px</td><td>−0.1 px</td><td>14 (3.5%)</td><td>14 / 140 (10%)</td></tr>
+      <tr><td>mouse A</td><td>50</td><td>6.8 px</td><td>14.3 px</td><td>24 px</td><td>+5.5 px</td><td>–</td><td>–</td></tr>
+      <tr><td><span lang="zh">按睁开程度（标注值）：&lt;100 / 100–150 / 150–200 / 200–250 / &gt;250 px</span><span lang="en">By opening (labeled): &lt;100 / 100–150 / 150–200 / 200–250 / &gt;250 px</span></td><td>56 / 354 / 285 / 196 / 58</td><td>3.4 / 2.3 / 2.0 / 1.3 / 5.2 px</td><td>6.4 / 7.0 / 6.3 / 4.1 / 13.9 px</td><td colspan="4"><span lang="zh">眯得最多的帧误差略大，但也只有几个像素</span><span lang="en">slightly larger on the most narrowed frames, still a few pixels</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="text" lang="zh">
+    <p><b>前提核对：眼睛在画面里的位置和大小，每天是否一样。</b></p>
+    <p>结论：位置有偏移，但不影响像素阈值。Pluto 最早三天（10-22、10-23、10-24，视频 10、9、8）眼宽小 3–12%，即使按此把阈值降低，这三天仍是大部分时间眯着，结论不变。所有视频用同一阈值。</p>
+    <p>为什么核对：像素阈值假设眼睛到相机的距离每天相同。距离变了，画面里所有长度一起变，同一个 147.5 px 对应的睁开程度就不同。</p>
+    <p>怎么核对：用模型给的两个眼角。眼睛位置 = 两眼角中点在整段视频的中位数；眼睛大小 = 眼宽 W（两眼角距离）的中位数。低于阈值的比例取自上面的每视频表，另按 140 px 和 120 px 各算一次。</p>
+    <div class="tablebox"><table>
+      <thead><tr><th>视频</th><th>日期</th><th>眼睛位置 x / y（px）</th><th>眼宽 W（px）</th><th>睁开高度中位数（px）</th><th>低于该老鼠阈值的帧</th><th>低于 140 px</th><th>低于 120 px</th></tr></thead>
+      <tbody>
+        <tr><td>Pluto 1–7</td><td>10-27 到 10-31</td><td>520–529 / 493–514</td><td>417–468</td><td>148–229</td><td>0.1–48.8%</td><td>0.1–36.1%</td><td>0–4.5%</td></tr>
+        <tr><td>Pluto 8</td><td>10-24</td><td>540 / 517</td><td>428</td><td>156</td><td>44.6%</td><td>36.8%</td><td>10.4%</td></tr>
+        <tr><td>Pluto 9</td><td>10-23</td><td>567 / 523</td><td>414</td><td>136</td><td>59.5%</td><td>53.6%</td><td>23.1%</td></tr>
+        <tr><td>Pluto 10</td><td>10-22</td><td>583 / 541</td><td>392</td><td>117</td><td>79.4%</td><td>72.6%</td><td>56.1%</td></tr>
+        <tr><td>Terra 11–18</td><td>10-08 到 10-17</td><td>598–637 / 482–523</td><td>417–465</td><td>135–214</td><td>0.2–72.2%</td><td>0.1–55.4%</td><td>0–33.3%</td></tr>
+      </tbody>
+    </table></div>
+    <ol>
+      <li>位置。Pluto 10-27 之后的 7 个视频相差 x 10 px、y 21 px 以内；Terra 的 8 个视频相差 39 / 41 px 以内。Pluto 10-22、10-23 比 10-28 之后向右下偏：用标注者自己标的眼角点复核（不经过模型），偏右 42 / 59 px、偏下 17 / 34 px，10-24 偏 13 / 7 px，偏移是真的。影响：O 是两点 y 坐标之差，整体平移不改变 O，所以位置偏移不影响阈值。</li>
+      <li>大小。10-22 到 10-24 眼宽 392–428 px，比 10-27 之后的中位数 444 px 小 3–12%。两种原因分不开：相机略远（画面里所有长度同比例缩小），或眼睛眯着（眼角间距也会缩短）。影响：若全归因于相机距离，这三天的阈值应按比例降到 130–143 px。表里按 140 px 算，这三天仍有 37–73% 的帧低于阈值；10-22 按 120 px 算仍有 56%。所以"这三天大部分时间眯着"不变，只是具体比例在 56–79% 之间有不确定。</li>
+      <li>处理。所有视频用同一阈值；录制时每天核对老鼠的位置。</li>
+    </ol>
+  </div>
+  <div class="text" lang="en">
     <p><b>Premise check: are the position and size of the eye in the image the same every day.</b></p>
     <p>Conclusion: the position shifts, but this does not affect the pixel threshold. On Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye width is 3–12% smaller; even with the threshold lowered accordingly, the eye is narrowed most of the time on those days, so the conclusion stands. All videos use the same threshold.</p>
     <p>Why check: a pixel threshold assumes the same eye-to-camera distance every day. If the distance changes, every length in the image changes with it, and the same 147.5 px means a different degree of opening.</p>
@@ -1013,49 +1082,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Handling. All videos use the same threshold; the mouse position is checked at every recording.</li>
     </ol>
   </div>
-  <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">有判断的视频 / 帧（其中非睁眼）</span><span lang="en">Videos / frames judged (not open)</span></th><th><span lang="zh">阈值（px）</span><span lang="en">Threshold (px)</span></th><th><span lang="zh">并列最好的范围</span><span lang="en">Best range</span></th><th><span lang="zh">留一视频的范围</span><span lang="en">Leave-one-video-out</span></th><th><span lang="zh">阈值处准确率</span><span lang="en">Accuracy at the threshold</span></th><th>120 px</th><th>140 px</th><th>160 px</th><th>180 px</th></tr></thead>
-    <tbody>
-      <tr><td>Pluto</td><td>10 / 151 (77)</td><td><b>147.5</b></td><td>147–148</td><td>147.5–160.5</td><td>94.0%</td><td>78.1%</td><td>90.1%</td><td>93.4%</td><td>78.8%</td></tr>
-      <tr><td>Terra</td><td>8 / 126 (64)</td><td><b>150.5</b></td><td>150–151</td><td>143.5–154.5</td><td>88.9%</td><td>74.6%</td><td>85.7%</td><td>86.5%</td><td>77.0%</td></tr>
-      <tr><td>mouse A</td><td>1 / 12 (0)</td><td><span lang="zh">定不了（没有一帧非睁眼）</span><span lang="en">none (no not-open frame)</span></td><td>–</td><td>–</td><td>–</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td></tr>
-    </tbody>
-  </table></div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the judged frames"></div>
-    <figcaption lang="zh"><span class="tag">图 10-1 怎么看：</span>每格一只老鼠（第一格是三只合并，仅供参考，阈值按单只老鼠定）。横轴是候选阈值 T（像素），蓝线是一致率（"O &lt; T 判非睁眼"和标注者判断一致的帧占全部帧的比例），橙线是检出率减误报率（公式见上文"阈值怎么选"）；橙色竖线是选出的阈值，橙色阴影是并列最好的范围，灰虚线是 120 / 140 / 160 / 180 px 四个候选。看三点：顶点在哪（阈值），顶有多宽（Pluto 147–160 几乎一样高，Terra 的顶更尖），两只老鼠的顶点是否接近（148 对 150）。mouse A 那格没有信息：12 帧全是睁开，阈值再高也只会把睁大的眼误判成没睁开。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-1, how to read:</span>One panel per mouse (the first pools all three, for reference only; thresholds are set per mouse). x = candidate threshold T in pixels; blue = agreement (share of all judged frames on which "O &lt; T → not open" agrees with the labeler), orange = recall minus false-alarm rate (formulas under "How the threshold is chosen" above); the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
-  </figure>
-  <figure>
-    <div class="figbox scroll"><img src="assets/fig_blink_examples.jpg" alt="The eye at the mouse threshold and at 180 px, one frame per video"></div>
-    <figcaption lang="zh"><span class="tag">图 10-2 怎么看：</span>阈值处的眼睛：上眼睑已盖住瞳孔上缘，符合非睁眼的定义；180 px 时眼睛完全睁开。每只老鼠两行（阈值行 Terra 150 px、Pluto 148 px；180 px 行），每个视频一帧，取整段预测里睁开高度等于该值 ±3 px 的帧；黄圈 = 上下眼睑点，蓝圈 = 眼角。可左右拖动。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-2, how to read:</span>The eye at the threshold: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open. Two rows per mouse (threshold row, Terra 150 px and Pluto 148 px; 180 px row), one frame per video whose opening in the whole-video predictions is within 3 px of that value; yellow = eyelid points, blue = eye corners. Scroll sideways.</figcaption>
-  </figure>
-  <div class="text" lang="zh">
-    <p><b>两项验证。</b>第一项，把标注者判过的 289 帧放回该老鼠全部帧的睁开高度分布上看，两类分不分得开、错的帧在哪里（图 10-3）。第二项，用标注者自己标的点量模型在"眼睑距离"这个数上错多少：每个视频留出的 50 张测试帧（第 5 步起留出、模型没训练过，19 个视频共 949 帧），同一帧上标注的两个眼睑点算出的距离，对模型算出的距离（图 10-4）。这 50 帧没有参与任何训练，是像素阈值的独立检验。</p>
-  </div>
-  <div class="text" lang="en">
-    <p><b>Two checks.</b> First, the 289 judged frames are placed back on the distribution of the eye opening over all frames of the mouse, to see whether the two classes separate and where the errors sit (Figure 10-3). Second, the labeler's own points measure how far the model is on the eyelid distance itself: on the 50 test frames held out per video (held out since step 5, never trained on, 949 frames over the 19 videos), the distance from the labeled eyelid points against the distance from the model's points on the same frame (Figure 10-4). These 50 frames took part in no training and are an independent check of the pixel threshold.</p>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_blink_dist.jpg" alt="Eye opening distribution per mouse with the judged frames overlaid"></div>
-    <figcaption lang="zh"><span class="tag">图 10-3 怎么看：</span>一列一只老鼠。上排灰色是这只老鼠所有视频全部帧的睁开高度直方图（Pluto 71 万帧、Terra 57 万帧），虚线是它的阈值。Terra 是明显的双峰，谷底正好在 150 px 附近，阈值落在谷里，所以图 10-1 里 Terra 的顶是尖的；Pluto 是一个宽的单峰，没有天然的谷，阈值切在峰的左坡上，所以 Pluto 的顶是平的、147–160 差别不大。下排是标注者判过的帧，红点判"非睁眼"、绿点判"睁开"，横坐标是模型给这帧的睁开高度。红点几乎都在线左边、绿点几乎都在线右边；判错的帧里，Pluto 的 9 帧（3 个绿点在左、6 个红点在右）都在线两侧 14 px 以内；Terra 的 14 帧（9 个绿点在左、5 个红点在右）有 13 帧在 17 px 以内，1 帧离线 37 px（视频 11 第 57329 帧，模型给 114 px，标注者判睁开）。mouse A 的 12 帧全是睁开，没有分界可画。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse. Top row, gray: histogram of the eye opening over every frame of all the mouse's videos (Pluto 714k frames, Terra 570k), dashed line = its threshold. Terra is clearly bimodal with the valley right around 150 px and the threshold in the valley, which is why Terra's peak in Figure 10-1 is sharp; Pluto is one broad hump with no natural valley, the threshold cuts its left slope, which is why Pluto's peak is flat and 147–160 hardly differ. Bottom row: the judged frames, red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots are left of the line and almost all green ones right of it; of the misjudged frames, Pluto's 9 (3 green on the left, 6 red on the right) all lie within 14 px of the line; of Terra's 14 (9 green on the left, 5 red on the right), 13 lie within 17 px and one is 37 px off (video 11, frame 57329, model 114 px, judged open). Mouse A's 12 frames are all open, so there is no boundary to draw.</figcaption>
-  </figure>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
-    <figcaption lang="zh"><span class="tag">图 10-4 怎么看：</span>一点一张测试帧，横坐标是标注者两个眼睑点算出的距离，纵坐标是模型两个眼睑点算出的距离，黑斜线是两者相等，点线是 ±10 px，虚线是该老鼠的阈值。点贴着斜线说明模型在这个数上基本不出错：Pluto 499 帧中位差 1.9 px、Terra 400 帧 2.2 px，90% 的帧差不到 6.3 px，没有系统偏差（中位偏差 ±0.1 px）。因为模型误差而跑到阈值另一边的帧，Pluto 12 帧（2.4%）、Terra 14 帧（3.5%），全是离线 20 px 以内的帧，那一档里约 8–10% 的帧被换到另一边。mouse A 只有一个视频，模型只见过它的 60 帧标注，差 6.8 px，偏大 5.5 px，但它的眼全程睁大，不影响。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame; x = the distance from the labeler's two eyelid points, y = the distance from the model's two points; the black diagonal is equality, dotted lines ±10 px, dashed lines the mouse threshold. The dots hug the diagonal, so the model hardly errs on this quantity: median difference 1.9 px on Pluto's 499 frames and 2.2 px on Terra's 400, 90% of the frames within 6.3 px, no bias (median ±0.1 px). Frames that the model's error puts on the other side of the threshold: 12 for Pluto (2.4%), 14 for Terra (3.5%), all within 20 px of the line, where about 8–10% of the frames change side. Mouse A has one video and its model saw only that video's 60 labels; it differs by 6.8 px and reads 5.5 px large, but that eye is wide open throughout, so it does not matter.</figcaption>
-  </figure>
-  <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">老鼠</span><span lang="en">Mouse</span></th><th><span lang="zh">测试帧</span><span lang="en">Test frames</span></th><th><span lang="zh">|模型 − 标注| 中位</span><span lang="en">Median |model − label|</span></th><th><span lang="zh">90% 的帧不超过</span><span lang="en">90th percentile</span></th><th><span lang="zh">最大</span><span lang="en">Max</span></th><th><span lang="zh">系统偏差（中位）</span><span lang="en">Bias (median)</span></th><th><span lang="zh">阈值两侧不一致</span><span lang="en">On different sides of the threshold</span></th><th><span lang="zh">其中离线 20 px 以内</span><span lang="en">Among frames within 20 px of the line</span></th></tr></thead>
-    <tbody>
-      <tr><td>Pluto</td><td>499</td><td>1.9 px</td><td>6.3 px</td><td>45 px</td><td>+0.1 px</td><td>12 (2.4%)</td><td>12 / 150 (8%)</td></tr>
-      <tr><td>Terra</td><td>400</td><td>2.2 px</td><td>6.2 px</td><td>34 px</td><td>−0.1 px</td><td>14 (3.5%)</td><td>14 / 140 (10%)</td></tr>
-      <tr><td>mouse A</td><td>50</td><td>6.8 px</td><td>14.3 px</td><td>24 px</td><td>+5.5 px</td><td>–</td><td>–</td></tr>
-      <tr><td><span lang="zh">按睁开程度（标注值）：&lt;100 / 100–150 / 150–200 / 200–250 / &gt;250 px</span><span lang="en">By opening (labeled): &lt;100 / 100–150 / 150–200 / 200–250 / &gt;250 px</span></td><td>56 / 354 / 285 / 196 / 58</td><td>3.4 / 2.3 / 2.0 / 1.3 / 5.2 px</td><td>6.4 / 7.0 / 6.3 / 4.1 / 13.9 px</td><td colspan="4"><span lang="zh">眯得最多的帧误差略大，但也只有几个像素</span><span lang="en">slightly larger on the most narrowed frames, still a few pixels</span></td></tr>
-    </tbody>
-  </table></div>
   <div class="text" lang="zh">
     <p><b>每个视频的结果。</b>下表是该判据在整段视频上的按帧结果：每个视频低于该老鼠阈值的帧占多少，以及换成 140 / 160 px 时的比例。最后一列是对照规则（见下）。</p>
   </div>
@@ -1086,6 +1112,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td>18</td><td>Terra</td><td>2025-10-08</td><td>135</td><td>150</td><td>72.2%</td><td>55.4%</td><td>83.6%</td><td>73.9%</td></tr>
     </tbody>
   </table></div>
+  <div class="text" lang="zh">
+    <p><b>Terra 按天的时间过程（图 10-5）。</b>结论：视频 11、18 大半段在阈值之下，视频 13、16、17 几乎全程在阈值之上；非睁眼在这些录像里是一种持续状态，不是偶发事件。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Terra day by day over time (Figure 10-5).</b> Conclusion: videos 11 and 18 are below the threshold most of the time, videos 13, 16 and 17 above it almost throughout; not-open is a sustained state in these recordings, not an occasional event.</p>
+  </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_opening_terra.jpg" alt="Terra: eye opening over time per video with the mouse threshold"></div>
     <figcaption lang="zh"><span class="tag">图 10-5 怎么看：</span>Terra 的 8 个视频各一行，横轴是时间（分钟），线是每 10 秒睁开高度的中位数，阴影向下到第 10 百分位，黑线是这只老鼠的阈值 150 px。线在黑线之上的时段眼睛睁着（13、16、17 几乎全程），在黑线之下的时段眼睛是眯着的（11、18 大半段）。不设阈值时，这条线本身就是睁开高度的连续量。Pluto 和 mouse A 的同样的图在结果文件夹里。</figcaption>
