@@ -1064,7 +1064,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   <div class="text" lang="zh">
     <p><b>前提核对：像素阈值能不能跨天用，也就是眼睛每天在画面里是不是一样大。</b></p>
-    <p>结论：能。Pluto 最早三天（10-22、10-23、10-24，视频 10、9、8）眼睛在画面里小 3–12%，原因分不开是相机略远还是眼睛眯着（眯眼时眼角间距也会缩短）。但即使全按"相机远了"处理、把阈值同比例降低，这三天仍有一半以上的帧低于阈值，所以"这三天大部分时间眯着"不变，只是比例在 56–79% 之间有不确定。其他日子眼宽相差不到 6%，不需要处理。所有视频用同一阈值。</p>
+    <p>结论：能。除 Pluto 最早三天外，各天眼宽相差不到 6%，所有视频用同一阈值。</p>
+    <p>但需要注意的是：Pluto 最早三天（10-22、10-23、10-24，视频 10、9、8）眼睛在画面里小 3–12%。原因分不开：相机略远，或眼睛眯着（眯眼时眼角间距也会缩短）。即使全按"相机远了"处理、把阈值同比例降低，这三天仍有一半以上的帧低于阈值。所以"这三天大部分时间眯着"不变，只是比例在 56–79% 之间有不确定。</p>
     <p>怎么核对：眼宽 W = 模型给的两个眼角距离在整段视频的中位数。把阈值按眼宽比例降低，相当于按 140 px 和 120 px 再算一次低于阈值的比例。</p>
     <div class="tablebox"><table>
       <thead><tr><th>视频</th><th>日期</th><th>眼宽 W（px）</th><th>比 Pluto 10-27 之后的中位数 444 px</th><th>低于 147.5 px 的帧</th><th>低于 140 px</th><th>低于 120 px</th></tr></thead>
@@ -1080,7 +1081,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <div class="text" lang="en">
     <p><b>Premise check: can a pixel threshold be used across days, i.e. is the eye the same size in the image every day.</b></p>
-    <p>Conclusion: yes. On Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye is 3–12% smaller in the image; whether the camera was slightly farther or the eye was narrowed (narrowing shortens the corner distance too) cannot be told apart. But even if all of it is treated as camera distance and the threshold lowered by the same factor, more than half of the frames of those days stay below it, so "narrowed most of the time on those three days" stands; only the share is uncertain, between 56% and 79%. On the other days the eye width varies by less than 6% and needs no handling. All videos use the same threshold.</p>
+    <p>Conclusion: yes. Apart from Pluto's three earliest days the eye width varies by less than 6% between days, and all videos use the same threshold.</p>
+    <p>One caveat: on Pluto's three earliest days (10-22, 10-23, 10-24; videos 10, 9, 8) the eye is 3–12% smaller in the image. The cause cannot be told apart: a slightly more distant camera, or a narrowed eye (narrowing shortens the corner distance too). Even if all of it is treated as camera distance and the threshold lowered by the same factor, more than half of the frames of those days stay below it. So "narrowed most of the time on those three days" stands; only the share is uncertain, between 56% and 79%.</p>
     <p>How: eye width W = median over the video of the distance between the model's two eye corners. Lowering the threshold in proportion to W amounts to recounting the frames below 140 px and below 120 px.</p>
     <div class="tablebox"><table>
       <thead><tr><th>Video</th><th>Date</th><th>Eye width W (px)</th><th>Against the median of Pluto from 10-27 on, 444 px</th><th>Frames below 147.5 px</th><th>Below 140 px</th><th>Below 120 px</th></tr></thead>
