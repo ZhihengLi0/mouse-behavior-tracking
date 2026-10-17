@@ -24,7 +24,7 @@ Outputs (results/blink_eyelid_distance/per_mouse_threshold_px/):
   small_opening_share_per_video.csv     share of frames with a small opening per video at each candidate T
   opening_distribution_per_video.png    distribution of O per video with the candidate thresholds
   opening_timeseries_<mouse>.png        O over time (10-s median) per video: the continuous variable
-  examples_<mouse>.png / .csv           per candidate T one row of frames whose O is closest to T (different videos)
+  examples_all.png / .csv               per mouse two rows (its threshold, 180 px), one frame per video whose O is closest to that value
 """
 import glob, sys
 from pathlib import Path
@@ -186,8 +186,8 @@ for m in MICE:
     fig.suptitle(f"{m}: eye opening (px) over time (line = median of each 10 s, band down to the 10th percentile); black = mouse threshold {TM[m]:.0f} px", fontsize=10.5)
     fig.savefig(OUT / f"opening_timeseries_{KEY[m]}.png", dpi=115); plt.close(fig)
 
-# ---- 6. example frames closest to each threshold -----------------------------------------------------------------------
-NCOL, TILE_W, TOL = 6, 420, 3.0
+# ---- 6. example frames: the eye at the mouse threshold and at 180 px, one frame per video (figure 10-2 of the page) ------
+TILE_W, TOL, OPEN_REF = 420, 3.0, 180.0
 def tile(v, f):
     x = V[v]; cap = cv2.VideoCapture(str(HERE / x["unit"] / f"{x['unit']}.mp4")); cap.set(cv2.CAP_PROP_POS_FRAMES, int(f)); ok, im = cap.read(); cap.release()
     if not ok: return None
@@ -202,12 +202,10 @@ def tile(v, f):
     cv2.putText(band, f"video {v}  frame {f}  opening = {x['O'][f]:.0f} px", (6, 21), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 1, cv2.LINE_AA)
     return np.vstack([crop, band])
 
-erows = []
-for m in MICE:
-    vs = [v for v, x in V.items() if x["mouse"] == m]
-    ts = sorted([float(t) for t in CAND if abs(t - TM[m]) >= 5] + [float(TM[m])])   # a candidate within 5 px of the mouse threshold would repeat its row
-    strips = []
-    for t in ts:
+erows, blocks = [], []
+for m in [mm for mm in ("Terra", "Pluto") if mm in TM]:
+    vs = [v for v, x in V.items() if x["mouse"] == m]; ncol = len(vs)
+    for t in [float(TM[m]), OPEN_REF]:
         cand = []   # per video: the trusted, confident frames whose O is closest to t
         for v in vs:
             x = V[v]; conf = np.minimum(x["d"]["eyelid_top"]["likelihood"].to_numpy(float), x["d"]["eyelid_bottom"]["likelihood"].to_numpy(float))
@@ -216,24 +214,26 @@ for m in MICE:
             for f in order:
                 if not np.isfinite(dist[f]) or dist[f] > TOL: break
                 if all(abs(int(f) - q) >= 600 for q in picks): picks.append(int(f))     # at least 10 s apart within a video
-                if len(picks) >= NCOL: break
+                if len(picks) >= ncol: break
             cand.append((v, picks))
         chosen = []; k = 0
-        while len(chosen) < NCOL and any(len(p) > k for _, p in cand):      # round-robin over the videos
+        while len(chosen) < ncol and any(len(p) > k for _, p in cand):      # one frame per video first, then second frames if a video has none
             for v, p in cand:
-                if len(p) > k and len(chosen) < NCOL: chosen.append((v, p[k]))
+                if len(p) > k and len(chosen) < ncol: chosen.append((v, p[k]))
             k += 1
         chosen.sort()
         tiles = [tile(v, f) for v, f in chosen]; tiles = [x_ for x_ in tiles if x_ is not None]
         erows += [dict(mouse=m, threshold_px=t, video=v, frame=f, time_s=round(f / FPS, 1), opening_px=round(float(V[v]["O"][f]), 1)) for v, f in chosen]
         h = max([x_.shape[0] for x_ in tiles] + [60])
-        tiles = [cv2.copyMakeBorder(x_, 0, h - x_.shape[0], 0, 0, cv2.BORDER_CONSTANT, value=(255, 255, 255)) for x_ in tiles] + [np.full((h, TILE_W, 3), 255, np.uint8)] * (NCOL - len(tiles))
-        head = np.full((40, TILE_W * NCOL, 3), 235, np.uint8)
-        tag = "  (threshold chosen for this mouse)" if abs(t - TM[m]) < 0.5 else ""
-        cv2.putText(head, f"opening = {t:.0f} px{tag}: frames whose opening is closest to it ({len(chosen)} found within {TOL:.0f} px)", (10, 27), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2, cv2.LINE_AA)
-        strips += [head, np.hstack(tiles)]
-    top = np.full((54, TILE_W * NCOL, 3), 255, np.uint8)
-    cv2.putText(top, f"{m}: what the eye looks like at each candidate threshold (eye opening in px; yellow = eyelid points, blue = eye corners)", (10, 36), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
-    cv2.imwrite(str(OUT / f"examples_{KEY[m]}.png"), np.vstack([top] + strips))
-    pd.DataFrame([e for e in erows if e["mouse"] == m]).to_csv(OUT / f"examples_{KEY[m]}.csv", index=False)
+        tiles = [cv2.copyMakeBorder(x_, 0, h - x_.shape[0], 0, 0, cv2.BORDER_CONSTANT, value=(255, 255, 255)) for x_ in tiles] + [np.full((h, TILE_W, 3), 255, np.uint8)] * (ncol - len(tiles))
+        head = np.full((44, TILE_W * ncol, 3), 235, np.uint8)
+        tag = f"{m} at its threshold, opening = {t:.0f} px" if t == float(TM[m]) else f"{m} with the eye open, opening = {OPEN_REF:.0f} px (contrast)"
+        cv2.putText(head, f"{tag}: one frame per video whose opening is within {TOL:.0f} px of this value", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+        blocks += [head, np.hstack(tiles)]
+wmax = max(b.shape[1] for b in blocks)
+blocks = [cv2.copyMakeBorder(b, 0, 0, 0, wmax - b.shape[1], cv2.BORDER_CONSTANT, value=(255, 255, 255)) for b in blocks]
+top = np.full((54, wmax, 3), 255, np.uint8)
+cv2.putText(top, "What the eye looks like at the mouse threshold (upper lid over the top of the pupil) and at 180 px (open); yellow = eyelid points, blue = eye corners", (10, 36), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+cv2.imwrite(str(OUT / "examples_all.png"), np.vstack([top] + blocks))
+pd.DataFrame(erows).to_csv(OUT / "examples_all.csv", index=False)
 print("\nwritten to", OUT)

@@ -45,8 +45,7 @@ FIGURES = [
     (V2 / "results/blink_eyelid_distance/results/every_video/blink_final_summary.png", "fig_blink_final.jpg", 2210),
     (V2 / "results/blink_eyelid_distance/results/one_threshold/blink_notopen_rule_summary.png", "fig_blink_notopen.jpg", 1875),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/threshold_scan_per_mouse.png", "fig_blink_scan.jpg", 2600),
-    (V2 / "results/blink_eyelid_distance/results/every_mouse/px/examples_Terra.png", "fig_blink_examples_terra.jpg", 2520),
-    (V2 / "results/blink_eyelid_distance/results/every_mouse/px/examples_Pluto.png", "fig_blink_examples_pluto.jpg", 2520),
+    (V2 / "results/blink_eyelid_distance/results/every_mouse/px/examples_all.png", "fig_blink_examples.jpg", 4200),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/opening_timeseries_Terra.png", "fig_blink_opening_terra.jpg", 1800),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/opening_distribution_with_verdicts.png", "fig_blink_dist.jpg", 1980),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/eyelid_distance_label_vs_model.png", "fig_blink_labelcheck.jpg", 1980),
@@ -168,7 +167,7 @@ for r in pl.itertuples():
                         f'  <figure><div class="figbox scroll"><div class="strip tall">\n' + "\n".join(items) + '\n  </div></div></figure>')
 
 # appendix: the single-frame "not open" spot check, one contact sheet per video (the labeler's verdicts on the original frames)
-notopen_strip = strip_of(lambda r: V2 / f"results/blink_eyelid_distance/labels/frames/blink_notopen_sheet_video{int(r.video):02d}.png", "notopen", 1700, "：18 帧单帧盲评", ": 18 single frames, blind")
+notopen_strip = strip_of(lambda r: V2 / f"results/blink_eyelid_distance/labels/frames/blink_notopen_sheet_video{int(r.video):02d}.png", "notopen", 1700, "：判断帧（最多 18 帧）", ": judged frames (at most 18)")
 
 if in_progress:
     zh_status = f"已完成 {n_final} 个视频（视频 0–{n_final - 1}）；视频 {in_progress[0]} 进行中，按 0 / 20 / 40 / … 帧的误差为 {' / '.join(in_progress[1])} px。"
