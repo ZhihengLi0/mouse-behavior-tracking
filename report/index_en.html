@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:52 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-17 15:53 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -886,7 +886,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_dist.jpg" alt="Eye opening distribution per mouse with the judged frames overlaid"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse. Top row, gray: histogram of the eye opening over every frame of all the mouse's videos (Pluto 714k frames, Terra 570k), dashed line = its threshold. Terra is clearly bimodal with the valley right around 150 px and the threshold in the valley, which is why Terra's peak in Figure 10-1 is sharp; Pluto is one broad hump with no natural valley, the threshold cuts its left slope, which is why Pluto's peak is flat and 147–160 hardly differ. Bottom row: the judged frames, red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots are left of the line and almost all green ones right of it; of the misjudged frames, Pluto's 9 (3 green on the left, 6 red on the right) all lie within 14 px of the line; of Terra's 14 (9 green on the left, 5 red on the right), 13 lie within 17 px and one is 37 px off (video 11, frame 57329, model 114 px, judged open). Mouse A's 12 frames are all open, so there is no boundary to draw.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse.
+      <ul>
+        <li>Top row: histogram of the eye opening over every frame of all the mouse's videos (gray), dashed line = the threshold. Terra is bimodal and the threshold sits in the valley; Pluto is unimodal and the threshold cuts the left slope. This is why Terra's peak in Figure 10-1 is sharp and Pluto's flat.</li>
+        <li>Bottom row: the judged frames. Red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots lie left of the threshold, almost all green ones right of it. Misjudged frames: Pluto 9, all within 14 px of the threshold; Terra 14, 13 within 17 px and one 37 px away. Mouse A's 12 frames are all open, so no boundary can be drawn.</li>
+      </ul>
+    </figcaption>
   </figure>
   
   <div class="text" lang="en">

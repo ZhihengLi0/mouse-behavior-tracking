@@ -1017,8 +1017,18 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_dist.jpg" alt="Eye opening distribution per mouse with the judged frames overlaid"></div>
-    <figcaption lang="zh"><span class="tag">图 10-3 怎么看：</span>一列一只老鼠。上排灰色是这只老鼠所有视频全部帧的睁开高度直方图（Pluto 71 万帧、Terra 57 万帧），虚线是它的阈值。Terra 是明显的双峰，谷底正好在 150 px 附近，阈值落在谷里，所以图 10-1 里 Terra 的顶是尖的；Pluto 是一个宽的单峰，没有天然的谷，阈值切在峰的左坡上，所以 Pluto 的顶是平的、147–160 差别不大。下排是标注者判过的帧，红点判"非睁眼"、绿点判"睁开"，横坐标是模型给这帧的睁开高度。红点几乎都在线左边、绿点几乎都在线右边；判错的帧里，Pluto 的 9 帧（3 个绿点在左、6 个红点在右）都在线两侧 14 px 以内；Terra 的 14 帧（9 个绿点在左、5 个红点在右）有 13 帧在 17 px 以内，1 帧离线 37 px（视频 11 第 57329 帧，模型给 114 px，标注者判睁开）。mouse A 的 12 帧全是睁开，没有分界可画。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse. Top row, gray: histogram of the eye opening over every frame of all the mouse's videos (Pluto 714k frames, Terra 570k), dashed line = its threshold. Terra is clearly bimodal with the valley right around 150 px and the threshold in the valley, which is why Terra's peak in Figure 10-1 is sharp; Pluto is one broad hump with no natural valley, the threshold cuts its left slope, which is why Pluto's peak is flat and 147–160 hardly differ. Bottom row: the judged frames, red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots are left of the line and almost all green ones right of it; of the misjudged frames, Pluto's 9 (3 green on the left, 6 red on the right) all lie within 14 px of the line; of Terra's 14 (9 green on the left, 5 red on the right), 13 lie within 17 px and one is 37 px off (video 11, frame 57329, model 114 px, judged open). Mouse A's 12 frames are all open, so there is no boundary to draw.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 10-3 怎么看：</span>一列一只老鼠。
+      <ul>
+        <li>上排：这只老鼠所有视频全部帧的睁开高度直方图（灰），虚线是阈值。Terra 是双峰，阈值落在谷里；Pluto 是单峰，阈值切在左坡上。这就是图 10-1 里 Terra 的顶尖、Pluto 的顶平的原因。</li>
+        <li>下排：判断帧。红 = 判非睁眼，绿 = 判睁开，横坐标是模型给这帧的睁开高度。红点几乎都在阈值左边，绿点几乎都在右边。判错的帧：Pluto 9 帧，都在阈值 14 px 以内；Terra 14 帧，13 帧在 17 px 以内，1 帧离阈值 37 px。mouse A 的 12 帧全是睁开，画不出分界。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse.
+      <ul>
+        <li>Top row: histogram of the eye opening over every frame of all the mouse's videos (gray), dashed line = the threshold. Terra is bimodal and the threshold sits in the valley; Pluto is unimodal and the threshold cuts the left slope. This is why Terra's peak in Figure 10-1 is sharp and Pluto's flat.</li>
+        <li>Bottom row: the judged frames. Red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots lie left of the threshold, almost all green ones right of it. Misjudged frames: Pluto 9, all within 14 px of the threshold; Terra 14, 13 within 17 px and one 37 px away. Mouse A's 12 frames are all open, so no boundary can be drawn.</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="text" lang="zh">
     <p><b>验证二：模型的眼睑距离和标注者自己标的差多少（图 10-4）。</b>数据：每个视频留出的 50 张测试帧（第 5 步起留出、模型没训练过，19 个视频共 949 帧），同一帧上标注的两个眼睑点算出的距离，对模型算出的距离。结论：中位差 2 px，无偏差，只把 2–4% 的测试帧换到阈值另一边，所以阈值附近的错大部分不是模型的。</p>
