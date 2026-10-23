@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:55 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -207,7 +207,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 2-2:</span>The same five models, two metrics. Left: RMSE over all keypoints, from 20.1 to 47.9 px, a large spread. Middle: median frame RMSE on the same y scale; ResNet-50 is the lowest of the five, 18.4 px. Right: share of test frames with frame RMSE above 50 px: 15% for HRNet-W18, 2% for CSPNeXt-S, none for ResNet-50 and HRNet-W32. The spread in the left panel comes mainly from these far-off frames.</figcaption>
   </figure>
   
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Taking everything together, ResNet-50. (1) Lowest test error: 20.1 px. (2) The validation losses of the five models are close, within 1.4%. (3) Best use of confidence: 514 of 800 points have confidence ≥ 0.6, against 75–375 for the other models; this helps when confidence is used later to detect blinks and tracking loss. (4) Low training cost: 1.7 h, against 3.7 h for HRNet-W32, the model with a similar error. All later experiments use ResNet-50 with batch 2. Recomputed with the median frame RMSE, ResNet-50 is still the lowest (18.4 px), but the five models are only about 2 px apart. The comparison of the two metrics shows that the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. This is why the median frame RMSE is the main metric from step 3 on, with the share of frames above 50 px reported separately.</p>
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>ResNet-50; all later experiments use ResNet-50 with batch 2.
+    <ul>
+      <li><b>Reasons:</b> lowest test error (20.1 px; also lowest by median frame RMSE, 18.4 px); best use of confidence (514 of 800 points with confidence ≥ 0.6, against 75–375 for the other models), which helps when confidence is used later to detect blinks and tracking loss; cheapest training (1.7 h, against 3.7 h for HRNet-W32, the model with a similar error). The five models differ by only 1.4% in validation loss and about 2 px in median frame RMSE; none of the gaps is large.</li>
+      <li><b>Lesson on the metric:</b> the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. From step 3 on the median frame RMSE is the main metric, with the share of frames above 50 px reported separately.</li>
+    </ul>
+  </div>
 </section>
 
 <!-- 3 -->
