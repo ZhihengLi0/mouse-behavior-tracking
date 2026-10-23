@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 16:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 17:18 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -574,9 +574,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><b>（三）第 2 批起：先用 jump 规则找候选帧，再按外观聚类</b></p>
     <ol>
       <li>用上一步训练出的模型预测整段视频的每一帧。</li>
-      <li>算阈值：眼宽 = 每一帧鼻侧眼角到颞侧眼角的距离，取整段视频的中位数；阈值 = 眼宽中位数 × 3%（约 11–15 px）。</li>
-      <li>算跳动：对每一帧，8 个点各自相对上一帧移动的距离，取其中最大的一个。</li>
-      <li>候选池里跳动超过阈值的帧就是候选帧（被 jump 标出的帧）。候选帧超过 12000 帧时等间隔抽稀到约 12000 帧；少于 40 帧时改用跳动最大的 2000 帧。</li>
+      <li>定阈值（一个像素数，每个视频一个）：眼宽 = 每一帧两个眼角的距离在整段视频的中位数；阈值 = 眼宽 × 3%，约 11–15 px。眼宽只用来定这个数，不参与筛选。</li>
+      <li>算每一帧的位移：8 个点各自相对上一帧移动了多少像素，取 8 个里最大的一个。</li>
+      <li>最大位移超过阈值的帧就是候选帧（任何一个点跳得大都算）。候选帧多于 12000 帧时，等间隔只保留约 12000 帧（为了聚类的计算量）；少于 40 帧时改用位移最大的 2000 帧。</li>
       <li>对候选帧做和第 1 批完全相同的步骤：算外观指纹、k-means 分 20 类、每类取离中心最近的一帧、相隔至少 1 秒、不足时增加类数。</li>
       <li>如果还不足 20 帧（模型已经很好、候选帧很少且挤在几秒内时会发生），按位移从大到小从候选帧里补，仍要求相隔 1 秒。</li>
     </ol>
@@ -601,9 +601,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><b>(c) From batch 2 on: candidates by the jump rule, then clustering by appearance</b></p>
     <ol>
       <li>The model of the previous step predicts every frame of the whole video.</li>
-      <li>Threshold: eye width = distance from the nasal to the temporal corner in each frame, median over the video; threshold = 3% of the median eye width (about 11–15 px).</li>
-      <li>Jump: for each frame, the distance each of the 8 points moved from the previous frame; the largest of the 8.</li>
-      <li>Pool frames whose jump exceeds the threshold are the candidates (the frames flagged by the jump rule). More than 12000 candidates are thinned evenly to about 12000; with fewer than 40, the 2000 frames with the largest jumps are used instead.</li>
+      <li>Threshold (one pixel number per video): eye width = median over the video of the distance between the two corners in each frame; threshold = 3% of it, about 11–15 px. The eye width only sets this number and plays no part in the selection.</li>
+      <li>Displacement of each frame: how many pixels each of the 8 points moved from the previous frame; the largest of the 8.</li>
+      <li>Frames whose largest displacement exceeds the threshold are the candidates (any one point jumping far counts). With more than 12000 candidates only about 12000 are kept, evenly spaced (to bound the clustering cost); with fewer than 40, the 2000 frames with the largest displacement are used instead.</li>
       <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart, more clusters if short.</li>
       <li>If there are still fewer than 20 (this happens when the model is already good and the few candidates are bunched within a few seconds), the batch is filled from the candidates in order of decreasing jump, still 1 s apart.</li>
     </ol>
