@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:37 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:41 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -192,7 +192,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Validation data</span></th><td><span lang="en">Same as step 1: the latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the model.</span></td></tr>
     <tr><th><span lang="en">Test data</span></th><td><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
     <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">Five models (ResNet-50, HRNet-W18, HRNet-W32, HRNet-W48, CSPNeXt-S), batch 2, 100 epochs each on CPU, other settings as in step 1, one run each.</span></td></tr>
-    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Same as step 1: RMSE over all keypoints at the time; Figure 2-2 also gives the median frame RMSE.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">Same as step 1: RMSE over all keypoints; Figure 2-2 also gives the median frame RMSE.</span></td></tr>
   </tbody></table></div>
   
   <p class="text" lang="en"><span class="tag">What was done:</span>Same data and settings (batch 2, 100 epochs), five backbones: ResNet-50, HRNet-W18 / W32 / W48, CSPNeXt-S.</p>
