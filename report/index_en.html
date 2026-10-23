@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:41 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:51 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -170,12 +170,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_batch_size.jpg" alt="Batch size sweep overview"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 1-1, how to read:</span>Top right: internal validation loss, lowest at batch 2 (star). Top left: test error, the blue line is also lowest at batch 2 (21.07 px). Bottom right: both together, batch 2 sits in the lower-left corner, so the two signals agree. Bottom left: share of points with confidence ≥ 0.6 falls as the batch grows.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 1-1:</span>Top right: internal validation loss, lowest at batch 2 (star). Top left: test error, the blue line is also lowest at batch 2 (21.07 px). Bottom right: both together, batch 2 sits in the lower-left corner, so the two signals agree. Bottom left: share of points with confidence ≥ 0.6 falls as the batch grows.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_batch_two_metrics.jpg" alt="Batch sizes scored with both metrics"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 1-2, how to read:</span>From step 3 on the metric is the median frame RMSE (the RMSE over the 8 points of each frame, then the median over the 100 frames), so that a few far-off frames do not dominate the number. Here the same four models are recomputed with it from the same predictions, no retraining. Left: the metric used at the time of step 1, RMSE over all keypoints. Middle: median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 1-2:</span>From step 3 on the metric is the median frame RMSE (the RMSE over the 8 points of each frame, then the median over the 100 frames), so that a few far-off frames do not dominate the number. Here the same four models are recomputed with it from the same predictions, no retraining. Left: the metric used at the time of step 1, RMSE over all keypoints. Middle: median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
   </figure>
   
   <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batches 2, 4, 8 and 16 cannot be told apart: one run each, the validation loss on the 20 validation frames differs by only 7%, and the error on the 100 test frames is 21.1–23.6 px (RMSE over all keypoints) or 18.5–20.1 px (median frame RMSE). Batch 2 is taken as the one with the lowest validation loss and is used in every later step.</p>
@@ -199,12 +199,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_model_selection.jpg" alt="Model selection overview"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 2-1, how to read:</span>Top left: test error, ResNet-50 lowest (20.1 px), HRNet-W32 close (21.1 px). Top right: internal validation loss, the five models differ by only 1.4% and cannot be separated. Bottom left: points with confidence ≥ 0.6, ResNet-50 has the most (514 of 800). Bottom right: training time vs error, ResNet-50 takes 1.7 h and sits in the lower-left corner (low error, short time; only CSPNeXt-S, with a much higher error, is faster).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 2-1:</span>Top left: test error, ResNet-50 lowest (20.1 px), HRNet-W32 close (21.1 px). Top right: internal validation loss, the five models differ by only 1.4% and cannot be separated. Bottom left: points with confidence ≥ 0.6, ResNet-50 has the most (514 of 800). Bottom right: training time vs error, ResNet-50 takes 1.7 h and sits in the lower-left corner (low error, short time; only CSPNeXt-S, with a much higher error, is faster).</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_model_two_metrics.jpg" alt="Models scored with both metrics"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 2-2, how to read:</span>The same five models recomputed with the median frame RMSE, the metric from step 3 on, from the same predictions (no retraining), next to the metric used at the time. Left: RMSE over all keypoints, from 20.1 to 47.9 px, a large spread. Middle: median frame RMSE on the same y scale; the five models give ResNet-50 18.4, HRNet-W32 19.7, HRNet-W48 19.2, CSPNeXt-S 19.6, HRNet-W18 20.5 px, only about 2 px apart. Right: share of test frames with frame RMSE above 50 px: 15% for HRNet-W18, 2% for CSPNeXt-S, none for ResNet-50 and HRNet-W32. The spread in the left panel comes mainly from these far-off frames.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 2-2:</span>The same five models recomputed with the median frame RMSE, the metric from step 3 on, from the same predictions (no retraining), next to the metric used at the time. Left: RMSE over all keypoints, from 20.1 to 47.9 px, a large spread. Middle: median frame RMSE on the same y scale; the five models give ResNet-50 18.4, HRNet-W32 19.7, HRNet-W48 19.2, CSPNeXt-S 19.6, HRNet-W18 20.5 px, only about 2 px apart. Right: share of test frames with frame RMSE above 50 px: 15% for HRNet-W18, 2% for CSPNeXt-S, none for ResNet-50 and HRNet-W32. The spread in the left panel comes mainly from these far-off frames.</figcaption>
   </figure>
   
   <p class="concl" lang="en"><span class="tag">Conclusion:</span>Taking everything together, ResNet-50. (1) Lowest test error: 20.1 px. (2) The validation losses of the five models are close, within 1.4%. (3) Best use of confidence: 514 of 800 points have confidence ≥ 0.6, against 75–375 for the other models; this helps when confidence is used later to detect blinks and tracking loss. (4) Low training cost: 1.7 h, against 3.7 h for HRNet-W32, the model with a similar error. All later experiments use ResNet-50 with batch 2. Recomputed with the median frame RMSE, ResNet-50 is still the lowest (18.4 px), but the five models are only about 2 px apart. The comparison of the two metrics shows that the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. This is why the median frame RMSE is the main metric from step 3 on, with the share of frames above 50 px reported separately.</p>
@@ -228,7 +228,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_active_learning.jpg" alt="Active learning convergence, rounds 0-11"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 3-1, how to read:</span>x = cumulative training frames, the three colours are the three detectors. Every round in the figure is scored with the same formula. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 3-1:</span>x = cumulative training frames, the three colours are the three detectors. Every round in the figure is scored with the same formula. <b>The middle panel is the primary metric</b> (median frame RMSE): all three lines wander between 15.7 and 17.5 px with no downward trend; the red line (jump) is slightly lower most of the time; note that its y axis spans only 2 px. The left panel is the mean, which a few badly wrong frames pull up (the blue spike at 120–140 frames comes from a few blink frames).</figcaption>
   </figure>
   
   <div class="concl" lang="en">
@@ -257,7 +257,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/kp_all_keypoints.jpg" alt="All eight keypoints on three mice"></div>
     
-    <figcaption lang="en"><b>Fig. 4-1.</b> <span class="tag">How to read:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.<br><span class="muted">Source: left, first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001; middle, Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frame 68086; right, Terra, video 11 (<code>11_20251017_Terra_spont_1</code>), frame 68086. All from the test set of the video; the points are human labels.</span></figcaption>
+    <figcaption lang="en"><span class="tag">Figure 4-1:</span>One human-labeled frame of each of the three mice. Red dots are the four pupil points and the red line is the ellipse through them; cyan dots are the two eyelid points and the two corners. The frames are brightened for display.<br><span class="muted">Source: left, first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001; middle, Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frame 68086; right, Terra, video 11 (<code>11_20251017_Terra_spont_1</code>), frame 68086. All from the test set of the video; the points are human labels.</span></figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -268,7 +268,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/kp_construction_pupil.jpg" alt="How the pupil points are constructed"></div>
     
-    <figcaption lang="en"><b>Fig. 4-2.</b> <span class="tag">How to read:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: no ellipse was fitted on purpose and the four points were placed at the topmost, bottommost, leftmost and rightmost visible points of the pupil, so they are not necessarily the ends of an ellipse and do not necessarily lie on its two axes.<br><span class="muted">Source: all three panels are Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frames 20855, 5160 and 4835 from left to right, taken from the first training batch. Red dots are the labels made under the definitions of 2026-09-20, yellow crosses the labels of the same frames before that.</span></figcaption>
+    <figcaption lang="en"><span class="tag">Figure 4-2:</span>How the four pupil points are obtained. The red ellipse covers the whole pupil, the dashed red lines are its two axes, and the four points are the ends of the axes. Yellow crosses and the dashed yellow outline show the placement before 2026-09-20: no ellipse was fitted on purpose and the four points were placed at the topmost, bottommost, leftmost and rightmost visible points of the pupil, so they are not necessarily the ends of an ellipse and do not necessarily lie on its two axes.<br><span class="muted">Source: all three panels are Pluto, video 1 (<code>1_20251031_Pluto_spont_1</code>), frames 20855, 5160 and 4835 from left to right, taken from the first training batch. Red dots are the labels made under the definitions of 2026-09-20, yellow crosses the labels of the same frames before that.</span></figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -286,7 +286,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox" style="max-width:58rem"><img src="assets/kp_construction_corners.jpg" alt="How the two corners are constructed"></div>
     
-    <figcaption lang="en"><b>Fig. 4-3.</b> <span class="tag">How to read:</span>How the two corners are obtained. The three rows are the whole eye, the left corner and the right corner; in each row the left image is the frame without any line and the right image is the same frame with the construction. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner, cyan = the labeled point. Dotted yellow lines and yellow crosses show the construction not adopted: along the inner border of the shadow at the left corner, and along the inner edge of the reflection and of the shadow below it at the right corner; both yellow lines run down to near the lower-eyelid point. The hatched area is the shadow at the left corner.<br><span class="muted">Source: all three rows are the first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001, from the test set. Cyan dots are human labels; the red and yellow lines are construction lines drawn on the image.</span></figcaption>
+    <figcaption lang="en"><span class="tag">Figure 4-3:</span>How the two corners are obtained. The three rows are the whole eye, the left corner and the right corner; in each row the left image is the frame without any line and the right image is the same frame with the construction. Solid red = eyelid margin traced on the image, dashed red = its continuation, red circle = the crossing, which is the corner, cyan = the labeled point. Dotted yellow lines and yellow crosses show the construction not adopted: along the inner border of the shadow at the left corner, and along the inner edge of the reflection and of the shadow below it at the right corner; both yellow lines run down to near the lower-eyelid point. The hatched area is the shadow at the left corner.<br><span class="muted">Source: all three rows are the first mouse, video 0 (<code>0_first5minvedio</code>), frame 15001, from the test set. Cyan dots are human labels; the red and yellow lines are construction lines drawn on the image.</span></figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -457,12 +457,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video18.jpg" alt="Video 18: batch 2 selection" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08): batch 2</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 5-1, how to read:</span>One selection sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Each sheet, from top to bottom: (1) scatter plot at the top left: one dot per candidate frame, placed by the first two principal components of its fingerprint and coloured by cluster; black stars are the 20 picked frames. Bars at the top right: frames per cluster. (2) Second row: when the frames of each cluster occur in the video; stars are the picks. (3) The next rows are traces predicted by the model against time, with a thin vertical line at each of the 20 picks: pupil centre x and y, eye opening, pupil area, lowest pupil confidence. (4) Bottom row: the largest jump in each frame; the red dashed line is the threshold and frames above it are candidates. <b>What to see:</b> the stars are spread over all regions of the scatter plot with one frame in every cluster, so the 20 picks cover the different appearances among the candidates instead of concentrating on one; the vertical lines are also spread over the whole duration instead of bunching at one moment. The sheets of every batch of every video are in the appendix at the end of the page.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-1:</span>One selection sheet per video (its batch 2, the first batch picked by the jump rule) in one row; scroll sideways; the video is named under each sheet. Each sheet, from top to bottom: (1) scatter plot at the top left: one dot per candidate frame, placed by the first two principal components of its fingerprint and coloured by cluster; black stars are the 20 picked frames. Bars at the top right: frames per cluster. (2) Second row: when the frames of each cluster occur in the video; stars are the picks. (3) The next rows are traces predicted by the model against time, with a thin vertical line at each of the 20 picks: pupil centre x and y, eye opening, pupil area, lowest pupil confidence. (4) Bottom row: the largest jump in each frame; the red dashed line is the threshold and frames above it are candidates. <b>What to see:</b> the stars are spread over all regions of the scatter plot with one frame in every cluster, so the 20 picks cover the different appearances among the candidates instead of concentrating on one; the vertical lines are also spread over the whole duration instead of bunching at one moment. The sheets of every batch of every video are in the appendix at the end of the page.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 5-2, how to read:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60; video 1 (first video of the new mouse) 20; after that 7 videos used 20 and 7 used 40, videos 7 and 12 none, video 14 60, video 9 80. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-2:</span>Left: how many of its own labels each video used at its plateau. Video 0 used 60; video 1 (first video of the new mouse) 20; after that 7 videos used 20 and 7 used 40, videos 7 and 12 none, video 14 60, video 9 80. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -487,12 +487,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/scale_video18.jpg" alt="Video 18: error vs own labels" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08): plateau at 40 labels, 12.38 px</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 5-3, how to read:</span>The curves of every video in one row, from video 0 to video 18; scroll sideways. Under each figure: video, mouse, date and plateau point. How to read the three panels, with video 9 as the example. Left: x = this video's own labels, y = error; 10.4 px at 20 labels, 8.6 px at 40, 8.2 px at 80, then two steps without a gain (9.4, 8.6 px), so the rule fired at 120 and the plateau point is 80. Middle: error of each of the 8 points; pupil bottom (blue) is the hardest. Right: label-free signals; the purple line is the share of video frames flagged by the jump rule, falling from 18% to 8% as labels are added.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-3:</span>The curves of every video in one row, from video 0 to video 18; scroll sideways. Under each figure: video, mouse, date and plateau point. How to read the three panels, with video 9 as the example. Left: x = this video's own labels, y = error; 10.4 px at 20 labels, 8.6 px at 40, 8.2 px at 80, then two steps without a gain (9.4, 8.6 px), so the rule fired at 120 and the plateau point is 80. Middle: error of each of the 8 points; pupil bottom (blue) is the hardest. Right: label-free signals; the purple line is the share of video frames flagged by the jump rule, falling from 18% to 8% as labels are added.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_main.jpg" alt="All videos, main line" style="width:2400px"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 5-4, how to read:</span>All videos in one figure, with the main line emphasized (wide; scroll sideways). From left to right each tinted block is one video, in training order; above it: video, date and carried labels. Inside a block x = that video's own labels and y = error (log scale). The bold coloured line is that video's own test set: the open circle is 0 labels (the previous model applied unchanged), then one point every 20 labels. What to see: most videos drop close to their plateau in the single step from 0 to 20 labels and stay flat afterwards. Grey lines are the test sets of the other videos, named at the right end.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-4:</span>All videos in one figure, with the main line emphasized (wide; scroll sideways). From left to right each tinted block is one video, in training order; above it: video, date and carried labels. Inside a block x = that video's own labels and y = error (log scale). The bold coloured line is that video's own test set: the open circle is 0 labels (the previous model applied unchanged), then one point every 20 labels. What to see: most videos drop close to their plateau in the single step from 0 to 20 labels and stay flat afterwards. Grey lines are the test sets of the other videos, named at the right end.</figcaption>
   </figure>
   
   <p class="text" lang="en">The full numbers of every video (generated from the result tables):</p>
@@ -580,7 +580,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_fewer.jpg" alt="All videos, first batch of 5 or 10 labels" style="width:2400px"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 6-1, how to read:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. In each block the open circles are, from left to right: 0 labels, the two 5-label subsets (5a, 5b, at the same x), the two 10-label subsets (10a, 10b), joined to the 20-label point. The band is the range between the two subsets: a narrow band means the two results agree, a wide band means that another choice of frames gives a very different result (e.g. 5 labels on video 1 or on video 6). The thin coloured line is the regular procedure of 20 labels per step. The figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 6-1:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. In each block the open circles are, from left to right: 0 labels, the two 5-label subsets (5a, 5b, at the same x), the two 10-label subsets (10a, 10b), joined to the 20-label point. The band is the range between the two subsets: a narrow band means the two results agree, a wide band means that another choice of frames gives a very different result (e.g. 5 labels on video 1 or on video 6). The thin coloured line is the regular procedure of 20 labels per step. The figure is wide; scroll sideways.</figcaption>
   </figure>
   <div class="tablebox">
     <table>
@@ -639,7 +639,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/fewer_video18.jpg" alt="fewer video 18" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 6-2, how to read:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 6-2:</span>One figure per video in one row; scroll sideways. In each, the blue line is the regular 0, 20, 40, … labels and the orange points are the two subsets of 5 and of 10 labels; left = median error, right = share of test frames above 50 px. Two examples: video 1 (first video of a new mouse): 208 px at 0 labels, 96 / 41 px at 5, 20 / 16 px at 10, 10.4 px at 20; more labels are better and neither 5 nor 10 is enough. Video 5 (well covered by the earlier videos): the median error is 9–16 px anywhere between 0 and 20 labels, but the share of test frames above 50 px falls from 12% at 0 labels to 0–4% at 5.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>5 or 10 labels are enough on a few videos but cannot replace 20.
@@ -669,12 +669,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_backtest.jpg" alt="All videos, back-test" style="width:2400px"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 7-1, how to read:</span>The same figure as Figure 5-4, here with the back-test emphasized. One colour per video: its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block and grey before its own block (its labels not yet in the training set). Two things to see: (1) the bold lines are essentially flat: adding other videos later does not make an earlier video worse. (2) At the far left, with labels of the first mouse only, every Pluto video (grey) is at 150–430 px; as soon as video 1's labels enter, videos 2, 3, 5, 7 drop to 5–20 px and videos 4, 8, 9, 10 to 20–40 px, although among video 1's seven models a few still score 100–220 px on videos 4, 6, 8, 9, 10. The figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 7-1:</span>The same figure as Figure 5-4, here with the back-test emphasized. One colour per video: its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block and grey before its own block (its labels not yet in the training set). Two things to see: (1) the bold lines are essentially flat: adding other videos later does not make an earlier video worse. (2) At the far left, with labels of the first mouse only, every Pluto video (grey) is at 150–430 px; as soon as video 1's labels enter, videos 2, 3, 5, 7 drop to 5–20 px and videos 4, 8, 9, 10 to 20–40 px, although among video 1's seven models a few still score 100–220 px on videos 4, 6, 8, 9, 10. The figure is wide; scroll sideways.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><img src="assets/cross_video_matrix.jpg" alt="Error of each model on each test set" style="width:6265px"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 7-2, how to read:</span>The same data as a table: rows = test videos, columns = models, cells = error (px); yellow is good, purple is bad. The purple block on the left is the models with labels of the first mouse only; to the right each row keeps its colour and never turns purple again. With 149 models side by side the figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 7-2:</span>The same data as a table: rows = test videos, columns = models, cells = error (px); yellow is good, purple is bad. The purple block on the left is the models with labels of the first mouse only; to the right each row keeps its colour and never turns purple again. With 149 models side by side the figure is wide; scroll sideways.</figcaption>
   </figure>
   
   <p class="concl" lang="en"><span class="tag">Conclusion:</span>One model can keep accumulating videos without hurting the old ones. Videos of the same day transfer directly (video 3 was at 4.4 px before any of its own labels); a new day needs its 0-label error checked before deciding how much to label. A 0-label score from a single model is not reliable; individual models can be far off.</p>
@@ -699,7 +699,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_kp_conf_error.jpg" alt="Error and confidence by keypoint, all videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-1, how to read:</span>Left: one row per keypoint, sorted from the largest error. The bar is the median error of the 19 videos pooled (number at its end), the dots are the 19 videos one by one; the two videos with the largest error are named (e.g. v8 = video 8). What to see: pupil top has the longest bar (10.2 px), the other 7 points are at 3.5–6.0 px; the dots far from the bars are mostly videos 4 and 8. Middle: the same for the mean confidence; dashed line = 0.6; the two videos with the lowest confidence are named. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint; the lines fall from left to right: the higher the confidence, the smaller the error.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1:</span>Left: one row per keypoint, sorted from the largest error. The bar is the median error of the 19 videos pooled (number at its end), the dots are the 19 videos one by one; the two videos with the largest error are named (e.g. v8 = video 8). What to see: pupil top has the longest bar (10.2 px), the other 7 points are at 3.5–6.0 px; the dots far from the bars are mostly videos 4 and 8. Middle: the same for the mean confidence; dashed line = 0.6; the two videos with the lowest confidence are named. Right: all points split into 5 confidence bins, median error within each bin (log scale), one line per keypoint; the lines fall from left to right: the higher the confidence, the smaller the error.</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -724,7 +724,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/kpconf_video18.jpg" alt="kpconf video 18" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-2, how to read:</span>One figure per video in one row; scroll sideways. In each: left, one line per keypoint, x = labels of this video (20, 40, 60, …), y = median error; lower is more accurate; the dotted line is the plateau point and the value of the last step is written at the right end; the four pupil points are solid, eyelids and corners dashed. Middle, the same with the mean confidence on the y axis; higher is better. Right, every point of the plateau-point model on the 50 test frames, x = confidence, y = error (log scale), colour = keypoint, dashed line = confidence 0.6; points towards the upper left have low confidence and a large error.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-2:</span>One figure per video in one row; scroll sideways. In each: left, one line per keypoint, x = labels of this video (20, 40, 60, …), y = median error; lower is more accurate; the dotted line is the plateau point and the value of the last step is written at the right end; the four pupil points are solid, eyelids and corners dashed. Middle, the same with the mean confidence on the y axis; higher is better. Right, every point of the plateau-point model on the 50 test frames, x = confidence, y = error (log scale), colour = keypoint, dashed line = confidence 0.6; points towards the upper left have low confidence and a large error.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>Pupil top is the least accurate point, and points with low confidence have larger errors.
@@ -754,7 +754,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_unreliable.jpg" alt="Jump, confidence and fitting deviation against the frame error"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-3, how to read:</span>A: one dot per frame, x = the value of jump, y = the frame RMSE of that frame (both log scale); grey = frame RMSE up to 20 px, orange 20–50 px, red above 50 px; the dashed line is jump's threshold, frames to its right are flagged. B: the same with the value of uncertain (lowest confidence) on x; frames to the left of the line (below 0.6) are flagged. C: the same with the value of fitting on x (log scale); the dashed line is DLC's default 20 px, frames to its right are flagged. D: recall (solid: share of the unreliable frames that are flagged) and precision (hatched: share of the flagged frames that are unreliable) of the five rules; red = very unreliable (above 50 px), orange = mildly unreliable (above 20 px); under the axis, the share of the 1330 frames each rule flags.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-3:</span>A: one dot per frame, x = the value of jump, y = the frame RMSE of that frame (both log scale); grey = frame RMSE up to 20 px, orange 20–50 px, red above 50 px; the dashed line is jump's threshold, frames to its right are flagged. B: the same with the value of uncertain (lowest confidence) on x; frames to the left of the line (below 0.6) are flagged. C: the same with the value of fitting on x (log scale); the dashed line is DLC's default 20 px, frames to its right are flagged. D: recall (solid: share of the unreliable frames that are flagged) and precision (hatched: share of the flagged frames that are unreliable) of the five rules; red = very unreliable (above 50 px), orange = mildly unreliable (above 20 px); under the axis, the share of the 1330 frames each rule flags.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>By use: human review with fitting; picking training frames with jump; for removing unreliable frames none of the five rules finds all unreliable frames without removing a large share of the frames.
@@ -795,7 +795,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_eye_area.jpg" alt="Area rules on all videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-1, how to read:</span>Left: the 940 test frames of the 19 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 0.5-s median filter (dark).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-1:</span>Left: the 940 test frames of the 19 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 0.5-s median filter (dark).</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on the area:</span>Among these rules the four-point rule has the lowest error, but on some videos the area is still not accurate.
@@ -847,7 +847,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the judged frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-1, how to read:</span>One panel per mouse (the first pools all three, for reference only; thresholds are set per mouse). x = candidate threshold T in pixels; blue = agreement (share of all judged frames on which "O &lt; T → not open" agrees with the labeler), orange = recall minus false-alarm rate (formulas under "How the threshold is chosen" above); the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-1:</span>One panel per mouse (the first pools all three, for reference only; thresholds are set per mouse). x = candidate threshold T in pixels; blue = agreement (share of all judged frames on which "O &lt; T → not open" agrees with the labeler), orange = recall minus false-alarm rate (formulas under "How the threshold is chosen" above); the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -889,7 +889,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox scroll"><img src="assets/fig_blink_examples.jpg" style="width:4200px;max-width:none" alt="The eye at the mouse threshold and at 180 px, one frame per video"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-2, how to read:</span>The eye at the threshold: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open. Two rows per mouse (threshold row, Terra 150 px and Pluto 148 px; 180 px row), one frame per video whose opening in the whole-video predictions is within 3 px of that value; yellow = eyelid points, blue = eye corners. Scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-2:</span>The eye at the threshold: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open. Two rows per mouse (threshold row, Terra 150 px and Pluto 148 px; 180 px row), one frame per video whose opening in the whole-video predictions is within 3 px of that value; yellow = eyelid points, blue = eye corners. Scroll sideways.</figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -898,7 +898,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_dist.jpg" alt="Eye opening distribution per mouse with the judged frames overlaid"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-3, how to read:</span>One column per mouse.
+    <figcaption lang="en"><span class="tag">Figure 10-3:</span>One column per mouse.
       <ul>
         <li>Top row: histogram of the eye opening over every frame of all the mouse's videos (gray), dashed line = the threshold. Terra is bimodal and the threshold sits in the valley; Pluto is unimodal and the threshold cuts the left slope. This is why Terra's peak in Figure 10-1 is sharp and Pluto's flat.</li>
         <li>Bottom row: the judged frames. Red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots lie left of the threshold, almost all green ones right of it. Misjudged frames: Pluto 9, all within 14 px of the threshold; Terra 14, 13 within 17 px and one 37 px away. Mouse A's 12 frames are all open, so no boundary can be drawn.</li>
@@ -912,7 +912,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-4, how to read:</span>One dot per test frame. x = the distance between the labeler's two eyelid points, y = the distance between the model's two. Black diagonal = equal, dotted lines = ±10 px, dashed line = the mouse threshold.
+    <figcaption lang="en"><span class="tag">Figure 10-4:</span>One dot per test frame. x = the distance between the labeler's two eyelid points, y = the distance between the model's two. Black diagonal = equal, dotted lines = ±10 px, dashed line = the mouse threshold.
       <ul>
         <li>The dots hug the diagonal: the model hardly errs on this quantity. Median difference Pluto 1.9 px (499 frames), Terra 2.2 px (400 frames), 90% of the frames within 6.3 px, no bias.</li>
         <li>Frames moved to the other side of the threshold by the model's error: Pluto 12 (2.4%), Terra 14 (3.5%), all within 20 px of the threshold.</li>
@@ -982,7 +982,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_opening_terra.jpg" alt="Terra: eye opening over time per video with the mouse threshold"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-5, how to read:</span>One row per Terra video; x = time in minutes, the line is the median eye opening of each 10 s, the band reaches down to the 10th percentile, the black line is the mouse threshold 150 px. Where the line is above the black line the eye is open (13, 16, 17 almost throughout), where it is below the eye is narrowed (11 and 18 most of the time). Without any threshold, this line is the eye opening as a continuous variable. The same figures for Pluto and mouse A are in the results folder.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-5:</span>One row per Terra video; x = time in minutes, the line is the median eye opening of each 10 s, the band reaches down to the 10th percentile, the black line is the mouse threshold 150 px. Where the line is above the black line the eye is open (13, 16, 17 almost throughout), where it is below the eye is narrowed (11 and 18 most of the time). Without any threshold, this line is the eye opening as a continuous variable. The same figures for Pluto and mouse A are in the results folder.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>One pixel threshold per mouse, <b>Pluto 147.5 px, Terra 150.5 px</b>, almost the same for the two mice.
@@ -1012,7 +1012,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 11-1, how to read:</span>One row per video; y = four-point area divided by the video's median area (1 = median, range 0–2), x = time (s).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-1:</span>One row per video; y = four-point area divided by the video's median area (1 = median, range 0–2), x = time (s).</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -1037,7 +1037,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/eyets_video18.jpg" alt="eyets video 18" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 11-2, how to read:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area (px²), eye opening O (px), lowest pupil confidence, pupil centre relative to its median position (px, blue x, yellow y); x = time (s).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-2:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area (px²), eye opening O (px), lowest pupil confidence, pupil centre relative to its median position (px, blue x, yellow y); x = time (s).</figcaption>
   </figure>
 </section>
 
