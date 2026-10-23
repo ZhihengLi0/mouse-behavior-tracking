@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 15:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 15:37 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -240,8 +240,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
     <tr><th><span lang="zh">标注标准</span><span lang="en">Label standard</span></th><td><span lang="zh">第一阶段（瞳孔上点标在看得见的瞳孔的最高处）。</span><span lang="en">Phase 1 (pupil top at the highest point of the visible pupil).</span></td></tr>
-    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">与第 1 步相同：最早的 80 帧训练。</span><span lang="en">Same as step 1: the earliest 80 frames.</span></td></tr>
-    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">与第 1 步相同：最晚的 20 帧。用来选模型。</span><span lang="en">Same as step 1: the latest 20 frames. Used to choose the model.</span></td></tr>
+    <tr><th><span lang="zh">训练数据</span><span lang="en">Training data</span></th><td><span lang="zh">与第 1 步相同：前 4 分钟里人工标注的 100 帧按视频时间排序，最早的 80 帧（第 0–33 秒）训练。</span><span lang="en">Same as step 1: the 100 hand-labeled frames of the first 4 minutes sorted by time in the video, the earliest 80 (0–33 s) for training.</span></td></tr>
+    <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">与第 1 步相同：同一批 100 帧里最晚的 20 帧（第 34–236 秒），与训练帧至少隔 1.2 秒。用来选模型。</span><span lang="en">Same as step 1: the latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the model.</span></td></tr>
     <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
     <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">5 种模型（ResNet-50、HRNet-W18、HRNet-W32、HRNet-W48、CSPNeXt-S），batch 2，各训练 100 轮，CPU，其余设置与第 1 步相同，每种训练一次。</span><span lang="en">Five models (ResNet-50, HRNet-W18, HRNet-W32, HRNet-W48, CSPNeXt-S), batch 2, 100 epochs each on CPU, other settings as in step 1, one run each.</span></td></tr>
     <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">与第 1 步相同：当时用全部关键点合在一起的 RMSE；图 2-2 同时给出中位帧 RMSE。</span><span lang="en">Same as step 1: RMSE over all keypoints at the time; Figure 2-2 also gives the median frame RMSE.</span></td></tr>
