@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 15:11 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 15:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -87,7 +87,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <h3>第一阶段的结论（第 1–3 步）</h3>
     <p>前提：瞳孔上点标在看得见的、没有被眼睑挡住的瞳孔的最高处。</p>
     <ol>
-      <li><b>batch size 用多少？</b>用 2。按内部验证损失选出；在测试集上四种 batch size 相差不大（第 1 步）。</li>
+      <li><b>batch size 用多少？</b>用 2。batch 2、4、8、16 分不出高下，按 20 帧验证帧上的验证损失最低取 2（第 1 步）。</li>
       <li><b>用哪个模型？</b>用 ResNet-50（第 2 步）。</li>
       <li><b>用哪种纠错算法挑要补标的帧？</b>用 jump。三种算法没有明显差距，jump 略微领先（第 3 步）。</li>
     </ol>
@@ -126,7 +126,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <h3>Conclusions of phase 1 (steps 1–3)</h3>
     <p>Premise: pupil top is placed at the highest point of the visible pupil, the part not hidden by the eyelid.</p>
     <ol>
-      <li><b>Which batch size?</b> 2, chosen by the internal validation loss; on the test set the four batch sizes differ little (step 1).</li>
+      <li><b>Which batch size?</b> 2. Batches 2, 4, 8 and 16 cannot be told apart; 2 has the lowest validation loss on the 20 validation frames (step 1).</li>
       <li><b>Which model?</b> ResNet-50 (step 2).</li>
       <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
     </ol>
@@ -206,7 +206,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 1 -->
 <section id="s1">
-  <h2><span class="no">1</span><span lang="zh">选 batch size：batch 2</span><span lang="en">Batch size: batch 2</span></h2>
+  <h2><span class="no">1</span><span lang="zh">batch size：四个分不出高下，按验证损失最低取 2</span><span lang="en">Batch size: the four cannot be told apart; 2 by the lowest validation loss</span></h2>
   <p class="text"><b><span lang="zh">基本信息</span><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><td><span lang="zh">第一只老鼠的 5 分钟眼睛视频（60 帧/秒，共 18,000 帧）。前 4 分钟用于挑帧和训练，最后 1 分钟只用于测试。</span><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
@@ -215,7 +215,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">验证数据</span><span lang="en">Validation data</span></th><td><span lang="zh">同一批 100 帧里时间最晚的 20 帧（34–236 秒），与训练帧相隔 1.2 秒以上。用来选 batch size。</span><span lang="en">The latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the batch size.</span></td></tr>
     <tr><th><span lang="zh">测试数据</span><span lang="en">Test data</span></th><td><span lang="zh">最后 1 分钟里按时间均匀取 100 帧，人工标注 8 个点。只用来报告成绩，不参与训练，也不参与任何选择。</span><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
     <tr><th><span lang="zh">模型和配置</span><span lang="en">Model and settings</span></th><td><span lang="zh">HRNet-W32（当时使用的模型），从 ImageNet 预训练权重开始训练 100 轮，CPU；学习率在第 80、95 轮下降；每个 batch size 训练一次；取内部验证 mAP 最高的那次存档来打分。</span><span lang="en">HRNet-W32 (the model in use at that time), trained for 100 epochs from ImageNet-pretrained weights on CPU; learning rate drops at epochs 80 and 95; one run per batch size; the snapshot with the best internal validation mAP is scored.</span></td></tr>
-    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">测试帧上全部关键点合在一起的 RMSE（像素），公式见页面开头“指标怎么算”的第 3 条（N 最多为 100 帧 × 8 点 = 800）。这一步和第 2 步当时用这个指标；图 1-2 同时给出中位帧 RMSE。</span><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 used this metric at the time; Figure 1-2 also gives the median frame RMSE.</span></td></tr>
+    <tr><th><span lang="zh">指标</span><span lang="en">Metric</span></th><td><span lang="zh">测试帧上全部关键点合在一起的 RMSE（像素），公式见页面开头“指标怎么算”的第 3 条（N 最多为 100 帧 × 8 点 = 800）。这一步和第 2 步当时用这个指标；图 1-2 同时给出中位帧 RMSE。选 batch 用的验证损失：网络训练时最小化的量（预测热图和以标注位置为中心的目标热图的均方差，加权重 0.05 的位置微调项），算在 20 帧验证帧上，每 10 个 epoch 算一次，取 100 个 epoch 里的最小值。</span><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 used this metric at the time; Figure 1-2 also gives the median frame RMSE. The validation loss used to choose the batch: the quantity the network minimizes in training (mean squared difference between the predicted heatmap and the target heatmap centred on the label, plus a location-refinement term with weight 0.05), computed on the 20 validation frames every 10 epochs, the minimum over the 100 epochs.</span></td></tr>
   </tbody></table></div>
   <p class="text" lang="zh"><span class="tag">做了什么：</span>用审核后的标注（前 80 帧训练，后 20 帧验证），batch size 取 2、4、8、16 各训练一次（100 轮）。选择规则在看结果之前定好：内部验证损失最低的 batch。最后 1 分钟的测试帧只用来报告，不参与选择。</p>
   <p class="text" lang="en"><span class="tag">What was done:</span>With the reviewed labels (first 80 frames train, last 20 validate), one run each at batch 2, 4, 8, 16 (100 epochs). The selection rule was fixed before looking at results: lowest internal validation loss. The final-minute test frames are report-only.</p>
@@ -229,8 +229,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">图 1-2 怎么看：</span>同样的四次训练，用两种指标打分（用同一批预测补算，没有重新训练）。左：当时用的指标，全部关键点合在一起的 RMSE。中：后面各步用的指标，中位帧 RMSE，和左图用同一个纵轴刻度。右：帧 RMSE 超过 50 px 的测试帧所占比例。按中位帧 RMSE，四个 batch size 是 19.7 / 18.5 / 20.1 / 19.1 px，都在 18.5–20.1 px 之间，batch 4 最低。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 1-2, how to read:</span>The same four runs scored with both metrics (scored afterwards from the same predictions, no retraining). Left: the metric used at the time, RMSE over all keypoints. Middle: the metric of the later steps, median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
   </figure>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>选 batch 2。内部验证集和独立测试集选出同一个 batch，说明扩大后的验证集可以信任。每个 batch 只跑了一次，batch 之间的差距不大（21.1–23.6 px）。用后面各步的指标（中位帧 RMSE）补算：四个 batch 在 18.5–20.1 px 之间，batch 4 最低（18.5 px），batch 2 是 19.7 px，相差 1.3 px；batch 4 和 batch 8 各有 1–2 帧错到 50 px 以上，batch 2 没有。选择规则是内部验证损失，不看测试集，所以选 batch 2 的决定不变；但按中位帧 RMSE，测试集并不显示 batch 2 最好，四个 batch 实际上分不出高下。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batch 2. The internal validation set and the independent test set pick the same batch, which shows the enlarged validation set can be trusted. One run per batch; the differences between batches are small (21.1–23.6 px). Re-scored with the metric of the later steps (median frame RMSE): the four batches lie between 18.5 and 20.1 px, batch 4 is the lowest (18.5 px) and batch 2 gives 19.7 px, 1.3 px apart; batch 4 and batch 8 each have 1–2 frames above 50 px, batch 2 has none. The selection rule is the internal validation loss and does not look at the test set, so the choice of batch 2 stands; but by median frame RMSE the test set does not show batch 2 as the best, and the four batches cannot really be told apart.</p>
+  <p class="concl" lang="zh"><span class="tag">结论：</span>batch 2、4、8、16 分不出高下：每个只训练一次，20 帧验证帧上的验证损失只差 7%，100 帧测试帧上的误差是 21.1–23.6 px（全部关键点合在一起的 RMSE）或 18.5–20.1 px（中位帧 RMSE，第 4 步起用的指标，用同一批预测重新打分）。按验证损失最低取 batch 2，之后所有步骤都用它。测试集不参与选择，按它排序 batch 2 也不是最低（中位帧 RMSE 下 batch 4 最低，18.5 px；batch 2 是 19.7 px）。</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batches 2, 4, 8 and 16 cannot be told apart: one run each, the validation loss on the 20 validation frames differs by only 7%, and the error on the 100 test frames is 21.1–23.6 px (RMSE over all keypoints) or 18.5–20.1 px (median frame RMSE, the metric used from step 4 on, re-scored from the same predictions). Batch 2 is taken as the one with the lowest validation loss and is used in every later step. The test set plays no part in the choice, and by it batch 2 is not the lowest either (by median frame RMSE batch 4 is, 18.5 px; batch 2 gives 19.7 px).</p>
 </section>
 
 <!-- 2 -->

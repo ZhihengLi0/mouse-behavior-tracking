@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:11 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -85,7 +85,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <h3>Conclusions of phase 1 (steps 1–3)</h3>
     <p>Premise: pupil top is placed at the highest point of the visible pupil, the part not hidden by the eyelid.</p>
     <ol>
-      <li><b>Which batch size?</b> 2, chosen by the internal validation loss; on the test set the four batch sizes differ little (step 1).</li>
+      <li><b>Which batch size?</b> 2. Batches 2, 4, 8 and 16 cannot be told apart; 2 has the lowest validation loss on the 20 validation frames (step 1).</li>
       <li><b>Which model?</b> ResNet-50 (step 2).</li>
       <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
     </ol>
@@ -154,7 +154,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 1 -->
 <section id="s1">
-  <h2><span class="no">1</span><span lang="en">Batch size: batch 2</span></h2>
+  <h2><span class="no">1</span><span lang="en">Batch size: the four cannot be told apart; 2 by the lowest validation loss</span></h2>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Video</span></th><td><span lang="en">The 5-minute eye video of the first mouse (60 fps, 18,000 frames). The first 4 minutes are used for frame selection and training, the final minute for testing only.</span></td></tr>
@@ -163,7 +163,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Validation data</span></th><td><span lang="en">The latest 20 of the same 100 frames (34–236 s), at least 1.2 s away from the training frames. Used to choose the batch size.</span></td></tr>
     <tr><th><span lang="en">Test data</span></th><td><span lang="en">100 frames evenly spaced in time over the final minute, all 8 points labeled by hand. Used only to report the score, never for training or for any choice.</span></td></tr>
     <tr><th><span lang="en">Model and settings</span></th><td><span lang="en">HRNet-W32 (the model in use at that time), trained for 100 epochs from ImageNet-pretrained weights on CPU; learning rate drops at epochs 80 and 95; one run per batch size; the snapshot with the best internal validation mAP is scored.</span></td></tr>
-    <tr><th><span lang="en">Metric</span></th><td><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 used this metric at the time; Figure 1-2 also gives the median frame RMSE.</span></td></tr>
+    <tr><th><span lang="en">Metric</span></th><td><span lang="en">RMSE over all keypoints of all test frames (pixels); the formula is item 3 of "How the metrics are computed" at the top (N is at most 100 frames × 8 points = 800). This step and step 2 used this metric at the time; Figure 1-2 also gives the median frame RMSE. The validation loss used to choose the batch: the quantity the network minimizes in training (mean squared difference between the predicted heatmap and the target heatmap centred on the label, plus a location-refinement term with weight 0.05), computed on the 20 validation frames every 10 epochs, the minimum over the 100 epochs.</span></td></tr>
   </tbody></table></div>
   
   <p class="text" lang="en"><span class="tag">What was done:</span>With the reviewed labels (first 80 frames train, last 20 validate), one run each at batch 2, 4, 8, 16 (100 epochs). The selection rule was fixed before looking at results: lowest internal validation loss. The final-minute test frames are report-only.</p>
@@ -178,7 +178,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 1-2, how to read:</span>The same four runs scored with both metrics (scored afterwards from the same predictions, no retraining). Left: the metric used at the time, RMSE over all keypoints. Middle: the metric of the later steps, median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
   </figure>
   
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batch 2. The internal validation set and the independent test set pick the same batch, which shows the enlarged validation set can be trusted. One run per batch; the differences between batches are small (21.1–23.6 px). Re-scored with the metric of the later steps (median frame RMSE): the four batches lie between 18.5 and 20.1 px, batch 4 is the lowest (18.5 px) and batch 2 gives 19.7 px, 1.3 px apart; batch 4 and batch 8 each have 1–2 frames above 50 px, batch 2 has none. The selection rule is the internal validation loss and does not look at the test set, so the choice of batch 2 stands; but by median frame RMSE the test set does not show batch 2 as the best, and the four batches cannot really be told apart.</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batches 2, 4, 8 and 16 cannot be told apart: one run each, the validation loss on the 20 validation frames differs by only 7%, and the error on the 100 test frames is 21.1–23.6 px (RMSE over all keypoints) or 18.5–20.1 px (median frame RMSE, the metric used from step 4 on, re-scored from the same predictions). Batch 2 is taken as the one with the lowest validation loss and is used in every later step. The test set plays no part in the choice, and by it batch 2 is not the lowest either (by median frame RMSE batch 4 is, 18.5 px; batch 2 gives 19.7 px).</p>
 </section>
 
 <!-- 2 -->
