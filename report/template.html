@@ -92,7 +92,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>用哪种纠错算法挑要补标的帧？</b>用 jump。三种算法没有明显差距，jump 略微领先（第 3 步）。</li>
     </ol>
     <h3>中间的逻辑：为什么换了标准还沿用 ResNet-50 和 batch 2</h3>
-    <p>2026 年 9 月 20 日把 8 个点各自标在哪里明确了下来（逐点对照见第 4 步）。和之前相比有三处变化：瞳孔上点从“看得见的瞳孔的最高处”改为“瞳孔椭圆真实的最高点”，上移约 50 px；瞳孔左、右两点从“看得见的瞳孔最靠左、最靠右的位置”改为椭圆横轴的两个端点；两个眼角从阴影和反光的内侧改到外侧，各外移 40–50 px。瞳孔下点和上下眼睑点的定义没有变。图像、任务和训练方式都没有变。batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以我们认为这两项选择不受影响，继续使用 ResNet-50 和 batch 2。这是一个判断，没有按明确后的定义重新比较过 batch size 和模型。第一阶段的三项选择本身是在同一套定义下做的：当时这个视频上的全部训练帧和测试帧都按同一种标法（核对见第 4 步），所以 batch size 之间、模型之间、纠错算法之间的比较是公平的。</p>
+    <p>结论：第一阶段选出的 ResNet-50 和 batch 2 继续用，没有在新定义下重选。理由分三步。</p>
+    <ol>
+      <li>第一阶段的三项比较本身是公平的：当时这个视频的全部训练帧和测试帧都按同一种标法（核对见第 4 步），所以 batch size 之间、模型之间、纠错算法之间的比较成立。</li>
+      <li>2026 年 9 月 20 日明确点位定义后变的是点标在哪里（逐点对照见第 4 步）：瞳孔上点从"看得见的瞳孔的最高处"改为"瞳孔椭圆真实的最高点"，上移约 50 px；瞳孔左、右两点从"看得见的瞳孔最靠左、最靠右的位置"改为椭圆横轴的两个端点；两个眼角从阴影和反光的内侧改到外侧，各外移 40–50 px。瞳孔下点和上下眼睑点没有变。图像、任务和训练方式都没有变。</li>
+      <li>batch size 和模型的选择取决于图像和训练方式，不取决于点标在哪里，所以这两项选择不受影响。</li>
+    </ol>
+    <p>这是一个判断，不是实验结果：没有按明确后的定义重新比较过 batch size 和模型。</p>
     <h3>第二阶段的结论（第 4–11 步）</h3>
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
@@ -125,7 +131,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
-    <p>On 2026-09-20 the placement of each of the 8 points was made explicit (point-by-point comparison in step 4). Three things changed: pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; and the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. The definitions of pupil bottom and of the two eyelid points did not change. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions. The three choices of phase 1 were themselves made under one set of definitions: all training and test frames of that video were labeled in the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms are fair.</p>
+    <p>Conclusion: ResNet-50 and batch 2, chosen in phase 1, are kept; they were not re-selected under the new definitions. Three steps of reasoning.</p>
+    <ol>
+      <li>The three comparisons of phase 1 were fair in themselves: all training and test frames of that video were labeled the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms hold.</li>
+      <li>What changed on 2026-09-20 is where the points are placed (point-by-point comparison in step 4): pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. Pupil bottom and the two eyelid points did not change. The images, the task and the training procedure did not change.</li>
+      <li>The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so both choices are unaffected.</li>
+    </ol>
+    <p>This is a judgment, not an experimental result: batch size and model were not compared again under the explicit definitions.</p>
     <h3>Conclusions of phase 2 (steps 4–11)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>

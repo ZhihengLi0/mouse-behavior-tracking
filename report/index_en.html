@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 09:00 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 09:02 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -90,7 +90,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Which error-correction algorithm picks the frames to label next?</b> jump. The three algorithms show no clear gap; jump is slightly ahead (step 3).</li>
     </ol>
     <h3>The logic in between: why ResNet-50 and batch 2 were kept after the standard changed</h3>
-    <p>On 2026-09-20 the placement of each of the 8 points was made explicit (point-by-point comparison in step 4). Three things changed: pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; and the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. The definitions of pupil bottom and of the two eyelid points did not change. The images, the task and the training procedure did not change. The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so we consider both choices unaffected and keep ResNet-50 with batch 2. This is a judgment; batch size and model were not compared again under the explicit definitions. The three choices of phase 1 were themselves made under one set of definitions: all training and test frames of that video were labeled in the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms are fair.</p>
+    <p>Conclusion: ResNet-50 and batch 2, chosen in phase 1, are kept; they were not re-selected under the new definitions. Three steps of reasoning.</p>
+    <ol>
+      <li>The three comparisons of phase 1 were fair in themselves: all training and test frames of that video were labeled the same way at the time (checked in step 4), so the comparisons between batch sizes, between models and between error-correction algorithms hold.</li>
+      <li>What changed on 2026-09-20 is where the points are placed (point-by-point comparison in step 4): pupil top moved from "the highest point of the visible pupil" to "the true top of the pupil ellipse", about 50 px higher; pupil left and right moved from "the leftmost and rightmost visible points of the pupil" to the two ends of the horizontal axis of the ellipse; the two corners moved from the inner side of the shadow and of the reflections to the outer side, 40–50 px outwards each. Pupil bottom and the two eyelid points did not change. The images, the task and the training procedure did not change.</li>
+      <li>The choice of batch size and model depends on the images and the training procedure, not on where the points are placed, so both choices are unaffected.</li>
+    </ol>
+    <p>This is a judgment, not an experimental result: batch size and model were not compared again under the explicit definitions.</p>
     <h3>Conclusions of phase 2 (steps 4–11)</h3>
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
