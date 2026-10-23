@@ -178,7 +178,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 1-2, how to read:</span>From step 3 on the metric is the median frame RMSE (the RMSE over the 8 points of each frame, then the median over the 100 frames), so that a few far-off frames do not dominate the number. Here the same four models are recomputed with it from the same predictions, no retraining. Left: the metric used at the time of step 1, RMSE over all keypoints. Middle: median frame RMSE, on the same y scale as the left panel. Right: share of test frames with frame RMSE above 50 px. By median frame RMSE the four batch sizes give 19.7 / 18.5 / 20.1 / 19.1 px, all between 18.5 and 20.1 px, with batch 4 the lowest.</figcaption>
   </figure>
   
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batches 2, 4, 8 and 16 cannot be told apart: one run each, the validation loss on the 20 validation frames differs by only 7%, and the error on the 100 test frames is 21.1–23.6 px (RMSE over all keypoints) or 18.5–20.1 px (median frame RMSE, the metric used from step 3 on so that a few far-off frames do not dominate, recomputed here from the same predictions). Batch 2 is taken as the one with the lowest validation loss and is used in every later step.</p>
+  <p class="concl" lang="en"><span class="tag">Conclusion:</span>Batches 2, 4, 8 and 16 cannot be told apart: one run each, the validation loss on the 20 validation frames differs by only 7%, and the error on the 100 test frames is 21.1–23.6 px (RMSE over all keypoints) or 18.5–20.1 px (median frame RMSE). Batch 2 is taken as the one with the lowest validation loss and is used in every later step.</p>
 </section>
 
 <!-- 2 -->
