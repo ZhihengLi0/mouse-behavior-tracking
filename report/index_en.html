@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 16:03 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -229,7 +229,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Metric</span></th><td><span lang="en">Median frame RMSE: the RMSE over the 8 points of each frame, then the median over the 100 frames.</span></td></tr>
   </tbody></table></div>
   
-  <p class="text" lang="en"><span class="tag">What was done:</span>The aim is to choose an error-correction algorithm: once a model is trained, an algorithm searches the video for frames where the model is probably wrong, a person corrects only those frames, and the model is retrained. This procedure is called active learning. Three algorithms were compared to see whose picks reduce the error most. Procedure: starting from 80 labels, each round the algorithm picks frames, a person corrects 20 of them, they are added and the model is retrained. Three detectors ran as three branches, all built into DeepLabCut (<code>extract_outlier_frames</code>) and all working on the model's prediction of every frame of the video: <b>uncertain</b>, frames in which any of the 8 points has confidence below 0.6; <b>jump</b>, frames in which any point moved more than 20 px from the previous frame; <b>fitting</b>, frames in which the 8 points deviate on average by more than 20 px from a time-series model (ARIMA, fitted on the confident frames only) of each point's trajectory. The flagged frames are then clustered into 20 groups by image appearance and one frame per group is given to the labeler. 11 rounds, each branch from 80 to 300 labels.</p>
+  <div class="text" lang="en">
+    <p><span class="tag">What was done:</span>Choose an error-correction algorithm. Once a model is trained, an algorithm searches the video for frames where the model is probably wrong, a person corrects only those frames and the model is retrained; this is active learning. Three algorithms were compared to see whose picks reduce the error most.</p>
+    <p><b>Procedure.</b> Start from 80 labels. Each round: the algorithm flags suspect frames in the prediction of the whole video → the flagged frames are clustered into 20 groups by image appearance, one frame per group → a person corrects these 20 frames and they are added to the training set → retrain. 11 rounds, from 80 to 300 labels. Each algorithm runs as its own branch.</p>
+    <p><b>The three algorithms</b> (all built into DeepLabCut, <code>extract_outlier_frames</code>; input = the model's prediction of every frame of the video):</p>
+    <ul>
+      <li><b>uncertain:</b> frames in which any of the 8 points has confidence below 0.6.</li>
+      <li><b>jump:</b> frames in which any point moved more than 20 px from the previous frame.</li>
+      <li><b>fitting:</b> frames in which the 8 points deviate on average by more than 20 px from a time-series model (ARIMA, fitted on the confident frames only) of each point's trajectory.</li>
+    </ul>
+  </div>
   <figure>
     <div class="figbox"><img src="assets/fig_active_learning.jpg" alt="Active learning convergence, rounds 0-11"></div>
     
