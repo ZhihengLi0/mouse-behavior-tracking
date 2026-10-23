@@ -97,7 +97,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p>前提：把瞳孔看成椭圆，上点标在椭圆真实的最高点；被眼睑挡住时，由标注的人按椭圆估计它的位置。</p>
     <ol>
       <li><b>同一个视频标多少帧够？</b>约 80 帧以内就饱和：同一个 5 分钟视频按 2026 年 9 月 20 日明确的点位定义重新标注后重做，20 / 40 / 60 / 80 / 100 帧的误差是 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px，没有随帧数下降；之后每个视频的平台点也都不超过 80 帧（第 5 步）。第一阶段在同一个视频上从 80 帧加到 300 帧，误差也没有下降（第 3 步）。</li>
-      <li><b>换一只新老鼠怎么办？</b>要重新标，标 20 帧后误差就降到约 10 px。第二只老鼠（当时的模型只见过一只老鼠）：不标时误差 208 px，标 20 帧后 10.4 px。第三只老鼠（模型已见过两只老鼠）：不标时 26 px，标 20 帧后 9.2 px。第二次换老鼠时，不标任何帧的起点误差小得多（第 5 步）。</li>
+      <li><b>换一只新老鼠怎么办？</b>要重新标，标 20 帧后误差就降到约 10 px（第 5 步）。
+        <ul>
+          <li>第二只老鼠（模型只见过一只老鼠）：不标时误差 208 px，标 20 帧后 10.4 px。</li>
+          <li>第三只老鼠（模型已见过两只老鼠）：不标时 26 px，标 20 帧后 9.2 px。</li>
+          <li>模型见过的老鼠越多，新老鼠不标时的起点误差越小，但标 20 帧仍然需要。</li>
+        </ul>
+      </li>
       <li><b>同一只老鼠之后的每个视频要标多少帧？</b>标 0–40 帧就到平台，已完成的 9 个里有 1 个需要 80 帧（第 5 步）。</li>
       <li><b>20 帧已经接近饱和，第一批能不能减到 5 帧或 10 帧？</b>不能取代 20 帧：19 个视频里 5 帧够用的只有 5 个、10 帧 7 个，事先无法判断是哪些，而且结果取决于正好取到哪几帧。这里比的是第一批的大小（从已标的 20 帧里取 5 帧或 10 帧），不是每步 5 帧的流程（第 6 步）。</li>
       <li><b>加入新视频会不会让旧视频变差？</b>不会（第 7 步）。</li>
@@ -124,7 +130,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p>Premise: the pupil is treated as an ellipse and pupil top is placed at the true top of that ellipse; where the eyelid hides it, the labeler estimates its position from the ellipse.</p>
     <ol>
       <li><b>How many labels are enough within one video?</b> It saturates within about 80 labels: the same 5-minute video, relabeled under the keypoint definitions made explicit on 2026-09-20 and redone, gives 12.9 / 13.0 / 12.0 / 13.1 / 12.3 px at 20 / 40 / 60 / 80 / 100 labels, with no decrease; and no later video has a plateau point above 80 labels (step 5). In phase 1 the same video showed no decrease from 80 to 300 labels either (step 3).</li>
-      <li><b>What about a new mouse?</b> It needs its own labels; after 20 of them the error is down to about 10 px. Second mouse (the model had seen one mouse): error 208 px with no labels, 10.4 px after 20. Third mouse (the model had seen two mice): 26 px with no labels, 9.2 px after 20. The second time the mouse changed, the starting error without any labels was far smaller (step 5).</li>
+      <li><b>What about a new mouse?</b> It needs its own labels; after 20 of them the error is down to about 10 px (step 5).
+        <ul>
+          <li>Second mouse (the model had seen one mouse): error 208 px with no labels, 10.4 px after 20.</li>
+          <li>Third mouse (the model had seen two mice): 26 px with no labels, 9.2 px after 20.</li>
+          <li>The more mice the model has seen, the smaller the starting error on a new mouse without labels; the 20 labels are still needed.</li>
+        </ul>
+      </li>
       <li><b>How many labels does each later video of the same mouse need?</b> 0–40 reach the plateau; 1 of the 9 finished ones needed 80 (step 5).</li>
       <li><b>20 labels already come close to saturation; could the first batch be cut to 5 or 10?</b> They cannot replace 20: 5 labels are enough on only 5 of the 19 videos and 10 labels on 7, one cannot tell in advance which, and the result depends on which frames happen to be taken. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
