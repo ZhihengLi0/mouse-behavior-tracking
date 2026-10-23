@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 15:55 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 15:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -260,13 +260,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <div class="concl" lang="zh"><span class="tag">结论：</span>选 ResNet-50，此后所有实验都用 ResNet-50 和 batch 2。
     <ul>
-      <li><b>理由：</b>测试集误差最低（20.1 px；按中位帧 RMSE 也最低，18.4 px）；置信度区分最好（800 个点里 514 个置信度 ≥ 0.6，其余模型 75–375 个），有利于之后用置信度判断眨眼和追踪丢失；训练最省（1.7 小时，误差接近的 HRNet-W32 要 3.7 小时）。五种模型的验证损失只差 1.4%，中位帧 RMSE 只差约 2 px，差距都不大。</li>
+      <li><b>理由：</b>测试集误差两种指标都最低：全部关键点合在一起的 RMSE 20.1 px，中位帧 RMSE 18.4 px；置信度区分最好（800 个点里 514 个置信度 ≥ 0.6，其余模型 75–375 个），有利于之后用置信度判断眨眼和追踪丢失；训练最省（1.7 小时，误差接近的 HRNet-W32 要 3.7 小时）。五种模型的验证损失只差 1.4%，中位帧 RMSE 只差约 2 px，差距都不大。</li>
       <li><b>指标的教训：</b>全部关键点合在一起的 RMSE 容易被少数错得很远的帧拉偏（HRNet-W18 的 47.9 px 主要来自 15% 的帧），它反映的是有没有严重错误，不是典型一帧的误差。所以第 3 步起用中位帧 RMSE 作为主要指标，并单独报告误差超过 50 px 的帧的比例。</li>
     </ul>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>ResNet-50; all later experiments use ResNet-50 with batch 2.
     <ul>
-      <li><b>Reasons:</b> lowest test error (20.1 px; also lowest by median frame RMSE, 18.4 px); best use of confidence (514 of 800 points with confidence ≥ 0.6, against 75–375 for the other models), which helps when confidence is used later to detect blinks and tracking loss; cheapest training (1.7 h, against 3.7 h for HRNet-W32, the model with a similar error). The five models differ by only 1.4% in validation loss and about 2 px in median frame RMSE; none of the gaps is large.</li>
+      <li><b>Reasons:</b> lowest test error by both metrics: RMSE over all keypoints 20.1 px, median frame RMSE 18.4 px; best use of confidence (514 of 800 points with confidence ≥ 0.6, against 75–375 for the other models), which helps when confidence is used later to detect blinks and tracking loss; cheapest training (1.7 h, against 3.7 h for HRNet-W32, the model with a similar error). The five models differ by only 1.4% in validation loss and about 2 px in median frame RMSE; none of the gaps is large.</li>
       <li><b>Lesson on the metric:</b> the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. From step 3 on the median frame RMSE is the main metric, with the share of frames above 50 px reported separately.</li>
     </ul>
   </div>

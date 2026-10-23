@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:55 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 15:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -209,7 +209,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>ResNet-50; all later experiments use ResNet-50 with batch 2.
     <ul>
-      <li><b>Reasons:</b> lowest test error (20.1 px; also lowest by median frame RMSE, 18.4 px); best use of confidence (514 of 800 points with confidence ≥ 0.6, against 75–375 for the other models), which helps when confidence is used later to detect blinks and tracking loss; cheapest training (1.7 h, against 3.7 h for HRNet-W32, the model with a similar error). The five models differ by only 1.4% in validation loss and about 2 px in median frame RMSE; none of the gaps is large.</li>
+      <li><b>Reasons:</b> lowest test error by both metrics: RMSE over all keypoints 20.1 px, median frame RMSE 18.4 px; best use of confidence (514 of 800 points with confidence ≥ 0.6, against 75–375 for the other models), which helps when confidence is used later to detect blinks and tracking loss; cheapest training (1.7 h, against 3.7 h for HRNet-W32, the model with a similar error). The five models differ by only 1.4% in validation loss and about 2 px in median frame RMSE; none of the gaps is large.</li>
       <li><b>Lesson on the metric:</b> the RMSE over all keypoints is easily pulled up by a few far-off frames (the 47.9 px of HRNet-W18 come mainly from 15% of the frames); it reflects whether there are gross failures, not the error of a typical frame. From step 3 on the median frame RMSE is the main metric, with the share of frames above 50 px reported separately.</li>
     </ul>
   </div>
