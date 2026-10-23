@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 16:10 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 16:40 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -311,11 +311,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="en">Earlier and present definitions, point by point</span></h3>
   
   <div class="text" lang="en">
-    <p><b>Where the numbers come from:</b> all are comparisons between human labels; no model is involved. Two comparisons are used.</p>
+    <p><b>Where the numbers come from:</b> two human label versions of the same frame, one under the earlier definition and one under the present one; the distance between the two is taken and the median over the frames reported (last column). No model is involved.</p>
     <ul>
-      <li><b>Position (column "median coordinates"):</b> two sets of human-labeled test frames from the final minute of the same video (the 5-minute video of the first mouse): 100 frames labeled before 2026-09-20 and the present 50 frames. Camera and eye position did not change, so the median coordinates of a point over each set show where that point was placed. Coordinates are pixels of the original frame, x to the right, y downwards.</li>
-      <li><b>Shift on the same frame (last column):</b> where a frame has two versions of labels, the distance between the two is taken and then the median over the frames. The four pupil points use 40 frames of the Pluto 2025-10-31 video (earlier labels vs the labels redone as an ellipse). The corners and eyelids use 90 frames of the 5-minute video of the first mouse (test set 50, validation set 20, first batch 20), with the two versions of labels: corners on the inner side and on the outer side.</li>
+      <li>The four pupil points: 40 frames of the Pluto 2025-10-31 video, the earlier labels against the labels redone as an ellipse.</li>
+      <li>The two corners and the two eyelid points: 90 frames of the 5-minute video of the first mouse (test set 50, validation set 20, first batch 20), corners on the inner side against corners on the outer side.</li>
     </ul>
+    <p>Relative positions in the definition columns (e.g. "about 11 px above the upper-eyelid point") are differences of median coordinates over each set of labeled frames.</p>
   </div>
   <div class="tablebox">
     <table>
@@ -323,38 +324,37 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
         <th><span lang="en">point</span></th>
         <th><span lang="en">definition before 2026-09-20</span></th>
         <th><span lang="en">present definition</span></th>
-        <th><span lang="en">median coordinates: before → now</span></th>
-        <th><span lang="en">median shift on the same frame</span></th>
+        <th><span lang="en">median shift between the two label versions on the same frame (main direction)</span></th>
       </tr></thead>
       <tbody>
         <tr><td><span lang="en">pupil top</span></td>
           <td><span lang="en">highest point of the visible pupil, stopping at the eyelid; about 25 px below the upper-eyelid point</span></td>
           <td><span lang="en">top of the pupil ellipse, estimated from the ellipse where hidden; about 11 px above the upper-eyelid point</span></td>
-          <td>y 368 → 319<span lang="en"> (49 px up)</span></td><td>52 px</td></tr>
+          <td>52 px<span lang="en"> (46 px up)</span></td></tr>
         <tr><td><span lang="en">pupil left, right</span></td>
           <td><span lang="en">leftmost and rightmost visible points of the pupil, no ellipse fitted; left about 37 px higher than right</span></td>
           <td><span lang="en">the two ends of the horizontal axis of the ellipse; left and right at the same height (0 px apart)</span></td>
-          <td><span lang="en">left</span> y 425 → 447<span lang="en">, right</span> y 462 → 448</td><td><span lang="en">about 14 px</span></td></tr>
+          <td>14 / 15 px<span lang="en"> (10 / 15 px up)</span></td></tr>
         <tr><td><span lang="en">pupil bottom</span></td>
           <td><span lang="en">lowest point of the visible pupil</span></td>
           <td><span lang="en">bottom of the ellipse (the lower edge is usually visible, so the position hardly changes)</span></td>
-          <td>y 585 → 586</td><td><span lang="en">about 14 px</span></td></tr>
+          <td>14 px<span lang="en"> (no consistent direction)</span></td></tr>
         <tr><td><span lang="en">left (nasal) corner</span></td>
           <td><span lang="en">inner side of the shadow</span></td>
           <td><span lang="en">outer side of the shadow: crossing of the two continued eyelid margins. Reason: the shadow is fur covering the eye, so the corner is more plausibly on its outer side</span></td>
-          <td>x 410 → 370<span lang="en"> (40 px outwards)</span></td><td>40 px</td></tr>
+          <td>40 px<span lang="en"> (36 px outwards)</span></td></tr>
         <tr><td><span lang="en">right (temporal) corner</span></td>
           <td><span lang="en">inner side of the reflections</span></td>
           <td><span lang="en">outer side of the reflections: where the lower margin, continued upwards along the outer line, meets the upper margin. Reason: fur does not reflect, so the reflections are still inside the eye</span></td>
-          <td>x 808 → 857<span lang="en"> (49 px outwards)</span></td><td>56 px</td></tr>
+          <td>56 px<span lang="en"> (53 px outwards)</span></td></tr>
         <tr><td><span lang="en">upper eyelid</span></td>
           <td><span lang="en">midpoint of the upper eyelid margin</span></td>
           <td><span lang="en">same definition; slightly higher after the corners moved</span></td>
-          <td>y 345 → 336<span lang="en"> (9 px up)</span></td><td><span lang="en">17 px (62 of 90 frames moved)</span></td></tr>
+          <td><span lang="en">17 px (13 px up; 62 of 90 frames moved)</span></td></tr>
         <tr><td><span lang="en">lower eyelid</span></td>
           <td><span lang="en">midpoint of the lower eyelid margin</span></td>
           <td><span lang="en">same definition</span></td>
-          <td>y 624 → 615<span lang="en"> (different frames; 9 px apart)</span></td><td>0 px</td></tr>
+          <td>0 px</td></tr>
       </tbody>
     </table>
   </div>
