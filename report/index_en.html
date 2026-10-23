@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 17:27 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 17:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -448,7 +448,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The model of the previous step predicts every frame of the whole video.</li>
       <li>Threshold (one pixel number per video): eye width = median over the video of the distance between the two corners in each frame; threshold = 3% of it, about 11–15 px. The eye width only sets this number and plays no part in the selection.</li>
       <li>Displacement of each frame: how many pixels each of the 8 points moved from the previous frame; the largest of the 8.</li>
-      <li>The rule in one line: largest displacement of the 8 points &gt; eye width × 3% → the frame is a candidate (a video's eye width is one fixed number, so the threshold is constant over the video; any one point jumping far counts). With more than 12000 candidates only about 12000 are kept, evenly spaced (to bound the clustering cost); with fewer than 40, the 2000 frames with the largest displacement are used instead.</li>
+      <li>The rule: largest displacement of the 8 points &gt; eye width × 3% → the frame is a candidate (a video's eye width is one fixed number, so the threshold is constant over the video; any one point jumping far counts). With more than 12000 candidates only about 12000 are kept, evenly spaced (to bound the clustering cost); with fewer than 40, the 2000 frames with the largest displacement are used instead.</li>
       <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart, more clusters if short.</li>
       <li>If there are still fewer than 20 (this happens when the model is already good and the few candidates are bunched within a few seconds), the batch is filled from the candidates in order of decreasing jump, still 1 s apart.</li>
     </ol>
