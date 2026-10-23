@@ -385,7 +385,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <p class="text small muted" lang="en">Each number is the median over the frames of the label set. A negative value means pupil top lies below the upper-eyelid point. The five earlier label sets agree with one another (left corner x 404–419, right corner x 795–808, pupil top 25–27 px below the upper-eyelid point) and differ clearly from the present placement.</p>
   
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The largest changes are pupil top and the two corners: the top point moved from the highest visible point to the top of the ellipse, and the corners from the inner to the outer side. Pupil left and right became the ends of the horizontal axis of the ellipse; pupil bottom and the two eyelid points keep their definitions. The earlier definitions were used consistently in steps 1–3, the present ones are used consistently from step 5 on. The four eyelid and corner points only serve to detect blinks, so a stable position that can be found in every frame is preferred. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again. Error numbers of steps 1–3 cannot be compared directly with those from step 5 on.</p>
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>The largest changes are pupil top and the two corners.
+    <ul>
+      <li><b>What changed:</b> pupil top moved from the highest visible point to the top of the ellipse; the two corners from the inner to the outer side; pupil left and right became the ends of the horizontal axis of the ellipse. Pupil bottom and the two eyelid points are unchanged.</li>
+      <li><b>Why the eyelids and corners are defined this way:</b> these four points only serve to detect blinks, so a stable position that can be found in every frame is preferred.</li>
+      <li><b>Effect on the results before and after:</b> the earlier definitions were used consistently in steps 1–3, the present ones from step 5 on; error numbers of the two parts cannot be compared directly. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again.</li>
+    </ul>
+  </div>
 </section>
 
 <!-- 5 -->

@@ -491,8 +491,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <p class="text small muted" lang="zh">每个数是该标注集里所有帧的中位数。负数表示瞳孔上点在上眼睑点的下方。之前的五组标注彼此一致（左眼角 x 404–419，右眼角 x 795–808，瞳孔上点在上眼睑点下方 25–27 px），和现在的标法明显不同。</p>
   <p class="text small muted" lang="en">Each number is the median over the frames of the label set. A negative value means pupil top lies below the upper-eyelid point. The five earlier label sets agree with one another (left corner x 404–419, right corner x 795–808, pupil top 25–27 px below the upper-eyelid point) and differ clearly from the present placement.</p>
-  <p class="concl" lang="zh"><span class="tag">结论：</span>变化最大的是瞳孔上点和两个眼角：上点从看得见的最高处改为椭圆顶端，眼角从内侧改到外侧。瞳孔左右点明确为椭圆横轴的端点，下点和上下眼睑点的定义不变。之前的定义在第 1–3 步里是统一使用的，现在的定义从第 5 步起统一使用。眼睑和眼角的四个点只用来判断眨眼，所以选每一帧都找得到的稳定位置。模型和 batch size 沿用第 1、2 步的选择（ResNet-50，batch 2）：变的是点标在哪里，图像和训练方式没有变，所以没有重新比较。第 1–3 步的误差数字不能和第 5 步起的数字直接比较。</p>
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The largest changes are pupil top and the two corners: the top point moved from the highest visible point to the top of the ellipse, and the corners from the inner to the outer side. Pupil left and right became the ends of the horizontal axis of the ellipse; pupil bottom and the two eyelid points keep their definitions. The earlier definitions were used consistently in steps 1–3, the present ones are used consistently from step 5 on. The four eyelid and corner points only serve to detect blinks, so a stable position that can be found in every frame is preferred. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again. Error numbers of steps 1–3 cannot be compared directly with those from step 5 on.</p>
+  <div class="concl" lang="zh"><span class="tag">结论：</span>变化最大的是瞳孔上点和两个眼角。
+    <ul>
+      <li><b>改了什么：</b>瞳孔上点从看得见的最高处改为椭圆顶端；两个眼角从内侧改到外侧；瞳孔左右点明确为椭圆横轴的端点。瞳孔下点和上下眼睑点不变。</li>
+      <li><b>为什么眼睑和眼角这样定：</b>这四个点只用来判断眨眼，所以选每一帧都找得到的稳定位置。</li>
+      <li><b>对前后结果的影响：</b>之前的定义在第 1–3 步里统一使用，现在的定义从第 5 步起统一使用，两段的误差数字不能直接比较。模型和 batch size 沿用第 1、2 步的选择（ResNet-50，batch 2）：变的是点标在哪里，图像和训练方式没有变，所以没有重新比较。</li>
+    </ul>
+  </div>
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>The largest changes are pupil top and the two corners.
+    <ul>
+      <li><b>What changed:</b> pupil top moved from the highest visible point to the top of the ellipse; the two corners from the inner to the outer side; pupil left and right became the ends of the horizontal axis of the ellipse. Pupil bottom and the two eyelid points are unchanged.</li>
+      <li><b>Why the eyelids and corners are defined this way:</b> these four points only serve to detect blinks, so a stable position that can be found in every frame is preferred.</li>
+      <li><b>Effect on the results before and after:</b> the earlier definitions were used consistently in steps 1–3, the present ones from step 5 on; error numbers of the two parts cannot be compared directly. Model and batch size are carried over from steps 1 and 2 (ResNet-50, batch 2): where the points are placed changed, the images and the training procedure did not, so they were not compared again.</li>
+    </ul>
+  </div>
 </section>
 
 <!-- 5 -->
