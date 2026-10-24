@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 20:23 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 20:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -574,7 +574,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text small" lang="en">
     <p><b>Notes on the table:</b> </p>
     <ul>
-      <li>Videos 0–3 carry all labels that existed when the next video started (320 in total), more than their plateau points (120 in total). From video 4 on only the labels up to the plateau point are carried. These 320 labels are the same in the training set of every later model, so comparisons between later videos are not affected.</li>
+      <li><span class="hl">For videos 0–3 the column "carried into later videos" (100 / 100 / 60 / 60, 320 in all) exceeds their plateau points (60 / 20 / 20 / 20, 120 in all), and so does "labeled in total".</span> Reason: when these four videos were done, the rule "stop at the plateau and carry only the labels up to it" was not yet fixed; what was carried is every label that existed when the next video started, and labeling continued a few steps past the plateau. From video 4 on the rule is applied strictly. These 320 labels are the same in the training set of every later model, so comparisons between the later videos are unaffected.</li>
       <li>Videos 4, 5 and 8 have larger errors (15.0, 15.9 and 25.3 px at the plateau point). The labeler's judgement: these three videos are blurry, the pupil edge and the point positions are hard to identify even by eye, so the human labels themselves are less certain and the errors are not comparable with the other videos.</li>
       <li>Video 5: the median error at 0 labels is already low, but 12% of test frames are off by more than 50 px; 20 labels remove all of them, so the plateau point is recorded as 20.</li>
       <li>Video 8 stays above 25 px at every step with 12–16% of test frames above 50 px; the cause is not known yet.</li>
