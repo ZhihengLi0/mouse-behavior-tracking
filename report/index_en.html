@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 14:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 14:42 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -824,7 +824,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>By use: human review with fitting; picking training frames with jump; for removing unreliable frames none of the five rules finds all unreliable frames without removing a large share of the frames.
     <ol>
-      <li><b>Human review: use fitting.</b> It flags 2.0% of the frames (27), 85% of which are very unreliable (above 50 px); it finds 23 of the 32 very unreliable frames (72%). Human review requires few flagged frames and a high share of unreliable frames among them; of the five rules only fitting has a precision above 50%, the others lie between 4.5% and 44%. The 9 it misses are frames whose predicted points are far from the labels but continuous with the neighbouring frames, so the time-series model predicts no deviation.</li>
+      <li><b>Human review: use fitting.</b> Human review requires few flagged frames and a high share of unreliable frames among them, and of the five rules only fitting has a precision above 50%. It flags 2.0% of the frames (27), 85% of which are very unreliable (above 50 px); it finds 23 of the 32 very unreliable frames (72%).</li>
       <li><b>Picking training frames (active learning): use jump; the choice of step 3 stands.</b> It flags 11.7% of the frames (156), 44% of which have a frame RMSE above 20 px; it finds 21 of the 32 very unreliable frames (66%). Picking training frames only requires a high share of unreliable frames among the flagged ones, not finding all of them. Fitting has the higher precision; why jump is still used:
         <ul>
           <li>Step 3 is the direct experiment: each algorithm picked its own frames for 11 rounds of training, scored on the test set; jump 16.4 px, fitting 17.0 px, a difference of 0.6 px, less than the variation of one retraining. Figure 8-3 only measures whether a flagged frame has a large error, not how much the model improves when it is labeled.</li>
