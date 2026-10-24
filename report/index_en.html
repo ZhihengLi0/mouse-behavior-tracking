@@ -581,7 +581,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ul>
   </div>
   
-  <p class="concl" lang="en"><span class="tag">Conclusion:</span>The starting point on a new mouse is improving: 208 px at 0 labels on the second mouse (the model had seen one mouse and 100 labels), 26 px on the third (two mice and 540 labels); on the third mouse, however, neighbouring models score between 17 and 33 px at 0 labels, so a single number is not stable. The first video of a new mouse needs 20 labels; of the 16 later videos of the same mouse, 14 reach the plateau with 0–40 labels (20 and 40 labels: 6 each, 0 labels: 2), the other two need 60 (video 14) and 80 (video 9). The error at the plateau is mostly between 3 and 16 px (video 8 excepted).</p>
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>The first video of a new mouse needs 20 labels; later videos of the same mouse mostly reach the plateau with 0–40.
+    <ul>
+      <li><b>Change of mouse:</b> 208 px with no labels on the second mouse (the model had seen one mouse and 100 labels), 26 px on the third (two mice and 540 labels): the starting point improves. On the third mouse, however, neighbouring models score 17–33 px at 0 labels, so a single number is not stable. Both new mice reach about 10 px after 20 labels.</li>
+      <li><b>The 16 later videos of the same mouse:</b> 14 reach the plateau with 0–40 labels (0 labels: 2, 20: 6, 40: 6); video 14 needs 60 and video 9 needs 80.</li>
+      <li><b>Error at the plateau:</b> mostly 3–16 px; video 8 is the exception (25 px, blurry image).</li>
+    </ul>
+  </div>
 </section>
 
 <!-- 6 -->
