@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 16:35 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 16:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -914,7 +914,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Frames with plausible eyelid points: O &lt; T → not open; O ≥ T → open.</li>
       <li>Frames with implausible eyelid points (0.02–1.6% of each video): no usable O, so the pupil is used instead. Mean confidence of the model's four pupil points &lt; 0.527 → not open, otherwise open. Basis: when the eye is closed the pupil is not visible and the model's confidence in the pupil points is low.</li>
     </ol>
-    <p>0.527 was chosen the same way as T: on human-labeled frames the model was not trained on, with "the labeler could not see the pupil and left all four points empty" as truth not open and "all four labeled" as truth open, every threshold was tried and the one with the largest recall − false-alarm rate taken (part B of <code>scripts/blink_and_area.py</code>). It was chosen on the frames of videos 0–16; on the 2371 frames of all 19 videos (43 all empty, 2328 all labeled) the same criterion gives 0.412. The two values differ only on the 0.02–1.6% of frames with implausible eyelid points; the scripts keep 0.527.</p>
+    <p>0.527 was chosen the same way as T: on human-labeled frames the model was not trained on, with the frames whose four pupil points were all left empty as truth not open and the frames with all four labeled as truth open, every threshold was tried and the one with the largest recall − false-alarm rate taken (part B of <code>scripts/blink_and_area.py</code>). Empty pupil points only mean that no point could be placed, not that the eye is closed, so the labeler checked each of these 43 frames again by eye; all 43 were judged not open (<code>results/blink_eyelid_distance/labels/frames/pupil_empty_frames_to_verify/</code>). It was chosen on the frames of videos 0–16; on the 2371 frames of all 19 videos (43 all empty, 2328 all labeled) the same criterion gives 0.412. The two values differ only on the 0.02–1.6% of frames with implausible eyelid points; the scripts keep 0.527.</p>
   </div>
   
   <div class="text" lang="en">

@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-24 16:35 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-24 16:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1199,7 +1199,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>眼睑点正常的帧：O &lt; T → 非睁眼；O ≥ T → 睁开。</li>
       <li>眼睑点失效的帧（每个视频 0.02–1.6%）：算不出可用的 O，改看瞳孔。模型四个瞳孔点置信度的平均值 &lt; 0.527 → 非睁眼，否则睁开。依据：眼睛闭着时瞳孔不可见，模型对瞳孔点的置信度低。</li>
     </ol>
-    <p>0.527 的选法和 T 相同：在标注过、模型没训练过的帧上，以“标注者看不清瞳孔、四个点全留空”为真值非睁眼、“四个点都标了”为真值睁开，逐个试阈值，取检出率 − 误报率最大的值（<code>scripts/blink_and_area.py</code> B 部分）。它选在视频 0–16 的帧上；在全部 19 个视频的 2371 帧（43 帧全空、2328 帧都标）上同一准则给出 0.412。两者只影响眼睑点失效的 0.02–1.6% 帧，各脚本沿用 0.527。</p>
+    <p>0.527 的选法和 T 相同：在标注过、模型没训练过的帧上，以“四个瞳孔点全留空”的帧为真值非睁眼、“四个点都标了”的帧为真值睁开，逐个试阈值，取检出率 − 误报率最大的值（<code>scripts/blink_and_area.py</code> B 部分）。四个点全留空只表示标注时放不下点，不等于闭眼，所以这 43 帧又由标注者逐帧人工核对，全部判为非睁眼（<code>results/blink_eyelid_distance/labels/frames/pupil_empty_frames_to_verify/</code>）。它选在视频 0–16 的帧上；在全部 19 个视频的 2371 帧（43 帧全空、2328 帧都标）上同一准则给出 0.412。两者只影响眼睑点失效的 0.02–1.6% 帧，各脚本沿用 0.527。</p>
   </div>
   <div class="text" lang="en">
     <p><b>Definition.</b> Each frame is in one of two states: <b>open</b>, or <b>not open</b> (the eye is closed, or the eyelid covers part of the pupil). Blink / long closure / squint come with the systematic analysis of the dynamics later.</p>
@@ -1214,7 +1214,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Frames with plausible eyelid points: O &lt; T → not open; O ≥ T → open.</li>
       <li>Frames with implausible eyelid points (0.02–1.6% of each video): no usable O, so the pupil is used instead. Mean confidence of the model's four pupil points &lt; 0.527 → not open, otherwise open. Basis: when the eye is closed the pupil is not visible and the model's confidence in the pupil points is low.</li>
     </ol>
-    <p>0.527 was chosen the same way as T: on human-labeled frames the model was not trained on, with "the labeler could not see the pupil and left all four points empty" as truth not open and "all four labeled" as truth open, every threshold was tried and the one with the largest recall − false-alarm rate taken (part B of <code>scripts/blink_and_area.py</code>). It was chosen on the frames of videos 0–16; on the 2371 frames of all 19 videos (43 all empty, 2328 all labeled) the same criterion gives 0.412. The two values differ only on the 0.02–1.6% of frames with implausible eyelid points; the scripts keep 0.527.</p>
+    <p>0.527 was chosen the same way as T: on human-labeled frames the model was not trained on, with the frames whose four pupil points were all left empty as truth not open and the frames with all four labeled as truth open, every threshold was tried and the one with the largest recall − false-alarm rate taken (part B of <code>scripts/blink_and_area.py</code>). Empty pupil points only mean that no point could be placed, not that the eye is closed, so the labeler checked each of these 43 frames again by eye; all 43 were judged not open (<code>results/blink_eyelid_distance/labels/frames/pupil_empty_frames_to_verify/</code>). It was chosen on the frames of videos 0–16; on the 2371 frames of all 19 videos (43 all empty, 2328 all labeled) the same criterion gives 0.412. The two values differ only on the 0.02–1.6% of frames with implausible eyelid points; the scripts keep 0.527.</p>
   </div>
   <div class="text" lang="zh">
     <p><b>阈值定在哪（图 10-1）。</b>结论：Pluto 147.5 px、Terra 150.5 px，取"检出率 − 误报率"最高的候选值；留一视频检验的范围 Pluto 147.5–160.5 px、Terra 143.5–154.5 px。怎么算见图下。</p>
