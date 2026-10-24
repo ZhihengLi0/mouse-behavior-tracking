@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 17:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 19:35 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -569,7 +569,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>给每一帧算一个“外观指纹”：转成灰度图，缩小到 128 × 96；用标准差 1 px 的高斯模糊图减去标准差 6 px 的高斯模糊图（留下边缘和形状，去掉缓慢的明暗变化）；再缩小到 32 × 24，展开成 768 个数；减去均值、除以标准差。</li>
       <li>对这些指纹做 k-means 聚类，分成 20 类（scikit-learn 的 <code>KMeans</code>，<code>n_clusters=20, n_init=10, max_iter=300, random_state=42</code>）。</li>
       <li>每一类取离类中心最近的那一帧（欧氏距离），共 20 帧。从帧数最多的类开始取。</li>
-      <li>间隔要求：取的帧之间、以及和已经标过的帧之间，至少相隔 1 秒；不满足的跳过。如果因此不足 20 帧，把类数增加到 30、40、…（最多 80）重新聚类，用新的类中心帧补足。</li>
+      <li>间隔要求：取的帧之间、以及和已经标过的帧之间，至少相隔 1 秒；不满足的跳过。如果因此不足 20 帧，已取的帧保留，把类数增加到 30、40、…（最多 80）重新聚类，新的类中心帧按类的大小从大到小、满足间隔的依次取，只补到 20 帧为止。</li>
     </ol>
     <p><b>（三）第 2 批起：先用 jump 规则找候选帧，再按外观聚类</b></p>
     <ol>
@@ -577,7 +577,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>定阈值（一个像素数，每个视频一个）：眼宽 = 每一帧两个眼角的距离在整段视频的中位数；阈值 = 眼宽 × 3%，约 11–15 px。眼宽只用来定这个数，不参与筛选。</li>
       <li>算每一帧的位移：8 个点各自相对上一帧移动了多少像素，取 8 个里最大的一个。</li>
       <li>判据：8 个点里最大的位移 &gt; 眼宽 × 3%，这一帧就是候选帧（一个视频的眼宽是一个定值，所以阈值整段视频不变；任何一个点跳得大都算）。候选帧多于 12000 帧时，等间隔只保留约 12000 帧（为了聚类的计算量）；少于 40 帧时改用位移最大的 2000 帧。</li>
-      <li>对候选帧做和第 1 批完全相同的步骤：算外观指纹、k-means 分 20 类、每类取离中心最近的一帧、相隔至少 1 秒、不足时增加类数。</li>
+      <li>对候选帧做和第 1 批完全相同的步骤：算外观指纹、k-means 分 20 类、每类取离中心最近的一帧、相隔至少 1 秒；不足 20 帧时把类数加到 30、40、…重新聚类，按类的大小顺序只补差额。</li>
       <li>如果还不足 20 帧（模型已经很好、候选帧很少且挤在几秒内时会发生），按位移从大到小从候选帧里补，仍要求相隔 1 秒。</li>
     </ol>
     <p>所以每一批都是“一类一帧”：jump 规则决定去哪里找（模型不稳的帧），聚类保证挑出的 20 帧画面各不相同，而不是 20 张几乎一样的帧。</p>
@@ -596,7 +596,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>An "appearance fingerprint" is computed for each frame: greyscale, downscaled to 128 × 96; a Gaussian blur with sigma 1 px minus a Gaussian blur with sigma 6 px (keeps edges and shape, removes slow lighting changes); downscaled to 32 × 24 and flattened to 768 numbers; mean subtracted and divided by the standard deviation.</li>
       <li>k-means on the fingerprints with 20 clusters (scikit-learn <code>KMeans</code>, <code>n_clusters=20, n_init=10, max_iter=300, random_state=42</code>).</li>
       <li>From each cluster the frame closest to the cluster centre (Euclidean distance) is taken, 20 frames in total, starting with the largest cluster.</li>
-      <li>Spacing: picked frames must be at least 1 s apart from each other and from every frame labeled earlier; frames that violate this are skipped. If fewer than 20 remain, the number of clusters is raised to 30, 40, … (at most 80) and the new centre frames fill the batch.</li>
+      <li>Spacing: picked frames must be at least 1 s apart from each other and from every frame labeled earlier; frames that violate this are skipped. If fewer than 20 remain, the frames already taken are kept, the number of clusters is raised to 30, 40, … (at most 80) and re-clustered, and the new centre frames are taken in order of cluster size, those that satisfy the spacing, only until 20 are reached.</li>
     </ol>
     <p><b>(c) From batch 2 on: candidates by the jump rule, then clustering by appearance</b></p>
     <ol>
@@ -604,7 +604,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Threshold (one pixel number per video): eye width = median over the video of the distance between the two corners in each frame; threshold = 3% of it, about 11–15 px. The eye width only sets this number and plays no part in the selection.</li>
       <li>Displacement of each frame: how many pixels each of the 8 points moved from the previous frame; the largest of the 8.</li>
       <li>The rule: largest displacement of the 8 points &gt; eye width × 3% → the frame is a candidate (a video's eye width is one fixed number, so the threshold is constant over the video; any one point jumping far counts). With more than 12000 candidates only about 12000 are kept, evenly spaced (to bound the clustering cost); with fewer than 40, the 2000 frames with the largest displacement are used instead.</li>
-      <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart, more clusters if short.</li>
+      <li>The candidates go through exactly the steps of batch 1: fingerprints, k-means with 20 clusters, the frame closest to each centre, at least 1 s apart; if fewer than 20, the number of clusters is raised to 30, 40, … and re-clustered, topping up only the shortfall in order of cluster size.</li>
       <li>If there are still fewer than 20 (this happens when the model is already good and the few candidates are bunched within a few seconds), the batch is filled from the candidates in order of decreasing jump, still 1 s apart.</li>
     </ol>
     <p>Every batch is therefore "one frame per cluster": the jump rule decides where to look (frames on which the model is unstable), and the clustering makes sure the 20 picked frames look different from each other instead of being 20 nearly identical frames.</p>
