@@ -944,7 +944,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <div class="figbox wide"><img src="assets/fig_unreliable.jpg" alt="Jump, confidence and fitting deviation against the frame error"></div>
     <figcaption lang="zh"><span class="tag">图 8-3：</span>三种算法的值和帧误差的关系（A–C），以及五条规则的检出率和准确率（D）。
       <ul>
-        <li>A：每个点是一帧。横轴是 jump 的值，纵轴是这一帧的帧 RMSE，都是对数刻度。灰色 = 帧 RMSE 不超过 20 px，橙色 = 20–50 px，红色 = 超过 50 px。竖虚线是 jump 的阈值，线右边的帧被标出。</li>
+        <li>A：每个点是一帧。横轴是 jump 的值：这一帧的预测和上一帧的预测之间的距离（8 个点取最大，除以眼宽），只用模型输出。纵轴是这一帧的预测和人工标注之间的距离（帧 RMSE）。都是对数刻度。灰色 = 帧 RMSE 不超过 20 px，橙色 = 20–50 px，红色 = 超过 50 px。竖虚线是 jump 的阈值，线右边的帧被标出。</li>
+        <li>A 里两群红点的区别：右上角的红点一帧之内位移了眼宽的 30%–200%，是这一帧单独出错、上一帧还对，jump 能抓到。左上角的红点位移不到眼宽 3%，和正常帧一样小，但误差 50–200 px，是上一帧已经错在同一个位置、连续几帧持续错，jump 看不出来。</li>
         <li>B：画法同 A，横轴换成 uncertain 的值（最低置信度）。线左边（低于 0.6）的帧被标出。</li>
         <li>C：画法同 A，横轴换成 fitting 的值（对数刻度）。竖虚线是 DLC 默认的 20 px，线右边的帧被标出。</li>
         <li>D：五条规则各两根柱。实心 = 检出率（不可信的帧里被标出的比例），斜线 = 准确率（标出的帧里不可信的比例）。红色对应非常不可信（超过 50 px），橙色对应轻微不可信（超过 20 px）。横轴下方是每条规则标出的帧占 1330 帧的比例。</li>
@@ -952,7 +953,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </figcaption>
     <figcaption lang="en"><span class="tag">Figure 8-3:</span>The value of each algorithm against the frame error (A–C), and recall and precision of the five rules (D).
       <ul>
-        <li>A: one dot per frame. x = the value of jump, y = the frame RMSE of that frame, both log scale. Grey = frame RMSE up to 20 px, orange = 20–50 px, red = above 50 px. The dashed line is jump's threshold; frames to its right are flagged.</li>
+        <li>A: one dot per frame. x = the value of jump: the distance between the prediction of this frame and the prediction of the previous frame (largest of the 8 points, divided by the eye width), model output only. y = the distance between the prediction of this frame and the human labels (frame RMSE). Both log scale. Grey = frame RMSE up to 20 px, orange = 20–50 px, red = above 50 px. The dashed line is jump's threshold; frames to its right are flagged.</li>
+        <li>The two groups of red dots in A: the red dots at the top right moved 30%–200% of the eye width within one frame, so this frame alone is wrong and the previous one was still right; jump catches them. The red dots at the top left moved less than 3% of the eye width, as little as a normal frame, yet are 50–200 px off: the previous frame was already wrong at the same place, the error persists over several frames, and jump cannot see it.</li>
         <li>B: as A, with the value of uncertain (lowest confidence) on x. Frames to the left of the line (below 0.6) are flagged.</li>
         <li>C: as A, with the value of fitting on x (log scale). The dashed line is DLC's default 20 px; frames to its right are flagged.</li>
         <li>D: two bars per rule. Solid = recall (share of the unreliable frames that are flagged), hatched = precision (share of the flagged frames that are unreliable). Red = very unreliable (above 50 px), orange = mildly unreliable (above 20 px). Under the axis, the share of the 1330 frames each rule flags.</li>
