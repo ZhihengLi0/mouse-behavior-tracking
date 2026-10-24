@@ -701,7 +701,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Can it replace 20 labels:</b> no, for three reasons. (a) On most videos the error with 5 or 10 labels is clearly higher than with 20. (b) One cannot tell in advance which kind a new video is: both are a change of mouse, yet 5 labels give 96 / 41 px on video 1 and 9.7 / 10.0 px on video 11. (c) With few frames the result depends on which frames happen to be taken: two 5-label subsets of the same video can differ a lot (video 1: 96 vs 41 px; video 6: 6.7 vs 12.8 px); 20 labels do not have this problem.</li>
       <li><b>Cost against benefit:</b> 5 or 10 labels save only 15 or 10 labels per video, at the price of an unstable result. So the first batch of every video stays at 20 labels, then 20 per step.</li>
       <li><b>Anomaly:</b> on video 4, 10 labels (45 px, both subsets) are worse than 0 labels (32 px). Conjectured cause: video 4 is blurry and these 10 labels are themselves uncertain, so a few inaccurate labels pull the model off, worse than keeping the earlier videos' model; from 20 labels on the error returns to about 15 px.</li>
-      <li><b>Scope of this conclusion:</b> the 5 and 10 labels are taken out of the 20 already labeled frames of the first batch, picked by image appearance without a model; what is compared is the size of the first batch. It is not a procedure of "label 5, find wrong frames with jump, label 5 more"; that procedure was not run and these numbers must not be read as its result.</li>
     </ol>
   </div>
 </section>

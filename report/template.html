@@ -816,7 +816,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>能不能取代 20 帧：</b>不能，原因有三个。（a）多数视频上 5 帧和 10 帧的误差明显高于 20 帧。（b）事先无法判断一个新视频属于哪一种：同样是换老鼠，视频 1 的 5 帧是 96 / 41 px，视频 11 的 5 帧是 9.7 / 10.0 px。（c）帧数少时结果取决于正好取到哪几帧：同一个视频的两组 5 帧可以差很多（视频 1：96 和 41 px；视频 6：6.7 和 12.8 px），20 帧没有这个问题。</li>
       <li><b>代价对比：</b>改成 5 帧或 10 帧，每个视频只少标 15 帧或 10 帧，换来的是结果不稳定。所以每个视频第一批仍是 20 帧，之后每步 20 帧。</li>
       <li><b>异常现象：</b>视频 4 上 10 帧（45 px，两组一致）比 0 帧（32 px）还差。原因猜测：视频 4 画面模糊，这 10 帧标注本身不确定，少量不准的标注把模型带偏，不如沿用前面视频的模型；20 帧起误差才回到 15 px 左右。</li>
-      <li><b>这个结论的范围：</b>这里的 5 帧、10 帧是从已经标好的第一批 20 帧里取出来的，按画面外观挑选，不依赖模型，比较的是“第一批标多少帧”。它不是“先标 5 帧、用 jump 找错帧、再标 5 帧”的流程，那种流程没有做过，这些数字不能当作它的结果。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>5 or 10 labels are enough on a few videos but cannot replace 20.
@@ -826,7 +825,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Can it replace 20 labels:</b> no, for three reasons. (a) On most videos the error with 5 or 10 labels is clearly higher than with 20. (b) One cannot tell in advance which kind a new video is: both are a change of mouse, yet 5 labels give 96 / 41 px on video 1 and 9.7 / 10.0 px on video 11. (c) With few frames the result depends on which frames happen to be taken: two 5-label subsets of the same video can differ a lot (video 1: 96 vs 41 px; video 6: 6.7 vs 12.8 px); 20 labels do not have this problem.</li>
       <li><b>Cost against benefit:</b> 5 or 10 labels save only 15 or 10 labels per video, at the price of an unstable result. So the first batch of every video stays at 20 labels, then 20 per step.</li>
       <li><b>Anomaly:</b> on video 4, 10 labels (45 px, both subsets) are worse than 0 labels (32 px). Conjectured cause: video 4 is blurry and these 10 labels are themselves uncertain, so a few inaccurate labels pull the model off, worse than keeping the earlier videos' model; from 20 labels on the error returns to about 15 px.</li>
-      <li><b>Scope of this conclusion:</b> the 5 and 10 labels are taken out of the 20 already labeled frames of the first batch, picked by image appearance without a model; what is compared is the size of the first batch. It is not a procedure of "label 5, find wrong frames with jump, label 5 more"; that procedure was not run and these numbers must not be read as its result.</li>
     </ol>
   </div>
 </section>
