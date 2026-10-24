@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 20:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 21:01 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -626,7 +626,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_fewer.jpg" alt="All videos, first batch of 5 or 10 labels" style="width:2400px"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 6-1:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. In each block the open circles are, from left to right: 0 labels, the two 5-label subsets (5a, 5b, at the same x), the two 10-label subsets (10a, 10b), joined to the 20-label point. The band is the range between the two subsets: a narrow band means the two results agree, a wide band means that another choice of frames gives a very different result (e.g. 5 labels on video 1 or on video 6). The thin coloured line is the regular procedure of 20 labels per step. The figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 6-1:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. The figure is wide; scroll sideways.
+      <ul>
+        <li>Black line: the regular procedure, 0 labels → 20 → 40 ….</li>
+        <li>Open circles: the two 5-label subsets (5a, 5b, at the same x) and the two 10-label subsets (10a, 10b).</li>
+        <li>Band: at 5 labels from the better to the worse of the two subsets, likewise at 10 labels, closing onto the 0-label and 20-label points. A narrow band means the two subsets agree; a wide one means another choice of frames gives a very different result (e.g. 5 labels on videos 1 and 6).</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="tablebox">
     <table>

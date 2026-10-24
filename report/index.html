@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 20:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 21:01 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -825,8 +825,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text" lang="en"><span class="hl">To be clear: the 5- and 10-label models were run afterwards only to look at the result; they were trained and scored, and were not used for jump selection or followed by more labeling. On the main line the jump rule is first used after the model of the first 20 labels. The results of this step therefore only answer "how large should the first batch be"; they do not represent a procedure of "5 labels first, then jump-selected labels".</span></p>
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_fewer.jpg" alt="All videos, first batch of 5 or 10 labels" style="width:2400px"></div>
-    <figcaption lang="zh"><span class="tag">图 6-1：</span>和图 5-4 是同一张图，这里突出 5 帧和 10 帧。每个色块里，空心圆从左到右是：0 帧、5 帧的两组（5a、5b，画在同一个横坐标上）、10 帧的两组（10a、10b），然后接到 20 帧的点。色带是两组结果之间的范围：色带窄，说明两组结果接近；色带宽，说明换一组帧结果差很多（例如视频 1 的 5 帧、视频 6 的 5 帧）。细的彩色线是正常的每步 20 帧。图很宽，可以左右拖动。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 6-1:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. In each block the open circles are, from left to right: 0 labels, the two 5-label subsets (5a, 5b, at the same x), the two 10-label subsets (10a, 10b), joined to the 20-label point. The band is the range between the two subsets: a narrow band means the two results agree, a wide band means that another choice of frames gives a very different result (e.g. 5 labels on video 1 or on video 6). The thin coloured line is the regular procedure of 20 labels per step. The figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 6-1：</span>和图 5-4 是同一张图，这里突出 5 帧和 10 帧。图很宽，可以左右拖动。
+      <ul>
+        <li>黑线：正常流程，0 帧 → 20 帧 → 40 帧 …。</li>
+        <li>空心圆：5 帧的两组（5a、5b，画在同一个横坐标上）和 10 帧的两组（10a、10b）。</li>
+        <li>色带：5 帧处从两组里较好的到较差的，10 帧处同样，两端收拢到 0 帧和 20 帧的点。色带窄，两组结果接近；色带宽，换一组帧结果差很多（例如视频 1 和视频 6 的 5 帧）。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 6-1:</span>The same figure as Figure 5-4, here with the 5- and 10-label models emphasized. The figure is wide; scroll sideways.
+      <ul>
+        <li>Black line: the regular procedure, 0 labels → 20 → 40 ….</li>
+        <li>Open circles: the two 5-label subsets (5a, 5b, at the same x) and the two 10-label subsets (10a, 10b).</li>
+        <li>Band: at 5 labels from the better to the worse of the two subsets, likewise at 10 labels, closing onto the 0-label and 20-label points. A narrow band means the two subsets agree; a wide one means another choice of frames gives a very different result (e.g. 5 labels on videos 1 and 6).</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="tablebox">
     <table>

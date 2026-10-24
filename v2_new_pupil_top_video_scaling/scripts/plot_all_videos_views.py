@@ -107,8 +107,12 @@ for FOCUS in ("main", "fewer", "backtest"):
             ax.plot([own.x.max()], [own.median_frame_rmse_px.iloc[-1]], "o", color=vc, ms=6, mec="white", mew=1.1, zorder=5)
             after_col[u] = vc
             continue
-        ax.plot(px, py, "-", color=col, lw=2.6 if FOCUS == "main" else 1.3, zorder=4, solid_joinstyle="round")
-        ax.plot(own.x, own.median_frame_rmse_px, "o", color=col, ms=6.5 if FOCUS == "main" else 4, mec="white", mew=1.2, zorder=5)
+        if FOCUS == "fewer":                                          # the regular 0 -> 20 -> 40 ... steps in black, so they stand apart from the coloured band
+            ax.plot(px, py, "-", color="black", lw=1.6, zorder=4, solid_joinstyle="round")
+            ax.plot(own.x, own.median_frame_rmse_px, "o", color="black", ms=4.5, mec="white", mew=1.0, zorder=5)
+        else:
+            ax.plot(px, py, "-", color=col, lw=2.6, zorder=4, solid_joinstyle="round")
+            ax.plot(own.x, own.median_frame_rmse_px, "o", color=col, ms=6.5, mec="white", mew=1.2, zorder=5)
         if u in zero_slot:
             ax.plot([zero_slot[u]], [float(zero[u])], "o", color="white", ms=7, mec=col, mew=1.9, zorder=5)
         sub = m[(m.test_unit == u) & (m.subset != "") & (m.model_unit == u)]
@@ -145,9 +149,9 @@ for FOCUS in ("main", "fewer", "backtest"):
     h = {"main": [plt.Line2D([], [], color=ACCENT[0], lw=2.6, marker="o", mec="white", mew=1.2, ms=6.5, label="coloured: the test set of the video being trained in that block (colours alternate between blocks)"),
                   plt.Line2D([], [], color=ACCENT[0], lw=0, marker="o", mfc="white", mec=ACCENT[0], mew=1.9, ms=7, label="open circle at 0: that video before any label of its own (the model it started from)"),
                   plt.Line2D([], [], color=GREY, lw=1.1, label="grey: the same test sets outside their own block (named at the right end)")],
-         "fewer": [matplotlib.patches.Patch(facecolor=ACCENT[0], alpha=0.4, edgecolor=ACCENT[0], label="shaded: range between the two subsets at 5 labels (5a, 5b) and at 10 labels (10a, 10b), from the 0-label point to the 20-label point"),
+         "fewer": [matplotlib.patches.Patch(facecolor=ACCENT[0], alpha=0.4, edgecolor=ACCENT[0], label="shaded: at 5 labels from the better to the worse of the two subsets (5a, 5b), likewise at 10 labels; the band is anchored at the 0-label and the 20-label point"),
                    plt.Line2D([], [], color=ACCENT[0], lw=0, marker="o", mfc="white", mec=ACCENT[0], mew=1.6, ms=6, label="small circles: the four subset models of a video (x = 5 and x = 10)"),
-                   plt.Line2D([], [], color=ACCENT[0], lw=1.3, marker="o", mec="white", ms=4, label="thin coloured line: the regular steps of 20 labels")],
+                   plt.Line2D([], [], color="black", lw=1.6, marker="o", mec="white", ms=4.5, label="black line: the regular steps of 20 labels (0 -> 20 -> 40 ...)")],
          "backtest": [plt.Line2D([], [], color=VCOL["5_20251029_Pluto_spont_1"], lw=2.4, label="bold, one colour per video (black = mouse A, purple to green = Pluto, yellow = Terra): its test set scored by the models trained AFTER its own block"),
                       plt.Line2D([], [], color=VCOL["5_20251029_Pluto_spont_1"], lw=1.2, label="thin, same colour: inside its own block"),
                       plt.Line2D([], [], color=GREY, lw=1.1, label="grey: before its own block (the video not yet in the training set)")]}[FOCUS]
