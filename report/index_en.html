@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 15:00 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 15:12 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -871,14 +871,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_eye_area.jpg" alt="Area rules on all videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-1:</span>Left: the 940 test frames of the 19 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 0.5-s median filter (dark).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-1:</span>Left: the 940 test frames of the 19 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 31-frame median filter (dark).</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on the area:</span>Among these rules the four-point rule has the lowest error, but on some videos the area is still not accurate.
     <ol>
       <li>Pooled over the 19 videos the four-point rule has a median error of 5.4%, the lowest group of the 9 rules; the three-point rule 8.4%; leaving out the bottom, left or right point 9.7–11.0%.</li>
       <li>Per video the four-point rule is lower than the three-point rule on 15 of the 19 videos; on videos 1, 2, 5 and 7 the three-point rule is lower.</li>
-      <li>A median filter over time does not help (5 frames 5.2%, 0.5 s 5.3%): the error is mostly not frame-to-frame jitter but runs of consecutive frames that are off together, which a median cannot correct.</li>
+      <li>A median filter over time does not help (5 frames 5.2%, 31 frames 5.3%): the error is mostly not frame-to-frame jitter but runs of consecutive frames that are off together, which a median cannot correct.</li>
       <li>The error differs a lot between videos: 1.5–10% on 13 videos, 10.5–13.3% on 4 (videos 5, 10, 15, 18), 43.8% on video 4 and 24.0% on video 8, video 8 is also the video with the largest keypoint error (step 5: 25.34 px) and video 4 the third (15.01 px; video 5 is at 15.85 px but its area error is only 10.7%). The pooled 90th percentile is 34%: in one frame of ten the area is off by about a third or more.</li>
       <li><b>Why the four-point rule is better:</b> both rules use the same width; they differ in the height. The four-point rule measures the height directly from top to bottom. The three-point rule has no top point, so it assumes that the left and right points lie exactly at mid-height of the ellipse and takes twice the distance from the bottom point to the line through them. A labeler cannot place the left and right points exactly at mid-height; they are always a few pixels too high or too low. The four-point rule uses only the x coordinates of these two points and is not affected, whereas the three-point rule doubles this offset into the height. Applying the three-point formula to the human points themselves (no model involved) differs from the human four-point area by a median of 5.0% over the 940 frames (13.0% on video 3, 9.0% on video 6). The model learns from the human labels and carries the same offset.</li>
     </ol>
