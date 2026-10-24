@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 20:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 20:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -751,7 +751,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><span class="hl">视频 0–3 的“带入后面视频”一列（100 / 100 / 60 / 60，共 320 帧）多于它们的平台点（60 / 20 / 20 / 20，共 120 帧），“一共标了”也多于平台点。</span>原因：这四个视频做的时候，“到平台就停、只带到平台点的标注”这条规则还没定，带入下一个视频的是下一个视频开始时已经标好的全部帧，平台点之后也继续标了几步。视频 4 起严格按规则：到平台就停，只带到平台点为止的标注。这 320 帧在之后每一个模型的训练集里都相同，所以后面视频之间的比较不受影响。</li>
       <li>视频 4、5、8 的误差偏大（平台点 15.0、15.9、25.3 px）。标注的人的判断是：这三个视频的画面比较模糊，瞳孔边缘和点位肉眼也难以准确识别，所以人工标注本身就不够确定，误差不能和其他视频直接比。</li>
       <li>视频 5：0 帧时中位误差已经较低，但有 12% 的测试帧误差超过 50 px；标 20 帧后这类帧降为 0，所以平台点记为 20 帧。</li>
-      <li>视频 8 的误差在每一步都在 25 px 以上，12–16% 的测试帧误差超过 50 px，原因还没有查明。</li>
+      <li>视频 8 的误差在每一步都在 25 px 以上，12–16% 的测试帧误差超过 50 px。原因是画面模糊，瞳孔边缘和点位肉眼也难以判断，标注本身就不确定。</li>
     </ul>
   </div>
   <div class="text small" lang="en">
@@ -760,7 +760,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><span class="hl">For videos 0–3 the column "carried into later videos" (100 / 100 / 60 / 60, 320 in all) exceeds their plateau points (60 / 20 / 20 / 20, 120 in all), and so does "labeled in total".</span> Reason: when these four videos were done, the rule "stop at the plateau and carry only the labels up to it" was not yet fixed; what was carried is every label that existed when the next video started, and labeling continued a few steps past the plateau. From video 4 on the rule is applied strictly. These 320 labels are the same in the training set of every later model, so comparisons between the later videos are unaffected.</li>
       <li>Videos 4, 5 and 8 have larger errors (15.0, 15.9 and 25.3 px at the plateau point). The labeler's judgement: these three videos are blurry, the pupil edge and the point positions are hard to identify even by eye, so the human labels themselves are less certain and the errors are not comparable with the other videos.</li>
       <li>Video 5: the median error at 0 labels is already low, but 12% of test frames are off by more than 50 px; 20 labels remove all of them, so the plateau point is recorded as 20.</li>
-      <li>Video 8 stays above 25 px at every step with 12–16% of test frames above 50 px; the cause is not known yet.</li>
+      <li>Video 8 stays above 25 px at every step with 12–16% of test frames above 50 px. The cause is a blurry image: the pupil edge and the points are hard to judge even by eye, so the labels themselves are uncertain.</li>
     </ul>
   </div>
   <p class="concl" lang="zh"><span class="tag">结论：</span>换老鼠的起点在变好：第二只老鼠 0 帧时 208 px（模型只见过一只老鼠、100 帧标注），第三只老鼠 0 帧时 26 px（模型见过两只老鼠、540 帧标注）；不过第三只老鼠上，相邻几个模型的 0 帧成绩在 17–33 px 之间变动，单个数字不稳定。新老鼠的第一个视频要标 20 帧；同一只老鼠之后的 16 个视频，14 个标 0–40 帧就到平台（20 帧和 40 帧各 6 个、0 帧 2 个），另外两个要 60 帧（视频 14）和 80 帧（视频 9）。到平台时的误差多数在 3–16 px 之间（视频 8 除外）。</p>
