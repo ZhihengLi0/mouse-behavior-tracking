@@ -47,9 +47,9 @@ figure{margin:0;display:flex;flex-direction:column;gap:8px}
 .figbox.scroll{overflow-x:auto}
 .figbox.scroll img{max-width:none}
 .strip{display:flex;gap:14px;align-items:flex-start}
-.strip .item{flex:0 0 auto;width:min(960px,82vw)}
+.strip .item{flex:0 0 auto;width:min(1100px,88vw)}
 .figbox.scroll .strip img{width:100%;max-width:100%}
-.strip.tall .item{width:min(600px,80vw)}
+.strip.tall .item{width:min(1100px,88vw)}
 .strip .cap{font-size:13px;line-height:1.5;margin-top:6px;color:var(--muted,#555)}
 .figbox.narrow{max-width:34rem}
 figcaption{font-size:14.5px;line-height:1.65;color:var(--ink);max-width:52rem}
@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 19:35 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-23 20:02 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>

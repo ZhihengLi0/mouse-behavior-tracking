@@ -87,8 +87,22 @@ gs = fig.add_gridspec(8, 2, width_ratios=[1.5, 1], height_ratios=[3.2, 1.9, 1, 1
 ax = fig.add_subplot(gs[0, 0])
 ax.scatter(proj[:, 0], proj[:, 1], c=labels, cmap=cmap, s=4, alpha=0.45, vmin=0, vmax=k - 1, rasterized=True)
 ax.scatter(proj[pos, 0], proj[pos, 1], marker="*", s=260, c="black", zorder=5)
-for pp, cl in zip(pos, pick_cluster):
-    ax.annotate(str(cl), (proj[pp, 0], proj[pp, 1]), fontsize=8, color="white", ha="center", va="center", zorder=6)
+# cluster number on each star; stars that sit on top of each other get the number pulled out on a leader line
+P = proj[pos] / (np.ptp(proj, axis=0) + 1e-9)        # positions in units of the axis range
+for i, (pp, cl) in enumerate(zip(pos, pick_cluster)):
+    x, y = proj[pp, 0], proj[pp, 1]
+    dist = np.sqrt(((P - P[i]) ** 2).sum(1)); dist[i] = np.inf
+    near = dist < 0.045
+    if not near.any():
+        ax.annotate(str(cl), (x, y), fontsize=8, color="white", ha="center", va="center", zorder=6)
+        continue
+    v = P[i] - P[near].mean(0)                         # away from the crowd; fall back to a spread of angles
+    if np.hypot(*v) < 1e-6:
+        v = np.array([np.cos(2 * np.pi * i / len(pos)), np.sin(2 * np.pi * i / len(pos))])
+    v = v / np.hypot(*v) * 0.09
+    ax.annotate(str(cl), (x, y), xytext=(x + v[0] * np.ptp(proj[:, 0]), y + v[1] * np.ptp(proj[:, 1])), fontsize=8, color="black",
+                ha="center", va="center", zorder=7, bbox=dict(boxstyle="circle,pad=0.15", fc="white", ec="black", lw=0.6),
+                arrowprops=dict(arrowstyle="-", lw=0.7, color="black", shrinkA=0, shrinkB=6))
 pool_txt = "every 5th frame of the training pool" if a.batch_no == 1 else "frames flagged by the jump rule"
 ax.set_title(f"{len(feats):,} candidate frames ({pool_txt}) in appearance space; colors = {k} k-means clusters, "
              f"stars = the {len(picks)} picked frames", fontsize=10.5)

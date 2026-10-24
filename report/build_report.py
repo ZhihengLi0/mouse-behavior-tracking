@@ -123,8 +123,8 @@ for r in pl.itertuples():
     if im is None:
         continue
     name = f"selection_video{int(r.video):02d}.jpg"
-    sc = 1200 / im.shape[1]
-    cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 84])
+    sc = min(1.0, 1716 / im.shape[1])
+    cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 90])
     sel_strip.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)}: batch 2 selection" loading="lazy">'
                      f'<div class="cap"><span lang="zh">视频 {int(r.video)}（{r.mouse}，{r.date}）：第 2 批</span><span lang="en">Video {int(r.video)} ({r.mouse}, {r.date}): batch 2</span></div></div>')
 
@@ -155,8 +155,8 @@ for r in pl.itertuples():
         im = cv2.imread(str(src))
         b = int(src.stem.split("_")[1]) // 20
         name = f"selection_video{int(r.video):02d}_batch{b:02d}.jpg"
-        sc = 1000 / im.shape[1]
-        cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 80])
+        sc = min(1.0, 1716 / im.shape[1])
+        cv2.imwrite(str(ASSETS / name), cv2.resize(im, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA), [cv2.IMWRITE_JPEG_QUALITY, 88])
         how_zh = "按画面外观挑，没有用模型" if b == 1 else f"由 {20 * (b - 1)} 帧模型的 jump 规则挑"
         how_en = "picked by appearance, no model" if b == 1 else f"picked by the jump rule of the {20 * (b - 1)}-label model"
         items.append(f'      <div class="item"><img src="assets/{name}" alt="Video {int(r.video)} batch {b}" loading="lazy">'
