@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-24 16:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-24 16:49 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1224,8 +1224,24 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the judged frames"></div>
-    <figcaption lang="zh"><span class="tag">图 10-1：</span>每格一只老鼠（第一格是三只合并，仅供参考，阈值按单只老鼠定）。横轴是候选阈值 T（像素），蓝线是一致率（"O &lt; T 判非睁眼"和标注者判断一致的帧占全部帧的比例），橙线是检出率减误报率（公式见上文"阈值怎么选"）；橙色竖线是选出的阈值，橙色阴影是并列最好的范围，灰虚线是 120 / 140 / 160 / 180 px 四个候选。看三点：顶点在哪（阈值），顶有多宽（Pluto 147–160 几乎一样高，Terra 的顶更尖），两只老鼠的顶点是否接近（148 对 150）。mouse A 那格没有信息：12 帧全是睁开，阈值再高也只会把睁大的眼误判成没睁开。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 10-1:</span>One panel per mouse (the first pools all three, for reference only; thresholds are set per mouse). x = candidate threshold T in pixels; blue = agreement (share of all judged frames on which "O &lt; T → not open" agrees with the labeler), orange = recall minus false-alarm rate (formulas under "How the threshold is chosen" above); the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 10-1：</span>每只老鼠在哪个阈值 T 上和标注者最一致。每格一只老鼠，第一格是三只合并，仅供参考，阈值按单只老鼠定。
+      <ul>
+        <li>横轴：候选阈值 T（像素）。</li>
+        <li>蓝线：一致率，“O &lt; T 判非睁眼”和标注者判断一致的帧占全部帧的比例。</li>
+        <li>橙线：检出率减误报率（公式见上文“阈值怎么选”）。橙色竖线是选出的阈值，橙色阴影是并列最好的范围，灰虚线是 120 / 140 / 160 / 180 px 四个候选。</li>
+        <li>看三点：顶点在哪（阈值）；顶有多宽（Pluto 147–160 几乎一样高，Terra 的顶更尖）；两只老鼠的顶点是否接近（148 对 150）。</li>
+        <li>mouse A 那格没有信息：12 帧全是睁开，阈值再高也只会把睁大的眼误判成没睁开。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-1:</span>At which threshold T each mouse agrees best with the labeler. One panel per mouse; the first pools all three, for reference only, thresholds are set per mouse.
+      <ul>
+        <li>x: candidate threshold T in pixels.</li>
+        <li>Blue: agreement, the share of all judged frames on which "O &lt; T → not open" agrees with the labeler.</li>
+        <li>Orange: recall minus false-alarm rate (formulas under "How the threshold is chosen" above). The orange vertical line is the chosen threshold, the orange band the range of equally good values, the dotted lines the candidates 120 / 140 / 160 / 180 px.</li>
+        <li>Three things to read: where the peak is (the threshold); how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper); whether the two mice agree (148 against 150).</li>
+        <li>The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="text" lang="zh">
     <p><b>阈值怎么选（图 10-1）。</b>每只老鼠只用自己的判断帧。候选 T 从 60 px 到 300 px，每 1 px 试一次。</p>

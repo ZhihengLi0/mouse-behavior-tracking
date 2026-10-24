@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 16:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 16:49 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -923,7 +923,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the judged frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-1:</span>One panel per mouse (the first pools all three, for reference only; thresholds are set per mouse). x = candidate threshold T in pixels; blue = agreement (share of all judged frames on which "O &lt; T → not open" agrees with the labeler), orange = recall minus false-alarm rate (formulas under "How the threshold is chosen" above); the orange vertical line is the chosen threshold, the orange band the range of equally good values, dotted lines the candidates 120 / 140 / 160 / 180 px. Three things to read: where the peak is (the threshold), how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper) and whether the two mice agree (148 against 150). The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-1:</span>At which threshold T each mouse agrees best with the labeler. One panel per mouse; the first pools all three, for reference only, thresholds are set per mouse.
+      <ul>
+        <li>x: candidate threshold T in pixels.</li>
+        <li>Blue: agreement, the share of all judged frames on which "O &lt; T → not open" agrees with the labeler.</li>
+        <li>Orange: recall minus false-alarm rate (formulas under "How the threshold is chosen" above). The orange vertical line is the chosen threshold, the orange band the range of equally good values, the dotted lines the candidates 120 / 140 / 160 / 180 px.</li>
+        <li>Three things to read: where the peak is (the threshold); how wide it is (Pluto is almost flat from 147 to 160, Terra's peak is sharper); whether the two mice agree (148 against 150).</li>
+        <li>The mouse-A panel carries no information: all 12 frames are open, so a higher threshold can only misjudge wide-open eyes.</li>
+      </ul>
+    </figcaption>
   </figure>
   
   <div class="text" lang="en">
