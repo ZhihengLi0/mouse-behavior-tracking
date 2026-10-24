@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-24 13:58 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-24 14:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1072,7 +1072,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="zh"><span class="tag">结论：</span>按用途分：人工复核用 fitting；挑训练帧用 jump；剔除不可信帧，五条规则都不能在少剔的同时找到全部不可信帧。
     <ol>
       <li><b>人工复核：用 fitting。</b>它标出 2.0% 的帧（27 帧），其中 85% 是非常不可信的帧（超过 50 px）；32 帧非常不可信的帧里找到 23 帧（72%）。人工复核要求标出的帧少、标出的帧中不可信的比例高；五条规则里只有 fitting 的准确率超过 50%，其余在 4.5%–44% 之间。漏掉的 9 帧是预测点离标注很远、但与前后帧的位置连续的帧，时间序列模型预测不出偏差。</li>
-      <li><b>挑训练帧（主动学习）：用 jump，第 3 步的选择成立。</b>它标出 11.7% 的帧（156 帧），其中 44% 帧 RMSE 超过 20 px；32 帧非常不可信的帧里找到 21 帧（66%）。挑训练帧只要求标出的帧中不可信的比例高，不要求找到全部不可信帧。fitting 的准确率更高，也可以用；第 3 步在视频 0 上实测，两种算法挑的帧对误差的改善相差 0.6 px，小于重复训练一次的波动。</li>
+      <li><b>挑训练帧（主动学习）：用 jump，第 3 步的选择成立。</b>它标出 11.7% 的帧（156 帧），其中 44% 帧 RMSE 超过 20 px；32 帧非常不可信的帧里找到 21 帧（66%）。挑训练帧只要求标出的帧中不可信的比例高，不要求找到全部不可信帧。fitting 的准确率更高，为什么仍用 jump：
+        <ul>
+          <li>第 3 步是直接实验：三种算法各自挑帧、各训练 11 轮，量测试集误差，jump 16.4 px、fitting 17.0 px，相差 0.6 px，小于重复训练一次的波动。图 8-3 量的只是标出的帧误差大不大，不是标了它模型进步多少。</li>
+          <li>每批只标 20 帧，要覆盖不同的出错情形。jump 标出的帧多（11.7%），再聚成 20 类取中心，情形各异；fitting 只标 2%，而且集中在突然偏离轨迹的一种错法，挑出的帧彼此相似。</li>
+        </ul>
+      </li>
       <li><b>剔除不可信帧（算面积、眨眼之前）：要找到全部 32 帧非常不可信的帧，就要剔除一半的帧。</b>uncertain（最低置信度低于 0.6）找到 32 帧，剔除 51.9%（690 帧）；uncertain 平均找到 30 帧，剔除 33.2%（442 帧）；jump 剔除 11.7%（156 帧），找到 21 帧，漏掉的 11 帧是预测点离标注很远、但与上一帧位置相近的帧；jump 或 uncertain 找到 32 帧，剔除 53.6%（713 帧），比 uncertain 单独用多剔 23 帧。</li>
       <li><b>轻微不可信（20–50 px）：五条规则都找不到大部分。</b>帧 RMSE 超过 20 px 的 155 帧里，fitting 找到 16%，jump 44%，uncertain 88% 但剔除 51.9% 的帧。这一档现有信号识别不了；减少它只能靠降低模型误差。</li>
       <li><b>四种算法的排序不依赖阈值。</b>AUC（非常不可信）：fitting 0.97、uncertain 0.94、uncertain 平均 0.91、jump 0.85。阈值里 jump 的 3% 是 DLC 默认 20 px 按眼宽换算的，uncertain 的 0.6 和 fitting 的 20 px 是 DLC 默认，只有 uncertain 平均的 0.79 是在这些帧上选的（选法见上文）。</li>
@@ -1083,7 +1088,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>By use: human review with fitting; picking training frames with jump; for removing unreliable frames none of the five rules finds all unreliable frames without removing a large share of the frames.
     <ol>
       <li><b>Human review: use fitting.</b> It flags 2.0% of the frames (27), 85% of which are very unreliable (above 50 px); it finds 23 of the 32 very unreliable frames (72%). Human review requires few flagged frames and a high share of unreliable frames among them; of the five rules only fitting has a precision above 50%, the others lie between 4.5% and 44%. The 9 it misses are frames whose predicted points are far from the labels but continuous with the neighbouring frames, so the time-series model predicts no deviation.</li>
-      <li><b>Picking training frames (active learning): use jump; the choice of step 3 stands.</b> It flags 11.7% of the frames (156), 44% of which have a frame RMSE above 20 px; it finds 21 of the 32 very unreliable frames (66%). Picking training frames only requires a high share of unreliable frames among the flagged ones, not finding all of them. Fitting, with its higher precision, would also do; step 3 measured on video 0 that the frames picked by the two algorithms improve the error by amounts 0.6 px apart, less than the variation of one retraining.</li>
+      <li><b>Picking training frames (active learning): use jump; the choice of step 3 stands.</b> It flags 11.7% of the frames (156), 44% of which have a frame RMSE above 20 px; it finds 21 of the 32 very unreliable frames (66%). Picking training frames only requires a high share of unreliable frames among the flagged ones, not finding all of them. Fitting has the higher precision; why jump is still used:
+        <ul>
+          <li>Step 3 is the direct experiment: each algorithm picked its own frames for 11 rounds of training, scored on the test set; jump 16.4 px, fitting 17.0 px, a difference of 0.6 px, less than the variation of one retraining. Figure 8-3 only measures whether a flagged frame has a large error, not how much the model improves when it is labeled.</li>
+          <li>Each batch labels only 20 frames, which should cover different kinds of errors. jump flags many frames (11.7%), which are then clustered into 20 groups and one centre taken from each, so the kinds differ; fitting flags only 2%, concentrated in one kind of error (a sudden departure from the trajectory), so the frames it picks resemble each other.</li>
+        </ul>
+      </li>
       <li><b>Removing unreliable frames (before area or blink analysis): finding all 32 very unreliable frames costs half of the frames.</b> uncertain (lowest confidence below 0.6) finds 32 and removes 51.9% (690 frames); uncertain mean finds 30 and removes 33.2% (442); jump removes 11.7% (156) and finds 21, the 11 it misses being frames whose predicted points are far from the labels but close to the previous frame's position; jump or uncertain finds 32 and removes 53.6% (713), 23 frames more than uncertain alone.</li>
       <li><b>Mildly unreliable frames (20–50 px): none of the five rules finds most of them.</b> Of the 155 frames with a frame RMSE above 20 px, fitting finds 16%, jump 44%, uncertain 88% while removing 51.9% of the frames. This level is not identifiable with the present signals; only a lower model error reduces it.</li>
       <li><b>The ranking of the four algorithms does not depend on the thresholds.</b> AUC (very unreliable): fitting 0.97, uncertain 0.94, uncertain mean 0.91, jump 0.85. Of the thresholds, jump's 3% is DLC's default 20 px converted to a share of the eye width, uncertain's 0.6 and fitting's 20 px are DLC defaults, and only the 0.79 of uncertain mean was chosen on these frames (procedure above).</li>
