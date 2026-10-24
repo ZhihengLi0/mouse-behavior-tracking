@@ -942,8 +942,22 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_unreliable.jpg" alt="Jump, confidence and fitting deviation against the frame error"></div>
-    <figcaption lang="zh"><span class="tag">图 8-3：</span>A：每个点是一帧，横轴是 jump 的值，纵轴是这一帧的帧 RMSE（都是对数刻度）；灰色是帧 RMSE 不超过 20 px 的帧，橙色 20–50 px，红色超过 50 px；竖虚线是 jump 的阈值，线右边的帧被标出。B：同样的画法，横轴换成 uncertain 的值（最低置信度），线左边（低于 0.6）的帧被标出。C：横轴换成 fitting 的值（对数刻度），竖虚线是 DLC 默认的 20 px，线右边的帧被标出。D：五条规则的检出率（实心：不可信的帧里被标出的比例）和准确率（斜线：标出的帧里不可信的比例），红色对应非常不可信（超过 50 px），橙色对应轻微不可信（超过 20 px）；横轴下方是每条规则标出的帧占 1330 帧的比例。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-3:</span>A: one dot per frame, x = the value of jump, y = the frame RMSE of that frame (both log scale); grey = frame RMSE up to 20 px, orange 20–50 px, red above 50 px; the dashed line is jump's threshold, frames to its right are flagged. B: the same with the value of uncertain (lowest confidence) on x; frames to the left of the line (below 0.6) are flagged. C: the same with the value of fitting on x (log scale); the dashed line is DLC's default 20 px, frames to its right are flagged. D: recall (solid: share of the unreliable frames that are flagged) and precision (hatched: share of the flagged frames that are unreliable) of the five rules; red = very unreliable (above 50 px), orange = mildly unreliable (above 20 px); under the axis, the share of the 1330 frames each rule flags.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 8-3：</span>三种算法的值和帧误差的关系（A–C），以及五条规则的检出率和准确率（D）。
+      <ul>
+        <li>A：每个点是一帧。横轴是 jump 的值，纵轴是这一帧的帧 RMSE，都是对数刻度。灰色 = 帧 RMSE 不超过 20 px，橙色 = 20–50 px，红色 = 超过 50 px。竖虚线是 jump 的阈值，线右边的帧被标出。</li>
+        <li>B：画法同 A，横轴换成 uncertain 的值（最低置信度）。线左边（低于 0.6）的帧被标出。</li>
+        <li>C：画法同 A，横轴换成 fitting 的值（对数刻度）。竖虚线是 DLC 默认的 20 px，线右边的帧被标出。</li>
+        <li>D：五条规则各两根柱。实心 = 检出率（不可信的帧里被标出的比例），斜线 = 准确率（标出的帧里不可信的比例）。红色对应非常不可信（超过 50 px），橙色对应轻微不可信（超过 20 px）。横轴下方是每条规则标出的帧占 1330 帧的比例。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The value of each algorithm against the frame error (A–C), and recall and precision of the five rules (D).
+      <ul>
+        <li>A: one dot per frame. x = the value of jump, y = the frame RMSE of that frame, both log scale. Grey = frame RMSE up to 20 px, orange = 20–50 px, red = above 50 px. The dashed line is jump's threshold; frames to its right are flagged.</li>
+        <li>B: as A, with the value of uncertain (lowest confidence) on x. Frames to the left of the line (below 0.6) are flagged.</li>
+        <li>C: as A, with the value of fitting on x (log scale). The dashed line is DLC's default 20 px; frames to its right are flagged.</li>
+        <li>D: two bars per rule. Solid = recall (share of the unreliable frames that are flagged), hatched = precision (share of the flagged frames that are unreliable). Red = very unreliable (above 50 px), orange = mildly unreliable (above 20 px). Under the axis, the share of the 1330 frames each rule flags.</li>
+      </ul>
+    </figcaption>
   </figure>
   <div class="concl" lang="zh"><span class="tag">结论：</span>按用途分：人工复核用 fitting；挑训练帧用 jump；剔除不可信帧，五条规则都不能在少剔的同时找到全部不可信帧。
     <ol>
