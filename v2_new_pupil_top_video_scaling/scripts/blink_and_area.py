@@ -299,8 +299,8 @@ C = pd.DataFrame(rowsC)
 C.to_csv(OUT / "blink_area_timeseries_all_videos.csv", index=False)
 
 # ---------------- figures ----------------
-NAMES = {"four": "four points", "no_top": "no top\n(production)", "no_bottom": "no bottom", "no_left": "no left", "no_right": "no right",
-         "drop_lowconf": "drop lowest\nconfidence", "four_fallback": "four, fallback\nif conf < 0.6", "four_med5": "four, 5-frame\nmedian", "four_med31": "four, 0.5-s\nmedian"}
+NAMES = {"four": "four points", "no_top": "three points\n(top unused)", "no_bottom": "no bottom", "no_left": "no left", "no_right": "no right",
+         "drop_lowconf": "drop lowest\nconfidence", "four_fallback": "four,\nfallback if\nconf < 0.6", "four_med5": "four,\n5-frame\nmedian", "four_med31": "four,\n0.5-s\nmedian"}
 fig, axes = plt.subplots(1, 2, figsize=(19, 6), constrained_layout=True, gridspec_kw={"width_ratios": [1, 1.25]})
 pool = A[A.video == "all"].set_index("rule").loc[RULES]
 ax = axes[0]
@@ -316,7 +316,7 @@ per = A[A.video != "all"]
 x = np.arange(PL.video.nunique())
 for rule, col, off in [("four", "#2A9D8F", -0.27), ("no_top", "0.6", 0), ("four_med31", "#264653", 0.27)]:
     ax.bar(x + off, per[per.rule == rule].median_abs_err_pct, 0.27, color=col, label=NAMES[rule].replace("\n", " "))
-ax.set_xticks(x); ax.set_xticklabels([f"video {v}" for v in PL.video], fontsize=9); ax.set_ylabel("median area error (%)")
+ax.set_xticks(x); ax.set_xticklabels([str(v) for v in PL.video], fontsize=9); ax.set_xlabel("video"); ax.set_ylabel("median area error (%)")
 ax.legend(fontsize=9); ax.grid(axis="y", alpha=0.3); ax.set_title("B. Per video (50 test frames each, model at the plateau point)", fontsize=11)
 fig.savefig(OUT / "blink_area_area_methods_all_videos.png", dpi=130)
 plt.close(fig)
