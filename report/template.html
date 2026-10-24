@@ -636,8 +636,18 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_labels_to_plateau.jpg" alt="Labels needed per video along the sequence"></div>
-    <figcaption lang="zh"><span class="tag">图 5-2：</span>左图：每个视频到平台时用了多少帧自己的标注。例如视频 0 用了 60 帧。右图：灰色虚线是 0 帧时的误差（上一个模型直接用），红线是到平台时的误差。两条线之间的距离就是这个视频自己的标注带来的改善。视频 1 的 0 帧误差是 208 px（超出图的范围），因为换了老鼠。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 5-2:</span>Left: how many of its own labels each video used at its plateau. For example, video 0 used 60. Right: the grey dashed line is the error at 0 labels (previous model unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px (off scale) because the mouse changed.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 5-2：</span>
+      <ul>
+        <li>左图：每个视频到平台时用了多少帧自己的标注。例如视频 0 用了 60 帧。</li>
+        <li>右图：灰色虚线是 0 帧时的误差（上一个视频的模型直接用），红线是到平台时的误差。两条线之间的距离就是这个视频自己的标注带来的改善。视频 1 的 0 帧误差是 208 px，超出图的范围，因为换了老鼠。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 5-2:</span>
+      <ul>
+        <li>Left: how many of its own labels each video used at its plateau. For example, video 0 used 60.</li>
+        <li>Right: the grey dashed line is the error at 0 labels (the previous video's model used unchanged), the red line the error at the plateau. The gap between them is what the video's own labels bought. Video 1 starts at 208 px, off scale, because the mouse changed.</li>
+      </ul>
+    </figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
