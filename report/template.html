@@ -843,8 +843,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text" lang="en"><span class="tag">What was done:</span>Every model trained along the sequence was scored on the test set of every video (back-test).</p>
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_backtest.jpg" alt="All videos, back-test" style="width:2400px"></div>
-    <figcaption lang="zh"><span class="tag">图 7-1：</span>和图 5-4 是同一张图，这里突出回测。每个视频一种颜色：它的测试集在自己的色块之后（后面的模型又加了别的视频的标注）画成粗线，在自己的色块之内是细线，在自己的色块之前（它的标注还没有进入训练集）是灰线。看两点：（1）粗线基本是平的：后面再加别的视频，之前的视频不变差。（2）最左边只有第一只老鼠的标注时，Pluto 的所有视频（灰线）误差都在 150–430 px；视频 1 的标注一加入，视频 2、3、5、7 降到 5–20 px，视频 4、8、9、10 降到 20–40 px，但视频 1 的 7 个模型里仍有个别模型在视频 4、6、8、9、10 上是 100–220 px。图很宽，可以左右拖动。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 7-1:</span>The same figure as Figure 5-4, here with the back-test emphasized. One colour per video: its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block and grey before its own block (its labels not yet in the training set). Two things to see: (1) the bold lines are essentially flat: adding other videos later does not make an earlier video worse. (2) At the far left, with labels of the first mouse only, every Pluto video (grey) is at 150–430 px; as soon as video 1's labels enter, videos 2, 3, 5, 7 drop to 5–20 px and videos 4, 8, 9, 10 to 20–40 px, although among video 1's seven models a few still score 100–220 px on videos 4, 6, 8, 9, 10. The figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 7-1：</span>和图 5-4 是同一张图，这里突出回测。图很宽，可以左右拖动。
+      <ul>
+        <li>每个视频一种颜色。它的测试集在自己的色块之后画成粗线（后面的模型又加了别的视频的标注），在自己的色块之内是细线，在自己的色块之前是灰线（它的标注还没有进入训练集）。</li>
+        <li>看点一：粗线基本是平的。后面再加别的视频，之前的视频不变差。</li>
+        <li>看点二：最左边只有第一只老鼠的标注时，Pluto 的所有视频（灰线）误差在 150–430 px。视频 1 的标注一加入，视频 2、3、5、7 降到 5–20 px，视频 4、8、9、10 降到 20–40 px；视频 1 的 7 个模型里仍有个别模型在视频 4、6、8、9、10 上是 100–220 px。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 7-1:</span>The same figure as Figure 5-4, here with the back-test emphasized. The figure is wide; scroll sideways.
+      <ul>
+        <li>One colour per video. Its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block, and grey before its own block (its labels not yet in the training set).</li>
+        <li>First thing to see: the bold lines are essentially flat. Adding other videos later does not make an earlier video worse.</li>
+        <li>Second: at the far left, with labels of the first mouse only, every Pluto video (grey) is at 150–430 px. As soon as video 1's labels enter, videos 2, 3, 5, 7 drop to 5–20 px and videos 4, 8, 9, 10 to 20–40 px; among video 1's seven models a few still score 100–220 px on videos 4, 6, 8, 9, 10.</li>
+      </ul>
+    </figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><img src="assets/cross_video_matrix.jpg" alt="Error of each model on each test set" style="width:6265px"></div>

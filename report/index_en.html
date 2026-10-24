@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-23 21:12 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-24 12:05 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -720,7 +720,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox scroll"><img src="assets/all_view_backtest.jpg" alt="All videos, back-test" style="width:2400px"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 7-1:</span>The same figure as Figure 5-4, here with the back-test emphasized. One colour per video: its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block and grey before its own block (its labels not yet in the training set). Two things to see: (1) the bold lines are essentially flat: adding other videos later does not make an earlier video worse. (2) At the far left, with labels of the first mouse only, every Pluto video (grey) is at 150–430 px; as soon as video 1's labels enter, videos 2, 3, 5, 7 drop to 5–20 px and videos 4, 8, 9, 10 to 20–40 px, although among video 1's seven models a few still score 100–220 px on videos 4, 6, 8, 9, 10. The figure is wide; scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 7-1:</span>The same figure as Figure 5-4, here with the back-test emphasized. The figure is wide; scroll sideways.
+      <ul>
+        <li>One colour per video. Its test set is bold after its own block (later models also contain labels of other videos), thin inside its own block, and grey before its own block (its labels not yet in the training set).</li>
+        <li>First thing to see: the bold lines are essentially flat. Adding other videos later does not make an earlier video worse.</li>
+        <li>Second: at the far left, with labels of the first mouse only, every Pluto video (grey) is at 150–430 px. As soon as video 1's labels enter, videos 2, 3, 5, 7 drop to 5–20 px and videos 4, 8, 9, 10 to 20–40 px; among video 1's seven models a few still score 100–220 px on videos 4, 6, 8, 9, 10.</li>
+      </ul>
+    </figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><img src="assets/cross_video_matrix.jpg" alt="Error of each model on each test set" style="width:6265px"></div>
