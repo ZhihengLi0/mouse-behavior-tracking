@@ -1,0 +1,7 @@
+signal,AUC_wrong20,AUC_wrong50,AUC_wrong20_videos_median,AUC_wrong20_videos_min
+d1_plateau_sweeplike,0.799,0.907,0.741,0.456
+d1_plateau_all,0.827,0.965,0.836,0.414
+d1_pairs_all,0.838,0.927,0.761,0.493
+d1_pairs_nocontext,0.833,0.932,0.788,0.594
+d1_pairs_all_deploy,0.847,0.917,0.811,0.603
+fit_pupil_ref,0.85,0.973,0.866,0.558

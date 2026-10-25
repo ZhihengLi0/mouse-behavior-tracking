@@ -78,6 +78,18 @@ Cheapest first, all label-free:
 - **Learned detector** on all features (gradient boosting) only if the logistic regression of S1-5 is clearly limited.
 - Lightning Pose retraining (temporal loss, temporal context network) last: a separate project.
 
+### Stage 1 ▶ done 2026-10-25 (`results/unreliable_frames_sweep/README.md`): no label-free signal beats the fitting
+family; best `fit_pupil` (AUC 0.85 / 0.97), recall 50 % at 20 px costs 9.2 % flagged (precision 64 %); at 5 % flagged
+every signal gives ≈ 30–35 % recall. Decision rule not met.
+
+### Stage 2a ▶ done 2026-10-25 (`results/error_detector/README.md`): detectors FITTED to our truth. Truth = 7010
+(model, labeled frame never trained on) pairs from the 65 existing whole-video predictions; tested leave-one-video-out
+on the 1330 step-8 frames. D1 gradient boosting on 93 label-free features: AUC 0.83–0.85; D2 ResNet-18 on the eye crop
+with the drawn prediction: 0.77; combinations with fit_pupil: ≤ +0.02 AUC, operating points unchanged (35 % recall at
+5 % flagged, 50 % at ≈ 9 %). The 101 misses at 5 % flagged are 20–35 px disagreements with normal confidence, no jump
+and a normal-looking crop. Open question before any further detector work: are they model errors or label ambiguity
+→ human re-check of those frames (next step).
+
 ### Literature ▶ done: `literature_unreliable_frames.md` (cards per source, two synthesis tables, references).
 
 ## P2 — repair the flagged frames at minimum human cost

@@ -1,0 +1,9 @@
+signal,AUC_wrong20,AUC_wrong50,recall_at_5pct,precision_at_5pct,recall_at_10pct,precision_at_10pct,flagged_for_recall50
+fit_pupil,0.85,0.973,34.8,81.8,52.3,60.9,9.2
+d2_frame,0.769,0.9,25.8,60.6,36.1,42.1,20.3
+d1_pairs_all_5fold,0.84,0.931,29.7,69.7,43.9,51.1,12.5
+"rank_avg(fit_pupil,d2_frame)",0.854,0.964,34.2,80.3,49.0,57.1,10.2
+"rank_avg(fit_pupil,d2_frame,d1)",0.869,0.963,35.5,83.3,48.4,56.4,10.2
+"lovo_lr(fit_pupil,d2_frame)",0.855,0.974,32.9,77.3,53.5,62.4,8.7
+"lovo_lr(fit_pupil,d2_frame,min_conf)",0.853,0.979,34.8,81.8,53.5,62.4,8.4
+"lovo_lr(fit_pupil,d2_frame,d1,min_conf,fit_max)",0.862,0.973,33.5,78.8,53.5,62.4,8.9
