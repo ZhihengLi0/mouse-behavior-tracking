@@ -82,6 +82,16 @@ Cheapest first, all label-free:
 
 ## P2 — repair the flagged frames at minimum human cost
 
+Constraint (Kaiwen, step 9 discussion): no temporal smoothing of the area or blink series, because a filter spreads
+or delays events and would distort the later alignment with neural signals. A centred 31-frame median removes
+anything shorter than ≈ 0.25 s; blinks and fast pupil changes live on that scale. The present pipeline is per frame
+everywhere (the network has no temporal context, the area is the raw four-point value, the blink verdict is a
+per-frame threshold, the detectors only flag), so nothing is smoothed today. Consequences for P2: a repair may change
+only the flagged frames and must leave every other frame untouched; every route is scored not only by pixel error
+but also by timing: the number of frames changed by more than 2 px, the shift of blink onsets and offsets, and the
+lag of the repaired area series against the raw one outside the flagged runs (must be 0). Dropping flagged frames
+(leaving gaps) is the alignment-safe default; interpolation and EKS are reported with their timing cost.
+
 Metric: human cost = frames (or points) a human touches per 1000 frames; benefit = reduction of frames > 20 px /
 > 50 px and of the area error, measured on the flagged test frames. Report "px of error removed per labelled frame".
 
