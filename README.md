@@ -8,6 +8,8 @@ how many human labels are needed, and how few frames must a person correct, befo
 Zhiheng Li (University of Minnesota), with Kaiwen Sheng (Stanford). Raw videos, frames, labels, model weights and
 per-frame predictions stay local; git carries code, documentation and audited aggregate results.
 
+Report page: https://zhihengli0.github.io/mouse-behavior-tracking/ (Chinese; English version at `index_en.html`).
+
 ## Status (last updated 2026-10-04 12:42 CDT)
 
 | what | state |
