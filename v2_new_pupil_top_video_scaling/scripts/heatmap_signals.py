@@ -37,6 +37,7 @@ from scale_step import BPS, HERE, PROJECT  # noqa: E402
 OUT = HERE / "results" / "heatmap_signals"
 OUT.mkdir(parents=True, exist_ok=True)
 MODELS = PROJECT / "dlc-models-pytorch" / "iteration-0"
+T0 = time.time()
 STATS = ["peak1", "peak2", "ratio", "dist_px", "n_peaks", "entropy", "mass_near"]
 
 
@@ -99,6 +100,9 @@ def build_runner(shuffle, batch, device, store):
             # this model's predictor does not apply a sigmoid (clip_scores instead): the raw map can be slightly
             # negative or above 1, so negative values are set to 0 before the mass and entropy are computed
             store.append(heatmap_stats(H.float().clamp(min=0), float(stride)))
+            n = sum(len(a) for a in store)
+            if n // 2000 != (n - len(store[-1])) // 2000:  # the runner returns its list only at the end, so
+                print(f"{n} frames  {(time.time() - T0) / 60:.1f} min", flush=True)  # progress is logged here
         return orig(stride, outputs)
 
     pred.forward = forward
@@ -123,13 +127,8 @@ def run(video, shuffle, limit, batch, device):
     runner, snap = build_runner(shuffle, batch, device, store)
     print("model", snap)
     t0 = time.time()
-    preds = []
-    done = 0
-    for p in runner.inference(images=frames(video_path, limit)):
-        preds.append(np.asarray(p["bodyparts"])[0, :, :3])  # (K, 3): x, y, conf of the single individual
-        done += 1
-        if done % 5000 == 0:
-            print(f"{done} frames  {(time.time() - t0) / 60:.1f} min", flush=True)
+    preds = [np.asarray(p["bodyparts"])[0, :, :3]  # (K, 3): x, y, conf of the single individual
+             for p in runner.inference(images=frames(video_path, limit))]
     poses = np.stack(preds)  # (N, K, 3)
     S = np.concatenate(store)[: len(poses)]  # (N, K, len(STATS))
     assert len(S) == len(poses), (len(S), len(poses))
