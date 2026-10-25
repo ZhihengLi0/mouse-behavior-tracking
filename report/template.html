@@ -1005,6 +1005,66 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       </li>
     </ol>
   </div>
+  <h3><span lang="zh">8.2 能不能更准地找出不可信帧：换信号、调阈值、用真值训练检测器，检出率都停在同一处</span><span lang="en">8.2 Can unreliable frames be found more precisely: other signals, other thresholds and detectors trained on our truth all stop at the same recall</span></h3>
+  <div class="text" lang="zh">
+    <p><b>目的。</b>8.1 的五条规则里 fitting 最适合人工复核，但 155 帧轻微不可信的帧（帧 RMSE 超过 20 px）它只找到 16%。这里的问题是：只用模型的输出（必要时加上图像），能不能把这些帧找得更准。</p>
+    <p><b>用的帧、真值、评法。</b>帧和真值同 8.1：1330 帧，超过 20 px 的 155 帧，超过 50 px 的 32 帧。每种信号报三样：AUC（定义见 8.1）；标出 5% 和 10% 的帧时的检出率和准确率；要找到一半超过 20 px 的帧需要标出多少帧。凡是在数据上拟合出来的东西（阈值、检测器）都留一个视频：用其余 18 个视频拟合，再判留出的那个视频的 70 帧，19 个视频轮流留出，所以每一帧都是由没有见过它所在视频的规则判定的。</p>
+    <p><b>试过的信号，三类。</b></p>
+    <ul>
+      <li><b>fitting 的变体。</b>阈值从 2 px 到 60 px 逐个试；8 个点的偏差改成取最大、只取 4 个瞳孔点的平均（下称 fit_pupil）、只取 4 个眼睑眼角点的平均、超出 99% 预测区间的点数；时间序列模型的阶数换成 (1,0,0)、(2,0,0)、(5,0,1)、(3,1,1)；正向加反向各预测一次取大者；偏差除以眼宽。</li>
+      <li><b>只看单帧、不看时间的信号。</b>姿态 PCA 重构误差：用该视频标注过的姿态（8 点 16 维）做主成分分析，保留解释 99% 方差的成分，量预测姿态被重构后的误差；同一视频各训练步模型之间的分歧：每个点在各模型间的标准差，按置信度加权；几何约束：瞳孔两条轴的中点偏离、瞳孔是否在上下眼睑之间、眼宽偏离该视频中位数的程度。</li>
+      <li><b>用真值训练的检测器。</b>训练样本不用新标注：每个视频已有的各训练步模型（20、40、60 帧那些步，共 65 个模型文件）对它没有训练过的标注帧（之后批次的帧和测试、验证帧）的预测，每个样本有已知的误差，共 7010 个样本，其中 1235 个超过 20 px。表格检测器：梯度提升分类器，93 个特征，包括 8 个点的置信度、8 个点相对眼角中点的位置、每个点相对前后帧的位移、每个点和居中 31 帧中位数的差（只作特征，不平滑任何输出）、每个点的 fitting 偏差、瞳孔的宽高和轴中点偏离、以及这些量在前一帧和后一帧的值。图像检测器：ResNet-18，输入眼睛区域的裁剪图和画上去的 8 个预测点，输出每个点是否错超过 20 px 和整帧是否错超过 20 px；另一版在训练时人工挪动预测点造出已知误差的样本。最后把这两种检测器和 fit_pupil 合并（逻辑回归、排名平均）。</li>
+    </ul>
+    <p><b>脚本和结果。</b><code>scripts/unreliable_frames_sweep.py</code> → <code>results/unreliable_frames_sweep/</code>（每帧每个信号的值、每个信号的 AUC、工作点、曲线）；<code>scripts/error_detector.py</code>、<code>scripts/error_detector_image.py</code> → <code>results/error_detector/</code>（7010 个训练样本的真值和特征、两种检测器在 1330 帧上的分数、AUC 和工作点）。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Purpose.</b> Of the five rules of 8.1, fitting suits human review best, but of the 155 mildly unreliable frames (frame RMSE above 20 px) it finds only 16%. The question here: using only the model's output (and, where needed, the image), can these frames be found more precisely.</p>
+    <p><b>Frames, truth, scoring.</b> Frames and truth as in 8.1: 1330 frames, 155 above 20 px, 32 above 50 px. Three things per signal: the AUC (defined in 8.1); recall and precision when 5% and 10% of the frames are flagged; the share of frames that must be flagged to find half of the frames above 20 px. Everything fitted on data (thresholds, detectors) is fitted with one video left out: the other 18 videos fit it, it then judges the 70 frames of the left-out video, and each of the 19 videos is left out in turn, so every frame is judged by a rule that never saw its video.</p>
+    <p><b>Signals tried, in three groups.</b></p>
+    <ul>
+      <li><b>Variants of fitting.</b> Every threshold from 2 px to 60 px; the 8 deviations combined as the maximum, the mean of the 4 pupil points only (called fit_pupil below), the mean of the 4 eyelid and corner points only, the count of points outside the 99% prediction interval; the order of the time-series model changed to (1,0,0), (2,0,0), (5,0,1), (3,1,1); forward and backward prediction, the larger deviation; deviation divided by the eye width.</li>
+      <li><b>Signals that look at one frame only, not at time.</b> Pose-PCA reconstruction error: a principal-component analysis of the video's labeled poses (8 points, 16 dimensions) keeping the components that explain 99% of the variance, and the error of the predicted pose after reconstruction; disagreement between the video's models from its training steps: the standard deviation of each point across the models, confidence-weighted; geometric constraints: the offset between the midpoints of the two pupil axes, whether the pupil lies between the eyelids, the deviation of the eye width from the video's median.</li>
+      <li><b>Detectors trained on our truth.</b> No new labels: the training examples are the predictions of each video's existing models from its training steps (the 20-, 40-, 60-label steps, 65 model files in all) on the labeled frames they had not been trained on (the frames of later batches and the test and validation frames); each example has a known error; 7010 examples, 1235 of them above 20 px. Tabular detector: a gradient-boosting classifier on 93 features, among them the 8 confidences, the 8 points relative to the corner midpoint, each point's displacement from the previous and to the next frame, each point's distance to its centred 31-frame median (a feature only; no output is smoothed), each point's fitting deviation, the pupil's width, height and axis-midpoint offset, and these quantities at the previous and the next frame. Image detector: a ResNet-18 given the crop of the eye region with the 8 predicted points drawn in, outputting whether each point is wrong by more than 20 px and whether the frame is; a second version adds training examples made by displacing predicted points by a known amount. Finally both detectors combined with fit_pupil (logistic regression, rank average).</li>
+    </ul>
+    <p><b>Scripts and results.</b> <code>scripts/unreliable_frames_sweep.py</code> → <code>results/unreliable_frames_sweep/</code> (every signal at every frame, AUC per signal, operating points, curves); <code>scripts/error_detector.py</code>, <code>scripts/error_detector_image.py</code> → <code>results/error_detector/</code> (truth and features of the 7010 training examples, the two detectors' scores on the 1330 frames, AUC and operating points).</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_detectors.jpg" alt="Recall against flagged share for every signal and detector"></div>
+    <figcaption lang="zh"><span class="tag">图 8-4：</span>每种信号和检测器在 1330 帧上的检出率随标出比例的变化。
+      <ul>
+        <li>A：真值是帧 RMSE 超过 20 px（155 帧）。横轴是标出的帧占 1330 帧的比例，纵轴是这 155 帧里被标出的比例（检出率）。每条曲线是一种信号，把它的阈值从最严到最松逐个试，每个阈值得到一个点。竖虚线是标出 5% 和 10% 的位置。曲线越靠左上越好；图例里的数是 AUC。</li>
+        <li>B：同 A，真值换成帧 RMSE 超过 50 px（32 帧）。</li>
+        <li>fit_pupil 和 fitting 是 8.1 的 fitting 算法只取 4 个瞳孔点 / 取 8 个点的版本；jump 和 uncertain 是 8.1 的算法；D1、D2 是用真值训练的表格检测器和图像检测器，每个视频的帧由没有用它训练的检测器判定。</li>
+      </ul>
+    </figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Recall of every signal and detector on the 1330 frames against the share of frames flagged.
+      <ul>
+        <li>A: truth = frame RMSE above 20 px (155 frames). x = flagged frames as a share of the 1330, y = the share of the 155 that are flagged (recall). One curve per signal, its threshold moved from strictest to loosest, one point per threshold. Dotted lines at 5% and 10% flagged. The closer a curve is to the top left the better; the number in the legend is the AUC.</li>
+        <li>B: as A, with frame RMSE above 50 px (32 frames) as the truth.</li>
+        <li>fit_pupil and fitting are the fitting algorithm of 8.1 over the 4 pupil points / over the 8 points; jump and uncertain are the algorithms of 8.1; D1 and D2 are the tabular and the image detector trained on our truth, each video's frames judged by a detector not trained with them.</li>
+      </ul>
+    </figcaption>
+  </figure>
+  <div class="concl" lang="zh"><span class="tag">结论：</span>没有一种信号或检测器明显超过只取 4 个瞳孔点的 fitting（fit_pupil）；标出 5% 的帧只能找到约 35% 超过 20 px 的帧，找到一半要标出 9–10% 的帧。
+    <ol>
+      <li><b>最好的信号是 fit_pupil</b>，AUC 0.850（20 px 档）、0.973（50 px 档）。两个可用的阈值：12.8 px 标出 5% 的帧，找到 20 px 档的 35%（准确率 82%）和 50 px 档的 78%；8.0 px 标出 9.2% 的帧，找到 20 px 档的 50%（准确率 64%）和 50 px 档的 90%。8.1 的 fitting（8 点平均，阈值 20 px）标出 2% 的帧，找到 20 px 档的 16%（准确率 89%）。</li>
+      <li><b>fitting 的其他变体 AUC 0.83–0.84</b>，彼此相差不到 0.01；反向预测、除以眼宽、换阶数都不改变结果。</li>
+      <li><b>只看单帧的信号更差</b>：姿态 PCA 0.78、uncertain 0.78、模型间分歧 0.75、几何约束 0.73、jump 0.72。原因是：每个视频只有 17–59 帧标注姿态，而且头固定的眼睛姿态本身变化小，一个瞳孔点错了对重构误差的影响比 2–5 px 的测量噪声还小；"各模型"是同一视频各训练步的模型，标注集嵌套、骨干相同，错起来一起错（视频 5、7、12 只有一个模型，分歧为 0）；卡住的帧里瞳孔四点多数仍是合理的椭圆，几何约束看不出。</li>
+      <li><b>用真值训练的检测器也不更好</b>：表格检测器 AUC 0.83–0.85，图像检测器 0.77，和 fit_pupil 合并最多提高 0.02，标出 5% 和 10% 时的检出率不变。用早期弱模型的错例训练反而把 50 px 档的 AUC 从 0.965 降到 0.927，原因是弱模型的错法和平台点模型不同；人工造的错例让图像检测器更差（0.76）。</li>
+      <li><b>漏掉的帧长什么样。</b>fit_pupil 标出 5% 时漏掉 101 帧超过 20 px 的帧：帧 RMSE 中位数 26 px（四分之三低于 34 px），最低置信度中位数 0.52，相对上一帧不跳动，图像检测器也把它们判为正常。155 帧里 92% 的最大误差落在瞳孔点（pupil_left 79 帧、pupil_right 27、pupil_top 22、pupil_bottom 15）；pupil_left 的偏差多为 40–70 px，61% 是模型的点比标注更靠图像左侧。这些帧是模型错还是标注本身有歧义，要标注者逐帧核对（清单在 <code>results/error_detector/missed_frames_to_verify/</code>）；核对之前这一档的检出率不会再提高。</li>
+      <li><b>限制。</b>同 8.1：样本小且集中，按帧评不按段评。需要重新跑推理的信号（热图的多个峰、用不同随机种子独立训练的模型之间的分歧）没有试。</li>
+    </ol>
+  </div>
+  <div class="concl" lang="en"><span class="tag">Conclusion:</span>No signal or detector clearly beats fitting over the 4 pupil points (fit_pupil); flagging 5% of the frames finds about 35% of the frames above 20 px, and finding half of them costs 9–10% of the frames.
+    <ol>
+      <li><b>The best signal is fit_pupil</b>, AUC 0.850 (20-px level) and 0.973 (50-px level). Two usable thresholds: 12.8 px flags 5% of the frames and finds 35% of the 20-px level (precision 82%) and 78% of the 50-px level; 8.0 px flags 9.2% and finds 50% of the 20-px level (precision 64%) and 90% of the 50-px level. The fitting of 8.1 (mean of 8 points, threshold 20 px) flags 2% and finds 16% of the 20-px level (precision 89%).</li>
+      <li><b>The other variants of fitting have an AUC of 0.83–0.84</b>, within 0.01 of each other; backward prediction, division by the eye width and other orders do not change the result.</li>
+      <li><b>Signals that look at one frame only are worse</b>: pose-PCA 0.78, uncertain 0.78, disagreement between models 0.75, geometric constraints 0.73, jump 0.72. The reasons: each video has only 17–59 labeled poses, and the pose of a head-fixed eye varies little, so one wrong pupil point changes the reconstruction error by less than the 2–5 px of measurement noise; "the models" are the training-step models of the same video, trained on nested label sets with the same backbone, and they fail together (videos 5, 7 and 12 have one model, so the disagreement is 0); in a stuck frame the four pupil points are usually still a plausible ellipse, which the geometric constraints cannot see.</li>
+      <li><b>Detectors trained on our truth are not better either</b>: tabular detector AUC 0.83–0.85, image detector 0.77, combined with fit_pupil at most 0.02 higher, with unchanged recall at 5% and 10% flagged. Training on the errors of the earlier, weaker models even lowers the 50-px AUC from 0.965 to 0.927, because those models fail differently from the plateau-point model; artificially made errors make the image detector worse (0.76).</li>
+      <li><b>What the missed frames look like.</b> At 5% flagged fit_pupil misses 101 frames above 20 px: median frame RMSE 26 px (three quarters below 34 px), median lowest confidence 0.52, no jump from the previous frame, and the image detector also calls them normal. In 92% of the 155 frames the largest error is on a pupil point (pupil_left 79 frames, pupil_right 27, pupil_top 22, pupil_bottom 15); the pupil_left offsets are mostly 40–70 px, and in 61% the model's point lies further to the image's left than the label. Whether these frames are model errors or ambiguities of the label itself has to be checked by the labeler frame by frame (list in <code>results/error_detector/missed_frames_to_verify/</code>); until then the recall at this level will not improve.</li>
+      <li><b>Limits.</b> As in 8.1: a small, concentrated sample, scored per frame and not per run. Signals that need a new inference pass (several peaks of the heatmap, disagreement between models trained independently with different random seeds) were not tried.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 9 -->

@@ -42,6 +42,7 @@ FIGURES = [
     (V2 / "results/area_timeseries/area_timeseries_all_videos.png", "fig_eye_timeseries.jpg", 2200),
     (V2 / "results/keypoint_confidence_error/keypoint_confidence_error_all_videos.png", "fig_kp_conf_error.jpg", 2880),
     (V2 / "results/unreliable_frames/unreliable_frames_all_videos.png", "fig_unreliable.jpg", 2625),
+    (V2 / "results/error_detector/detectors_page.png", "fig_detectors.jpg", 2400),
     (V2 / "results/blink_eyelid_distance/results/every_video/blink_final_summary.png", "fig_blink_final.jpg", 2210),
     (V2 / "results/blink_eyelid_distance/results/one_threshold/blink_notopen_rule_summary.png", "fig_blink_notopen.jpg", 1875),
     (V2 / "results/blink_eyelid_distance/results/every_mouse/px/threshold_scan_per_mouse.png", "fig_blink_scan.jpg", 2600),
