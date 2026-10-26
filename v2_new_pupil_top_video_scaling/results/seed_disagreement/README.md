@@ -20,6 +20,28 @@ video. The main-line coordinates stay those of the plateau model; the second mod
 Script: `scripts/seed_disagreement.py --video 8 --twin 3081`. Files: `pilot_video08.csv` (table), `pilot_video08_frames.csv`
 (70 frames with both models' coordinates and every score), `train_video08_seed7.log` (local only).
 
-## Result
+## Result (video 8, 70 frames: 38 > 20 px, 9 > 50 px)
 
-(pending: training started 2026-10-25 20:24)
+Full table: `pilot_video08.csv`; per frame: `pilot_video08_frames.csv`.
+
+| score | AUC > 20 px | AUC > 50 px |
+|---|---|---|
+| fit_pupil (reference) | 0.894 | 0.729 |
+| min_conf (lowest confidence) | 0.830 | 0.741 |
+| heatmap entropy, 4 pupil points (`results/heatmap_signals`) | 0.868 | 0.811 |
+| seed disagreement, mean over 8 points (best of 4 variants) | 0.762 | 0.536 |
+| seed disagreement, other variants (max, pupil only) | 0.69–0.71 | 0.46–0.50 |
+| rank average fit_pupil + disagreement | 0.888 | 0.649 |
+| rank average fit_pupil + disagreement + heatmap entropy | 0.911 | 0.719 |
+
+- The disagreement between the two seeds is a weak signal here: alone it is below the confidence, and added to
+  fit_pupil it changes nothing (AUC gain −0.005, bootstrap interval −0.07 to +0.07; at > 50 px it hurts).
+- The reason is that the two models make the same errors. Their per-frame RMSEs rank almost identically (Spearman
+  0.89); all 38 frames the main model gets wrong by > 20 px the twin also gets wrong (plus 4 more); 6 of the 9
+  > 50 px frames are shared. The two predictions differ by only 4.9 px (median) on the wrong frames against 3.4 px on
+  the right ones, and their pupil_left offsets from the human label are correlated (0.64).
+- The twin is slightly worse than the plateau model (median RMSE 25.3 vs 21.5 px over the 70 frames), the ordinary
+  seed-to-seed spread.
+- Reading: on this video the wrong frames are not places where training is unstable; any model trained on these
+  labels lands at the same positions. That points to the labels / the definition of the pupil edge (or to a lack of
+  training examples of these situations), not to something a detector can see. One video, one extra seed, 70 frames.
