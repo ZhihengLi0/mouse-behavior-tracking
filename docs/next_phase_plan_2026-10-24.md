@@ -90,6 +90,14 @@ with the drawn prediction: 0.77; combinations with fit_pupil: ≤ +0.02 AUC, ope
 and a normal-looking crop. Open question before any further detector work: are they model errors or label ambiguity
 → human re-check of those frames (next step).
 
+### Stage 2b ▶ done 2026-10-25 (`results/heatmap_signals/README.md`, `results/seed_disagreement/README.md`): the two
+signals that need a new inference pass, pilot on video 8 (70 frames, 38 > 20 px). Heatmap shape (plateau model re-run on
+the whole video, 7 numbers per point, heatmaps not stored): entropy of the 4 pupil heatmaps AUC 0.868 alone, +0.031 with
+fit_pupil (bootstrap −0.013…+0.090). Seed disagreement (twin model shuffle 3081, seed 7, identical 420-frame training
+set): AUC 0.762 alone, no gain; the two seeds share all 38 wrong frames (RMSE rank correlation 0.89, 4.9 px apart on
+wrong frames). Reading: the wrong frames are systematic, not training noise → the label / pupil-edge definition question,
+not more detectors. P1 detection closed under the current truth; page section 8.2 updated.
+
 ### Literature ▶ done: `literature_unreliable_frames.md` (cards per source, two synthesis tables, references).
 
 ## P2 — repair the flagged frames at minimum human cost
