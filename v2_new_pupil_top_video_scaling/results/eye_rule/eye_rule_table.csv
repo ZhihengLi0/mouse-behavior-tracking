@@ -1,0 +1,19 @@
+rule,flagged_pct,recall20_pct,precision20_pct,recall50_pct,eye_wrong_caught,eye_wrong_total,pupil_wrong_caught,pupil_wrong_total
+"fit_pupil alone, 5.0%",5.6,38.1,79.7,78.1,5,12,54,143
+fit_pupil 5.0% OR fit_eye 1.0%,6.2,38.7,73.2,81.2,6,12,54,143
+  fit_pupil alone at 6.2%,7.1,46.5,76.6,87.5,6,12,66,143
+fit_pupil 5.0% OR fit_eye 1.5%,6.2,38.7,72.3,81.2,6,12,54,143
+  fit_pupil alone at 6.2%,7.1,46.5,76.6,87.5,6,12,66,143
+fit_pupil 5.0% OR fit_eye 2.5%,7.1,40.6,67.0,81.2,8,12,55,143
+  fit_pupil alone at 7.1%,7.7,47.7,72.5,87.5,6,12,68,143
+fit_pupil 5.0% OR fit_eye 5.0%,9.3,44.5,55.6,81.2,8,12,61,143
+  fit_pupil alone at 9.3%,9.5,51.6,63.5,90.6,6,12,74,143
+"fit_pupil alone, 9.2%",9.4,51.6,64.0,90.6,6,12,74,143
+fit_pupil 9.2% OR fit_eye 1.0%,9.9,52.3,61.4,93.8,7,12,74,143
+  fit_pupil alone at 9.9%,10.2,52.3,60.0,90.6,7,12,74,143
+fit_pupil 9.2% OR fit_eye 1.5%,10.0,52.3,60.9,93.8,7,12,74,143
+  fit_pupil alone at 10.0%,10.4,52.9,59.4,90.6,7,12,75,143
+fit_pupil 9.2% OR fit_eye 2.5%,10.7,54.2,59.2,93.8,9,12,75,143
+  fit_pupil alone at 10.7%,11.1,54.8,57.8,93.8,7,12,78,143
+fit_pupil 9.2% OR fit_eye 5.0%,12.6,56.8,52.4,93.8,9,12,79,143
+  fit_pupil alone at 12.6%,13.2,58.1,51.1,93.8,7,12,83,143
