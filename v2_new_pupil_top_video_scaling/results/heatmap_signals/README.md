@@ -22,6 +22,28 @@ Script: `scripts/heatmap_signals.py --video 8` (≈ 80–95 min on this Mac). Fi
 (per frame, local only, ≈ 40 MB), `pilot_video08.csv` (the table below), `pilot_video08_frames.csv` (the 70 frames
 with every score), `run_video08.log` (local only).
 
-## Result
+## Result (video 8, 70 frames: 38 > 20 px, 9 > 50 px)
 
-(pending: the run started 2026-10-25 17:18)
+Video 8 has more wrong frames than right ones, so "recall at 5 % flagged" (3 frames) says nothing here; the AUC is the
+number to read. Full table: `pilot_video08.csv`.
+
+| score | AUC > 20 px | AUC > 50 px |
+|---|---|---|
+| fit_pupil (reference, best signal of section 8.2) | 0.894 | 0.729 |
+| fitting (8 points) | 0.873 | 0.703 |
+| min_conf (lowest confidence) | 0.830 | 0.741 |
+| jump | 0.752 | 0.500 |
+| heatmap entropy, mean of the 4 pupil points (best heatmap score) | 0.868 | 0.809 |
+| heatmap peak ratio, mean of the 4 pupil points | 0.864 | 0.780 |
+| other heatmap scores (mass near the peak, number of peaks, max over points, all 8 points) | 0.59–0.86 | 0.57–0.79 |
+| rank average of fit_pupil and heatmap entropy | 0.926 | 0.798 |
+
+- Alone, no heatmap score beats fit_pupil at > 20 px; the best one (pupil entropy) is a better "uncertain" than the
+  confidence (0.868 vs 0.830) and the best single score at > 50 px (0.809, 9 frames).
+- Combined with fit_pupil (rank average) the AUC at > 20 px rises by 0.031 (bootstrap over the 70 frames: 95 % interval
+  −0.013 to +0.090, gain > 0 in 90 % of resamples). Of the 6 wrong frames that fit_pupil ranks outside its top 38,
+  the entropy ranks 3 inside the top 38 and the combination 2; precision of the top 38 goes 0.84 → 0.87.
+- The entropy is correlated with fit_pupil (Spearman 0.64) and with the confidence (0.77): partly new information,
+  not an independent signal.
+- The best score was picked among 16 heatmap scores on the same 70 frames, which flatters it; one video, 70 frames,
+  so this is a reason to look at two more videos (1 and 4, ≈ 3 h), not a result.
