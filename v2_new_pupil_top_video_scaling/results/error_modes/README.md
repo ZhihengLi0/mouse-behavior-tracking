@@ -44,3 +44,19 @@ video are used only to judge the clusters afterwards.
 Label the 20 frames (model pre-labels, human corrects), retrain on 420 + 20 (`scale_step.py --tag modes`), compare on the
 70 truth frames with the plateau model (median 25.3 / 21.5 px on the 70 frames, 38 > 20 px) and with the existing
 40-label and 60-label models of the main line (same label count, old selection rule).
+
+## Videos 1, 2, 11, 4 (2026-10-27, same script and defaults; `video01/`, `video02/`, `video11/`, `video04/`)
+
+k by silhouette: video 1 k = 5 (0.11), video 2 k = 6 (0.11), video 11 k = 4 (0.28), video 4 k = 6 (0.20). Unlike video 8,
+the clusters of these videos are not blocks of time: every cluster spans the whole video (first to last frame), only
+the medians differ. The > 50 px truth frames fall into small high-suspicion clusters that are the throw frames
+themselves: video 1 clusters 2 and 3 (5.5 % and 1.1 % of frames, fit_pupil median 47 and 92 px, all 7 of their truth
+frames > 50 px); video 2 clusters 4 and 5 (0.6 % and 0.7 %, 172 and 9 px; the one truth frame in cluster 5 is 146 px)
+and cluster 1 (8.7 %, 3 of its 17 truth frames > 50 px); video 11 cluster 2 (1.1 %, one truth frame, 161 px) and
+clusters 1 and 3 (13 % each, 1–2 of 8–10 truth frames > 50 px); video 4 cluster 5 (1.1 %, 60 px, 1 of 2 truth frames
+> 50 px) and cluster 3 (22.8 %, 1 of 3). The large clusters have 0 frames > 50 px and 0–5 of 13–57 truth frames > 20 px.
+So on videos whose errors are sporadic throws the clustering only re-finds what the time-series signal finds, in
+clusters of ≈ 1 % of frames; the "one eye state holds the errors" picture is specific to video 8 (and the video-4
+large cluster 2, 32 % of frames, holds 25 of its 51 truth frames with an area error > 20 % but none > 20 px RMSE — the
+blurry-pupil area error, not a localisation error). `selection.csv` is written for each video; no frames were
+extracted for labeling (nothing to retrain for on these videos).

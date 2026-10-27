@@ -61,7 +61,7 @@ def load_inputs(video):
     step = max(1, int(rr.labels_at_plateau) // 20)
     h5 = sorted(glob.glob(str(HERE / rr.unit / "training-data" / f"predictions_step{step:02d}" / "*snapshot*120*.h5")))[-1]
     d = pt.load(h5)
-    hm = sorted(glob.glob(str(RES / "heatmap_signals" / f"video{video:02d}_shuffle*.csv")))
+    hm = sorted(p for p in glob.glob(str(RES / "heatmap_signals" / f"video{video:02d}_shuffle*.csv")) if "_peaks" not in p)
     if not hm:
         raise SystemExit(f"no heatmap file for video {video}: run heatmap_signals.py first")
     H = pd.read_csv(hm[-1]).set_index("frame").sort_index()

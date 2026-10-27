@@ -1,0 +1,5 @@
+cluster,frames,share_pct,mean_suspicion,fit_pupil_median_px,pupil_entropy_median,truth_frames,truth_gt20px,truth_gt50px,truth_area_gt20pct,truth_rmse_median_px,top_features
+0,52660,73.4,0.394,1.4,0.57,51,0,0,0,8.2,hm_pupil_left_mass_near +0.4; conf_pupil_left +0.3; hm_pupil_left_entropy -0.3; hm_pupil_right_entropy -0.3
+1,9295,13.0,0.824,3.8,0.589,8,2,1,4,15.6,geo_pupil_h +1.9; conf_pupil_right -1.8; hm_pupil_right_mass_near -1.7; hm_pupil_right_entropy +1.6
+2,760,1.1,0.767,3.4,0.585,1,1,1,0,161.1,geo_eyelid_bottom_along +9.1; geo_pupil_top_across +8.8; geo_eyelid_top_across +8.7; geo_pupil_bottom_along +8.7
+3,9033,12.6,0.761,2.5,0.588,10,2,2,2,14.5,conf_pupil_bottom -1.8; hm_pupil_bottom_entropy +1.7; hm_pupil_bottom_mass_near -1.7; hm_pupil_bottom_n_peaks +1.5

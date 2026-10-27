@@ -47,3 +47,8 @@ number to read. Full table: `pilot_video08.csv`.
   not an independent signal.
 - The best score was picked among 16 heatmap scores on the same 70 frames, which flatters it; one video, 70 frames,
   so this is a reason to look at two more videos (1 and 4, ≈ 3 h), not a result.
+
+Videos 1, 2, 11, 4 (2026-10-27, `pilot_videoNN.csv`, written by the `--peaks` passes): the mean pupil heatmap entropy
+has AUC 0.72 / 0.86 / 0.77 / 0.43 against the > 50 px frames where fit_pupil has 0.996 / 0.985 / 0.977 / 1.000, and
+0.76 / 0.71 / 0.81 / 0.63 against > 20 px (fit_pupil 0.94 / 0.998 / 0.98 / 0.75). The heatmap statistics add nothing
+to the fitting signal on these videos either; the peak coordinates are used by `scripts/second_peak_repair.py`.

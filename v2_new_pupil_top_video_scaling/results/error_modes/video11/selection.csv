@@ -1,0 +1,21 @@
+frame,cluster,reason,suspicion,fit_pupil_px,pupil_entropy_mean,in_pool,minute
+665,0,medoid of sub-cluster,0.717,3.063,0.576,True,0.2
+6132,0,medoid of sub-cluster,0.699,2.017,0.581,True,1.7
+29977,0,medoid of sub-cluster,0.182,0.956,0.567,True,8.3
+32034,0,medoid of sub-cluster,0.588,2.388,0.572,True,8.9
+33240,0,medoid of sub-cluster,0.284,1.192,0.569,True,9.2
+34174,0,medoid of sub-cluster,0.233,1.247,0.566,True,9.5
+46888,0,medoid of sub-cluster,0.58,1.655,0.578,True,13.0
+49122,0,medoid of sub-cluster,0.398,1.651,0.568,True,13.6
+49671,0,medoid of sub-cluster,0.231,0.745,0.571,True,13.8
+54175,0,medoid of sub-cluster,0.271,1.02,0.571,True,15.0
+55934,0,medoid of sub-cluster,0.377,1.277,0.572,True,15.5
+2569,1,medoid of sub-cluster,0.903,4.227,0.593,True,0.7
+3961,1,medoid of sub-cluster,0.472,1.372,0.576,True,1.1
+37612,1,medoid of sub-cluster,0.86,3.911,0.587,True,10.4
+55592,1,medoid of sub-cluster,0.92,7.303,0.591,True,15.4
+45817,2,medoid of sub-cluster,0.802,2.51,0.587,True,12.7
+38008,3,medoid of sub-cluster,0.984,40.908,0.607,True,10.6
+38753,3,medoid of sub-cluster,0.801,2.114,0.595,True,10.8
+39860,3,medoid of sub-cluster,0.54,1.317,0.583,True,11.1
+40431,3,medoid of sub-cluster,0.799,2.718,0.584,True,11.2

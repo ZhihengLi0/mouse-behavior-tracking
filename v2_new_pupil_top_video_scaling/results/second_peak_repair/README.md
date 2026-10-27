@@ -51,3 +51,54 @@ The other 23 of the 32 > 50 px truth frames (videos 1, 2, 4, 10, 11, 14) are fam
 
 Note for reruns of `scripts/error_modes.py`: it globs `video08_shuffle*.csv` and takes the last match; the folder now
 also holds `video08_shuffle911_run1_2026-10-25.csv` (byte-identical to the regenerated file) and the `_peaks.csv`.
+
+## Videos 1, 2, 11, 4 (overnight 2026-10-26/27, same script, same defaults; `video01/`, `video02/`, `video11/`, `video04/`)
+
+Chosen with the user: two clean videos with sporadic throws (2: truth median 6.9 px, 4 frames > 50 px; 11: 8.9 px,
+4 frames), the family-A video 1 (12.7 px, 8 frames) and the second blurry video 4 (14.7 px, 2 frames; 57 % of its
+truth frames have an area error > 20 %, like video 8). Pooled bands, k = 5, all frames of each video.
+
+| video | truth > 50 px | repaired to < 50 px (to < 20 px) | dropped | left alone (eye closed) | > 50 px left among kept | frames ≤ 20 px made worse / dropped | whole video repaired / dropped | flagged by fit_o200_max (44 px) |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 8 | 6 (5) | 2 | 0 | 0 | 0 / 1 | 5.4 % / 3.9 % | 16.5 % |
+| 2 | 4 | 0 (0) | 4 | 0 | 0 | 0 / 0 | 0.5 % / 1.1 % | 6.1 % |
+| 11 | 4 | 2 (2) | 0 | 2 | 2 (the closed ones) | 0 / 0 | 0.7 % / 0.3 % | 4.3 % |
+| 4 | 2 | 2 (0) | 0 | 0 | 0 | 0 / 0 | 14.2 % / 3.1 % | 5.0 % |
+| 8 | 9 | 2 (0), one made worse | 6 | 0 | 1 | 2 / 3 | 4.5 % / 13.5 % | 12.6 % |
+| all | 27 | 12 (7) | 12 | 2 | 3 | 2 / 4 | | |
+
+- **Video 1 (family A proper).** The 6 frames with pupil_left thrown 230–420 px into the fur or outside the eye are
+  all repaired by their second peak, which sits on the pupil edge: 148 → 13, 139 → 17, 117 → 16, 114 → 10, 111 → 15,
+  85 → 31 px (`video01/repaired_sheet.jpg`). The 2 frames with several points thrown (354 px with four points; 83 px
+  with pupil_left and pupil_bottom) are dropped. Of the 56 frames ≤ 20 px none is changed and one is dropped (17.7 px,
+  its pupil_top 31 px off). After the rule no truth frame of the video is above 50 px. Whole video: 3 858 frames
+  repaired (3 554 through pupil_left), 2 822 dropped; 87 % of them are also flagged by fit_o200_max, which flags 16.5 %
+  of this video.
+- **Video 2.** All 4 frames > 50 px are dropped, none repaired: pupil_top thrown 196 / 210 / 59 px (its second peak is
+  not at a valid place) and one frame whose error is the temporal corner (410 px; the pupil is within 21 px). No frame
+  ≤ 20 px is changed or dropped; one 20–50 px frame is made worse (23 → 40 px, pupil_left moved from 19 to 94 px off).
+  Whole video 0.5 % repaired, 1.1 % dropped (fit_o200_max flags 6.1 %).
+- **Video 11.** The 2 frames with pupil_left thrown 483 / 494 px are repaired to 11 / 12 px. The other 2 frames > 50 px
+  are "closed" (eye opening below half the video's median: one with pupil_bottom 495 px off, one with the nasal corner
+  455 px off) and are left alone by design; the area series masks such frames anyway. Nothing else changes (0.7 %
+  repaired, 0.3 % dropped on the whole video).
+- **Video 4 (blurry, but not the video-8 mode).** Both frames > 50 px are repaired (118 → 33 px: pupil_bottom 320 → 20;
+  117 → 38 px: pupil_top 331 → 64, but the pair replacement also moved pupil_left from 1 to 85 px off), and 8 more truth
+  frames are changed, every one for the better (42 → 16, 41 → 22, 35 → 25, 27 → 24, 27 → 20, 19 → 9, 18 → 16, 16 → 6 px):
+  the model's pupil_right sits on the corneal reflection next to the small blurry pupil and its second peak is the
+  pupil edge (`video04/repaired_sheet.jpg`). This is a third kind of error — a wrong bright target, sustained, not
+  jumpy — which the second peak does fix and the time series does not see: 14.2 % of the whole video is repaired
+  (pupil_right in 6 052 frames) while fit_o200_max flags 5.0 %, and only 1 572 of the 10 153 repaired frames are
+  flagged. Whole-video effect unverified beyond the 70 truth frames (median 14.7 → 13.7 px).
+
+Reading across the five videos: the rule removes or repairs 24 of the 27 > 50 px frames (the remaining 3 are two
+closed-eye frames and one video-8 frame); on the 238 frames ≤ 20 px of videos 1, 2, 11, 4 it changes nothing for the
+worse and drops one. Its failures are video 8's core-vs-ring mode (geometry is normal, see above) and multi-point
+throws (dropped, not repaired). The share of a video it touches runs from 1 % (clean videos) to 18 % (video 8) and
+is not predicted by the time-series flag share (video 4: 17 % touched, 5 % flagged), so the two finders are
+complementary: the time series sees jumps, the geometry sees sustained wrong targets. Under the constraint "repair
+only flagged frames" the video-4 repairs would mostly not be applied.
+
+Script note: `scripts/error_modes.py` (2026-10-27) now skips the `_peaks.csv` files when it looks for a video's heatmap
+statistics (it took the last file in sorted order, which after a `--peaks` run was the peaks file; videos 1 and 2 were
+re-clustered after the fix, video 8 was unaffected).
