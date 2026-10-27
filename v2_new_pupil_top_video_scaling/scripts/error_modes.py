@@ -21,7 +21,7 @@ Frames to label (label-free, only from the training pool = the video minus its v
 cluster proportional to size × suspicion, at least 1, at most 4, 20 in all; inside a cluster the quota frames are the
 medoids of a k-means with k = quota (spread over the cluster), not the most extreme frames.
 
-Outputs in results/error_modes/videoNN/: clusters_summary.csv, cluster_features.csv, selection.csv, frames_clusters.csv
+Outputs in results/error_modes/videoNN/: clusters_summary.csv, cluster_features.csv, selection.csv, frames_clusters.csv.gz
 (all frames, local only), sheets cluster_KK.jpg (local only). Nothing else is modified."""
 import argparse
 import glob
@@ -247,7 +247,7 @@ def main():
     assert SEL.in_pool.all() and len(SEL) == a.n_select
     SEL["minute"] = (SEL.frame / 3600).round(1)
     SEL.round(3).to_csv(out / "selection.csv", index=False)
-    frames.round(4).to_csv(out / "frames_clusters.csv", index=False)
+    frames.round(4).to_csv(out / "frames_clusters.csv.gz", index=False)
     print(SEL.to_string(index=False))
 
     # contact sheets

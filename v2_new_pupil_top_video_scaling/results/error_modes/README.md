@@ -2,7 +2,7 @@
 
 Script: `scripts/error_modes.py --video N`. Per video one folder `videoNN/` with `clusters_summary.csv`, `cluster_features.csv`
 (cluster mean of every feature, z-scored), `silhouette_by_k.csv`, `selection.csv` (the frames to label) and, local only,
-`frames_clusters.csv` (every frame) and one contact sheet per cluster `cluster_KK.jpg`.
+`frames_clusters.csv.gz` (every frame) and one contact sheet per cluster `cluster_KK.jpg`.
 
 Question (user's proposal): instead of a fixed number of frames per key point, let the data say how many ways the model
 goes wrong, and label one or two frames per way. Every frame of the whole video is described by what the model produced on
