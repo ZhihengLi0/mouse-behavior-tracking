@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Open any folder of img*.png for labeling in napari-deeplabcut (empty keypoint layer if the folder has no
+# CollectedData / machinelabels file).   bash label_folder.sh <folder>
+set -euo pipefail
+FOLDER="$(cd "${1:?usage: label_folder.sh <folder with img*.png>}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; PROJECT_DIR="$(cd "$HERE/.." && pwd)"
+PYTHON="/Users/lizhiheng/miniforge3/envs/DEEPLABCUT/bin/python"
+CONFIG="$PROJECT_DIR/dlc_projects/EyePupilBlink-Zhiheng-2026-08-17/config.yaml"
+mkdir -p "$PROJECT_DIR/local_data/matplotlib" "$PROJECT_DIR/local_data/numba" "$PROJECT_DIR/local_data/xdg_cache" "$PROJECT_DIR/local_data/napari_config"
+export MPLCONFIGDIR="$PROJECT_DIR/local_data/matplotlib" NUMBA_CACHE_DIR="$PROJECT_DIR/local_data/numba"
+export XDG_CACHE_HOME="$PROJECT_DIR/local_data/xdg_cache" NAPARI_CONFIG="$PROJECT_DIR/local_data/napari_config/settings.yaml"
+"$PYTHON" - <<PY
+from deeplabcut.gui.widgets import launch_napari
+import napari
+viewer = launch_napari(files=["$FOLDER", "$CONFIG"], plugin="napari-deeplabcut", stack=False)
+napari.run()
+PY
