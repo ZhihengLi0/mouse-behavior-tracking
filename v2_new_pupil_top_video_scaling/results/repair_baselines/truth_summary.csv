@@ -1,0 +1,3 @@
+rule,frames,flagged,flagged_pct,flagged_gt20px,flagged_gt50px,flagged_area_gt20pct,recall_gt20px,recall_gt50px,recall_area_gt20pct,unflagged_gt20px,unflagged_gt50px,unflagged_area_gt20pct,unflagged_gt20px_pct,unflagged_gt50px_pct,unflagged_area_gt20pct_pct,all_area_gt20pct_pct,flagged_area_err_median_pct,unflagged_area_err_median_pct,flagged_in_short_runs,short_runs_area_err_before_median_pct,short_runs_area_err_interp_median_pct,short_runs_interp_better,short_runs_interp_worse
+5pct,1330,67,5.0,55,25,44,35.5,78.1,21.4,100,7,162,7.9,0.6,12.8,15.5,36.9,4.8,30,38.5,23.6,18,12
+9pct,1330,123,9.2,77,28,64,49.7,87.5,31.1,78,4,142,6.5,0.3,11.8,15.5,23.5,4.6,39,14.6,12.4,20,19
