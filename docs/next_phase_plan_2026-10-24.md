@@ -174,3 +174,32 @@ Results: `results/repair_baselines/`, `results/error_modes/`, `results/relabel_t
 Next, A family at the 50-px tier: (1) geometry-checked second-peak repair on video 8 (inference pass storing peak-2
 coordinates); (2) retrain with the 20 mode frames, count > 50 px on the 70 truth frames against the 40-label model of
 the main line; (3) 2026-10-31: drop vs. repair, acceptable residual.
+
+## P2 ▶ 2026-10-26 evening: detectors at the 50-px tier, second-peak repair
+
+Results: `results/tier50_reeval/`, `results/second_peak_repair/` (READMEs there).
+
+- **Every signal and detector re-evaluated at the 50-px tier** (`tier50_reeval.py`, nothing recomputed): the ranking
+  changes. The largest-of-8 fitting deviation with a low-order model (SARIMAX (2,0,0), (3,1,1) or (1,0,0)) catches 31
+  of the 32 > 50 px frames at 5 % flagged (AUC 0.986 for (2,0,0); 90 % recall at 3.8–6 % flagged), where fit_pupil
+  (mean of the four pupil points, the 8.2 choice) catches 25 and the learned detectors D1 / D2 24 / 22. The gain is
+  video 8 (9 of 9 instead of 5 of 9); the one frame missed by all is video 14 frame 61431 (51 px, no motion). Reason:
+  > 50 px frames are mostly one point thrown far, which the maximum sees and the mean over four dilutes; at the 20-px
+  tier these scores are 0.02–0.04 AUC below fit_pupil, which is why they were set aside. Caveats: 32 positives (one
+  frame = 3 %), overlapping intervals among the top seven, best of 45 picked on the same frames. On whole videos the
+  rule flags 5.4 % ((2,0,0), 22 673 runs) or 6.5 % ((3,1,1), 14 034 runs, fewer single-frame runs).
+- **Second-peak repair** (`second_peak_repair.py`; `heatmap_signals.py --peaks` stores the peak-2 cell coordinates,
+  one 90-min pass per video). Per frame, label-free, no temporal term: a pupil point whose scale-free position
+  relative to the other three is > 5 MADs off, or outside the eye, is replaced by its own second heatmap peak if that
+  makes the frame pass; otherwise the frame is dropped. On video 8 this fails, and for a reason that matters: its 9
+  > 50 px frames are the core-vs-ring mode (the model's four points form a consistent small ellipse on the dark core,
+  the label is the wider ring; pupil_left ≈ 120 px, pupil_bottom ≈ 60 px, pupil_top ≈ 40 px off together). The geometry
+  is normal, the second peak of pupil_left sits near the ring in 6 of 9 frames but the other points have none, so no
+  frame reaches 20 px and two correct frames are made worse. These 9 are family B at large magnitude (12–16 % of the
+  video's frames), to be addressed by labels of that state (`labels/modes01/`), not per frame. The other 23 > 50 px
+  frames (videos 1, 2, 4, 10, 11, 14) are family A proper: one or two points thrown 200–600 px with confidence ≈ 0.
+  Video 1 (8 frames, 6 with pupil_left alone 230–420 px off) is the test of the repair; its peaks pass is running.
+
+Next: (1) video 1 second-peak result → drop vs. repair for family A; (2) label the 20 mode frames of video 8 and
+retrain (needs an extra-sets option in `scale_step.py`); (3) 2026-10-31: detector = largest-of-8 fitting deviation at
+the 50-px tier, drop as the default fix, mode-targeted labels for the core-vs-ring state.
