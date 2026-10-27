@@ -144,3 +144,33 @@ is below an agreed level (to agree with Kaiwen; proposal: ≤ 2% of frames per v
 
 Nothing in `results/` of earlier steps is modified; every new result goes to a new folder and the page gets a new
 section only when a result is final.
+
+## P2 ▶ 2026-10-26: truth tier, two error families, baselines
+
+Results: `results/repair_baselines/`, `results/error_modes/`, `results/relabel_test/` (READMEs there).
+
+- **Truth tier decided 2026-10-26** from the contact sheets of `results/wrong_frames_gallery/`: frames 20–50 px off are
+  within what can be placed by eye (dark core vs. wider ring of the pupil); frames > 50 px are visibly wrong.
+  "Must fix" = > 50 px; > 20 px is reported only. A blind re-label test (40 frames, `scripts/relabel_test.py`) was
+  prepared, labeled once and lost in a save failure; not repeated.
+- **Two families.** A: sporadic large errors (> 50 px; pupil_left is the worst point in 21 of the 32 frames; 13 frames
+  have one point > 50 px, 19 several). fit_pupil at 5 % flagged catches 27 of 32 (84 %), at 9.2 % 30 of 32; the 5
+  missed at 5 % are 51–54 px frames without a jump plus two low-confidence smooth ones.
+  B: moderate, direction-consistent offsets (10–50 px) on pupil_top / pupil_left, invisible to every label-free signal,
+  now classed as label noise. Consequence for the area series: at 20–30 px frame RMSE the four-point area differs from
+  the labeled one by 29 % (median), so the area cannot be claimed better than ≈ 20–30 % per frame under this tier.
+- **Per-frame human repair is out.** fit_pupil at 5 % (2.99 % of the eye width) flags 69 907 frames in 18 543 runs over
+  the 19 whole videos (median run 1 frame). Human cost can only be "labels per video" (retraining) or zero.
+- **Drop baseline** (`repair_baselines.py`): dropping the flagged frames from the area series moves the median area by
+  ≤ 6 %, leaves > 50 px frames at 0.6 % of the remaining truth frames (0.3 % at the 9.2 % rule), timing impact none; the
+  blink series is left untouched (the flag concerns the pupil). Interpolation inside short runs is a coin toss.
+- **Error modes** (`error_modes.py`, video 8): clusters of the model's own output are eye states in blocks of time; the
+  state of the last six minutes holds 35 of the 38 wrong truth frames and all 9 > 50 px. The test and validation
+  windows are the last four minutes of every video (select_frames.py), the training pool the earlier part; video 8's
+  labels came mostly from minutes 0–10. 20 pool frames of that state are extracted to `labels/modes01/` (not labeled).
+- In video 8 the > 50 px frames are the extreme of one systematic mode (pupil_left ≈ 120 px left and pupil_bottom
+  ≈ 60 px low in all 9); pupil_left has a strong second heatmap peak (ratio 0.5–0.98) in 6 of the 9.
+
+Next, A family at the 50-px tier: (1) geometry-checked second-peak repair on video 8 (inference pass storing peak-2
+coordinates); (2) retrain with the 20 mode frames, count > 50 px on the 70 truth frames against the 40-label model of
+the main line; (3) 2026-10-31: drop vs. repair, acceptable residual.

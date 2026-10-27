@@ -83,13 +83,22 @@ def make():
     print(f"key written to {KEY} (do not open it before labeling)")
 
 
+DUMMY = "img041.png"   # an all-black extra image with one placeholder point: napari-deeplabcut 0.3.1 cannot advance to
+                       # the next key point when the label layer is empty (id becomes nan), so the layer must hold one
+                       # real point; it sits on this black frame, which the labeler skips, and eval() ignores it
+
+
 def write_empty_label_file(names):
-    """An all-NaN CollectedData_Zhiheng file in the same format as the existing label sets, so napari-deeplabcut
-    opens the folder as a label set with no points and saves back into the same file."""
+    """A CollectedData_Zhiheng file in the same format as the existing label sets: all 40 test images NaN, plus the
+    dummy frame with one point, so napari-deeplabcut opens the folder as a label set and saves back into the file."""
     template = HERE / "8_20251024_Pluto_spont1" / "training-data" / "labels" / "test50" / "CollectedData_Zhiheng.h5"
     cols = pd.read_hdf(template).columns
-    idx = pd.MultiIndex.from_tuples([("labels", LABEL_DIR.name, n) for n in names])
+    # napari-deeplabcut addresses rows by the last three path parts of the image (parent of parent, parent, file)
+    idx = pd.MultiIndex.from_tuples([(LABEL_DIR.parent.name, LABEL_DIR.name, n) for n in names + [DUMMY]])
     df = pd.DataFrame(np.nan, index=idx, columns=cols)
+    df.loc[(LABEL_DIR.parent.name, LABEL_DIR.name, DUMMY), [("Zhiheng", "pupil_top", "x"), ("Zhiheng", "pupil_top", "y")]] = [20.0, 20.0]
+    from PIL import Image
+    Image.new("RGB", Image.open(LABEL_DIR / names[0]).size, (0, 0, 0)).save(LABEL_DIR / DUMMY)
     df.to_hdf(LABEL_DIR / "CollectedData_Zhiheng.h5", key="df_with_missing", mode="w")
     df.to_csv(LABEL_DIR / "CollectedData_Zhiheng.csv")
 
@@ -114,6 +123,7 @@ def read_new_labels():
             d[f"new_{bp}_x"] = float(row[(sc, bp, "x")])
             d[f"new_{bp}_y"] = float(row[(sc, bp, "y")])
         rows[name] = d
+    rows.pop(DUMMY, None)
     return pd.DataFrame.from_dict(rows, orient="index").rename_axis("blind_name").reset_index()
 
 

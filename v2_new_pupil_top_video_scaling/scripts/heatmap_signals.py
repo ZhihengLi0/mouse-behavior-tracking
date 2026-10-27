@@ -17,7 +17,12 @@ Per key point and frame (heatmap as the predictor sees it, negative values set t
   entropy         entropy of the normalised heatmap divided by log(cells) (0 = one cell, 1 = flat)
   mass_near       share of the heatmap mass within 12 px of peak1
 
-usage: heatmap_signals.py --video 8 [--shuffle 911] [--limit 300] [--batch 32] [--eval]
+usage: heatmap_signals.py --video 8 [--shuffle 911] [--limit 300] [--batch 32] [--eval] [--peaks]
+
+--peaks (added 2026-10-26, P2): additionally store the heatmap CELL coordinates of peak 1 and peak 2 and the stride,
+per key point, in a second file videoNN_shuffleSSSS_peaks.csv (the regressed x, y come from peak 1 plus the location
+refinement, so the pixel position of peak 2 is peak-2 cell * stride + the median offset (x - x1 * stride) measured on
+peak 1). The default outputs are unchanged.
 """
 import argparse
 import math
@@ -39,6 +44,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 MODELS = PROJECT / "dlc-models-pytorch" / "iteration-0"
 T0 = time.time()
 STATS = ["peak1", "peak2", "ratio", "dist_px", "n_peaks", "entropy", "mass_near"]
+PEAKS = ["x1c", "y1c", "x2c", "y2c", "stride"]
 
 
 def unit_of(video):
@@ -56,7 +62,7 @@ def plateau_shuffle(video):
     return int(re.search(r"shuffle(\d+)_", h5[-1].name).group(1)), step, h5[-1]
 
 
-def heatmap_stats(H, stride):
+def heatmap_stats(H, stride, peaks=False):
     """H: (B, K, h, w) heatmaps after sigmoid. Returns (B, K, len(STATS)) float32 on CPU."""
     B, K, h, w = H.shape
     flat = H.reshape(B, K, -1)
@@ -77,10 +83,15 @@ def heatmap_stats(H, stride):
     entropy = -(P * torch.log(P.clamp_min(1e-12))).sum(dim=2) / math.log(h * w)
     near = (d * stride <= 12.0).reshape(B, K, -1)
     mass_near = (flat * near).sum(dim=2) / flat.sum(dim=2).clamp_min(1e-12)
-    return torch.stack([peak1, peak2, peak2 / peak1.clamp_min(1e-6), dist_px, n_peaks, entropy, mass_near], dim=2).cpu().numpy()
+    S = torch.stack([peak1, peak2, peak2 / peak1.clamp_min(1e-6), dist_px, n_peaks, entropy, mass_near], dim=2)
+    if peaks:
+        x2 = torch.where(peak2 > 0, x2, torch.full_like(x2, float("nan")))
+        y2 = torch.where(peak2 > 0, y2, torch.full_like(y2, float("nan")))
+        S = torch.cat([S, torch.stack([x1, y1, x2, y2, torch.full_like(x1, stride)], dim=2)], dim=2)
+    return S.cpu().numpy()
 
 
-def build_runner(shuffle, batch, device, store):
+def build_runner(shuffle, batch, device, store, peaks=False):
     from deeplabcut.pose_estimation_pytorch.apis.utils import get_pose_inference_runner
     folder = next(MODELS.glob(f"*shuffle{shuffle}"))
     snap = folder / "train" / "snapshot-120.pt"
@@ -99,7 +110,7 @@ def build_runner(shuffle, batch, device, store):
                 H = torch.sigmoid(H)
             # this model's predictor does not apply a sigmoid (clip_scores instead): the raw map can be slightly
             # negative or above 1, so negative values are set to 0 before the mass and entropy are computed
-            store.append(heatmap_stats(H.float().clamp(min=0), float(stride)))
+            store.append(heatmap_stats(H.float().clamp(min=0), float(stride), peaks))
             n = sum(len(a) for a in store)
             if n // 2000 != (n - len(store[-1])) // 2000:  # the runner returns its list only at the end, so
                 print(f"{n} frames  {(time.time() - T0) / 60:.1f} min", flush=True)  # progress is logged here
@@ -120,11 +131,11 @@ def frames(video_path, limit):
     print("frames in video:", n)
 
 
-def run(video, shuffle, limit, batch, device):
+def run(video, shuffle, limit, batch, device, peaks=False):
     unit = unit_of(video)
     video_path = HERE / unit / f"{unit}.mp4"
     store = []
-    runner, snap = build_runner(shuffle, batch, device, store)
+    runner, snap = build_runner(shuffle, batch, device, store, peaks)
     print("model", snap)
     t0 = time.time()
     preds = [np.asarray(p["bodyparts"])[0, :, :3]  # (K, 3): x, y, conf of the single individual
@@ -139,6 +150,14 @@ def run(video, shuffle, limit, batch, device):
             cols[f"{bp}_{s}"] = S[:, k, j]
     D = pd.DataFrame(cols)
     tag = f"video{video:02d}_shuffle{shuffle}" + (f"_first{limit}" if limit else "")
+    if peaks:
+        pc = {"frame": np.arange(len(poses))}
+        for k, bp in enumerate(BPS):
+            pc[f"{bp}_x"], pc[f"{bp}_y"] = poses[:, k, 0], poses[:, k, 1]
+            for j, s in enumerate(PEAKS):
+                pc[f"{bp}_{s}"] = S[:, k, len(STATS) + j]
+        pd.DataFrame(pc).to_csv(OUT / f"{tag}_peaks.csv", index=False, float_format="%.3f")
+        print(f"written {OUT / f'{tag}_peaks.csv'}")
     D.to_csv(OUT / f"{tag}.csv", index=False, float_format="%.4f")
     print(f"written {OUT / f'{tag}.csv'}  {len(D)} frames  {(time.time() - t0) / 60:.1f} min")
     return D
@@ -220,6 +239,7 @@ def main():
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--device", default="mps")
     ap.add_argument("--eval", action="store_true", help="only evaluate an existing full-video csv")
+    ap.add_argument("--peaks", action="store_true", help="also store peak-1 / peak-2 cell coordinates (second file)")
     a = ap.parse_args()
     shuffle, step, h5 = plateau_shuffle(a.video)
     if a.shuffle:
@@ -228,7 +248,7 @@ def main():
     if a.eval:
         D = pd.read_csv(OUT / f"video{a.video:02d}_shuffle{shuffle}.csv")
     else:
-        D = run(a.video, shuffle, a.limit, a.batch, a.device)
+        D = run(a.video, shuffle, a.limit, a.batch, a.device, a.peaks)
     check_against_saved(D, h5)
     if not a.limit:
         evaluate(a.video, D)
