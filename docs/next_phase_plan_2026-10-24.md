@@ -203,3 +203,26 @@ Results: `results/tier50_reeval/`, `results/second_peak_repair/` (READMEs there)
 Next: (1) video 1 second-peak result → drop vs. repair for family A; (2) label the 20 mode frames of video 8 and
 retrain (needs an extra-sets option in `scale_step.py`); (3) 2026-10-31: detector = largest-of-8 fitting deviation at
 the 50-px tier, drop as the default fix, mode-targeted labels for the core-vs-ring state.
+
+## P2 ▶ 2026-10-27 (overnight): the same three analyses on videos 1, 2, 11, 4
+
+Results: `results/second_peak_repair/README.md`, `results/error_modes/README.md`, `results/heatmap_signals/README.md`.
+Five videos now have the heatmap-peaks pass, the error-mode clustering and the second-peak repair: two clean ones
+(2, 11), the family-A video 1, and the two blurry ones (8, 4).
+
+- **The per-frame second-peak rule works on family A and fails on the video-8 mode.** Of the 27 > 50 px truth frames of
+  the five videos it repairs 12 (7 to below 20 px) and drops 12; two closed-eye frames are left alone and one video-8
+  frame remains. On the 238 frames ≤ 20 px of videos 1, 2, 11, 4 nothing is made worse and one is dropped. Video 1: 6 of
+  8 repaired (pupil_left back from 230–420 px to 10–31 px), 2 dropped. Video 2: all 4 dropped (pupil_top throws with
+  no valid second peak). Video 11: 2 repaired to ≈ 11 px, 2 closed-eye frames untouched. Video 4: both repaired to
+  33 / 38 px and 8 moderate frames improved, because its error is a third kind — pupil_right on the corneal reflection,
+  sustained, not jumpy — which the second peak fixes but the time series does not flag (17 % of the video touched,
+  5 % flagged). Video 8 stays unrepairable (core-vs-ring).
+- **Clustering is only informative where a whole eye state is wrong.** On videos 1, 2, 11, 4 the clusters span the
+  whole video and the > 50 px frames sit in clusters of ≈ 1 % of frames that are the throw frames themselves (what the
+  time series already finds); the time-block structure with one error-holding state is specific to video 8.
+- Heatmap entropy adds nothing on these videos either (AUC 0.43–0.86 vs 0.98–1.00 for the fitting signal).
+
+For 2026-10-31: finder = largest-of-8 fitting deviation (jumps) plus the per-frame geometry check (sustained wrong
+targets); fixer for family A = second peak where the frame then passes the geometry, else drop; video 8's mode =
+labels of that state.
