@@ -226,3 +226,28 @@ Five videos now have the heatmap-peaks pass, the error-mode clustering and the s
 For 2026-10-31: finder = largest-of-8 fitting deviation (jumps) plus the per-frame geometry check (sustained wrong
 targets); fixer for family A = second peak where the frame then passes the geometry, else drop; video 8's mode =
 labels of that state.
+
+## P2 ▶ 2026-10-27/28 (night): one pipeline, the chosen detector in front, run the same way on ten videos
+
+User, 10-27: the geometry check that gated the repair was itself a second "find the suspicious frame" rule; the finder
+and the fixer must be one system, and anything that does not help the conclusion goes. `results/geometry_detector/`
+ranks the geometry check as a detector (AUC 0.86 vs 0.99 for the largest-of-8 fitting deviation, 27 vs 31 of 32; the OR
+adds nothing), so the finder stays the detector chosen at the 50-px tier and the geometry check is only the acceptance
+test of the repair. `results/second_peak_repair/README.md`, last section: this pipeline on videos 1, 2, 4, 8, 10, 11,
+14, 15, 17, 18.
+
+- 32 > 50 px frames: 13 repaired (8 to < 20 px), 10 dropped, 9 left (4 marginal video-8 frames under the 44 px
+  threshold, 4 frames the eyelid rule calls closed, 1 = video 14 frame 61431 that no detector sees). 0 good frames
+  made worse, 1 good frame dropped, in 471 frames ≤ 20 px. Clean video 17: nothing touched among its truth frames,
+  0.6 % of the whole video touched.
+- Whole-video cost 0.6–9.3 % of frames touched per video, drops 0.3–5.4 %; no interpolation, no smoothing.
+- The detector is not a new algorithm: it is the fitting rule of 8.1 with the largest of the 8 points instead of the
+  mean, a simpler model order ((2,0,0) instead of (3,0,1)) and the threshold set at 5 % flagged (≈ 44 px). At 50 px the
+  originals catch 25 (fitting), 21 (jump), 17 (uncertain) of 32; this one 31.
+- Known blind spots for 10-31: sustained wrong targets that do not jump (video 4's pupil_right on the corneal glint;
+  14 % of that video violates the geometry but is never flagged), the core-vs-ring state of video 8 (only labels of
+  that state can fix it), and frames where the model's own eyelid points make the frame look closed.
+- Proposed clean-up (awaiting the user's confirmation): the geometry-first results and their band-width variants, the
+  geometry-as-detector table, the clustering of videos 1, 2, 11, 4, the heatmap-entropy pilots of those videos, the
+  abandoned blind re-label test and the moot missed-frames list; page 8.2 condensed to "the other signals do not beat
+  fitting", 8.2/8.3 rewritten for the 50-px tier and the repair rule.

@@ -1,0 +1,2 @@
+video,frames,k_mad,bands,trigger,thr_o200_px,flag_o200_pct,ok,closed,flagged_ok,unflagged_violation,repaired,drop,repaired_pct,drop_pct,unflagged_violation_pct,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right
+10,71748,5.0,pooled,fit_o200_max,44.2,2.87,68957,537,737,640,393,484,0.55,0.67,0.89,51,36,290,59
