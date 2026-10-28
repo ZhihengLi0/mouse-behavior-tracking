@@ -1,0 +1,2 @@
+video,frames,k_mad,bands,ok,closed,repaired,drop,repaired_pct,drop_pct,flag_o200_pct,flag_pupil_pct,repaired_and_flag_o200,drop_and_flag_o200,flag_o200_and_ok,thr_o200_px,thr_pupil_px,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right
+1,71748,7.0,pooled,65795,474,3975,1504,5.54,2.1,16.51,14.97,3965,1496,5908,44.2,12.8,139,19,3775,85

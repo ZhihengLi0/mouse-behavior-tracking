@@ -102,3 +102,47 @@ only flagged frames" the video-4 repairs would mostly not be applied.
 Script note: `scripts/error_modes.py` (2026-10-27) now skips the `_peaks.csv` files when it looks for a video's heatmap
 statistics (it took the last file in sorted order, which after a `--peaks` run was the peaks file; videos 1 and 2 were
 re-clustered after the fix, video 8 was unaffected).
+
+## Two systems, the same experiments on every video (2026-10-27 night)
+
+User, 10-27: the geometry check above is itself a "find the suspicious frame" rule, and the finder and the fixer should
+be one system. `results/geometry_detector/README.md` ranks the geometry check as a detector on the 1330 truth frames:
+AUC 0.86 against 0.99 for fit_o200_max, 27 against 31 of the 32 > 50 px frames at the same flagged share, and the OR of
+the two catches nothing more. So two complete systems are compared, both zero-human, per frame, without smoothing:
+
+- **System A (geometry)** — find = geometry check; fix = peak 2 if the frame then passes the check, else drop.
+  (`scripts/second_peak_repair.py`, folders `videoNN/`; parameter variants `videoNN_k3/`, `videoNN_k7/`, `videoNN_own/`
+  via the `--tag` option added 10-27, default output unchanged.)
+- **System B (time series triggered)** — find = fit_o200_max (largest-of-8 fitting deviation, SARIMAX (2,0,0), pooled
+  threshold 44 px = the detector chosen at the 50-px tier); fix = on flagged open frames only, replace the geometry-
+  violating pupil points or the point with the largest deviation by peak 2 and accept the smallest replacement after
+  which the geometry check passes, else drop; a flagged frame that passes the check untouched stays as it is
+  ("flagged_ok"); unflagged frames are never touched even if they violate the geometry ("unflagged_violation").
+  (`scripts/triggered_repair.py`, folders `videoNN_trig/`, same summary columns.)
+
+Truth frames (70 per video), the > 50 px frames and the frames ≤ 20 px:
+
+| video | > 50 px | A: repaired < 50 (< 20) / dropped / left | B: repaired < 50 (< 20) / dropped / left | false repairs / false drops A → B | whole video repaired + dropped A → B | B: unflagged geometry violations |
+|---|---|---|---|---|---|---|
+| 1 | 8 | 6 (5) / 2 / 0 | 6 (5) / 2 / 0 | 0 / 1 → 0 / 1 | 9.3 % → 8.1 % | 1.3 % |
+| 2 | 4 | 0 / 4 / 0 | 1 (1) / 3 / 0 | 0 / 0 → 0 / 0 | 1.5 % → 1.5 % | 0.1 % |
+| 11 | 4 | 2 (2) / 0 / 2 closed | 2 (2) / 0 / 2 closed | 0 / 0 → 0 / 0 | 1.0 % → 1.0 % | 0.0 % |
+| 4 | 2 | 2 (0) / 0 / 0 | 2 (0) / 0 / 0 | 0 / 0 → 0 / 0 | 17.3 % → 2.9 % | 14.4 % |
+| 8 | 9 | 2 (0) / 6 / 1 | 2 (0) / 3 / 4 | 2 / 3 → 0 / 0 | 18.0 % → 8.5 % | 9.6 % |
+
+- **B is the coherent system and the safer one**: 0 false repairs and 0 false drops on all five videos (A: 2 and 3, all
+  in video 8), the same > 50 px frames repaired in videos 1, 11, 4 and one more in video 2 (frame 68672, pupil_top 74 → 7 px:
+  the largest-deviation point was added to the candidates), and half the drops on the whole videos (video 8 13.5 → 5.4 %,
+  video 1 3.9 → 2.7 %).
+- **What B gives up**: (1) the sustained glint mode of video 4 — 14 % of its frames violate the geometry but are never
+  flagged by the time series, so B leaves them (A repaired 10 of the 70 truth frames there, median error 14.7 → 13.7 px);
+  (2) four video-8 frames at 50–55 px whose fitting deviation is 36–40 px, under the pooled 44 px threshold (the
+  leave-one-video-out threshold of `tier50_reeval` is lower for video 8 and catches them). Both are the two finders'
+  known difference (jumps vs sustained wrong targets) and belong in the 10-31 discussion, not in the pipeline.
+- **Band width** (`videoNN_k3/`, `_k7/`, `_own/`; k = 5 with the pooled scale is the default): k = 3 produces false
+  drops on every video (video 1: 4 of 61 frames ≤ 20 px; video 8: 9, and 24 % of the whole video dropped) for one
+  extra repair on video 2; k = 7 and the video's own MAD drop less (video 8: 6–8 % instead of 13.5 %) but leave more
+  video-8 frames unrepaired (1 of 9 instead of 2) and k = 7 keeps one > 50 px frame. The default is kept.
+
+Every video that gets the peaks pass gets the same five folders (`videoNN`, `_k3`, `_k7`, `_own`, `_trig`); the
+whole-video shares of A and B per video are in each folder's `whole_video.csv`.

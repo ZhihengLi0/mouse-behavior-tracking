@@ -1,0 +1,5 @@
+signal,n_scored,flagged_pct,caught50,recall50,prec50,caught20,recall20
+geo rule (k=5 or hard violation),1330,5.3,27,84.4,38.6,54,34.8
+fit_o200_max 5 % flag,1330,6.0,31,96.9,38.8,59,38.1
+"OR(geo rule, fit_o200_max 5 %)",1330,7.9,31,96.9,29.5,72,46.5
+"AND(geo rule, fit_o200_max 5 %)",1330,3.4,27,84.4,60.0,41,26.5
