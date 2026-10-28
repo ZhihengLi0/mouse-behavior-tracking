@@ -1,9 +1,9 @@
 # New pupil standard: labels needed per video
 
-Era 3 of the project (from 2026-09-20). The pupil is labeled as an ELLIPSE: `pupil_top / bottom / left / right`
+Era 3 of the project (2026-09-20 to 2026-10-12: all 19 videos finished; since 2026-10-24 the same folder hosts the unreliable-frames work, see `results/`). The pupil is labeled as an ELLIPSE: `pupil_top / bottom / left / right`
 are the four endpoints of the ellipse fitted to the pupil, including the part hidden under the upper lid.
 Eyelids and eye corners keep the earlier strategy (lid points at the middle of each lid arc, corners at the
-corners; they only serve blink detection). Numbers from the earlier eras (`../old_pupil_top/`) are not comparable.
+corners; they only serve blink detection). Numbers from the earlier eras (`../v1_old_pupil_top/`) are not comparable.
 
 Fixed choices carried over from the earlier work: ResNet-50, batch 2, from scratch, final snapshot - now 120 epochs with LR milestones [96, 114] (2026-09-20) -,
 k-means (DoG fingerprints) for the first batch, jump rule + k-means for later batches, median per-frame RMSE over
@@ -26,16 +26,24 @@ results/                 ACROSS videos: x = number of videos, y = labels needed 
   results/               WITHIN this video: x = labels on this video (20, 40, 60, ...), y = test error
     selection_sheets/    one sheet per selected batch: clusters + time series of the chosen frames
     blink_area_analysis/ per-video time series (pupil area 4-point / 3-point, eye opening, confidence) and blink / area studies
-1_20251031_Pluto_spont_1/ video 1 (mouse B, 19.9 min), same layout
-2_20251031_Pluto_spont_3/      video 2 (mouse B, 2025-10-31, Drive session spont_3; formerly "pluton2"), same layout
-3_20251031_Pluto_spont_2/       video 3 (mouse B, 2025-10-31, Drive session spont_2; formerly "pluto3"), same layout
-4_20251030_Pluto_spont_1/ video 4 (mouse B, 2025-10-30; poor image quality), same layout
-5_20251029_Pluto_spont_1/ video 5 (mouse B, 2025-10-29): frozen test set only (scored by every model)
-6_20251028_Pluto_spont_1/ video 6 (mouse B, 2025-10-28): frozen test set only (scored by every model)
-7_20251027_Pluto_spont1/  video 7 (mouse B, 2025-10-27): frozen test set only (scored by every model)
-8_20251024_Pluto_spont1/  video 8 (mouse B, 2025-10-24): frozen test set only (scored by every model)
-9_20251023_Pluto1/       video 9 (mouse B, 2025-10-23): test set being labeled
-10_20251022_Pluto1/      video 10 (mouse B, 2025-10-22): finished at 40 labels, 10.32 px
+1_20251031_Pluto_spont_1/ video 1 (mouse B "Pluto", 2025-10-31, 19.9 min), same layout; finished at 20 labels, 10.37 px
+2_20251031_Pluto_spont_3/ video 2 (Pluto, 2025-10-31, Drive session spont_3): 20 labels, 7.73 px
+3_20251031_Pluto_spont_2/ video 3 (Pluto, 2025-10-31, Drive session spont_2): 20 labels, 3.40 px
+4_20251030_Pluto_spont_1/ video 4 (Pluto, 2025-10-30; poor image quality; run 2 under convention v2): 40 labels, 15.01 px
+5_20251029_Pluto_spont_1/ video 5 (Pluto, 2025-10-29): 20 labels, 15.85 px
+6_20251028_Pluto_spont_1/ video 6 (Pluto, 2025-10-28): 20 labels, 6.75 px
+7_20251027_Pluto_spont1/  video 7 (Pluto, 2025-10-27): 0 labels, 5.36 px (the video-6 model already fits this day)
+8_20251024_Pluto_spont1/  video 8 (Pluto, 2025-10-24; hard day): 20 labels, 25.34 px
+9_20251023_Pluto1/        video 9 (Pluto, 2025-10-23): 80 labels, 8.20 px
+10_20251022_Pluto1/       video 10 (Pluto, 2025-10-22; last Pluto day): 40 labels, 10.32 px
+11_20251017_Terra_spont_1/ video 11 (mouse C "Terra", 2025-10-17; first day of a new mouse): 40 labels, 8.86 px
+12_20251016_Terra_spont_2/ video 12 (Terra, 2025-10-16): 0 labels, 5.13 px (the video-11 model already fits this day)
+13_20251015_Terra_spont_1/ video 13 (Terra, 2025-10-15): 20 labels, 9.43 px
+14_20251014_Terra_spont_1/ video 14 (Terra, 2025-10-14): 60 labels, 10.30 px
+15_20251013_Terra_spont_1/ video 15 (Terra, 2025-10-13): 40 labels, 9.73 px
+16_20251010_Terra_spont_1/ video 16 (Terra, 2025-10-10): 40 labels, 7.15 px
+17_20251009_Terra_spont_1/ video 17 (Terra, 2025-10-09): 40 labels, 4.47 px
+18_20251008_Terra_spont_1/ video 18 (Terra, 2025-10-08; the last video): 40 labels, 12.38 px
 ```
 
 Per video: 50 test frames (final 10%, at least 60 s), 20 validation frames (the 10% before), 2-s guard bands,
@@ -49,4 +57,4 @@ training batches of 20 from the remaining pool.
   largest jump first, under the same 1-s spacing (and only if that is still not enough, from the 2,000 largest
   jumps of the pool). Batch 3 = 11 medoids + 9 flagged frames; the threshold itself was not relaxed.
 
-Units 11-18 (added 2026-09-30): mouse C "Terra", one recording day each, newest first - `11_20251017_Terra_spont_1`, `12_20251016_Terra_spont_2`, `13_20251015_Terra_spont_1`, `14_20251014_Terra_spont_1`, `15_20251013_Terra_spont_1`, `16_20251010_Terra_spont_1`, `17_20251009_Terra_spont_1`, `18_20251008_Terra_spont_1` (names = the lab Google Drive session names; 10-16 has no spont_1). Same layout as the Pluto units; they start after video 10.
+Units 11-18 (added 2026-09-30, all finished by 2026-10-12): mouse C "Terra", one recording day each, newest first - `11_20251017_Terra_spont_1`, `12_20251016_Terra_spont_2`, `13_20251015_Terra_spont_1`, `14_20251014_Terra_spont_1`, `15_20251013_Terra_spont_1`, `16_20251010_Terra_spont_1`, `17_20251009_Terra_spont_1`, `18_20251008_Terra_spont_1` (names = the lab Google Drive session names; 10-16 has no spont_1). Same layout as the Pluto units; they start after video 10.
