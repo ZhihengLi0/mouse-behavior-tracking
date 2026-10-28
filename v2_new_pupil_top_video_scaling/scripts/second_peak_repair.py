@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Automatic per-frame repair of sporadic big errors by a geometry-checked second heatmap peak (P2 step 3, pilot).
 
-    python second_peak_repair.py --video 8 [--k-mad 5] [--bands pooled|own] [--sheet]
+    python second_peak_repair.py --video 8 [--k-mad 5] [--bands pooled|own] [--sheet] [--tag NAME]
 
 Idea: a > 50 px frame is usually one pupil point thrown far (pupil_left in 21 of the 32 truth frames) while the
 predictor's heatmap for that point often has a second, nearly as strong peak at the right place. Nothing temporal is
@@ -208,8 +208,9 @@ def main():
     ap.add_argument("--k-mad", type=float, default=5.0)
     ap.add_argument("--bands", choices=["pooled", "own"], default="pooled")
     ap.add_argument("--sheet", action="store_true", help="also write the contact sheet of the repaired / dropped truth frames (local jpg)")
+    ap.add_argument("--tag", default="", help="suffix of the output folder (videoNN_TAG) for parameter variants; default folder videoNN")
     a = ap.parse_args()
-    out = RES / "second_peak_repair" / f"video{a.video:02d}"
+    out = RES / "second_peak_repair" / (f"video{a.video:02d}" + (f"_{a.tag}" if a.tag else ""))
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
