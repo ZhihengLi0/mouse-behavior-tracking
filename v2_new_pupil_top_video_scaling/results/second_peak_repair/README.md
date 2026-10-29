@@ -147,7 +147,7 @@ Truth frames (70 per video), the > 50 px frames and the frames ≤ 20 px:
 Every video that gets the peaks pass gets the same five folders (`videoNN`, `_k3`, `_k7`, `_own`, `_trig`); the
 whole-video shares of A and B per video are in each folder's `whole_video.csv`.
 
-## The chosen pipeline on ten videos (overnight 2026-10-27/28, `videoNN_trig/` folders, `scripts/triggered_repair.py`)
+## The chosen pipeline on fourteen videos (overnights 2026-10-27/28 and 10-28/29, `videoNN_trig/` folders, `scripts/triggered_repair.py`)
 
 User, 10-27 night: keep one pipeline, the one whose finder is the detector chosen at the 50-px tier, and run it the same
 way on every video — no clustering, no band-width variants, no geometry-first version from here on. The pipeline:
@@ -155,7 +155,9 @@ way on every video — no clustering, no band-width variants, no geometry-first 
 replace the geometry-violating pupil points or the point with the largest deviation by the heatmap's second peak and
 accept the smallest replacement after which the geometry check passes; **else drop**; a flagged frame that already
 passes the check and every unflagged frame stay as they are. Videos 10, 14, 17, 18, 15 got the peaks pass tonight
-(88 min each) and the repair (seconds); the five earlier videos are re-listed with the same pipeline.
+(88 min each) and the repair (seconds); the five earlier videos are re-listed with the same pipeline. Videos 5, 3, 9 and 13 followed on the night of
+10-28/29; none of them has a truth frame above 50 px, so on them the run measures only what the pipeline does where
+nothing is wrong. Videos 12, 0, 16, 6 and 7 are still missing.
 
 | video | labels | truth > 50 px | repaired to < 50 (< 20) | dropped | left: closed / unflagged / passes the check | frames ≤ 20 px made worse / dropped | median error before → after (kept) | flagged | whole video repaired / dropped |
 |---|---|---|---|---|---|---|---|---|---|
@@ -169,19 +171,24 @@ passes the check and every unflagged frame stay as they are. Videos 10, 14, 17, 
 | 17 | 4.7 | 0 | – | – | – | 0 / 0 | 4.7 → 4.7 | 1.5 % | 0.2 % / 0.4 % |
 | 18 | 12.4 | 0 | – | – | – | 0 / 0 | 11.2 → 11.2 | 9.7 % | 3.8 % / 1.4 % |
 | 15 | 9.7 | 0 | – | – | – | 0 / 0 | 10.4 → 10.4 | 9.4 % | 2.2 % / 1.1 % |
+| 5 | 13.3 | 0 | – | – | – | 0 / 0 | 13.3 → 13.3 | 1.1 % | 0.03 % / 0.1 % |
+| 3 | 3.3 | 0 | – | – | – | 0 / 0 | 3.3 → 3.3 | 3.2 % | 0.2 % / 0.3 % |
+| 9 | 9.0 | 0 | – | – | – | 0 / 0 | 9.0 → 9.0 | 2.2 % | 0.4 % / 0.6 % |
+| 13 | 9.4 | 0 | – | – | – | 0 / 0 | 9.4 → 9.4 | 1.7 % | 0.4 % / 0.4 % |
 
-- **32 > 50 px frames in the ten videos: 13 repaired (8 to below 20 px), 10 dropped, 9 left.** Of the 9 left: 4 are
+- **32 > 50 px frames in the fourteen videos (all of them in the first ten): 13 repaired (8 to below 20 px), 10 dropped, 9 left.** Of the 9 left: 4 are
   marginal video-8 frames (50–55 px, deviation 36–40 px, under the pooled 44 px threshold), 2 + 2 are frames the eyelid
   rule calls closed (video 11, and video 10 frames 61053 / 70136 where the model's eyelid points are themselves wrong, so
   "closed" is the model's error, not the eye's), 1 is video 14 frame 61431 (51 px, deviation 11 px: no jump, no geometry
   violation — the frame missed by every detector). Among the kept frames 9 remain above 50 px; none of the kept frames
   that were below 50 px went above it.
-- **False changes: 0 repairs made worse, 1 drop** (video 1, a 16 px frame) on the 471 frames ≤ 20 px of the ten videos.
-  On the clean video 17 no truth frame is touched; on the whole video 0.2 % repaired and 0.4 % dropped is the
-  pipeline's cost where nothing is wrong.
-- **Whole-video cost**: 0.6–9.3 % of frames touched (repaired + dropped) per video; the share follows the flag share
-  (video 1 8 %, video 8 8.5 %, videos 18 / 15 5 % / 3 %, the clean videos ≈ 1 %). Drops are 0.3–5.4 % per video; nothing
+- **False changes: 0 repairs made worse, 1 drop** (video 1, a 16 px frame) on the 725 frames ≤ 20 px of the fourteen videos.
+  On the clean videos 17, 5, 3, 9 and 13 no truth frame is made worse (the one change, video 13 frame 67940, takes a
+  27 px frame to 10 px); on the whole videos 0.03–0.4 % repaired and 0.1–0.6 % dropped is the pipeline's cost where
+  nothing is wrong.
+- **Whole-video cost**: 0.2–9.3 % of frames touched (repaired + dropped) per video; the share follows the flag share
+  (video 1 8 %, video 8 8.5 %, videos 18 / 15 5 % / 3 %, the clean videos ≈ 1 %). Drops are 0.1–5.4 % per video; nothing
   is interpolated or smoothed, so the only timing effect is the dropped frames.
 - Video 10 frame 70282 and video 14 frame 64865 are multi-point throws (3–4 pupil points at once): dropped, as in
   video 2. Video 14 frame 59165 (27 px, pupil_right replaced, 27 → 41 px) is the one repair of a 20–50 px frame that got
-  worse — the only such case in ten videos.
+  worse — the only such case in fourteen videos.
