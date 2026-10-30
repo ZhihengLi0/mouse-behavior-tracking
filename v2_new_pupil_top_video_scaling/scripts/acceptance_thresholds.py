@@ -15,10 +15,10 @@ repair with a basis? Three candidates, each evaluated on the same candidate repa
             points (along coordinate; position inside the eyelid band as a fraction; the four ratios of
             second_peak_repair.Geometry) must each lie inside the min-max range of the 1330 human labels; no constant
 
-Candidate repairs = the truth frames flagged at the fitting threshold (results/fit_threshold/chosen.csv), eye open, with
-at least one pupil point over the threshold; every pupil point over the threshold is replaced by its second peak (the
-replacement of flag_and_repair.py --accept fit). Outcome: right if rmse_after <= rmse_before - 5 px, wrong if
-rmse_after >= rmse_before + 5 px, neutral otherwise. Cut for conf and jump = the value that maximises (share of right
+Candidate repairs = the truth frames flagged at the fitting threshold (results/fit_threshold/chosen.csv, in eye widths),
+eye open, with at least one pupil point over the threshold; every pupil point over the threshold is replaced by its
+second peak (the replacement of flag_and_repair.py --accept fit). Outcome, in eye widths: right if the frame error falls
+by more than 0.01 of the eye width, wrong if it grows by more than 0.01, neutral otherwise. Cut for conf and jump = the value that maximises (share of right
 repairs accepted) - (share of wrong repairs accepted), ties to the stricter cut; leave-one-video-out as for the
 flagging threshold. For labelgeo the leave-one-video-out number is the coverage: how many human labels of the held-out
 video fall outside the region built from the other 18 videos.
@@ -94,7 +94,7 @@ def video_candidates(v, thr):
     p2, off = peak2_pixels(d, P)
     B, scale = pooled_bands(RES / "second_peak_repair")
     G = Geometry(xy, scale)
-    dev = fwd["200"]
+    dev = fwd["200"] / G.Wm
     n = len(d)
     peak2 = {b: H[f"{b}_peak2"].to_numpy(float) for b in BPS}
     rows = []
@@ -114,7 +114,7 @@ def video_candidates(v, thr):
                 if 0 <= g < n and np.isfinite(xy[b][g]).all():
                     jumps.append(np.hypot(*(after[b] - xy[b][g])) / G.Wm)
         quant = eye_quantities(after, G.sign_lr, G.sign_tb)
-        rows.append({"video": v, "frame": f, "set": hr.set, "points": "+".join(cand), "rmse_before": frame_rmse(before, hr), "rmse_after": frame_rmse(after, hr),
+        rows.append({"video": v, "frame": f, "set": hr.set, "points": "+".join(cand), "rmse_before": frame_rmse(before, hr) / G.Wm, "rmse_after": frame_rmse(after, hr) / G.Wm,
                      "conf": min(peak2[b][f] for b in cand), "jump": max(jumps) if jumps else np.nan, **quant})
     return pd.DataFrame(rows), label_quantities(truth, G)
 
@@ -135,7 +135,7 @@ def cut(C, score, higher_is_better):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    thr = float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_px)
+    thr = float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_eye_widths)
     C, L = [], []
     for v in sorted(PL[PL.status == "final"].video.astype(int)):
         c, q = video_candidates(v, thr)
@@ -144,12 +144,13 @@ def main():
         L.append(q)
         print(f"video {v}: {len(c)} candidate repairs, {len(q)} fully labeled frames")
     C, L = pd.concat(C, ignore_index=True), pd.concat(L, ignore_index=True)
-    C["outcome"] = np.where(C.rmse_after <= C.rmse_before - 5, "right", np.where(C.rmse_after >= C.rmse_before + 5, "wrong", "neutral"))
+    C["outcome"] = np.where(C.rmse_after < C.rmse_before - 0.01, "right", np.where(C.rmse_after > C.rmse_before + 0.01, "wrong", "neutral"))
     R = region(L).set_index("quantity")
     C["labelgeo_inside"] = [inside(r, R) for _, r in C.iterrows()]
     C.round(4).to_csv(OUT / "candidates.csv", index=False)
     R.reset_index().round(4).to_csv(OUT / "label_region.csv", index=False)
-    print(f"\n{len(C)} candidate repairs: {dict(C.outcome.value_counts())}; > 50 px before: {int((C.rmse_before > 50).sum())}")
+    line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
+    print(f"\n{len(C)} candidate repairs: {dict(C.outcome.value_counts())}; wrong frames (> {line} eye widths) before: {int((C.rmse_before > line).sum())}")
 
     rows, lovo = [], []
     for score, hib in (("conf", True), ("jump", False)):

@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
-"""Choose the flagging threshold of the fitting deviation from the truth frames, the way the blink threshold was chosen.
+"""Choose the flagging threshold of the fitting deviation from the truth frames, in units of eye width.
 
     python fit_threshold.py
 
 The finder is fixed (user, 2026-10-30): the fitting deviation of DeepLabCut's outlier detection, SARIMAX (2,0,0) fitted on
 the whole video, one-step forward prediction, largest of the 8 key points (fit_o200_max in
-results/unreliable_frames_sweep/signals_all_frames.csv). What was open is the threshold: until now it was the 95 %
-quantile of the score on the truth frames (44 px), a budget of frames to flag with no basis in the errors themselves.
+results/unreliable_frames_sweep/signals_all_frames.csv), divided by the video's eye width (results/error_tier/
+eye_width.csv) so that the threshold carries over to another camera or distance.
 
-Here the threshold is read off the frames that must be found: the truth frames with frame RMSE > 50 px (32 of 1330).
-For every candidate threshold t: recall = share of the > 50 px frames with score > t; false share = share of the frames
-<= 50 px with score > t (user, 10-30: at the 50-px tier every frame at or below 50 px is a good frame, so flagging it is a
-false flag; the share among the <= 20 px frames is reported alongside). Chosen t = the one that
-maximises recall - false share (the usual ROC optimum, no free constant). Leave-one-video-out: the same rule on the other
-18 videos, applied to the held-out video, to see whether the pooled choice holds up.
+The threshold is read off the frames that must be found: the truth frames whose error is above the line of
+results/error_tier/tier.csv (0.14 of the eye width, 23 of 1330 frames). For every candidate threshold t: recall = share
+of the wrong frames with score > t; false share = share of all other frames (the good frames) with score > t.
+With the line at 0.14 every wrong frame has a score of at least 0.257, so the curve is flat at full recall from 0.04 up
+to 0.257 and the ROC optimum (max recall - false share) sits on the edge, at the smallest wrong frame's score: a
+threshold with no margin, which leave-one-video-out shows (20 of 23 caught). The threshold used is therefore the line
+itself: a frame is flagged when a point's fitting deviation exceeds the same amount of eye width that makes an error a
+wrong frame. One number for the whole pipeline, no extra constant, and a margin of almost two to the smallest wrong
+frame. The ROC optimum is kept in chosen.csv as the comparison; leave-one-video-out is reported for both rules.
 
-Outputs in results/fit_threshold/: threshold_curve.csv (every candidate), chosen.csv (pooled threshold and what it
-does), lovo.csv (per held-out video), fit_threshold_curve.png. Nothing existing is modified."""
+Outputs in results/fit_threshold/: threshold_curve.csv (every candidate), chosen.csv (the threshold in eye widths and
+its pixel equivalents, what it catches and flags), lovo.csv (per held-out video), fit_threshold_curve.png."""
 import sys
 from pathlib import Path
 
@@ -29,71 +32,79 @@ from scale_step import HERE  # noqa: E402
 RES = HERE / "results"
 OUT = RES / "fit_threshold"
 OUT.mkdir(parents=True, exist_ok=True)
-SCORE, BIG, CLEAN = "fit_o200_max", 50.0, 50.0
-TIGHT = 20.0
+SCORE = "fit_o200_max"
 
 
-def table(M, grid):
-    big, clean, tight = M[M.rmse > BIG], M[M.rmse <= CLEAN], M[M.rmse <= TIGHT]
+def table(M, grid, line):
+    wrong, good = M[M.error_rel > line], M[M.error_rel <= line]
     rows = []
     for t in grid:
-        rows.append({"threshold_px": t, "caught_gt50": int((big.score > t).sum()), "positives_gt50": len(big),
-                     "recall_gt50": (big.score > t).mean(), "flagged_le50": int((clean.score > t).sum()), "n_le50": len(clean),
-                     "false_share_le50": (clean.score > t).mean(), "flagged_le20": int((tight.score > t).sum()), "n_le20": len(tight),
-                     "false_share_le20": (tight.score > t).mean(), "flagged_share_all": (M.score > t).mean()})
+        rows.append({"threshold_eye_widths": t, "caught_wrong": int((wrong.score > t).sum()), "wrong_total": len(wrong), "recall": (wrong.score > t).mean(),
+                     "flagged_good": int((good.score > t).sum()), "good_total": len(good), "false_share": (good.score > t).mean(),
+                     "flagged_share_all": (M.score > t).mean()})
     T = pd.DataFrame(rows)
-    T["recall_minus_false"] = T.recall_gt50 - T.false_share_le50
+    T["recall_minus_false"] = T.recall - T.false_share
     return T
 
 
-def choose(M):
-    grid = np.unique(np.floor(M.score.to_numpy()))  # integer pixels: a threshold of t flags score > t
-    T = table(M, grid)
+def choose(M, line):
+    grid = np.unique(np.round(M.score.to_numpy(), 3))
+    T = table(M, grid, line)
     best = T.loc[T.recall_minus_false.idxmax()]
-    return float(best.threshold_px), T
+    return float(best.threshold_eye_widths), T
 
 
 def main():
+    line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
+    E = pd.read_csv(RES / "error_tier" / "truth_errors.csv")[["video", "frame", "error_rel", "eye_width_px"]]
     S = pd.read_csv(RES / "unreliable_frames_sweep" / "signals_all_frames.csv")[["video", "frame", SCORE]]
-    L = pd.read_csv(RES / "error_detector" / "scores_lovo.csv")
-    L = L[L.plateau].drop_duplicates(["video", "frame"])[["video", "frame", "frame_rmse_px"]]
-    M = L.merge(S, on=["video", "frame"], how="inner").rename(columns={SCORE: "score", "frame_rmse_px": "rmse"})
+    M = E.merge(S, on=["video", "frame"], how="inner")
+    M["score"] = M[SCORE] / M.eye_width_px
     assert len(M) == 1330 and M.score.notna().all(), len(M)
-    thr, T = choose(M)
+    W = pd.read_csv(RES / "error_tier" / "eye_width.csv").eye_width_px
+    opt, T = choose(M, line)
     T.round(4).to_csv(OUT / "threshold_curve.csv", index=False)
-    chosen = T[T.threshold_px == thr].iloc[0].to_dict()
-    old = T[T.threshold_px == 44].iloc[0].to_dict()
-    pd.DataFrame([{"rule": "max(recall - false share)", **chosen}, {"rule": "95 % quantile (previous)", **old}]).round(4).to_csv(OUT / "chosen.csv", index=False)
-    print(f"chosen threshold {thr:.0f} px: catches {chosen['caught_gt50']}/{chosen['positives_gt50']} > 50 px, flags {100 * chosen['false_share_le50']:.1f} % of the <= 50 px frames ({100 * chosen['false_share_le20']:.1f} % of the <= 20 px), {100 * chosen['flagged_share_all']:.1f} % of all truth frames")
-    print(f"previous 44 px: catches {old['caught_gt50']}/{old['positives_gt50']}, flags {100 * old['false_share_le50']:.1f} % ({100 * old['false_share_le20']:.1f} %) / {100 * old['flagged_share_all']:.1f} %")
+    rows = []
+    for rule, thr in (("threshold = the error line", line), ("max(recall - false share), comparison", opt)):
+        ch = table(M, [thr], line).iloc[0].to_dict()
+        ch.update({"rule": rule, "line_eye_widths": line, "threshold_px_min": round(thr * W.min(), 1), "threshold_px_median": round(thr * W.median(), 1), "threshold_px_max": round(thr * W.max(), 1)})
+        rows.append(ch)
+        print(f"{rule}: threshold {thr:.3f} eye widths (≈ {ch['threshold_px_median']} px) catches {ch['caught_wrong']}/{ch['wrong_total']}, "
+              f"flags {100 * ch['false_share']:.1f} % of the good frames, {100 * ch['flagged_share_all']:.1f} % of all truth frames")
+    pd.DataFrame(rows).round(4).to_csv(OUT / "chosen.csv", index=False)
+    thr = line
+    print("neighbourhood:")
+    print(T[(T.threshold_eye_widths >= 0.04) & (T.threshold_eye_widths <= 0.2)].iloc[::6][["threshold_eye_widths", "caught_wrong", "false_share", "flagged_share_all", "recall_minus_false"]].round(3).to_string(index=False))
 
     rows = []
     for v in sorted(M.video.unique()):
-        tv, _ = choose(M[M.video != v])
+        topt, _ = choose(M[M.video != v], line)
         H = M[M.video == v]
-        big, clean = H[H.rmse > BIG], H[H.rmse <= CLEAN]
-        rows.append({"held_out_video": v, "threshold_from_other_18_px": tv, "positives_gt50": len(big), "caught_gt50": int((big.score > tv).sum()),
-                     "flagged_le50": int((clean.score > tv).sum()), "n_le50": len(clean), "flagged_share_all": round(float((H.score > tv).mean()), 4)})
+        wrong, good = H[H.error_rel > line], H[H.error_rel <= line]
+        for rule, tv in (("line", line), ("roc_optimum", topt)):
+            rows.append({"rule": rule, "held_out_video": v, "threshold_from_other_18": tv, "wrong": len(wrong), "caught_wrong": int((wrong.score > tv).sum()),
+                         "flagged_good": int((good.score > tv).sum()), "good": len(good), "flagged_share_all": round(float((H.score > tv).mean()), 4)})
     Lv = pd.DataFrame(rows)
     Lv.to_csv(OUT / "lovo.csv", index=False)
-    print(Lv.to_string(index=False))
-    print(f"leave-one-video-out: thresholds {sorted(Lv.threshold_from_other_18_px.unique())}, caught {int(Lv.caught_gt50.sum())}/{int(Lv.positives_gt50.sum())}, "
-          f"flagged {int(Lv.flagged_le50.sum())}/{int(Lv.n_le50.sum())} of the <= 50 px frames")
+    for rule in ("line", "roc_optimum"):
+        s = Lv[Lv.rule == rule]
+        print(f"leave-one-video-out, {rule}: thresholds {sorted(s.threshold_from_other_18.unique())}, caught {int(s.caught_wrong.sum())}/{int(s.wrong.sum())}, "
+              f"flagged {int(s.flagged_good.sum())}/{int(s.good.sum())} good frames")
 
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(figsize=(8, 4.2), constrained_layout=True)
-    Tp = T[(T.threshold_px >= 5) & (T.threshold_px <= 120)]
-    ax.plot(Tp.threshold_px, 100 * Tp.recall_gt50, color="#2f6db3", lw=2, label="recall of the > 50 px frames (%)")
-    ax.plot(Tp.threshold_px, 100 * Tp.false_share_le50, color="#d1495b", lw=2, label="share of the <= 50 px frames flagged (%)")
-    ax.plot(Tp.threshold_px, 100 * Tp.false_share_le20, color="#d1495b", lw=1, ls=":", label="share of the <= 20 px frames flagged (%)")
-    ax.plot(Tp.threshold_px, 100 * Tp.recall_minus_false, color="0.3", lw=1.2, ls="--", label="difference (%)")
-    ax.axvline(thr, color="0.6", lw=1)
-    ax.text(thr + 1, 50, f"chosen {thr:.0f} px", color="0.3", fontsize=9)
-    ax.axvline(44, color="0.8", lw=1, ls=":")
-    ax.text(45, 30, "previous 44 px", color="0.5", fontsize=9)
-    ax.set_xlabel("threshold on the fitting deviation, largest of 8 points (px)")
+    Tp = T[(T.threshold_eye_widths >= 0.01) & (T.threshold_eye_widths <= 0.3)]
+    xp = 100 * Tp.threshold_eye_widths
+    ax.plot(xp, 100 * Tp.recall, color="#2f6db3", lw=2, label="wrong frames caught (%)")
+    ax.plot(xp, 100 * Tp.false_share, color="#d1495b", lw=2, label="good frames flagged (%)")
+    ax.plot(xp, 100 * Tp.recall_minus_false, color="0.3", lw=1.2, ls="--", label="difference (%)")
+    ax.axvline(100 * thr, color="0.6", lw=1)
+    ax.text(100 * thr + 0.3, 50, f"used: {100 * thr:.0f} % of eye width\n(= the error line)", color="0.3", fontsize=9)
+    ax.axvline(100 * opt, color="0.8", lw=1, ls=":")
+    ax.text(100 * opt + 0.3, 30, f"ROC optimum {100 * opt:.1f} %\n(no margin)", color="0.5", fontsize=9)
+    ax.set_xlabel("threshold on the fitting deviation, largest of 8 points, in % of the eye width")
     ax.set_ylabel("%")
     ax.set_title("Flagging threshold read off the 1330 truth frames")
     ax.spines[["top", "right"]].set_visible(False)

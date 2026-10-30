@@ -1,4 +1,4 @@
 test,cut,accept_if,right_accepted,right_total,wrong_accepted,wrong_total,objective
-conf,0.21,>=,33,40,13,31,0.4056
-jump,0.167,<=,18,40,4,31,0.321
-labelgeo,,inside label range,28,40,6,31,
+conf,0.238,>=,18,24,2,13,0.5962
+jump,0.485,<=,13,24,3,13,0.3109
+labelgeo,,inside label range,17,24,1,13,

@@ -1,3 +1,3 @@
-rule,threshold_px,caught_gt50,positives_gt50,recall_gt50,flagged_le50,n_le50,false_share_le50,flagged_le20,n_le20,false_share_le20,flagged_share_all,recall_minus_false
-max(recall - false share),36.0,31.0,32.0,0.9688,54.0,1298.0,0.0416,23.0,1175.0,0.0196,0.0639,0.9271
-95 % quantile (previous),44.0,27.0,32.0,0.8438,40.0,1298.0,0.0308,17.0,1175.0,0.0145,0.0504,0.8129
+threshold_eye_widths,caught_wrong,wrong_total,recall,flagged_good,good_total,false_share,flagged_share_all,recall_minus_false,rule,line_eye_widths,threshold_px_min,threshold_px_median,threshold_px_max
+0.14,23.0,23.0,1.0,28.0,1307.0,0.0214,0.0383,0.9786,threshold = the error line,0.14,54.8,61.3,69.0
+0.257,23.0,23.0,1.0,13.0,1307.0,0.0099,0.0271,0.9901,"max(recall - false share), comparison",0.14,100.6,112.6,126.8

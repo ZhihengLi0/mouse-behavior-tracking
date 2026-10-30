@@ -26,7 +26,7 @@ from second_peak_repair import BPS, P4, PL, RES, Geometry, load, peak2_pixels, p
 
 FAR = RES / "flag_and_repair"
 OUT = FAR / "all_videos"
-TESTS = ("fit", "geometry", "conf", "jump", "labelgeo", "labelregion", "labelregion0")
+TESTS = ("geometry", "fit", "conf", "jump", "labelgeo", "labelregion0", "labelregion")
 GAP, LONG, N_PER, SEED = 5, 30, 10, 0
 
 
@@ -66,7 +66,7 @@ def draw_sample(v, test, T, rng):
             E = S[S.episode == e]
             r = E.iloc[rng.integers(len(E))]
             rows.append({"video": v, "accept": test, "frame": int(r.frame), "status": st, "points": r.points if isinstance(r.points, str) else "",
-                         "episode_len": int((T.episode == e).sum()), "fit_px": round(float(r.fit_o200_max), 1), "worst_point": r.worst_point, "verdict": ""})
+                         "episode_len": int((T.episode == e).sum()), "fit_rel": round(float(r.fit_rel), 3), "worst_point": r.worst_point, "verdict": ""})
     return rows
 
 
@@ -108,7 +108,7 @@ def sheet(v, test, sample, ctx):
                 dr.ellipse([nx - 4, ny - 4, nx + 4, ny + 4], fill=(80, 120, 255))
         dr.rectangle([0, 0, TW, 18], fill=(0, 0, 0))
         st = "still flagged" if r["status"] == "flagged_not_repaired" else r["status"]
-        dr.text((4, 1), f"{f} {st} {r['points'].replace('pupil_', '')} ep {r['episode_len']} fit {r['fit_px']:.0f}", fill=(255, 255, 255), font=FONT)
+        dr.text((4, 1), f"{f} {st} {r['points'].replace('pupil_', '')} ep {r['episode_len']} fit {100 * r['fit_rel']:.0f}%", fill=(255, 255, 255), font=FONT)
         S.paste(crop, ((j % COLS) * TW, 40 + (j // COLS) * TH))
     cap.release()
     (OUT / "spotcheck").mkdir(exist_ok=True)
@@ -135,7 +135,7 @@ def figure(Wv):
         ax.set_xticks(x)
         ax.set_xticklabels([f"{int(r.video)}\n{r.mouse}" for r in D.itertuples()], fontsize=8)
     axes[0].legend(frameon=False, ncol=3)
-    fig.suptitle(f"Flag by the fitting deviation (> {Wv.thr_px.iloc[0]:.0f} px), repair by the second peak: share per video", fontsize=11)
+    fig.suptitle(f"Flag by the fitting deviation (> {100 * Wv.thr_eye_widths.iloc[0]:.0f} % of eye width), repair by the second peak: share per video", fontsize=11)
     fig.savefig(OUT / "share_per_video.png", dpi=150)
 
 
@@ -167,34 +167,20 @@ def main():
     P.to_csv(OUT / "spotcheck_sample.csv", index=False)
 
     rows = []
+    cols = ["wrong_before", "wrong_flagged", "wrong_repaired_frames", "wrong_repaired_to_good", "wrong_flagged_not_repaired", "wrong_left_untouched", "wrong_unflagged",
+            "wrong_after_all", "wrong_after_unflagged", "good_flagged", "good_repaired", "good_made_worse", "good_pushed_over_line", "good_flagged_not_repaired"]
     for test in TESTS:
         s, w = Sv[Sv.accept == test], Wv[Wv.accept == test]
-        rows.append({"accept": test, "videos": len(s), "thr_px": float(s.thr_px.iloc[0]), "truth_frames": int(s.truth_frames.sum()),
-                     "gt50_before": int(s.gt50_before.sum()), "gt50_flagged": int(s.gt50_flagged.sum()),
-                     "gt50_repaired_to_lt50": int(s.gt50_repaired_to_lt50.sum()), "gt50_repaired_to_lt20": int(s.gt50_repaired_to_lt20.sum()),
-                     "gt50_flagged_not_repaired": int(s.gt50_flagged_not_repaired.sum()), "gt50_left_untouched": int(s.gt50_left_untouched.sum()),
-                     "gt50_unflagged": int(s.gt50_unflagged.sum()), "gt50_after_unflagged": int(s.gt50_after_unflagged.sum()),
-                     "frames_le20": int((s.truth_frames - s.gt20_before).sum()), "lt20_repaired": int(s.repairs_lt20.sum()),
-                     "false_repairs_lt20_worse5px": int(s.false_repairs_lt20_worse5px.sum()), "lt20_flagged": int(s.lt20_flagged.sum()),
-                     "lt20_flagged_not_repaired": int(s.lt20_flagged_not_repaired.sum()),
-                     "mid_20to50_flagged_not_repaired": int(s.mid_20to50_flagged_not_repaired.sum()),
+        rows.append({"accept": test, "videos": len(s), "thr_eye_widths": float(s.thr_eye_widths.iloc[0]), "line_eye_widths": float(s.line_eye_widths.iloc[0]),
+                     "truth_frames": int(s.truth_frames.sum()), **{c: int(s[c].sum()) for c in cols},
                      "frames_total": int(w.frames.sum()), "flagged_pct": round(100 * (w.frames * w.flagged_pct / 100).sum() / w.frames.sum(), 2),
                      "repaired_pct": round(100 * w.repaired.sum() / w.frames.sum(), 2),
                      "flagged_not_repaired_pct": round(100 * w.flagged_not_repaired.sum() / w.frames.sum(), 2),
                      "touched_pct_min": float(w.touched_pct.min()), "touched_pct_median": float(w.touched_pct.median()), "touched_pct_max": float(w.touched_pct.max())})
     tot = pd.DataFrame(rows)
     tot.to_csv(OUT / "totals.csv", index=False)
-    print(tot.T.to_string())
-    for test in TESTS:   # good frames at the 50-px tier, from the per-video truth_frames.csv
-        T50 = pd.concat([pd.read_csv(FAR / f"video{v:02d}_{test}" / "truth_frames.csv") for v in videos])
-        good, rp, nr = T50.rmse_before <= 50, T50.status == "repaired", T50.status == "flagged_not_repaired"
-        tot.loc[tot.accept == test, "le50_flagged"] = int((good & T50.flag).sum())
-        tot.loc[tot.accept == test, "le50_repaired"] = int((good & rp).sum())
-        tot.loc[tot.accept == test, "le50_made_worse5px"] = int((good & rp & (T50.rmse_after > T50.rmse_before + 5)).sum())
-        tot.loc[tot.accept == test, "le50_flagged_not_repaired"] = int((good & nr).sum())
-    tot.to_csv(OUT / "totals.csv", index=False)
-    print(tot.set_index("accept")[["gt50_repaired_to_lt50", "gt50_repaired_to_lt20", "gt50_flagged_not_repaired", "le50_flagged", "le50_repaired", "le50_made_worse5px", "le50_flagged_not_repaired", "repaired_pct", "flagged_not_repaired_pct"]].T.to_string())
-    C = Sv.pivot(index="video", columns="accept", values=["gt50_before", "gt50_repaired_to_lt50", "gt50_flagged_not_repaired", "false_repairs_lt20_worse5px", "lt20_flagged_not_repaired"])
+    print(tot.set_index("accept")[cols + ["flagged_pct", "repaired_pct", "flagged_not_repaired_pct"]].T.to_string())
+    C = Sv.pivot(index="video", columns="accept", values=["wrong_before", "wrong_repaired_to_good", "wrong_flagged_not_repaired", "good_made_worse", "good_flagged_not_repaired"])
     C.columns = [f"{a}_{b}" for a, b in C.columns]
     C = C.merge(Wv.pivot(index="video", columns="accept", values=["flagged_pct", "repaired_pct", "flagged_not_repaired_pct"]).pipe(lambda D: D.set_axis([f"{a}_{b}" for a, b in D.columns], axis=1)), left_index=True, right_index=True)
     C.reset_index().to_csv(OUT / "comparison.csv", index=False)

@@ -1,0 +1,2 @@
+line_eye_widths,last_frame_below,first_frame_above,line_px_min,line_px_median,line_px_max,truth_frames,wrong_frames,wrong_frames_gt50px,wrong_per_video
+0.14,0.1273,0.1535,54.8,61.3,69.0,1330,23,32,1:8 2:4 4:2 8:1 10:3 11:4 14:1
