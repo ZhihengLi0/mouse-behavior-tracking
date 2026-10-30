@@ -29,6 +29,10 @@ replacement as --accept fit, accepted when the second peak's heatmap value is >=
 on the candidate point), or when the candidate's displacement to the previous and next frame, relative to the median eye
 width, is <= the jump cut (DeepLabCut's jump criterion), or when the frame's twelve pupil-point quantities lie inside the
 range spanned by the 1330 human labels (labelgeo, no constant). Cuts and region from results/acceptance_thresholds/.
+Repair, --accept labelregion: the label region widened by the leave-one-video-out margin (label_region_margin.csv), used in
+the two steps of the geometry rule: a flagged frame whose pupil-point quantities are already inside the region is left
+alone ("flagged_passes_check"); otherwise the points over the threshold are replaced and the repair is accepted if the
+frame is then inside.
 
 Outputs in results/flag_and_repair/videoNN_<accept>/: summary.csv (truth frames), whole_video.csv, truth_frames.csv,
 frames_all.csv.gz (every frame, local only); the one-step predictions are cached in results/flag_and_repair/cache/
@@ -116,7 +120,11 @@ def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n):
     new = xy_frame(xy, i)
     for b in cand:
         new[b] = p2[b][i]
-    if mode == "conf":
+    if mode == "labelregion":
+        if inside(eye_quantities(xy_frame(xy, i), G.sign_lr, G.sign_tb), R):
+            return "flagged_passes_check", (), xy_frame(xy, i)
+        ok = inside(eye_quantities(new, G.sign_lr, G.sign_tb), R)
+    elif mode == "conf":
         ok = min(peak2[b][i] for b in cand) >= cutv
     elif mode == "jump":
         jumps = [np.hypot(*(new[b] - xy[b][g])) / G.Wm for b in cand for g in (i - 1, i + 1) if 0 <= g < n and np.isfinite(xy[b][g]).all()]
@@ -129,12 +137,14 @@ def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--video", type=int, required=True)
-    ap.add_argument("--accept", choices=["fit", "geometry", "conf", "jump", "labelgeo"], default="fit")
+    ap.add_argument("--accept", choices=["fit", "geometry", "conf", "jump", "labelgeo", "labelregion"], default="fit")
     ap.add_argument("--thr", type=float, default=None, help="flagging threshold in px; default = results/fit_threshold/chosen.csv")
     ap.add_argument("--k-mad", type=float, default=5.0)
+    ap.add_argument("--margin", type=float, default=None, help="labelregion only: widen the label range by this fraction instead of the leave-one-video-out margin; output folder videoNN_labelregion<margin*100>")
     a = ap.parse_args()
     thr = a.thr if a.thr is not None else float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_px)
-    out = OUT / f"video{a.video:02d}_{a.accept}"
+    tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
+    out = OUT / f"video{a.video:02d}_{tag}"
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
@@ -156,13 +166,20 @@ def main():
         print(f"acceptance cut {a.accept} {ch.loc[a.accept, 'accept_if']} {cutv}")
     elif a.accept == "labelgeo":
         R = pd.read_csv(RES / "acceptance_thresholds" / "label_region.csv").set_index("quantity")
+    elif a.accept == "labelregion":
+        R = pd.read_csv(RES / "acceptance_thresholds" / "label_region_margin.csv").set_index("quantity")
+        if a.margin is not None:
+            R0 = pd.read_csv(RES / "acceptance_thresholds" / "label_region.csv").set_index("quantity")
+            w = R0["max"] - R0["min"]
+            R = pd.DataFrame({"min": R0["min"] - a.margin * w, "max": R0["max"] + a.margin * w, "margin": a.margin})
+        print(f"label region widened by margin {R.margin.iloc[0]:.2f}")
     peak2 = {b: H[f"{b}_peak2"].to_numpy(float) for b in BPS}
 
     status, reps, new_xy = [], [], {b: xy[b].copy() for b in BPS}
     for i in range(n):
         if a.accept == "fit":
             st, rep, new = repair_fit(G, xy, p2, pm, dev, i, thr, bool(flag[i]))
-        elif a.accept in ("conf", "jump", "labelgeo"):
+        elif a.accept in ("conf", "jump", "labelgeo", "labelregion"):
             st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n)
         else:
             st, rep, new = repair_triggered(G, xy, p2, i, a.k_mad, bool(flag[i]), worst[i])
@@ -182,7 +199,7 @@ def main():
         F["fit_o200_max_after"] = fit_after
     F.to_csv(out / "frames_all.csv.gz", index=False, float_format="%.3f")
     counts = {s: int((status == s).sum()) for s in STATUSES}
-    W = pd.DataFrame([{"video": a.video, "frames": n, "accept": a.accept, "thr_px": thr, "flagged_pct": round(100 * flag.mean(), 2),
+    W = pd.DataFrame([{"video": a.video, "frames": n, "accept": tag, "thr_px": thr, "flagged_pct": round(100 * flag.mean(), 2),
                        "flagged_closed": int((flag & G.closed).sum()), **counts,
                        "repaired_pct": round(100 * counts["repaired"] / n, 2), "flagged_not_repaired_pct": round(100 * counts["flagged_not_repaired"] / n, 2),
                        "worst_not_pupil_among_flagged": int((flag & ~np.isin(worst, P4) & ~G.closed).sum()),
@@ -207,7 +224,7 @@ def main():
     big, clean, rep = T.rmse_before > 50, T.rmse_before <= 20, T.status == "repaired"
     nr = T.status == "flagged_not_repaired"
     untouched = T.status.isin(["ok", "closed", "flagged_passes_check", "unflagged_violation"])
-    S = {"video": a.video, "accept": a.accept, "thr_px": thr, "truth_frames": len(T), "gt50_before": int(big.sum()), "gt20_before": int((T.rmse_before > 20).sum()),
+    S = {"video": a.video, "accept": tag, "thr_px": thr, "truth_frames": len(T), "gt50_before": int(big.sum()), "gt20_before": int((T.rmse_before > 20).sum()),
          **{s: int((T.status == s).sum()) for s in STATUSES},
          "gt50_flagged": int((big & T.flag).sum()), "gt50_repaired_frames": int((big & rep).sum()),
          "gt50_repaired_to_lt50": int((big & rep & (T.rmse_after <= 50)).sum()), "gt50_repaired_to_lt20": int((big & rep & (T.rmse_after <= 20)).sum()),

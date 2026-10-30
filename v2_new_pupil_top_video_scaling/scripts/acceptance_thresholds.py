@@ -23,7 +23,15 @@ repairs accepted) - (share of wrong repairs accepted), ties to the stricter cut;
 flagging threshold. For labelgeo the leave-one-video-out number is the coverage: how many human labels of the held-out
 video fall outside the region built from the other 18 videos.
 
-Outputs in results/acceptance_thresholds/: candidates.csv, chosen.csv, lovo.csv, label_region.csv, label_region_lovo.csv.
+Margin for a new video (added the same evening): the region from 18 videos misses some labels of the 19th, so each
+quantity's range is widened by a fraction m of its width on both sides; m = the smallest value (steps of 0.01) at which
+no held-out label of any video falls outside the region built from the other 18 (label_region_margin.csv: m and the
+widened ranges). flag_and_repair.py --accept labelregion uses the widened region in two steps, as the geometry rule
+does: a flagged frame already inside the region is left alone; otherwise the points over the threshold are replaced
+and the repair is accepted if the frame is then inside.
+
+Outputs in results/acceptance_thresholds/: candidates.csv, chosen.csv, lovo.csv, label_region.csv, label_region_lovo.csv,
+label_region_margin.csv.
 Nothing existing is modified."""
 import numpy as np
 import pandas as pd
@@ -70,8 +78,10 @@ def label_quantities(truth, G):
     return pd.DataFrame(rows)
 
 
-def region(Q):
-    return pd.DataFrame({"quantity": QUANTS, "min": [Q[q].min() for q in QUANTS], "max": [Q[q].max() for q in QUANTS]})
+def region(Q, m=0.0):
+    lo, hi = np.array([Q[q].min() for q in QUANTS]), np.array([Q[q].max() for q in QUANTS])
+    w = hi - lo
+    return pd.DataFrame({"quantity": QUANTS, "min": lo - m * w, "max": hi + m * w})
 
 
 def inside(quant, R):
@@ -176,6 +186,20 @@ def main():
     Cv.to_csv(OUT / "label_region_lovo.csv", index=False)
     print(f"leave-one-video-out labelgeo: {int(Cv.labels_outside_region_of_other_18.sum())}/{int(Cv.labels.sum())} human labels outside the region of the other 18 videos; "
           f"right accepted {int(Cv.right_accepted.sum())}/{int(Cv.right.sum())}, wrong accepted {int(Cv.wrong_accepted.sum())}/{int(Cv.wrong.sum())}")
+    m = 0.0
+    while True:
+        out = 0
+        for v in sorted(L.video.unique()):
+            Rv = region(L[L.video != v], m).set_index("quantity")
+            out += sum(not inside(r, Rv) for _, r in L[L.video == v].iterrows())
+        print(f"margin {m:.2f}: {out} held-out labels outside")
+        if out == 0 or m >= 1.0:
+            break
+        m = round(m + 0.01, 2)
+    Rm = region(L, m).reset_index(drop=True)
+    Rm["margin"] = m
+    Rm.round(4).to_csv(OUT / "label_region_margin.csv", index=False)
+    print(f"margin m = {m:.2f} of each quantity's range: every held-out video's labels inside the region of the other 18")
 
 
 if __name__ == "__main__":

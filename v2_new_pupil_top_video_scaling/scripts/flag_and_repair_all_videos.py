@@ -26,7 +26,7 @@ from second_peak_repair import BPS, P4, PL, RES, Geometry, load, peak2_pixels, p
 
 FAR = RES / "flag_and_repair"
 OUT = FAR / "all_videos"
-TESTS = ("fit", "geometry", "conf", "jump", "labelgeo")
+TESTS = ("fit", "geometry", "conf", "jump", "labelgeo", "labelregion", "labelregion0")
 GAP, LONG, N_PER, SEED = 5, 30, 10, 0
 
 
