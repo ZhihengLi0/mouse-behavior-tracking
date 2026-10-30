@@ -126,12 +126,38 @@ All five acceptance tests on the 19 videos (`all_videos/totals.csv`):
 - **The hand-made geometry rule still does best on every line**, and the reason is visible in the table: it is the only
   test that first asks whether the flagged frame needs a repair at all. A flagged frame whose pupil points already pass
   the check is left alone (`flagged_passes_check`), which is what happens to most of the 54 flagged good frames; the
-  three tests above try to repair every flagged frame with a point over the threshold. A fair version of labelgeo would
-  do the same with the label region (leave the frame if it already lies inside; repair only if the replacement brings
-  it inside), and the region's tightness on a new video (4.4 % of labels outside) would need a margin set by
-  leave-one-video-out. That is the next step if the geometry idea is to be kept with a basis; the constants of the
-  present rule (5 MAD, 0.6 eye width, 0.1 lid margin) would otherwise have to be validated leave-one-video-out
-  themselves.
+  three tests above try to repair every flagged frame with a point over the threshold.
+
+### The label region used in the same two steps (`--accept labelregion`, same evening)
+
+The fair version of the label-region test: a flagged frame whose twelve quantities already lie inside the label range
+is left alone (`flagged_passes_check`); only otherwise are the points over the threshold replaced, and the repair is
+accepted if the frame is then inside. Two widths of the range were run on all 19 videos: the range as the labels span
+it (margin 0, `videoNN_labelregion0/`), and the range widened on both sides by 42 % of each quantity's width
+(`videoNN_labelregion/`), 42 % being the smallest margin at which every held-out video's labels fall inside the range of
+the other 18 (`label_region_margin.csv`).
+
+| | geometry (hand-made) | label range, two steps, margin 0 | label range, two steps, margin 42 % |
+|---|---|---|---|
+| > 50 px frames repaired to below 50 px (below 20 px), of 31 flagged | **16 (8)** | 12 (8) | 12 (8) |
+| > 50 px frames still flagged / left alone as "passes the check" | 11 / 4 | 13 / 6 | 7 / 12 |
+| ≤ 50 px frames repaired / made worse by > 5 px, of 54 flagged | 10 / 1 | 5 / 1 | 2 / 2 |
+| ≤ 50 px frames still flagged | **9** | 19 | 8 |
+| whole videos: repaired / still flagged | 1.6 % / 1.1 % | 1.0 % / 2.3 % | 0.8 % / 1.6 % |
+
+- **With the two steps the label range comes close to the hand-made rule without any constant**: the same 8 big errors
+  brought below 20 px, one good frame made worse, but 4 fewer big errors repaired and twice as many good frames left
+  flagged. On the 75 candidate truth frames the unwidened range accepts 20 right repairs and 1 wrong one, the same
+  record as the hand-made rule; the difference on the whole set comes from the first step, where the hand-made bands
+  (5 MAD around the video's own median) are tighter around a good frame than the pooled min–max of all labels.
+- **The margin rule "every held-out label inside" is not a good basis**: the 42 % is set by two or three outlying human
+  labels (the count of labels outside falls from 58 at margin 0 to 3 at 20 % and then needs 42 % for the last one), and
+  the wider the range the more real errors are waved through as "passes the check" (12 of 31 at 42 %, 6 at margin 0;
+  on the 75 candidates the right repairs accepted fall from 20 to 14, `README` table above). If a margin is wanted it
+  should be read off the candidate repairs like the other cuts, not off the label coverage.
+- Where this leaves the acceptance question: the hand-made geometry rule is still the best test on the truth frames;
+  the label range in two steps is the version with a basis and is a little weaker. The honest statement for the
+  meeting is that the geometry idea is validated by the label range, and the remaining gap is the width of the bands.
 
 ## Spot check by eye, same rule on every video
 
