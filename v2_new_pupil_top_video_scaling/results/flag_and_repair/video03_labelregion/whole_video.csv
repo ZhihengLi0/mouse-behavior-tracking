@@ -1,2 +1,2 @@
-video,frames,accept,thr_px,flagged_pct,flagged_closed,ok,closed,flagged_passes_check,unflagged_violation,repaired,flagged_not_repaired,repaired_pct,flagged_not_repaired_pct,worst_not_pupil_among_flagged,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right
-3,71748,labelregion,36.0,4.0,240,68872,249,2157,0,66,404,0.09,0.56,225,2,5,59,2
+video,frames,accept,eye_width_px,thr_eye_widths,thr_px,flagged_pct,flagged_closed,ok,closed,flagged_passes_check,unflagged_violation,repaired,flagged_not_repaired,repaired_pct,flagged_not_repaired_pct,worst_not_pupil_among_flagged,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right
+3,71748,labelregion,416.6,0.14,58.3,1.83,235,70422,249,688,0,70,319,0.1,0.44,171,2,7,61,2
