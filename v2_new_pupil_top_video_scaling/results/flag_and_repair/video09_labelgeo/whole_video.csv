@@ -1,0 +1,2 @@
+video,frames,accept,thr_px,flagged_pct,flagged_closed,ok,closed,flagged_passes_check,unflagged_violation,repaired,flagged_not_repaired,repaired_pct,flagged_not_repaired_pct,worst_not_pupil_among_flagged,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right
+9,71748,labelgeo,36.0,2.74,394,69765,411,0,0,374,1198,0.52,1.67,585,14,28,325,8
