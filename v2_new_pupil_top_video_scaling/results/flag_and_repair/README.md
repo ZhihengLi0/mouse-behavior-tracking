@@ -85,6 +85,54 @@ which the time series cannot give. So the two steps cannot share one criterion, 
 is, is doing the second job. Its constants remain the open point: they were set by hand and should be validated the
 same way as the threshold (leave-one-video-out) before the rule is called final.
 
+## Acceptance tests with a basis (`scripts/acceptance_thresholds.py`, `results/acceptance_thresholds/`, same day)
+
+The geometry rule above was made by hand. Three acceptance tests whose quantity has a basis were added and run the same
+way (same 36 px flagging, same candidate points and replacement as `--accept fit`, all 19 videos):
+
+- **conf**: DeepLabCut's own confidence applied to the candidate point: the heatmap value of the second peak (the
+  smallest over the replaced points). Accept if ≥ 0.21.
+- **jump**: DeepLabCut's jump criterion applied to the candidate point: its displacement to the model's position in the
+  previous and the next frame, the larger of the two, divided by the video's median eye width. Accept if ≤ 0.167.
+- **labelgeo**: the geometry region spanned by the human labels. In the frame's own eye frame (origin = midpoint of the
+  corners, unit = that frame's eye width), twelve scale-free quantities of the four pupil points (along coordinate,
+  position inside the eyelid band as a fraction, the four ratios of the geometry rule) must each lie inside the min–max
+  range of the 1330 human labels. No constant.
+
+The two cuts were read off the truth frames by the rule used for the 36 px threshold: candidate repairs = the 75 truth
+frames flagged at 36 px with a pupil point over the threshold; a repair is right if it lowers the frame error by 5 px
+or more (40 of 75), wrong if it raises it by 5 px or more (31), neutral otherwise (4); the cut maximises the share of
+right repairs accepted minus the share of wrong repairs accepted (`candidates.csv`, `chosen.csv`). Leave-one-video-out
+(`lovo.csv`, `label_region_lovo.csv`): the conf cut is 0.21–0.215 in every fold; the jump cut moves between 0.15 and
+0.25; the label region built from 18 videos leaves 58 of the held-out videos' 1318 fully labeled frames outside it
+(4.4 %), i.e. the region is a little tight when a video is new.
+
+All five acceptance tests on the 19 videos (`all_videos/totals.csv`):
+
+| | fitting (same criterion) | geometry (hand-made) | conf | jump | labelgeo |
+|---|---|---|---|---|---|
+| > 50 px frames repaired to below 50 px (below 20 px), of 31 flagged | 6 (2) | **16 (8)** | 14 (7) | 5 (2) | 12 (8) |
+| > 50 px frames still flagged | 21 | **11** | 13 | 22 | 15 |
+| ≤ 50 px frames flagged, of 1298 | 54 | 54 | 54 | 54 | 54 |
+| … repaired / made worse by > 5 px | 20 / 7 | **10 / 1** | 30 / 12 | 16 / 4 | 20 / 6 |
+| … still flagged | 34 | **9** | 24 | 38 | 34 |
+| whole videos: repaired / still flagged | 2.2 % / 3.7 % | 1.6 % / 1.1 % | 3.4 % / 2.4 % | 2.1 % / 3.7 % | 2.4 % / 3.4 % |
+
+- **Of the tests with a basis, the second peak's confidence repairs the most big errors (14 of 31) but also damages
+  the most good frames (12 of 54)**: a strong second peak is where the model saw a second plausible pupil edge, and on a
+  good frame that was flagged because the eye moved fast the second peak is simply the wrong edge. Jump refuses almost
+  everything, right and wrong alike: a point thrown for a stretch of frames has neighbours that are themselves wrong.
+  The label region sits between the two (12 repaired, 6 damaged).
+- **The hand-made geometry rule still does best on every line**, and the reason is visible in the table: it is the only
+  test that first asks whether the flagged frame needs a repair at all. A flagged frame whose pupil points already pass
+  the check is left alone (`flagged_passes_check`), which is what happens to most of the 54 flagged good frames; the
+  three tests above try to repair every flagged frame with a point over the threshold. A fair version of labelgeo would
+  do the same with the label region (leave the frame if it already lies inside; repair only if the replacement brings
+  it inside), and the region's tightness on a new video (4.4 % of labels outside) would need a margin set by
+  leave-one-video-out. That is the next step if the geometry idea is to be kept with a basis; the constants of the
+  present rule (5 MAD, 0.6 eye width, 0.1 lid margin) would otherwise have to be validated leave-one-video-out
+  themselves.
+
 ## Spot check by eye, same rule on every video
 
 `all_videos/spotcheck_sample.csv`: per video and per acceptance test, up to 10 repaired and 10 still-flagged frames, one
