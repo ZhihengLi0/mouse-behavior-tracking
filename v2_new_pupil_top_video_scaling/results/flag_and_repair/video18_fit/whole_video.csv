@@ -1,0 +1,2 @@
+video,frames,accept,thr_px,flagged_pct,flagged_closed,ok,closed,flagged_passes_check,unflagged_violation,repaired,flagged_not_repaired,repaired_pct,flagged_not_repaired_pct,worst_not_pupil_among_flagged,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right
+18,71748,fit,36.0,13.05,418,62285,521,0,0,4699,4243,6.55,5.91,815,554,1209,1115,2083
