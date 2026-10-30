@@ -1,0 +1,13 @@
+quantity,min,max
+pupil_top_along,-0.2117,0.0737
+pupil_bottom_along,-0.1561,0.119
+pupil_left_along,-0.4594,0.0042
+pupil_right_along,0.0177,0.377
+pupil_top_lidfrac,-0.8402,0.3003
+pupil_bottom_lidfrac,0.4757,1.339
+pupil_left_lidfrac,0.2563,0.8143
+pupil_right_lidfrac,-0.0501,0.5963
+pupil_top_ratio,0.2435,0.7744
+pupil_bottom_ratio,0.2065,0.6646
+pupil_left_ratio,0.3601,1.073
+pupil_right_ratio,0.3188,1.0578
