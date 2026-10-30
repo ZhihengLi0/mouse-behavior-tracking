@@ -10,7 +10,8 @@ quantile of the score on the truth frames (44 px), a budget of frames to flag wi
 
 Here the threshold is read off the frames that must be found: the truth frames with frame RMSE > 50 px (32 of 1330).
 For every candidate threshold t: recall = share of the > 50 px frames with score > t; false share = share of the frames
-<= 20 px with score > t; the 20-50 px frames are neither target nor clean and are only reported. Chosen t = the one that
+<= 50 px with score > t (user, 10-30: at the 50-px tier every frame at or below 50 px is a good frame, so flagging it is a
+false flag; the share among the <= 20 px frames is reported alongside). Chosen t = the one that
 maximises recall - false share (the usual ROC optimum, no free constant). Leave-one-video-out: the same rule on the other
 18 videos, applied to the held-out video, to see whether the pooled choice holds up.
 
@@ -28,19 +29,20 @@ from scale_step import HERE  # noqa: E402
 RES = HERE / "results"
 OUT = RES / "fit_threshold"
 OUT.mkdir(parents=True, exist_ok=True)
-SCORE, BIG, CLEAN = "fit_o200_max", 50.0, 20.0
+SCORE, BIG, CLEAN = "fit_o200_max", 50.0, 50.0
+TIGHT = 20.0
 
 
 def table(M, grid):
-    big, clean, mid = M[M.rmse > BIG], M[M.rmse <= CLEAN], M[(M.rmse > CLEAN) & (M.rmse <= BIG)]
+    big, clean, tight = M[M.rmse > BIG], M[M.rmse <= CLEAN], M[M.rmse <= TIGHT]
     rows = []
     for t in grid:
         rows.append({"threshold_px": t, "caught_gt50": int((big.score > t).sum()), "positives_gt50": len(big),
-                     "recall_gt50": (big.score > t).mean(), "flagged_le20": int((clean.score > t).sum()), "n_le20": len(clean),
-                     "false_share_le20": (clean.score > t).mean(), "flagged_20to50": int((mid.score > t).sum()), "n_20to50": len(mid),
-                     "flagged_share_all": (M.score > t).mean()})
+                     "recall_gt50": (big.score > t).mean(), "flagged_le50": int((clean.score > t).sum()), "n_le50": len(clean),
+                     "false_share_le50": (clean.score > t).mean(), "flagged_le20": int((tight.score > t).sum()), "n_le20": len(tight),
+                     "false_share_le20": (tight.score > t).mean(), "flagged_share_all": (M.score > t).mean()})
     T = pd.DataFrame(rows)
-    T["recall_minus_false"] = T.recall_gt50 - T.false_share_le20
+    T["recall_minus_false"] = T.recall_gt50 - T.false_share_le50
     return T
 
 
@@ -62,8 +64,8 @@ def main():
     chosen = T[T.threshold_px == thr].iloc[0].to_dict()
     old = T[T.threshold_px == 44].iloc[0].to_dict()
     pd.DataFrame([{"rule": "max(recall - false share)", **chosen}, {"rule": "95 % quantile (previous)", **old}]).round(4).to_csv(OUT / "chosen.csv", index=False)
-    print(f"chosen threshold {thr:.0f} px: catches {chosen['caught_gt50']}/{chosen['positives_gt50']} > 50 px, flags {100 * chosen['false_share_le20']:.1f} % of the <= 20 px frames, {100 * chosen['flagged_share_all']:.1f} % of all truth frames")
-    print(f"previous 44 px: catches {old['caught_gt50']}/{old['positives_gt50']}, flags {100 * old['false_share_le20']:.1f} % / {100 * old['flagged_share_all']:.1f} %")
+    print(f"chosen threshold {thr:.0f} px: catches {chosen['caught_gt50']}/{chosen['positives_gt50']} > 50 px, flags {100 * chosen['false_share_le50']:.1f} % of the <= 50 px frames ({100 * chosen['false_share_le20']:.1f} % of the <= 20 px), {100 * chosen['flagged_share_all']:.1f} % of all truth frames")
+    print(f"previous 44 px: catches {old['caught_gt50']}/{old['positives_gt50']}, flags {100 * old['false_share_le50']:.1f} % ({100 * old['false_share_le20']:.1f} %) / {100 * old['flagged_share_all']:.1f} %")
 
     rows = []
     for v in sorted(M.video.unique()):
@@ -71,12 +73,12 @@ def main():
         H = M[M.video == v]
         big, clean = H[H.rmse > BIG], H[H.rmse <= CLEAN]
         rows.append({"held_out_video": v, "threshold_from_other_18_px": tv, "positives_gt50": len(big), "caught_gt50": int((big.score > tv).sum()),
-                     "flagged_le20": int((clean.score > tv).sum()), "n_le20": len(clean), "flagged_share_all": round(float((H.score > tv).mean()), 4)})
+                     "flagged_le50": int((clean.score > tv).sum()), "n_le50": len(clean), "flagged_share_all": round(float((H.score > tv).mean()), 4)})
     Lv = pd.DataFrame(rows)
     Lv.to_csv(OUT / "lovo.csv", index=False)
     print(Lv.to_string(index=False))
     print(f"leave-one-video-out: thresholds {sorted(Lv.threshold_from_other_18_px.unique())}, caught {int(Lv.caught_gt50.sum())}/{int(Lv.positives_gt50.sum())}, "
-          f"flagged {int(Lv.flagged_le20.sum())}/{int(Lv.n_le20.sum())} of the <= 20 px frames")
+          f"flagged {int(Lv.flagged_le50.sum())}/{int(Lv.n_le50.sum())} of the <= 50 px frames")
 
     import matplotlib
     matplotlib.use("Agg")
@@ -84,7 +86,8 @@ def main():
     fig, ax = plt.subplots(figsize=(8, 4.2), constrained_layout=True)
     Tp = T[(T.threshold_px >= 5) & (T.threshold_px <= 120)]
     ax.plot(Tp.threshold_px, 100 * Tp.recall_gt50, color="#2f6db3", lw=2, label="recall of the > 50 px frames (%)")
-    ax.plot(Tp.threshold_px, 100 * Tp.false_share_le20, color="#d1495b", lw=2, label="share of the <= 20 px frames flagged (%)")
+    ax.plot(Tp.threshold_px, 100 * Tp.false_share_le50, color="#d1495b", lw=2, label="share of the <= 50 px frames flagged (%)")
+    ax.plot(Tp.threshold_px, 100 * Tp.false_share_le20, color="#d1495b", lw=1, ls=":", label="share of the <= 20 px frames flagged (%)")
     ax.plot(Tp.threshold_px, 100 * Tp.recall_minus_false, color="0.3", lw=1.2, ls="--", label="difference (%)")
     ax.axvline(thr, color="0.6", lw=1)
     ax.text(thr + 1, 50, f"chosen {thr:.0f} px", color="0.3", fontsize=9)

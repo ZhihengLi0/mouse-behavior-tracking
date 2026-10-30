@@ -23,23 +23,24 @@ prediction, distance between predicted and actual position, largest of the 8 key
 likelihood below 0.01 are treated as missing, as in the sweep.
 
 Threshold rule: over the 1330 truth frames, for every integer threshold t, recall = share of the 32 frames with error
-> 50 px whose score exceeds t, false share = share of the 1175 frames with error ≤ 20 px whose score exceeds t; the
-20–50 px frames are neither target nor clean and are only reported. Chosen t maximises recall minus false share (the
-ROC optimum; no free constant).
+> 50 px whose score exceeds t, false share = share of the 1298 frames with error ≤ 50 px whose score exceeds t (user,
+10-30: at the 50-px tier every frame at or below 50 px is a good frame, so flagging it is a false flag; the share among
+the ≤ 20 px frames is given alongside). Chosen t maximises recall minus false share (the ROC optimum; no free constant).
 
-| threshold | catches of the 32 > 50 px frames | flags among the 1175 ≤ 20 px frames | flags among all truth frames |
-|---|---|---|---|
-| **36 px (chosen)** | **31** | **2.0 %** | **6.4 %** |
-| 44 px (previous, 95 % quantile) | 27 | 1.4 % | 5.0 % |
+| threshold | catches of the 32 > 50 px frames | flags among the 1298 ≤ 50 px frames | among the 1175 ≤ 20 px | flags among all truth frames |
+|---|---|---|---|---|
+| **36 px (chosen)** | **31** | **4.2 %** | 2.0 % | **6.4 %** |
+| 44 px (previous, 95 % quantile) | 27 | 3.1 % | 1.4 % | 5.0 % |
 
 Why 36: the 32 scores, sorted, are 11 px (video 14, the frame no detector finds), then 36.3, 36.4, 36.7, 39.8 (four
 marginal video-8 frames of 50–55 px), then 45 px, then 26 frames from 56 px up to 580 px. Above 36 the four video-8
 frames are lost for a gain of 0.3 % fewer false flags; below 36 no further > 50 px frame is gained until 10 px, where a
-quarter of the good frames would be flagged.
+quarter of the good frames would be flagged. The choice is the same whether the good frames are counted as ≤ 50 px or
+≤ 20 px.
 
 Leave-one-video-out (`lovo.csv`): the same rule on the other 18 videos, applied to the held-out one. 18 of 19 folds
-choose 35–36 px; the fold that holds out video 8 chooses 117 px, because the frames between 36 and 56 px are all video
-8's. Over the 19 folds 25 of 32 frames are caught, 21 of 1175 good frames flagged. **The 36 px value therefore rests on
+choose 36 px; the fold that holds out video 8 chooses 117 px, because the frames between 36 and 56 px are all video
+8's. Over the 19 folds 25 of 32 frames are caught, 38 of 1298 good frames flagged. **The 36 px value therefore rests on
 video 8**; without it the data would say "anything between 45 and 117 px". That is a property of the truth set (one
 video holds all the marginal errors), to be said as such.
 
@@ -63,14 +64,16 @@ Both tests, same 19 videos, same threshold (`all_videos/totals.csv`, `comparison
 | … repaired to below 50 px (below 20 px) | 6 (2) | 16 (8) |
 | … flagged, not repaired | 21 | 11 |
 | … left alone: closed-eye 4, unflagged 1 | 5 | 5 |
-| ≤ 20 px frames repaired / made worse by > 5 px | 7 / 6 | 0 / 0 |
-| ≤ 20 px frames flagged / of them still flagged | 23 / 16 | 23 / 3 |
+| ≤ 50 px frames (good at this tier) flagged, of 1298 | 54 | 54 |
+| … repaired / made worse by > 5 px / pushed above 50 px | 20 / 7 / 0 | 10 / 1 / 0 |
+| … still flagged | 34 | 9 |
+| the same among the ≤ 20 px frames: repaired / made worse / still flagged | 7 / 6 / 16 | 0 / 0 / 3 |
 | whole videos: flagged / repaired / still flagged | 6.3 % / 2.2 % / 3.7 % | 6.3 % / 1.6 % / 1.1 % |
 | touched share per video, min / median / max | 0.3 / 3.7 / 17.2 % | 0.1 / 1.4 / 11.8 % |
 
 **The same criterion is the worse acceptance test, on both counts.** It repairs 6 of the 32 big errors where the
-geometry test repairs 16, and it turns 6 falsely flagged good frames into frames that are actually wrong, where the
-geometry test touches none of them (it says "the frame passes, leave it"). The frame-by-frame comparison
+geometry test repairs 16, and of the 54 good frames (≤ 50 px) that are flagged it makes 7 worse and leaves 34 flagged, where the
+geometry test makes 1 worse and leaves 9 flagged (for the rest it says "the frame passes, leave it"). The frame-by-frame comparison
 (`all_videos/truth_summary_all.csv`, per-video `truth_frames.csv`) shows why, and it is the same reason both times:
 the one-step prediction is built from the preceding frames. When the model is wrong for a stretch, the prediction
 follows the wrong trajectory, so the correct second peak lies far from it and is refused (videos 1, 2, 11: six frames
