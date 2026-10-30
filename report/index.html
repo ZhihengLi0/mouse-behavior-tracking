@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 17:25 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 17:26 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1201,6 +1201,44 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Limits.</b> As in 8.1: a small, concentrated sample, scored per frame and not per run. The two signals that need a new inference pass were tried on one video, one extra seed and 70 frames; the best of the 16 heatmap scores was chosen on the same frames, which flatters it; the second model was not run on the whole video. Extending to more videos costs about 80 minutes of inference or about 4 hours of training per video and was not done, because the result would not change the next step (checking the 101 missed frames).</li>
     </ol>
   </div>
+
+  <h3><span lang="zh">8.3 找、修、验三步走：找出错帧，用热图第二峰修，再验收；19 个视频上 23 帧错帧全部找到，修好 12 帧</span><span lang="en">8.3 Find, repair, check: the wrong frames are found, repaired from the heatmap's second peak and the repair is checked; on the 19 videos all 23 wrong frames are found and 12 repaired</span></h3>
+  <div class="text" lang="zh">
+    <p><b>单位和线。</b>这一节所有的误差和阈值都是该视频眼宽的倍数（眼宽 = 两个眼角距离的中位数，由模型预测算出），换相机或换距离不用重定。错帧的线是眼宽的 14%，来源见 8.1 开头和图 8-0。</p>
+    <p><b>找。</b>用 DeepLabCut 自带的 fitting 量：对 8 个点各自用它之前的轨迹预报它在这一帧的位置，量预报位置和实际预测的距离，8 个点取最大，超过眼宽的 14% 就把这一帧标出。阈值就是错帧的线本身，不另设数：找的是"有一个点偏离了足以构成错帧的距离"的帧。23 帧错帧的这个量都在眼宽的 25% 以上，所以每一轮留一视频验证都全部找到；代价是 1307 帧对的帧里标出 28 帧，占全部真值帧的 3.8%。</p>
+    <p><b>修。</b>被标出的帧里，哪个瞳孔点的偏离超过线，就把它换成这个点热图上的第二个峰。模型预测每个点时输出一张热图，第一个峰是它给出的位置，点被甩飞时第二个峰往往在正确位置。眼睑距离判为闭眼的帧不动。</p>
+    <p><b>验。</b>换完以后要判断新位置像不像瞳孔上的点，通过才算修好，不通过就不换、帧仍然标出。没有任何帧被删除，修不了的帧留着标出，要不要去掉由用数据的人决定。验收的标准比较了七种，同样的 19 个视频、同样的真值帧，两种最好：一种是手定的几何规则（四个瞳孔点相对眼角、眼睑的比例落在该视频中位数附近的带内）；另一种不含任何手定的数，用 1330 帧人工标注张成的范围做"合理"的范围，范围的余量用留一视频定，并且先问"这帧本来是否合理"，合理就不动。两种各修好 12 帧错帧，留 7 帧标出，都没有把对的帧修坏到越过线。把找帧的同一个 fitting 量拿来做验收反而最差：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因为眼睛快动而被标出时，预报滞后，靠近预报的错误第二峰被接受。找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的证据。</p>
+    <table>
+      <thead><tr><th></th><th>几何规则（手定）</th><th>人工标注范围，两步，留一视频定余量</th><th>同一个 fitting 量</th></tr></thead>
+      <tbody>
+        <tr><td>23 帧错帧里修好的</td><td>12</td><td>12</td><td>5</td></tr>
+        <tr><td>错帧仍标出</td><td>7</td><td>7</td><td>14</td></tr>
+        <tr><td>错帧因判为闭眼未动</td><td>4</td><td>4</td><td>4</td></tr>
+        <tr><td>28 帧被标出的对的帧里被修的 / 修坏的</td><td>4 / 0</td><td>1 / 1</td><td>10 / 2</td></tr>
+        <tr><td>对的帧仍标出</td><td>7</td><td>6</td><td>18</td></tr>
+        <tr><td>全视频：修的 / 仍标出的帧比例</td><td>1.0% / 0.9%</td><td>0.8% / 1.2%</td><td>1.0% / 2.4%</td></tr>
+      </tbody>
+    </table>
+    <p><b>没修好的。</b>7 帧仍标出的错帧是多个点同时甩出、第二峰也不在瞳孔上的帧（视频 1、2、14）和视频 8 的一帧；4 帧未动的是眼睑规则判为闭眼的帧（视频 10、11），其中两帧是模型的眼睑点本身错了。被标出的对的帧，多数是眼睛快速移动的帧。整段视频里被修和仍标出的帧各约 1%，视频 1 和 8 最多；这些帧是不是真错，真值帧回答不了，已按同一规则从每个视频抽出修复帧和仍标出帧各 10 帧待人眼核对。脚本和结果：<code>scripts/error_tier.py</code>、<code>fit_threshold.py</code>、<code>acceptance_thresholds.py</code>、<code>flag_and_repair.py</code>；<code>results/error_tier/</code>、<code>results/fit_threshold/</code>、<code>results/acceptance_thresholds/</code>、<code>results/flag_and_repair/</code>。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Units and the line.</b> Every error and threshold in this section is a fraction of the video's eye width (the median distance between the two corners, taken from the model's predictions), so nothing has to be re-set for another camera or distance. The line for a wrong frame is 14% of the eye width; see the start of 8.1 and Figure 8-0.</p>
+    <p><b>Find.</b> DeepLabCut's own fitting score: for each of the 8 points the position in this frame is predicted from the point's earlier trajectory, the distance between the predicted and the actual position is measured, the largest of the 8 is taken, and the frame is flagged when it exceeds 14% of the eye width. The threshold is the line itself, no extra number: what is looked for is a frame in which one point moved by the distance that makes a frame wrong. All 23 wrong frames have this score above 25% of the eye width, so every leave-one-video-out fold finds all of them; the cost is 28 flagged frames among the 1307 right ones, 3.8% of all truth frames.</p>
+    <p><b>Repair.</b> In a flagged frame, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap. The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. Frames the eyelid distance calls closed are left alone.</p>
+    <p><b>Check.</b> After the replacement something has to judge whether the new position looks like a pupil point; if it passes, the frame counts as repaired, otherwise nothing is changed and the frame stays flagged. No frame is deleted: frames that cannot be repaired stay flagged, and whether to leave them out is for whoever uses the data. Seven acceptance tests were compared on the same 19 videos and the same truth frames; two are best. One is a hand-made geometry rule (the ratios of the four pupil points relative to the corners and eyelids inside bands around the video's median). The other contains no hand-set number: the range spanned by the 1330 human labels is the "plausible" range, its margin is set by leave-one-video-out, and it first asks whether the frame was plausible to begin with, leaving it alone if so. Both repair 12 of the 23 wrong frames and leave 7 flagged, and neither pushes a right frame over the line. Using the finder's own fitting score as the acceptance test is the worst option: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused, while a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; accepting needs evidence from the frame itself.</p>
+    <table>
+      <thead><tr><th></th><th>geometry rule (hand-made)</th><th>human-label range, two steps, margin by leave-one-video-out</th><th>the same fitting score</th></tr></thead>
+      <tbody>
+        <tr><td>repaired, of the 23 wrong frames</td><td>12</td><td>12</td><td>5</td></tr>
+        <tr><td>wrong frames still flagged</td><td>7</td><td>7</td><td>14</td></tr>
+        <tr><td>wrong frames left alone as closed-eye</td><td>4</td><td>4</td><td>4</td></tr>
+        <tr><td>of the 28 flagged right frames: repaired / made worse</td><td>4 / 0</td><td>1 / 1</td><td>10 / 2</td></tr>
+        <tr><td>right frames still flagged</td><td>7</td><td>6</td><td>18</td></tr>
+        <tr><td>whole videos: repaired / still flagged, share of all frames</td><td>1.0% / 0.9%</td><td>0.8% / 1.2%</td><td>1.0% / 2.4%</td></tr>
+      </tbody>
+    </table>
+    <p><b>What is not repaired.</b> The 7 wrong frames that stay flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14), plus one frame of video 8; the 4 untouched frames are the ones the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong. The flagged right frames are mostly frames in which the eye moved fast. Over the whole videos about 1% of the frames are repaired and about 1% stay flagged, most in videos 1 and 8; whether those are real errors the truth frames cannot say, so 10 repaired and 10 still-flagged frames per video were drawn by the same rule for a check by eye. Scripts and results: <code>scripts/error_tier.py</code>, <code>fit_threshold.py</code>, <code>acceptance_thresholds.py</code>, <code>flag_and_repair.py</code>; <code>results/error_tier/</code>, <code>results/fit_threshold/</code>, <code>results/acceptance_thresholds/</code>, <code>results/flag_and_repair/</code>.</p>
+  </div>
 </section>
 
 <!-- 9 -->
@@ -1596,14 +1634,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h2><span class="no">12</span><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></h2>
   <div class="text" lang="zh">
     <ul>
-      <li><b>不可信帧：</b>怎么把预测不可信的帧找出来、怎么继续降低它们，没有结论。详见第 8 步 8.1、8.2 节。</li>
+      <li><b>不可信帧：</b>找出错帧和修复已有一条流水线（8.3）：23 帧错帧全部找到，修好 12 帧。还没有结论的是剩下的 11 帧（多点同时甩出的 7 帧、被判为闭眼的 4 帧）怎么办，以及整段视频里被修和仍标出的各约 1% 的帧有多少是真错，等人眼核对。</li>
       <li><b>视频 4、5、8 误差偏大</b>（视频 8 在 25 px 以上）。原因是画面模糊，肉眼也难定点，标注者本身的判断就不稳定。整幅画面的清晰度和亮度与其他 Pluto 视频无差别，模糊在瞳孔边缘的局部，还没有量化。</li>
       <li><b>面积：</b>用四点法，全部测试帧上中位误差 5.4%，三点法 8.4%；但 19 个视频里有 4 个（视频 1、2、5、7）三点法更低，视频 4、8 两种算法都不准（43.8%、24.0%），这两点还没有解释。<b>平台点</b>集中在 20–40 帧（20 帧和 40 帧各 7 个视频，0 帧 2 个，60 帧 2 个，80 帧 1 个），但每个点只训练一次、测试集 50 帧，±20 帧内分不出。</li>
     </ul>
   </div>
   <div class="text" lang="en">
     <ul>
-      <li><b>Unreliable frames:</b> how to find the frames whose prediction cannot be trusted, and how to reduce them further, is unresolved. See step 8, sections 8.1 and 8.2.</li>
+      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (8.3): all 23 wrong frames are found and 12 repaired. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how many of the roughly 1% repaired and 1% still-flagged frames of the whole videos are real errors, which awaits a check by eye.</li>
       <li><b>Videos 4, 5 and 8 have larger errors</b> (video 8 above 25 px). The cause is a blurry image: the points are hard to place even by eye, so the labeler's own judgement is unstable. Whole-image sharpness and brightness do not differ from the other Pluto videos; the blur is local, at the pupil edge, and has not been quantified.</li>
       <li><b>Area:</b> the four-point rule is used; median error 5.4% on all test frames against 8.4% for the three-point rule. But on 4 of the 19 videos (videos 1, 2, 5, 7) the three-point rule is lower, and on videos 4 and 8 both rules are inaccurate (43.8%, 24.0%); neither is explained. <b>Plateau points</b> cluster at 20–40 labels (20 and 40 labels: 7 videos each; 0 labels: 2; 60 labels: 2; 80 labels: 1), but each point is a single training run on 50 test frames, so differences within ±20 labels cannot be resolved.</li>
     </ul>
