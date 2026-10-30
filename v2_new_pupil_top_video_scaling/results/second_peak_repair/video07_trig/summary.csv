@@ -1,0 +1,2 @@
+video,k_mad,bands,trigger,truth_frames,gt50_before,gt20_before,ok,closed,flagged_ok,unflagged_violation,repaired,drop,gt50_repaired_frames,gt50_repaired_to_lt50,gt50_repaired_to_lt20,gt50_dropped,gt50_left_untouched,gt50_unflagged,gt50_after_among_kept,gt20_after_among_kept,false_repairs_lt20_worse5px,repairs_lt20,false_drops_lt20,drops_20to50,median_rmse_before,median_rmse_after_kept,repaired_median_before,repaired_median_after
+7,5.0,pooled,fit_o200_max,70,0,1,69,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,5.72,5.72,,
