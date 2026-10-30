@@ -1,5 +1,12 @@
 # Second-peak repair of sporadic big errors (P2 step 3, pilot), 2026-10-26
 
+> **Note, 2026-10-30.** Wherever this file says *drop* or *dropped*, no frame was removed from anything: it is the
+> status of a flagged frame that the repair could not fix, and such frames simply stay flagged. Whether they are left out
+> later is a decision for whoever uses the data. The flagging threshold (95 % quantile, 44 px) and the geometry acceptance
+> used here were superseded on 10-30 by a threshold read off the > 50 px truth frames and by acceptance with the same
+> fitting criterion (`results/fit_threshold/`, `results/flag_and_repair/`). The numbers below are left as they were.
+
+
 Script: `scripts/second_peak_repair.py --video N [--k-mad 5] [--bands pooled|own] [--sheet]`. Inputs: the plateau model's
 whole-video predictions, the heatmap peak coordinates written by `scripts/heatmap_signals.py --peaks` (new option, one
 inference pass of ≈ 90 min per video; `results/heatmap_signals/videoNN_shuffleSSSS_peaks.csv`, local only) and the
