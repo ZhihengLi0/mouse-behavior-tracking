@@ -26,7 +26,7 @@ from second_peak_repair import BPS, P4, PL, RES, Geometry, load, peak2_pixels, p
 
 FAR = RES / "flag_and_repair"
 OUT = FAR / "all_videos"
-TESTS = ("fit", "geometry")
+TESTS = ("fit", "geometry", "conf", "jump", "labelgeo")
 GAP, LONG, N_PER, SEED = 5, 30, 10, 0
 
 
@@ -119,7 +119,7 @@ def figure(Wv):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(2, 1, figsize=(12, 7), sharex=True, constrained_layout=True)
+    fig, axes = plt.subplots(len(TESTS), 1, figsize=(12, 3.2 * len(TESTS)), sharex=True, constrained_layout=True)
     cols = {"flagged": "#9bb7d4", "repaired": "#2f6db3", "still flagged": "#e0a458"}
     bw = 0.27
     for ax, test in zip(axes, TESTS):
@@ -145,7 +145,7 @@ def main():
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     meta = PL[PL.status == "final"].set_index("video")[["mouse", "date", "labels_at_plateau", "plateau_median_px"]]
-    videos = sorted({int(p.name[5:7]) for p in FAR.glob("video*_fit")} & {int(p.name[5:7]) for p in FAR.glob("video*_geometry")})
+    videos = sorted(set.intersection(*[{int(p.name[5:7]) for p in FAR.glob(f"video*_{t}")} for t in TESTS]))
     W, S, ST, sample = [], [], [], []
     rng = np.random.default_rng(SEED)
     for v in videos:
@@ -185,6 +185,15 @@ def main():
     tot = pd.DataFrame(rows)
     tot.to_csv(OUT / "totals.csv", index=False)
     print(tot.T.to_string())
+    for test in TESTS:   # good frames at the 50-px tier, from the per-video truth_frames.csv
+        T50 = pd.concat([pd.read_csv(FAR / f"video{v:02d}_{test}" / "truth_frames.csv") for v in videos])
+        good, rp, nr = T50.rmse_before <= 50, T50.status == "repaired", T50.status == "flagged_not_repaired"
+        tot.loc[tot.accept == test, "le50_flagged"] = int((good & T50.flag).sum())
+        tot.loc[tot.accept == test, "le50_repaired"] = int((good & rp).sum())
+        tot.loc[tot.accept == test, "le50_made_worse5px"] = int((good & rp & (T50.rmse_after > T50.rmse_before + 5)).sum())
+        tot.loc[tot.accept == test, "le50_flagged_not_repaired"] = int((good & nr).sum())
+    tot.to_csv(OUT / "totals.csv", index=False)
+    print(tot.set_index("accept")[["gt50_repaired_to_lt50", "gt50_repaired_to_lt20", "gt50_flagged_not_repaired", "le50_flagged", "le50_repaired", "le50_made_worse5px", "le50_flagged_not_repaired", "repaired_pct", "flagged_not_repaired_pct"]].T.to_string())
     C = Sv.pivot(index="video", columns="accept", values=["gt50_before", "gt50_repaired_to_lt50", "gt50_flagged_not_repaired", "false_repairs_lt20_worse5px", "lt20_flagged_not_repaired"])
     C.columns = [f"{a}_{b}" for a, b in C.columns]
     C = C.merge(Wv.pivot(index="video", columns="accept", values=["flagged_pct", "repaired_pct", "flagged_not_repaired_pct"]).pipe(lambda D: D.set_axis([f"{a}_{b}" for a, b in D.columns], axis=1)), left_index=True, right_index=True)

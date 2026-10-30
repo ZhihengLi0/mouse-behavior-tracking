@@ -24,6 +24,11 @@ finder used, i.e. computed from the model's original trajectory; a repaired fram
 the frames after it (reported as a limitation).
 Repair, --accept geometry: repair_triggered() of triggered_repair.py with the new threshold; its "flagged_ok" is
 reported as "flagged_passes_check" and its "drop" as "flagged_not_repaired".
+Repair, --accept conf | jump | labelgeo (added the same day, scripts/acceptance_thresholds.py): same candidate points and
+replacement as --accept fit, accepted when the second peak's heatmap value is >= the conf cut (DeepLabCut's confidence
+on the candidate point), or when the candidate's displacement to the previous and next frame, relative to the median eye
+width, is <= the jump cut (DeepLabCut's jump criterion), or when the frame's twelve pupil-point quantities lie inside the
+range spanned by the 1330 human labels (labelgeo, no constant). Cuts and region from results/acceptance_thresholds/.
 
 Outputs in results/flag_and_repair/videoNN_<accept>/: summary.csv (truth frames), whole_video.csv, truth_frames.csv,
 frames_all.csv.gz (every frame, local only); the one-step predictions are cached in results/flag_and_repair/cache/
@@ -35,6 +40,7 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
+from acceptance_thresholds import eye_quantities, inside
 from second_peak_repair import BPS, P4, RES, Geometry, frame_rmse, load, peak2_pixels, pooled_bands, xy_frame
 from triggered_repair import repair_triggered
 
@@ -97,10 +103,33 @@ def repair_fit(G, xy, p2, pm, dev, i, thr, flagged):
     return "repaired", tuple(cand), new
 
 
+def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n):
+    """Same candidates and replacement as repair_fit; acceptance by conf / jump / labelgeo."""
+    if G.closed[i]:
+        return "closed", (), xy_frame(xy, i)
+    if not flagged:
+        return "ok", (), xy_frame(xy, i)
+    over = [b for b in BPS if dev[i, BPS.index(b)] > thr]
+    cand = [b for b in over if b in P4]
+    if not cand or len(cand) < len(over) or any(not np.isfinite(p2[b][i]).all() for b in cand):
+        return "flagged_not_repaired", (), xy_frame(xy, i)
+    new = xy_frame(xy, i)
+    for b in cand:
+        new[b] = p2[b][i]
+    if mode == "conf":
+        ok = min(peak2[b][i] for b in cand) >= cutv
+    elif mode == "jump":
+        jumps = [np.hypot(*(new[b] - xy[b][g])) / G.Wm for b in cand for g in (i - 1, i + 1) if 0 <= g < n and np.isfinite(xy[b][g]).all()]
+        ok = bool(jumps) and max(jumps) <= cutv
+    else:
+        ok = inside(eye_quantities(new, G.sign_lr, G.sign_tb), R)
+    return ("repaired", tuple(cand), new) if ok else ("flagged_not_repaired", (), xy_frame(xy, i))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--video", type=int, required=True)
-    ap.add_argument("--accept", choices=["fit", "geometry"], default="fit")
+    ap.add_argument("--accept", choices=["fit", "geometry", "conf", "jump", "labelgeo"], default="fit")
     ap.add_argument("--thr", type=float, default=None, help="flagging threshold in px; default = results/fit_threshold/chosen.csv")
     ap.add_argument("--k-mad", type=float, default=5.0)
     a = ap.parse_args()
@@ -120,11 +149,21 @@ def main():
     worst = np.array(BPS)[np.nanargmax(np.nan_to_num(dev, nan=-1), axis=1)]
     print(f"video {a.video}: {n} frames, fit_o200_max > {thr:.0f} px flags {100 * flag.mean():.2f} %, acceptance = {a.accept}")
     pm = predictions_cached(a.video, d, dev) if a.accept == "fit" else None
+    cutv, R = None, None
+    if a.accept in ("conf", "jump"):
+        ch = pd.read_csv(RES / "acceptance_thresholds" / "chosen.csv").set_index("test")
+        cutv = float(ch.loc[a.accept, "cut"])
+        print(f"acceptance cut {a.accept} {ch.loc[a.accept, 'accept_if']} {cutv}")
+    elif a.accept == "labelgeo":
+        R = pd.read_csv(RES / "acceptance_thresholds" / "label_region.csv").set_index("quantity")
+    peak2 = {b: H[f"{b}_peak2"].to_numpy(float) for b in BPS}
 
     status, reps, new_xy = [], [], {b: xy[b].copy() for b in BPS}
     for i in range(n):
         if a.accept == "fit":
             st, rep, new = repair_fit(G, xy, p2, pm, dev, i, thr, bool(flag[i]))
+        elif a.accept in ("conf", "jump", "labelgeo"):
+            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n)
         else:
             st, rep, new = repair_triggered(G, xy, p2, i, a.k_mad, bool(flag[i]), worst[i])
             st = {"flagged_ok": "flagged_passes_check", "drop": "flagged_not_repaired"}.get(st, st)
