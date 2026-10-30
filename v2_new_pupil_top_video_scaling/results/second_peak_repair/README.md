@@ -199,3 +199,34 @@ nothing is wrong. Videos 12, 0, 16, 6 and 7 followed on 10-29, so every video no
 - Video 10 frame 70282 and video 14 frame 64865 are multi-point throws (3–4 pupil points at once): dropped, as in
   video 2. Video 14 frame 59165 (27 px, pupil_right replaced, 27 → 41 px) is the one repair of a 20–50 px frame that got
   worse — the only such case in nineteen videos.
+
+## Across the nineteen videos (`all_videos/`, `scripts/triggered_repair_all_videos.py`, 2026-10-29)
+
+One script reads the nineteen `videoNN_trig/` folders and writes the tables side by side (`whole_video_all.csv`,
+`truth_summary_all.csv`, `totals.csv`), the time structure of the touched frames (`touched_structure.csv`), the figure
+`touched_share_per_video.png` and a spot-check sample drawn by the same rule on every video (below).
+
+- **Truth frames, all videos together**: 1330 frames, 32 above 50 px. The pipeline repairs 13 of them to below 50 px
+  (8 to below 20 px), drops 10 and leaves 9; among the kept frames 9 remain above 50 px, all of them frames it left
+  alone. Of the 1175 frames at or below 20 px, none is made worse by a repair and one is dropped; five frames between
+  20 and 50 px are dropped.
+- **Whole videos**: 1.31 million frames, 5.1 % flagged by the time-series rule, 1.3 % repaired, 1.0 % dropped. The
+  touched share per video runs from 0.09 % (video 16) to 8.5 % (video 8), median 1.2 %; the five videos above 2 % are
+  1, 8, 18, 15 and 6, the first four being the videos with the most > 50 px truth frames or the worst image quality.
+- **How the touched frames sit in time**: mostly in short episodes (median length one to three frames; a third to a
+  half of the episodes are single frames), but in videos 1, 6, 7, 8 and 12 a quarter to a half of the touched frames
+  lie in episodes of one second or longer, the longest 150–220 frames: there the model stays wrong for a while, and a
+  drop removes a whole stretch rather than a frame.
+- **Which point, how far**: the replaced point is pupil_left on most Pluto videos (video 1: 3538 of 3886 repairs,
+  video 6: 1369 of 1382, video 8: 1997 of 2394), pupil_right on videos 4 and 18, pupil_top on videos 13 and 15. On
+  videos 0, 1, 2, 3, 6, 10 and 11 the accepted second peak lies 260–530 px from the model's point: the model had put the
+  point at the image border (in video 6 pupil_left sits at the top edge of the image, the second peak on the pupil);
+  on the other videos the repairs move a point 70–130 px.
+- **Spot check by eye, same rule on every video** (`spotcheck_sample.csv`, sheets `spotcheck/videoNN.jpg` local only):
+  per video 10 repaired and 10 dropped frames, one frame per episode, episodes drawn at random (seed 0); 374 frames in
+  all (video 16 has only four dropped episodes). The `verdict` column (real error / false alarm / cannot tell) is empty
+  and is to be filled in by hand; until then the touched share of a video is not its error rate. A first look at
+  videos 6 and 12: the repaired frames of video 6 are the pupil_left-at-the-border case throughout, a real error mode
+  that this video's 70 truth frames do not contain, and its dropped frames are frames where the four pupil points
+  collapse onto the glint or the lid; video 12 is mixed, with some repairs moving pupil_top a short way along the
+  upper lid and some dropped frames showing a narrow, dark eye with plausible-looking points.

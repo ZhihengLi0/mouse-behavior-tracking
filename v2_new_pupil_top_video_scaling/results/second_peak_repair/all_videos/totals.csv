@@ -1,0 +1,2 @@
+videos,truth_frames,gt50_before,gt50_repaired_to_lt50,gt50_repaired_to_lt20,gt50_dropped,gt50_left_untouched,gt50_after_among_kept,frames_le20,false_repairs_lt20_worse5px,false_drops_lt20,drops_20to50,frames_total,flagged_total,repaired_total,dropped_total,flagged_pct,repaired_pct,dropped_pct,touched_pct_min,touched_pct_median,touched_pct_max,spotcheck_frames
+19,1330,32,13,8,10,9,9,1175,0,1,5,1309478,66285,16863,12733,5.06,1.29,0.97,0.09,1.22,8.45,374
