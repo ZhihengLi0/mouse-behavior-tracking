@@ -1,0 +1,3 @@
+rule,threshold_px,caught_gt50,positives_gt50,recall_gt50,flagged_le20,n_le20,false_share_le20,flagged_20to50,n_20to50,flagged_share_all,recall_minus_false
+max(recall - false share),36.0,31.0,32.0,0.9688,23.0,1175.0,0.0196,31.0,123.0,0.0639,0.9492
+95 % quantile (previous),44.0,27.0,32.0,0.8438,17.0,1175.0,0.0145,23.0,123.0,0.0504,0.8293
