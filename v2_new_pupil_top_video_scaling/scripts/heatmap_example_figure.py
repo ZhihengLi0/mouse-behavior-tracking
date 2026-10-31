@@ -94,8 +94,8 @@ def heatmaps(video, frames):
 def main():
     rows = pick()
     fig, axes = plt.subplots(len(rows), 4, figsize=(17, 3.7 * len(rows)), constrained_layout=True)
-    heads = ["before: red = the model's 8 points", "heatmap of the thrown point, whole frame, 8 px per cell\nred = peak 1 (reported), blue = peak 2, dashed = the view",
-             "the same heatmap in the view", "after: blue = the point moved to peak 2"]
+    heads = ["before: red = the model's 8 points", "heatmap of the thrown point, whole frame, 8 px per cell\ngreen to yellow = low to high; red = peak 1 (reported), blue = peak 2\ndashed box = the area the other panels show",
+             "the same heatmap inside the dashed box", "after: blue = the point moved to peak 2"]
     for i, (v, f, b, pts) in enumerate(rows):
         imgs, store, xy, p2, off, G, Wd = heatmaps(v, [f])
         img, (Hm, s) = imgs[0], store[0]
@@ -118,7 +118,7 @@ def main():
             for sp in ax.spines.values():
                 sp.set_visible(False)
             if i == 0:
-                ax.set_title(heads[c], fontsize=14)
+                ax.set_title(heads[c], fontsize=12)
         ax = axes[i][0]
         ax.imshow(img)
         for bb in BPS:
@@ -128,7 +128,7 @@ def main():
         ax.set_xlabel(f"video {v}, frame {f}: {b.replace('_', ' ')} thrown" + (" out of this view" if outside else "") + f"\npeak 1 scores {v1:.2f}, peak 2 scores {v2:.2f}", fontsize=13, loc="left")
         ax = axes[i][1]
         ax.imshow(img)
-        ax.imshow(hmask, extent=hext, cmap="autumn", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
+        ax.imshow(hmask, extent=hext, cmap="summer", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
         ax.plot(px, py, "o", mfc="none", mec="#ff3c3c", mew=2.5, ms=16)
         ax.plot(nx, ny, "o", mfc="none", mec="#5078ff", mew=2.5, ms=16)
         ax.add_patch(plt.Rectangle((x0, y0), w, h, fill=False, ec="white", lw=1.2, ls="--"))
@@ -136,7 +136,7 @@ def main():
         ax.set_ylim(img.shape[0], 0)
         ax = axes[i][2]
         ax.imshow(img)
-        ax.imshow(hmask, extent=hext, cmap="autumn", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
+        ax.imshow(hmask, extent=hext, cmap="summer", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
         ax.plot(nx, ny, "o", mfc="none", mec="#5078ff", mew=2.5, ms=16)
         if not outside:
             ax.plot(px, py, "o", mfc="none", mec="#ff3c3c", mew=2.5, ms=16)

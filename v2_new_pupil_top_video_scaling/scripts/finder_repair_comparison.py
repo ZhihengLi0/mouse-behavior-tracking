@@ -7,7 +7,8 @@ Reads results/flag_and_repair/videoNN_labelregion (fitting finder), videoNN_pca_
 (flag_and_repair.py --finder pca | either), acceptance = human-label range in every case. Per finder: on the 1330 truth
 frames, wrong frames before, flagged, repaired to good, wrong after, good frames repaired / made worse; on every frame of
 the 19 videos, shares flagged, repaired, flagged and not repaired, flagged but passing the check. Totals and per video.
-Outputs results/flag_and_repair/all_videos/finders.csv, finders_by_video.csv, finders.png. Nothing existing is modified."""
+Outputs results/flag_and_repair/all_videos/finders.csv, finders_by_video.csv, finders.png, finders_share_by_video.png
+(flagged share per video, fitting against PCA). Nothing existing is modified."""
 import sys
 from pathlib import Path
 
@@ -76,7 +77,7 @@ def main():
         ax.text(i + 1.5 * wdt, r.wrong_after + 0.4, f"{int(r.wrong_after)}", ha="center", fontsize=9, color="#d1495b")
         ax.text(i + 0.5 * wdt, r.wrong_repaired_to_good + 0.4, f"{int(r.wrong_repaired_to_good)}", ha="center", fontsize=9, color="#2f6db3")
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{r['name']}\ngood frames made worse: {int(r.good_made_worse)}" for _, r in R.iterrows()], fontsize=9)
+    ax.set_xticklabels([f"{r['name']}\n(good frames made worse: {int(r.good_made_worse)})" for _, r in R.iterrows()], fontsize=9)
     ax.set_ylabel("truth frames (of 1330)")
     ax.set_title("Truth frames: the 23 wrong frames with each finder", fontsize=10)
     ax.legend(frameon=False, fontsize=8.5)
@@ -88,7 +89,7 @@ def main():
         for dx, val in ((-wdt, r.repaired_pct), (0, r.flagged_not_repaired_pct), (wdt, r.flagged_passes_check_pct)):
             ax.text(i + dx, val + 0.05, f"{val:.2f}", ha="center", fontsize=8)
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{r['name']}\nflagged {r.flagged_pct:.1f} % of all frames" for _, r in R.iterrows()], fontsize=9)
+    ax.set_xticklabels([f"{r['name']}\n(flags {r.flagged_pct:.1f} %)" for _, r in R.iterrows()], fontsize=9)
     ax.set_ylabel("% of all 1.31 M frames")
     ax.set_title("Every frame of the 19 videos: what happens to the flagged frames", fontsize=10)
     ax.legend(frameon=False, fontsize=8.5)
@@ -97,6 +98,25 @@ def main():
         ax.grid(axis="y", color="0.92")
         ax.set_axisbelow(True)
     fig.savefig(OUT / "finders.png", dpi=150)
+
+    # flagged share per video, fitting against PCA
+    Pv = pd.DataFrame(per)
+    fit_s, pca_s = Pv[Pv.finder == "fit"].set_index("video").flagged_pct, Pv[Pv.finder == "pca"].set_index("video").flagged_pct
+    lab = pd.read_csv(RES / "finder_comparison" / "pca_threshold.csv").set_index("video")
+    fig, ax = plt.subplots(figsize=(10, 4.2), constrained_layout=True)
+    xs = np.arange(19)
+    ax.bar(xs - 0.2, fit_s.reindex(range(19)), 0.4, color="#2f6db3", label="fitting, threshold = the line (14 % of eye width)")
+    ax.bar(xs + 0.2, pca_s.reindex(range(19)), 0.4, color="#d1495b", label="PCA, threshold = 3.9 × the video's median score")
+    ax.set_xticks(xs)
+    ax.set_xticklabels([f"{v}\n{int(lab.labels_seen[v])}" for v in range(19)], fontsize=8.5)
+    ax.set_xlabel("video (second line: labeled poses the video's PCA was fitted on)")
+    ax.set_ylabel("% of the video's frames flagged")
+    ax.set_title("Share of every frame flagged by each finder, per video")
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.grid(axis="y", color="0.92")
+    ax.set_axisbelow(True)
+    ax.legend(frameon=False, fontsize=9)
+    fig.savefig(OUT / "finders_share_by_video.png", dpi=150)
 
 
 if __name__ == "__main__":
