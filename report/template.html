@@ -1034,8 +1034,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_pca_vs_labels.png" alt="The PCA finder against the number of labeled poses it is fitted on"></div>
-    <figcaption lang="zh"><span class="tag">图 9-4：</span>PCA 用不同数量的标注拟合时，两种阈值规则在最坏的视频上各标出多少帧；两者找到的错帧数一样（蓝色数字）。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Share of frames the two threshold rules flag in the worst video when the PCA is fitted on different numbers of labels; both find the same wrong frames (blue numbers).</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-4：</span>两种 PCA 阈值在最坏的视频上各标出多少帧，横轴是 PCA 用几帧标注拟合。红：所有视频同一个数，分数超过眼宽的 3% 就标出。蓝：每个视频先取自己全部帧分数的中位数，超过它的 3.9 倍才标出。眼宽只抵消相机远近，中位数还抵消标注多少带来的分数大小差异。两者找到的错帧数一样（蓝色数字）。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Share of frames two PCA thresholds flag in the worst video, against the number of labels the PCA is fitted on. Red: one number for every video, flagged when the score exceeds 3% of the eye width. Blue: each video takes the median score of all its frames and flags above 3.9 times it. The eye width only cancels camera distance; the median also cancels the change in score size with the number of labels. Both find the same wrong frames (blue numbers).</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_share.png" alt="Share of every frame flagged by fitting and by the PCA, per video"></div>
