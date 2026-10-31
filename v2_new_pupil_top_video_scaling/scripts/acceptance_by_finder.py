@@ -77,11 +77,13 @@ def main():
         ax.set_title(f"{fname}: the 23 wrong frames", fontsize=10)
         ax.set_ylabel("frames")
         ax = axes[row][1]
-        bw = 0.28
-        ax.bar(x - bw, Tf.good_repaired, width=bw - 0.03, color="#2f6db3", label="repaired")
-        ax.bar(x, Tf.good_made_worse, width=bw - 0.03, color="#d1495b", label="made worse")
-        ax.bar(x + bw, Tf.good_flagged_not_repaired, width=bw - 0.03, color="#e0a458", label="still flagged")
-        ax.set_title(f"{fname}: the {int(Tf.good_flagged.iloc[0])} right frames it flagged", fontsize=10)
+        bw = 0.21
+        passes = Tf.good_flagged - Tf.good_repaired - Tf.good_flagged_not_repaired
+        ax.bar(x - 1.5 * bw, Tf.good_repaired, width=bw - 0.02, color="#2f6db3", label="repaired")
+        ax.bar(x - 0.5 * bw, Tf.good_made_worse, width=bw - 0.02, color="#d1495b", label="made worse (part of repaired)")
+        ax.bar(x + 0.5 * bw, Tf.good_flagged_not_repaired, width=bw - 0.02, color="#e0a458", label="still flagged")
+        ax.bar(x + 1.5 * bw, passes, width=bw - 0.02, color="#cfcfcf", label="judged plausible as it is, left alone")
+        ax.set_title(f"{fname}: the {int(Tf.good_flagged.iloc[0])} right frames it flagged (repaired + still flagged + left alone = {int(Tf.good_flagged.iloc[0])})", fontsize=10)
         for ax in axes[row]:
             ax.set_xticks(x)
             ax.set_xticklabels([NAMES[a] for a in Tf.index], fontsize=8)

@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 16:50 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 17:02 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1260,8 +1260,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
-    <figcaption lang="zh"><span class="tag">图 9-8：</span>验收标准的比较，(a)–(g) 对应上文；上排 fitting 找出的帧，下排 PCA 找出的帧。左：23 帧错帧里修好的（蓝）、仍标出的（橙）、判为闭眼未动的（灰）。右：被标出的对帧里被修的、修坏的、仍标出的。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The acceptance tests, (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired, made worse, still flagged.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-8：</span>验收标准的比较，(a)–(g) 对应上文；上排 fitting 找出的帧，下排 PCA 找出的帧。左：23 帧错帧里修好的（蓝）、仍标出的（橙）、判为闭眼未动的（灰）。右：被标出的对帧里被修的（蓝，其中修坏的为红）、仍标出的（橙）、两步验收判为本来合理而不动的（灰），三类加起来等于被标出的对帧数。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The acceptance tests, (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired (blue, of which made worse in red), still flagged (orange), judged plausible as they are by a two-step test and left alone (grey); the three add up to the flagged right frames.</figcaption>
   </figure>
   <div class="text" lang="zh">
     <p><b>换找法，修法和验收不变。</b>fitting、PCA、两者任一，三种找法各在 19 个视频上跑一遍（图 9-9）。真值帧上三者几乎一样：23 帧错帧都找全，分别修好 12、11、12 帧，对的帧变差 1、0、1 帧。整段视频上 PCA 标出 2.4% 的帧、修好 0.72%，fitting 标出 3.8%、修好 0.78%，并集标出 4.2%、修好 0.80%。并集多标出的帧几乎都修不了：PCA 单独找到的错帧，第二峰过不了验收，留在"标出未修"里。所以找帧的进步没有变成修复的进步，这类帧要另找修法。</p>
