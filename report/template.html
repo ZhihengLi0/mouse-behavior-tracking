@@ -936,17 +936,31 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="zh">9.1 什么算错帧：误差以眼宽为单位，线在眼宽的 14%</span><span lang="en">9.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
   <div class="text" lang="zh">
     <p>误差用眼宽的倍数而不用像素，是为了换相机或换拍摄距离时同一个数仍然适用。把 1330 帧的误差画成直方图（图 9-1）：主体是一个鼓包，在眼宽的 13% 左右收尾；再往右是稀疏的一条尾巴。<b>线放在眼宽的 14%</b>，12.7% 到 15.4% 之间没有帧。超过线的帧叫错帧，其余都算对的帧。线是看直方图定的，方法和第 11 步的眨眼阈值一样。</p>
-    <p>空档的来历：线以下，模型的点仍在瞳孔边缘上，偏差只是边缘放在哪一圈，超不过瞳孔的尺寸（1307 帧主体帧里，模型最差的瞳孔点离瞳孔中心的距离中位数是 1.16 倍瞳孔半径，九成在 1.4 倍以内）；线以上，热图的最高峰跳到了别的结构上，眼角、眼睑、反光点或画面边缘（23 帧错帧里最差的点离瞳孔中心中位数 5 倍半径）。瞳孔外面紧挨着的是均匀的虹膜，热图在那里不形成峰，所以没有"刚离开瞳孔一点"的帧。</p>
   </div>
   <div class="text" lang="en">
     <p>Errors are in units of eye width rather than pixels so that the same numbers hold on another camera or at another distance. The histogram of the 1330 errors (Figure 9-1) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail. <b>The line is at 14% of the eye width</b>; there is no frame between 12.7% and 15.4%. Frames above the line are wrong frames, every other frame counts as right. The line was read off the histogram, as the blink threshold of step 11 was.</p>
-    <p>Where the gap comes from: below the line the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, which cannot exceed the pupil's size (in the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4); above the line the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border (in the 23 wrong frames the worst point is at a median 5 radii). The pupil is surrounded by uniform iris, where the heatmap forms no peak, so there is no frame "just outside the pupil".</p>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>
     <figcaption lang="zh"><span class="tag">图 9-1：</span>1330 帧真值帧的帧误差，以眼宽为单位，横轴对数刻度。蓝色是主体，红色是线右边的 23 帧错帧，虚线是眼宽 14% 的线。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-1:</span>Frame error of the 1330 truth frames in units of the eye width, log scale. Blue: the main group; red: the 23 wrong frames to the right of the line; dashed: the line at 14% of the eye width.</figcaption>
   </figure>
+  <div class="text" lang="zh">
+    <p><b>两群之间为什么是空的。</b></p>
+    <ol>
+      <li><b>线以下：</b>模型的点仍在瞳孔边缘上，偏差只是边缘放在哪一圈，所以超不过瞳孔的尺寸。1307 帧主体帧里，模型最差的瞳孔点离瞳孔中心的距离中位数是 1.16 倍瞳孔半径，九成在 1.4 倍以内。</li>
+      <li><b>线以上：</b>热图的最高峰跳到了别的结构上，眼角、眼睑、反光点或画面边缘。23 帧错帧里最差的点离瞳孔中心的中位数是 5 倍半径。</li>
+      <li><b>中间没有帧：</b>模型只在长得像它学过的那个点的地方给高分。瞳孔边缘是明暗分界，眼角、反光点、睑缘各有自己的样子，这些地方会出现峰；紧挨着瞳孔外面的虹膜是一片均匀的纹理，没有任何点长在那里，模型在那里不给高分，也就不会有峰。所以一个点要么留在瞳孔边缘上，要么跳到远处的另一个结构，不会停在"刚离开瞳孔一点"的地方。第 9.3 步的热图实例（图 9-4）里能看到这一点：两个峰一个在瞳孔边缘、一个在毛发或画面边缘，中间没有。</li>
+    </ol>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Why the gap between the two groups is empty.</b></p>
+    <ol>
+      <li><b>Below the line:</b> the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, so it cannot exceed the pupil's size. In the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4.</li>
+      <li><b>Above the line:</b> the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border. In the 23 wrong frames the worst point is at a median 5 radii.</li>
+      <li><b>Nothing in between:</b> the model scores high only where the image looks like the point it has learned. The pupil edge is a dark-to-light boundary; corners, glints and lid margins each have their own look, and peaks appear there. The iris right outside the pupil is a uniform texture in which no point was ever placed, so the model gives it no high score and no peak forms there. A point therefore either stays on the pupil edge or jumps to another structure far away; it does not stop "just outside the pupil". The heatmap examples of 9.3 (Figure 9-4) show this: one peak on the pupil edge, the other on the fur or the image border, nothing between them.</li>
+    </ol>
+  </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_above.jpg" alt="Every truth frame above the line, with the human labels and the model's points"></div>
     <figcaption lang="zh"><span class="tag">图 9-2a：</span>线以上的全部 23 帧，误差从大到小。绿圈 = 人工标注，红点 = 模型，黄线连起误差超过眼宽 7% 的点。每一帧都有点离开了眼睛。</figcaption>
