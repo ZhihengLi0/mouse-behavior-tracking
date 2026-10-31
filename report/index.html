@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 11:21 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 11:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1058,7 +1058,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li><b>线以下：</b>模型的点仍在瞳孔边缘上，偏差只是边缘放在哪一圈，所以超不过瞳孔的尺寸。1307 帧主体帧里，模型最差的瞳孔点离瞳孔中心的距离中位数是 1.16 倍瞳孔半径，九成在 1.4 倍以内。</li>
       <li><b>线以上：</b>热图的最高峰跳到了别的结构上，眼角、眼睑、反光点或画面边缘。23 帧错帧里最差的点离瞳孔中心的中位数是 5 倍半径。</li>
-      <li><b>中间没有帧：</b>模型只在长得像它学过的那个点的地方给高分。瞳孔边缘是明暗分界，眼角、反光点、睑缘各有自己的样子，这些地方会出现峰；紧挨着瞳孔外面的虹膜是一片均匀的纹理，没有任何点长在那里，模型在那里不给高分，也就不会有峰。所以一个点要么留在瞳孔边缘上，要么跳到远处的另一个结构，不会停在"刚离开瞳孔一点"的地方。第 9.3 步的热图实例（图 9-4）里能看到这一点：两个峰一个在瞳孔边缘、一个在毛发或画面边缘，中间没有。</li>
+      <li><b>中间没有帧：</b>模型只在长得像它学过的那个点的地方给高分。瞳孔边缘、眼角、睑缘、反光点各有自己的样子，峰只会出现在这些地方；从正确位置到另一个结构之间是一片均匀的虹膜、皮肤或毛发，没有任何点长在那里，模型在那里不给高分，也就不会有峰。所以一个点要么留在它该在的位置上，要么跳到远处的另一个结构，不会停在"刚离开一点"的地方。瞳孔点如此，眼角和睑缘的点也如此，第 9.3 步的热图实例（图 9-4）里能看到这一点：两个峰一个在正确位置、一个在毛发或画面边缘，中间没有。</li>
     </ol>
   </div>
   <div class="text" lang="en">
@@ -1066,7 +1066,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li><b>Below the line:</b> the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, so it cannot exceed the pupil's size. In the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4.</li>
       <li><b>Above the line:</b> the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border. In the 23 wrong frames the worst point is at a median 5 radii.</li>
-      <li><b>Nothing in between:</b> the model scores high only where the image looks like the point it has learned. The pupil edge is a dark-to-light boundary; corners, glints and lid margins each have their own look, and peaks appear there. The iris right outside the pupil is a uniform texture in which no point was ever placed, so the model gives it no high score and no peak forms there. A point therefore either stays on the pupil edge or jumps to another structure far away; it does not stop "just outside the pupil". The heatmap examples of 9.3 (Figure 9-4) show this: one peak on the pupil edge, the other on the fur or the image border, nothing between them.</li>
+      <li><b>Nothing in between:</b> the model scores high only where the image looks like the point it has learned. The pupil edge, the corners, the lid margins and the glints each have their own look, and peaks appear only there. Between the right place and the next structure lies a uniform stretch of iris, skin or fur in which no point was ever placed, so the model gives it no high score and no peak forms there. A point therefore either stays where it belongs or jumps to another structure far away; it does not stop just off its place. This holds for the pupil points and for the corner and lid points alike, and the heatmap examples of step 9.3 (figure 9-4) show it: of the two peaks one sits at the right place and one on the fur or the frame border, with nothing between them.</li>
     </ol>
   </div>
   <figure>
