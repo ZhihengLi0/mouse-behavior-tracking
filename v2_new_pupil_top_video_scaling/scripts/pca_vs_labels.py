@@ -100,21 +100,19 @@ def main():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=(8.5, 4.4), constrained_layout=True)
-    ax.plot(S.k, S.whole_video_flagged_max_pct, "^-", color="#d1495b", lw=1.6, label=f"fixed threshold ({100 * THR:.1f} % of eye width): worst video")
-    ax.plot(S.k, S.whole_video_flagged_median_pct, "o-", color="#e0a458", lw=1.6, label="fixed threshold: median video")
-    ax.plot(S.k, S.median_rule_flagged_max_pct, "^-", color="#2f6db3", lw=1.6, label=f"{MULT:.1f} × the video's median (used): worst video")
-    ax.plot(S.k, S.median_rule_flagged_median_pct, "o-", color="#7fa7d6", lw=1.6, label=f"{MULT:.1f} × the video's median (used): median video")
+    fig, ax = plt.subplots(figsize=(8, 3.8), constrained_layout=True)
+    ax.plot(S.k, S.whole_video_flagged_max_pct, "^-", color="#d1495b", lw=1.8, label=f"one fixed threshold for every video ({100 * THR:.1f} % of eye width)")
+    ax.plot(S.k, S.median_rule_flagged_max_pct, "o-", color="#2f6db3", lw=1.8, label=f"{MULT:.1f} × the video's own median (used)")
     for k, c, n in zip(S.k, S.median_rule_wrong_caught, S.wrong_frames):
-        ax.annotate(f"{c}/{n}", (k, S.median_rule_flagged_max_pct[S.k == k].iloc[0]), textcoords="offset points", xytext=(0, 7), ha="center", fontsize=8, color="#2f6db3")
+        ax.annotate(f"{c}/{n}", (k, S.median_rule_flagged_max_pct[S.k == k].iloc[0]), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=8, color="#2f6db3")
     ax.set_xlabel("labeled poses the PCA is fitted on")
-    ax.set_ylabel("% of the video's frames flagged")
-    ax.set_title("Whole videos: share flagged under the two threshold rules against the number of labels\n(blue numbers: wrong truth frames found by the median rule)", fontsize=10)
+    ax.set_ylabel("% of frames flagged, worst video")
+    ax.set_title("PCA threshold rule: share of frames flagged in the worst of the 19 videos\n(numbers: wrong truth frames found, the same under both rules)", fontsize=10)
     ax.set_xticks(KS)
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(color="0.92")
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, fontsize=8.5)
+    ax.legend(frameon=False, fontsize=9)
     fig.savefig(F.OUT / "pca_vs_labels.png", dpi=150)
 
 
