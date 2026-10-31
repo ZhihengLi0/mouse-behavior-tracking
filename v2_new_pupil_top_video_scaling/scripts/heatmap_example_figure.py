@@ -94,7 +94,7 @@ def heatmaps(video, frames):
 def main():
     rows = pick()
     fig, axes = plt.subplots(len(rows), 4, figsize=(17, 3.7 * len(rows)), constrained_layout=True)
-    heads = ["before: red = the model's 8 points", "heatmap of the thrown point, whole frame, 8 px per cell\nred ring = peak 1 (reported), blue ring = peak 2, dashed = the view",
+    heads = ["before: red = the model's 8 points", "heatmap of the thrown point, whole frame, 8 px per cell\nred = peak 1 (reported), blue = peak 2, dashed = the view",
              "the same heatmap in the view", "after: blue = the point moved to peak 2"]
     for i, (v, f, b, pts) in enumerate(rows):
         imgs, store, xy, p2, off, G, Wd = heatmaps(v, [f])
@@ -118,14 +118,14 @@ def main():
             for sp in ax.spines.values():
                 sp.set_visible(False)
             if i == 0:
-                ax.set_title(heads[c], fontsize=11)
+                ax.set_title(heads[c], fontsize=14)
         ax = axes[i][0]
         ax.imshow(img)
         for bb in BPS:
             ax.plot(*xy[bb][f], "o", mfc="none", mec="#ff3c3c", mew=2, ms=10)
         ax.set_xlim(x0, x1)
         ax.set_ylim(y1, y0)
-        ax.set_xlabel(f"video {v}, frame {f}: {b.replace('_', ' ')} thrown" + (" out of this view" if outside else "") + f"\npeak 1 scores {v1:.2f}, peak 2 scores {v2:.2f}", fontsize=10, loc="left")
+        ax.set_xlabel(f"video {v}, frame {f}: {b.replace('_', ' ')} thrown" + (" out of this view" if outside else "") + f"\npeak 1 scores {v1:.2f}, peak 2 scores {v2:.2f}", fontsize=13, loc="left")
         ax = axes[i][1]
         ax.imshow(img)
         ax.imshow(hmask, extent=hext, cmap="autumn", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
