@@ -1,0 +1,20 @@
+signal,family,needs_labels_of_video,n,auc,threshold_finds_all,good_flagged_at_full_recall,good_flagged_share,lovo_caught,lovo_good_flagged
+PCA of this video's training poses: reconstruction error,PCA,True,1330,1.0,0.0553,0,0.0,22,0
+"fitting (DLC default): mean of 8 points, order (3,0,1)",DeepLabCut,False,1330,0.9993,0.0492,4,0.0031,22,4
+"fitting, largest of 8, order (1,0,0)",fitting variant,False,1330,0.9988,0.258,8,0.0061,22,8
+trained detector D1 (leave-one-video-out),trained detector,True,1330,0.9984,0.9337,8,0.0061,22,8
+"rank combination (fitting, PCA, ensemble, confidence)",combination,True,1330,0.9992,0.8981,11,0.0084,22,10
+"fitting, largest of 8, order (2,0,0)  [used]",fitting variant,False,1330,0.998,0.2611,13,0.0099,20,10
+"fitting, forward and backward, largest",fitting variant,False,1330,0.9983,0.2191,16,0.0122,22,14
+"fitting, largest of 8, order (3,0,1)",fitting variant,False,1330,0.9982,0.199,18,0.0138,22,18
+logistic combination of the signals (leave-one-video-out),combination,True,1330,0.9992,3.3862,19,0.0145,22,19
+"fitting, largest of 8, order (5,0,1)",fitting variant,False,1330,0.9978,0.1976,19,0.0145,21,18
+"trained detector D1, no context",trained detector,True,1330,0.9982,0.8677,22,0.0168,22,22
+two models (seeds): largest disagreement,ensemble,False,1330,0.9824,0.0686,114,0.0872,19,104
+PCA of the mouse's training poses: reconstruction error,PCA,True,1330,0.9838,0.0079,198,0.1515,20,192
+"fitting, mean of 4 pupil points",fitting variant,False,1330,0.9872,0.0085,300,0.2295,22,295
+uncertain (DLC): lowest confidence,DeepLabCut,False,1330,0.9286,-0.49,329,0.2517,21,325
+mean confidence,DeepLabCut,False,1330,0.901,-0.8681,947,0.7246,22,939
+geometry: pupil width deviation,geometry,False,1330,0.839,0.0096,976,0.7467,21,966
+jump (DLC): largest move since previous frame,DeepLabCut,False,1330,0.911,0.0061,1124,0.86,22,1124
+geometry: pupil axes midpoint offset,geometry,False,1330,0.9328,0.0067,1194,0.9135,22,1178
