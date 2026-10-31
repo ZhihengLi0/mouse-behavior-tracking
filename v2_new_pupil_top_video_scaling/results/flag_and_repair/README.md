@@ -75,6 +75,25 @@ modified; the earlier pixel-based pipeline in `results/second_peak_repair/` is l
 - **Whole videos**: with either of the two best tests about 1 % of all frames are repaired and about 1 % stay flagged;
   the share per video follows the video's quality (video 8 and video 1 highest).
 
+## Error before and after the repair, all 19 videos
+
+`scripts/repair_before_after.py` reads the per-video `truth_frames.csv` of the seven tests and puts the old and the
+new error side by side: `all_videos/error_before_after.csv` (per video and test) and `all_videos/error_before_after.png`.
+The comparison exists only on the 1330 truth frames, the frames with human labels; for the whole videos only the share
+of frames changed can be given.
+
+| 1330 truth frames | before | geometry | fit | conf | jump | labelgeo | labelregion0 | labelregion |
+|---|---|---|---|---|---|---|---|---|
+| mean frame error, % of eye width | 3.14 | 2.92 | 3.02 | 2.95 | 3.05 | 2.95 | 2.95 | **2.91** |
+| median frame error, % of eye width | 2.00 | 1.99 | 2.00 | 1.99 | 2.00 | 1.99 | 1.99 | 1.99 |
+| frames above the line (wrong) | 23 | 11 | 18 | 14 | 18 | 13 | 13 | **11** |
+| frames changed / improved / made worse by > 1 % | | 16 / 16 / 0 | 14 / 12 / 2 | 19 / 16 / 2 | 15 / 12 / 3 | 17 / 15 / 1 | 14 / 14 / 0 | 13 / 12 / 1 |
+| whole videos, share of frames changed | | 1.0 % | 1.0 % | 1.6 % | 1.2 % | 1.1 % | 0.8 % | 0.8 % |
+
+With the adopted test only six videos change at all (1, 2, 4, 8, 10, 11, the videos that have wrong frames); video 1
+goes from 6.5 % to 4.5 % mean error and from 8 to 2 wrong frames. The median does not move because the repair touches
+about 1 % of the frames; the mean falls because the thrown points were far.
+
 ## Spot check by eye, same rule on every video
 
 `all_videos/spotcheck_sample.csv`: per video and per test, up to 10 repaired and 10 still-flagged frames, one per
@@ -86,6 +105,6 @@ length, fitting deviation in % of eye width). The `verdict` column is empty: rea
 
 `videoNN_<test>/`: `summary.csv` (truth frames), `whole_video.csv`, `truth_frames.csv` (errors in eye widths and in px);
 `frames_all.csv.gz` and `cache/videoNN_pred200.npy` local only. `all_videos/`: `whole_video_all.csv`,
-`truth_summary_all.csv`, `totals.csv`, `comparison.csv`, `touched_structure.csv`, `share_per_video.png`,
+`truth_summary_all.csv`, `totals.csv`, `comparison.csv`, `touched_structure.csv`, `error_before_after.csv`, `share_per_video.png`, `error_before_after.png`,
 `spotcheck_sample.csv`. Threshold and line: `results/error_tier/`, `results/fit_threshold/`,
 `results/acceptance_thresholds/`.
