@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1032,7 +1032,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
         <tr><td>脚本 / 结果</td><td><code>scripts/error_tier.py</code> / <code>results/error_tier/</code></td></tr>
       </tbody>
     </table>
-    <p>所有误差和阈值都用眼宽的倍数，换相机或换拍摄距离不用重定。把 1330 帧的误差画成直方图（图 8-0）：主体是一个鼓包，在眼宽的 13% 左右收尾，再往右是稀疏的一条尾巴，那些帧里有一个点被甩到了很远。线放在鼓包收尾处，眼宽的 14%，12.7% 到 15.4% 之间没有帧。超过线的叫<b>错帧</b>，其余都算对的帧。以前用过的 20 px 一档是标注噪声，人自己重标也放不准到这个程度，不再用。</p>
+    <p>所有误差和阈值都用眼宽的倍数，换相机或换拍摄距离不用重定。把 1330 帧的误差画成直方图（图 8-0）：主体是一个鼓包，在眼宽的 13% 左右收尾，再往右是稀疏的一条尾巴，那些帧里有一个点被甩到了很远。线放在鼓包收尾处，眼宽的 14%，12.7% 到 15.4% 之间没有帧。空档的来历：主体里的帧，模型的点都在瞳孔边缘附近，差别只是边缘放在哪一圈，这种偏差超不过瞳孔的半径；线以上的帧，热图的最高峰跑到了别的结构上，眼角、眼睑、反光点或画面边缘，点整个离开了瞳孔，误差一下就是几十个百分点。峰要么在瞳孔上要么不在，所以中间空着。超过线的叫<b>错帧</b>，其余都算对的帧。以前用过的 20 px 一档是标注噪声，人自己重标也放不准到这个程度，不再用。</p>
   </div>
   <div class="text" lang="en">
     <table>
@@ -1046,7 +1046,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
         <tr><td>Script / results</td><td><code>scripts/error_tier.py</code> / <code>results/error_tier/</code></td></tr>
       </tbody>
     </table>
-    <p>All errors and thresholds are fractions of the eye width, so nothing has to be re-set for another camera or distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which a point was thrown far. The line is put where the main group ends, at 14% of the eye width; there is no frame between 12.7% and 15.4%. A frame above the line is a <b>wrong frame</b>; every other frame counts as right. The 20-px level used earlier is label noise, a person relabeling cannot place the points to that precision, and is not used any more.</p>
+    <p>All errors and thresholds are fractions of the eye width, so nothing has to be re-set for another camera or distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which a point was thrown far. The line is put where the main group ends, at 14% of the eye width; there is no frame between 12.7% and 15.4%. Where the gap comes from: in the main group the model's points sit near the pupil edge and differ only in which ring of the edge they sit on, a deviation that cannot exceed the pupil's radius; above the line the heatmap's highest peak has moved to another structure, a corner, an eyelid, a glint or the image border, the point has left the pupil altogether, and the error is tens of per cent at once. The peak is either on the pupil or not, so the middle stays empty. A frame above the line is a <b>wrong frame</b>; every other frame counts as right. The 20-px level used earlier is label noise, a person relabeling cannot place the points to that precision, and is not used any more.</p>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>

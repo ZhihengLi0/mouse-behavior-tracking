@@ -64,7 +64,7 @@ def main():
     ax.hist(L.error_rel[L.error_rel <= line], bins=bins, color="#9bb7d4", label=f"{len(L) - n_wrong} frames: the main group")
     ax.hist(L.error_rel[L.error_rel > line], bins=bins, color="#d1495b", label=f"{n_wrong} frames: a point thrown far (wrong frame)")
     ax.axvline(line, color="0.25", lw=1.2, ls="--")
-    ax.text(line * 1.08, ax.get_ylim()[1] * 0.9, f"line: {100 * line:.1f} % of eye width\n≈ {line * E.eye_width_px.median():.0f} px on these videos", fontsize=9, color="0.25", va="top")
+    ax.text(line * 1.08, ax.get_ylim()[1] * 0.55, f"line: {100 * line:.0f} % of eye width\n≈ {line * E.eye_width_px.median():.0f} px on these videos", fontsize=9, color="0.25", va="top")
     ax.set_xscale("log")
     ax.set_xlabel("frame error of the plateau model against the human labels, in units of the eye width (log scale)")
     ax.set_ylabel("truth frames")
@@ -72,7 +72,7 @@ def main():
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", color="0.92")
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, fontsize=9)
+    ax.legend(frameon=False, fontsize=9, loc="upper left")
     ticks = [0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0]
     ax.set_xticks(ticks)
     ax.set_xticklabels([f"{100 * t:g} %" for t in ticks])

@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -806,7 +806,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
         <tr><td>Script / results</td><td><code>scripts/error_tier.py</code> / <code>results/error_tier/</code></td></tr>
       </tbody>
     </table>
-    <p>All errors and thresholds are fractions of the eye width, so nothing has to be re-set for another camera or distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which a point was thrown far. The line is put where the main group ends, at 14% of the eye width; there is no frame between 12.7% and 15.4%. A frame above the line is a <b>wrong frame</b>; every other frame counts as right. The 20-px level used earlier is label noise, a person relabeling cannot place the points to that precision, and is not used any more.</p>
+    <p>All errors and thresholds are fractions of the eye width, so nothing has to be re-set for another camera or distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which a point was thrown far. The line is put where the main group ends, at 14% of the eye width; there is no frame between 12.7% and 15.4%. Where the gap comes from: in the main group the model's points sit near the pupil edge and differ only in which ring of the edge they sit on, a deviation that cannot exceed the pupil's radius; above the line the heatmap's highest peak has moved to another structure, a corner, an eyelid, a glint or the image border, the point has left the pupil altogether, and the error is tens of per cent at once. The peak is either on the pupil or not, so the middle stays empty. A frame above the line is a <b>wrong frame</b>; every other frame counts as right. The 20-px level used earlier is label noise, a person relabeling cannot place the points to that precision, and is not used any more.</p>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>
