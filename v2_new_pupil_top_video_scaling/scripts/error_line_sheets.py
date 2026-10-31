@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Contact sheets as evidence for the error line (report 8.1), in units of eye width: every truth frame above the line
-(the 23 wrong frames) and every truth frame in the upper part of the main group (7 % to the line). Green ring = human
-label, red dot = model, yellow line joins the two where a point's error exceeds half the line. Output
+(the 23 wrong frames) and the 48 truth frames just below the line (the upper end of the main group). Green ring = human
+label, red dot = model, yellow line joins the two where the point's own error exceeds the line (the same 14 % of eye width). Output
 results/error_tier/sheet_above_line.jpg, sheet_below_line.jpg (English captions). Nothing existing is modified."""
 import cv2
 import numpy as np
@@ -51,7 +51,7 @@ def frame_tile(v, f, err):
         e = np.hypot(*(hum[b] - xy[b][f])) / Wm
         if np.isfinite(e) and e > werr:
             worst, werr = b, e
-        if np.isfinite(e) and e > line / 2:
+        if np.isfinite(e) and e > line:
             cd.line([hx, hy, px, py], fill=(255, 220, 0), width=2)
         if np.isfinite(hx) and np.isfinite(hy):
             cd.ellipse([hx - 5, hy - 5, hx + 5, hy + 5], outline=(60, 255, 60), width=3)
@@ -73,7 +73,8 @@ def sheet(D, title, name):
     print("saved", name, len(D), "frames")
 
 
-sheet(E[E.error_rel > line], f"Above the line: every truth frame with error > {100 * line:.0f}% of eye width ({int((E.error_rel > line).sum())} frames). green ring = human label, red = model, yellow line = point error > {50 * line:.0f}% of eye width", "sheet_above_line.jpg")
-sheet(E[(E.error_rel <= line) & (E.error_rel >= 0.07)], f"Below the line, upper part of the main group: every truth frame with error 7% to {100 * line:.0f}% of eye width ({int(((E.error_rel <= line) & (E.error_rel >= 0.07)).sum())} frames). Same colours", "sheet_below_line.jpg")
+sheet(E[E.error_rel > line], f"Above the line: every truth frame with error > {100 * line:.0f}% of eye width ({int((E.error_rel > line).sum())} frames). green ring = human label, red = model, yellow line = the point's own error > {100 * line:.0f}% of eye width (the same number as the line)", "sheet_above_line.jpg")
+N_BELOW = 48
+sheet(E[E.error_rel <= line].nlargest(N_BELOW, "error_rel"), f"Just below the line: the {N_BELOW} truth frames with the largest error that is still under {100 * line:.0f}% of eye width (the upper end of the main group). Same colours, same {100 * line:.0f}% rule for the yellow line", "sheet_below_line.jpg")
 for v in cache:
     cache[v][2].release()

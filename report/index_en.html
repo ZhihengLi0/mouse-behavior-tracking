@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:34 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:36 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -833,12 +833,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_above.jpg" alt="Every truth frame above the line, with the human labels and the model's points"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-2a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has left the eye.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-2a:</span>All 23 frames above the line, largest frame error first. Green ring = human label, red = model; a yellow line joins the two where the point's own error also exceeds 14% of the eye width, the same number as the line. In every frame a point has left the eye.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_below.jpg" alt="Every truth frame with error between 7 and 14 percent of eye width"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-2b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The points are all near the pupil edge; the blurry pupil of video 8 makes up most of them.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-2b:</span>The 48 frames just below the line, the upper end of the main group, same colours and the same 14% rule. A single point can exceed 14% while the frame error over the 8 points stays under the line; the points are all near the pupil edge, and the blurry pupil of video 8 makes up most of them.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on wrong frames:</span>one line, 14% of the eye width.
