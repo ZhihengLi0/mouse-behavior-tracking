@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 23:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 23:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1026,7 +1026,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 9 -->
 <section id="s9">
-  <h2><span class="no">9</span><span lang="zh">不可信帧：整段视频预测完以后，哪些帧的预测不可信，怎么不用标注把它们找出来，怎么用最少的人力修好</span><span lang="en">Unreliable frames: once a whole video is predicted, which frames cannot be trusted, how to find them without labels, and how to repair them with the least human effort</span></h2>
+  <h2><span class="no">9</span><span lang="zh">不可信帧：主动学习把误差降到饱和以后，整段视频里哪些帧的预测仍不可信，怎么不用标注把它们找出来，怎么用最少的人力修好</span><span lang="en">Unreliable frames: once active learning has brought the error to its plateau, which frames of a whole video are still not to be trusted, how to find them without labels, and how to repair them with the least human effort</span></h2>
   <div class="text" lang="zh">
     <p><b>问题。</b>每个视频的模型到平台点之后，整段视频预测完，仍有少数帧预测得明显不对。第 8 步说明置信度不能当错帧的判据，瞳孔上点置信度高时误差也有 8.3 px，所以下面找帧不用置信度，用时序。训练已经饱和，不再加标注，问题是：（1）哪些帧的预测不可信，要不用标注就找出来；（2）找出来的帧怎么用最少的人力修好。9.1 先定什么算错帧，9.2 找，9.3 修和验。</p>
   </div>
