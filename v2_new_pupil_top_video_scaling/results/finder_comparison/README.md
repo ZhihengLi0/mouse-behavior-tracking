@@ -30,12 +30,12 @@ video 18 (fitting 5.7 %): narrowed-eye frames absent from its 35 training poses 
 
 ## 3. By eye where the two disagree (`scripts/finder_disagreement_review.py`, `_eval.py`; `disagreement_review/`)
 
-4 frames per video and group at random (fixed-threshold PCA), judged blind, 145 of 148 judged (`finder_disagreement_verdicts.csv`,
-`result.csv/.png`): flagged by the PCA only, 70 judged: 39 really wrong, 22 fine, 9 cannot tell; flagged by fitting only,
-75 judged: 8 wrong, 59 fine, 8 cannot tell. The PCA-only errors are the four pupil points bunched beside the pupil for runs
-of frames, no jump; fitting's own flags are mostly fast eye movements. Weighted by each video's count of such frames
-(`per_video.csv`): the PCA alone points at an estimated 1 900 wrong frames without video 18 (4 500 with it), fitting alone
-at 1 800 out of 22 400 flagged.
+4 frames per video and group at random, drawn with the PCA at its first fixed threshold (3.0 %), judged blind, 145 of 148
+judged (`finder_disagreement_verdicts.csv`). Counted on the 117 judged frames that stay in the same group under the rule
+in use (3.93 × median, §5; `items_rule_in_use.csv`, `result.csv/.png`): flagged by the PCA only, 51 judged: 33 really
+wrong, 13 fine, 5 cannot tell; flagged by fitting only, 66 judged: 3 wrong, 56 fine, 7 cannot tell. On all 145 judged
+frames at the fixed threshold (`result_fixed_threshold.*`): 39 / 22 / 9 and 8 / 59 / 8. The PCA-only errors are the four
+pupil points bunched beside the pupil for runs of frames, no jump; fitting's own flags are mostly fast eye movements.
 
 ## 4. The PCA against the number of labels (`scripts/pca_vs_labels.py`, `pca_vs_labels*.csv/.png`)
 
