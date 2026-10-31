@@ -1,0 +1,4 @@
+finder,name,videos,truth_frames,wrong_before,wrong_flagged,wrong_repaired,wrong_repaired_to_good,wrong_after,good_flagged,good_repaired,good_made_worse,good_pushed_over_line,mean_error_before_pct,mean_error_after_pct,median_error_before_pct,median_error_after_pct,frames,flagged_pct,repaired_pct,flagged_not_repaired_pct,flagged_passes_check_pct,flagged_closed_pct
+fit,fitting,19,1330,23,23,12,12,11,28,1,1,0,3.14,2.911,1.995,1.99,1309478,3.817,0.777,1.155,1.417,0.468
+pca,PCA,19,1330,23,23,11,11,12,14,1,0,0,3.14,2.922,1.995,1.99,1309478,2.394,0.722,0.824,0.418,0.432
+either,either finder,19,1330,23,23,12,12,11,40,2,1,0,3.14,2.908,1.995,1.99,1309478,4.197,0.801,1.179,1.743,0.474
