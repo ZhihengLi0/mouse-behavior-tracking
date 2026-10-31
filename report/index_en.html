@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -793,6 +793,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
   <h3><span lang="en">8.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
+  
+  <div class="text" lang="en">
+    <p><b>The question.</b> Once a video's model has reached its plateau and the whole video is predicted, a few frames are still clearly wrong. Step 3 compared DeepLabCut's three outlier algorithms as pickers of the next frames to label in active learning and chose jump. The question here is different: training has saturated and no labels are added, so (1) which frames cannot be trusted, to be found without labels, and (2) how to repair them with the least human effort. 8.1 defines a wrong frame, 8.2 finds them, 8.3 repairs and checks.</p>
+  </div>
   <p class="text"><b><span lang="en">Basic information (shared by 8.1–8.3)</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra).</span></td></tr>
@@ -833,7 +837,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="en">8.2 Finding wrong frames: fitting finds all 23, its threshold is the line itself</span></h3>
   
   <div class="text" lang="en">
-    <p>DeepLabCut ships three algorithms for suspicious frames; each gives every frame one number from the model's predictions alone, no labels, and the frame is flagged when the number crosses a threshold.</p>
+    <p>DeepLabCut ships three algorithms for suspicious frames; each gives every frame one number from the model's predictions alone, no labels, and the frame is flagged when the number crosses a threshold. The course of the work: the three were compared on the 1330 frames and fitting was best; attempts to beat it at the 20-px level with other signals, detectors trained on our truth, the heatmap shape and a second model trained with another seed did not succeed; once the line was set at 14% of the eye width fitting found every wrong frame, so the finding step was settled and the question moved to the repair.</p>
     <ol>
       <li><b>jump:</b> the displacement of the point that moved farthest since the previous frame, divided by the eye width.</li>
       <li><b>uncertain:</b> the lowest confidence of the 8 points.</li>
@@ -852,7 +856,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>AUC: fitting 1.00 (default form and the form used here alike), uncertain 0.93, jump 0.91. To find all 23 frames fitting flags 0.3–1.0% of the right frames, uncertain 25%, jump 86%: a thrown point usually stays where it landed and does not jump again, so jump cannot see it; confidence is only loosely tied to error (start of step 8).</li>
       <li>Threshold = the line (14% of the eye width): all 23 found, 28 of the 1307 right frames flagged, 3.8% of all truth frames. All 23 wrong frames have deviations above 25% of the eye width, so holding out each video in turn and checking with the other 18 finds all of them in every round.</li>
       <li>The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
-      <li>Other signals and detectors trained on our truth, tried earlier at the 20-px level, did not beat fitting; the record is in <code>results/unreliable_frames_sweep/</code> and <code>results/tier50_reeval/</code> and is not repeated here.</li>
+      <li>No attempt to beat fitting succeeded; the record is in <code>results/unreliable_frames_sweep/</code>, <code>results/tier50_reeval/</code> and <code>results/error_detector/</code> and is not repeated here.</li>
     </ol>
   </div>
 
