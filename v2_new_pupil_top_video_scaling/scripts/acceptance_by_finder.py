@@ -63,7 +63,7 @@ def main():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(2, 2, figsize=(14, 8.6), constrained_layout=True)
+    fig, axes = plt.subplots(2, 2, figsize=(16, 9), constrained_layout=True)
     for row, (key, fname, _) in enumerate(FINDERS):
         Tf = T[T.finder == key].set_index("accept")
         Tf = Tf.loc[[a for a in ORDER if a in Tf.index]]
@@ -83,14 +83,17 @@ def main():
         ax.bar(x - 0.5 * bw, Tf.good_made_worse, width=bw - 0.02, color="#d1495b", label="made worse (part of repaired)")
         ax.bar(x + 0.5 * bw, Tf.good_flagged_not_repaired, width=bw - 0.02, color="#e0a458", label="still flagged")
         ax.bar(x + 1.5 * bw, passes, width=bw - 0.02, color="#cfcfcf", label="judged plausible as it is, left alone")
+        ax.set_ylim(0, 1.4 * max(Tf.good_repaired.max(), Tf.good_flagged_not_repaired.max(), passes.max()))
         ax.set_title(f"{fname}: the {int(Tf.good_flagged.iloc[0])} right frames it flagged (repaired + still flagged + left alone = {int(Tf.good_flagged.iloc[0])})", fontsize=10)
         for ax in axes[row]:
             ax.set_xticks(x)
-            ax.set_xticklabels([NAMES[a] for a in Tf.index], fontsize=8)
+            ax.set_xticklabels([NAMES[a] for a in Tf.index], fontsize=7.5)
             ax.spines[["top", "right"]].set_visible(False)
             ax.grid(axis="y", color="0.92")
             ax.set_axisbelow(True)
-            ax.legend(frameon=False, fontsize=8.5)
+        axes[row][0].legend(frameon=False, fontsize=8.5, loc="upper right", bbox_to_anchor=(1.0, 1.0))
+        axes[row][0].set_ylim(0, 23 * 1.3)
+        axes[row][1].legend(frameon=False, fontsize=8.5, loc="upper center", ncol=2)
     fig.suptitle("Acceptance tests for the second-peak repair under each finder, same 19 videos", fontsize=11)
     fig.savefig(OUT / "acceptance_by_finder.png", dpi=150)
     print("saved", OUT / "acceptance_by_finder.png")
