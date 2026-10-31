@@ -107,11 +107,23 @@ def main():
     xs = np.arange(19)
     ax.bar(xs - 0.2, fit_s.reindex(range(19)), 0.4, color="#2f6db3", label="fitting, threshold = the line (14 % of eye width)")
     ax.bar(xs + 0.2, pca_s.reindex(range(19)), 0.4, color="#d1495b", label="PCA, threshold = 3.9 × the video's median score")
+    # wrong truth frames of each video and how many each finder found
+    wf = Pv[Pv.finder == "fit"].set_index("video"); wp = Pv[Pv.finder == "pca"].set_index("video")
+    top = max(fit_s.max(), pca_s.max())
+    for v in range(19):
+        n = int(wf.wrong_before[v])
+        if n == 0:
+            continue
+        a_, b_ = int(wf.wrong_flagged[v]), int(wp.wrong_flagged[v])
+        txt = f"{a_}/{n}" if a_ == b_ else f"{a_}/{n} | {b_}/{n}"
+        ax.text(v, max(fit_s[v], pca_s[v]) + 0.25, txt, ha="center", va="bottom", fontsize=8.5, color="0.2", fontweight="bold")
+    ax.text(0.99, 0.72, "n/n above a video = its wrong truth frames found / its wrong truth frames\n(same for both finders; videos without a number have no wrong truth frame)", transform=ax.transAxes, ha="right", va="top", fontsize=8.5, color="0.3")
+    ax.set_ylim(0, top * 1.12)
     ax.set_xticks(xs)
     ax.set_xticklabels([f"{v}\n{int(lab.labels_seen[v])}" for v in range(19)], fontsize=8.5)
     ax.set_xlabel("video (second line: labeled poses the video's PCA was fitted on)")
     ax.set_ylabel("% of the video's frames flagged")
-    ax.set_title("Share of every frame flagged by each finder, per video")
+    ax.set_title("Share of every frame flagged by each finder, per video, and the wrong truth frames found")
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", color="0.92")
     ax.set_axisbelow(True)

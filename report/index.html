@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 14:52 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 15:00 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1142,8 +1142,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_share.png" alt="Share of every frame flagged by fitting and by the PCA, per video"></div>
-    <figcaption lang="zh"><span class="tag">图 9-4：</span>整段视频上两种信号各标出多少帧，按视频；横轴第二行是该视频的 PCA 用的标注姿态数。fitting 的阈值是线，PCA 的阈值是本视频中位数的 3.9 倍。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Share of every frame flagged by each signal, per video; the second line of the axis gives the labeled poses the video's PCA was fitted on. Fitting at the line, the PCA at 3.9 × the video's median.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-4：</span>按定好的阈值直接跑，整段视频上两种信号各标出多少比例的帧，按视频，这就是实际要人去看的量；横轴第二行是该视频的 PCA 用的标注姿态数。柱子上方的 n/n 是该视频真值帧里的错帧有几帧被找到，两种信号都全部找到，没有数字的视频没有错帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Run with the thresholds as set, the share of every frame each signal flags, per video, which is what a person would have to look at; the second line of the axis gives the labeled poses the video's PCA was fitted on. The n/n above a video: how many of its wrong truth frames were found, all of them by both signals; videos without a number have no wrong truth frame.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_finder_disagreement.png" alt="By-eye verdicts on frames flagged by only one of the two finders"></div>
