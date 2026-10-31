@@ -130,7 +130,7 @@ def fig_signals(T):
             txt += f"   (forms: {lo:.1f}–{hi:.1f} %)"
             xt = hi
         else:
-            xt = x
+            xt = x if r.good_flagged_share > 0 else 0.056
         txt += f"   held-out videos: {int(r.lovo_caught)} of 23 found"
         ax.text(xt * 1.12, i, txt, va="center", fontsize=8.5, color=col if col != "0.55" else "0.25")
         labels.append(label)
