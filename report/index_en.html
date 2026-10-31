@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:13 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:23 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -852,13 +852,25 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="en">9.2 Finding wrong frames: fitting sees jumps in time, the PCA sees implausible shapes, the two complement each other</span></h3>
   
   <div class="text" lang="en">
-    <p>A finder looks only at the model's predictions, gives every frame one number and flags the frame when the number crosses a threshold. Every candidate we could think of was compared at the 14% line (Figure 9-3) and they fall into two tiers: fitting, the PCA, detectors trained on the truth frames and combinations of signals all find the 23 wrong frames while flagging at most a dozen of the 1307 right frames, and cannot be ranked among themselves; confidence, jump, geometry and two-model disagreement flag an order of magnitude more. Of the first tier the two that need no training and no combination are used: fitting sees jumps in time, the PCA sees implausible shapes.</p>
+    <p>A finder looks only at the model's predictions, gives every frame one number and flags the frame when the number crosses a threshold. The candidates were compared at the 14% line (Figure 9-3); this page uses two: fitting sees jumps in time, the PCA sees implausible shapes. Both find all 23 wrong frames, but not the same frames.</p>
     <ol>
       <li><b>jump:</b> the displacement of the point that moved farthest since the previous frame, divided by the eye width.</li>
       <li><b>uncertain:</b> the lowest confidence of the 8 points.</li>
       <li><b>fitting:</b> a time-series model (SARIMAX, one fit per whole video, points with confidence below 0.01 treated as missing) fitted to each point's x and y trajectory predicts the point's position in this frame from the preceding frames; a point's deviation = distance between predicted and actual position, divided by the eye width. DeepLabCut's default takes the mean deviation of the 8 points, order (3,0,1); this page takes the largest of the 8, order (2,0,0).</li>
       <li><b>PCA:</b> the human-labeled poses the video's model was trained on (8 points, 16 coordinates, the 17–73 frames up to the plateau) go through a principal component analysis keeping 99% of the variance, which gives the subspace of "normal poses"; the predicted pose of every frame is projected onto it and reconstructed, and the RMS of the 8 points' reconstruction residuals divided by the eye width is the frame's score; a single point's residual says which point to repair. It does not look at neighbouring frames, so a single frame suffices, but it needs the video's own training labels.</li>
-      <li><b>Thresholds:</b> the largest-of-8 form of fitting measures exactly "how far one point strayed", so its threshold is the line for a wrong frame: a frame is flagged when one point's deviation exceeds 14% of the eye width, no extra number. The PCA threshold = 3.9 × the median score of all frames of the video, computed from the video's own predictions, no labels; the multiple is set the way the line was, the multiple that just finds all 23 wrong frames on the truth frames divided by the margin the fitting line leaves to its smallest wrong frame. A fixed share of the eye width will not do: the share needed drifts with the number of labels the PCA saw (11.5% at 10 labels, 6% at 20, 5% at 30), and fixed it flags 18% of video 18 where the median rule flags 3% (Figure 9-6).</li>
+      <li><b>Threshold of fitting = the line, 14% of the eye width.</b>
+        <ul>
+          <li>It measures exactly how far the farthest point strayed, in eye widths, the same quantity that defines a wrong frame, so the line itself is the threshold, no extra number.</li>
+          <li>All 23 wrong frames have a largest deviation above 25% of the eye width, so the line leaves a margin of almost two; holding out each video in turn and checking with the other 18 finds all of them in every round.</li>
+        </ul>
+      </li>
+      <li><b>Threshold of the PCA = 3.9 × the median score of all frames of the video.</b>
+        <ul>
+          <li>Why per video: the scale of the PCA score drifts with the number of labels it saw. The score that just finds all wrong frames is 11.5% of the eye width with 10 labels, 6% with 20, 5% with 30; fixed to one share, video 18 gets 18% of its frames flagged (Figure 9-6).</li>
+          <li>Why the median: most frames of a video are normal, so the median is the video's own background, computed from the predictions without labels; as a multiple of the median the threshold no longer drifts with the number of labels.</li>
+          <li>How the multiple was set: on the truth frames, as the line was. The lowest-scoring of the 23 wrong frames sits at 7.2 × its video's median; divided by the margin the fitting line leaves to its smallest wrong frame, 1.84, that gives 3.9. Every held-out video finds all of them; video 18 drops to 3%.</li>
+        </ul>
+      </li>
     </ol>
   </div>
   <figure>
