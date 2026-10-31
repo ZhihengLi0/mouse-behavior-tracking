@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:17 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:26 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -869,25 +869,34 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Acceptance tests compared (seven, same frames):</b> (a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels; the range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th; the frame is first checked as it is and left alone if already plausible. (b) <b>geometry rule</b>: the same quantities with hand-set bands (video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order). (c) <b>the same fitting score</b>: the replaced point's distance to the same prediction falls below the line. (d) second-peak confidence at least 0.238; (e) displacement of the replaced point to the previous and next frame at most 0.485 eye widths; (f) label range without margin and without the plausibility check first; (g) label range without margin, with the check first. The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise "right repairs accepted" minus "wrong repairs accepted".</li>
     </ol>
   </div>
+  
+  <div class="text" lang="en">
+    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus a small offset inside it, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the pupil edge usually still holds a local high cell, at least 3 cells away from the highest: the second peak. The repair moves the thrown point to the second peak, and the check then decides whether that place looks like a pupil point. Figure 8-3 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-3:</span>Three repaired frames. Left to right: before, red = the model's 8 points, the thrown point outside the view; the heatmap of that point over the whole frame, red ring = peak 1 (the reported position), blue ring = peak 2, dashed box = the view of the other panels; the same heatmap inside the view, peak 2 on the pupil edge; after, blue = the point moved to peak 2.</figcaption>
+  </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-4:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
-  </figure>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_error_before_after.png" alt="Error of the 1330 truth frames before and after the repair, per video and per frame"></div>
-    
-    <figcaption lang="en"><span class="tag">Figure 8-5:</span>Error before and after the repair on the 1330 truth frames of all 19 videos. Left: mean error of each video's 70 frames, grey = before, blue = after (human-label range), black marker = geometry rule; the numbers are the frames above the line before→after. Right: every frame before against after, log axes, dashed = the 14% line.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-5:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
     
     <figcaption lang="en"><span class="tag">Figure 8-6:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-7:</span>Repaired frames from the check by eye, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
@@ -897,7 +906,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
-      <li>Before and after (Figure 8-5): the mean error of the 1330 frames falls from 3.1% to 2.9% of the eye width, the frames above the line from 23 to 11, one frame gets worse; the median does not move because only 1% of the frames are changed. Only the six videos with wrong frames change; video 1 goes from 6.5% to 4.5%.</li>
       <li>Whole videos (Figure 8-6): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
     </ol>
   </div>
