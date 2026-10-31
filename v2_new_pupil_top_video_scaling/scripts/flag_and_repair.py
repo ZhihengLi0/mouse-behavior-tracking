@@ -3,6 +3,19 @@
 Everything in units of the video's eye width, nothing is ever deleted.
 
     python flag_and_repair.py --video 8 [--accept geometry|fit|conf|jump|labelgeo|labelregion] [--thr 0.14] [--margin 0]
+                              [--finder fit|pca|either] [--out DIR]
+
+Finder option (user, 2026-10-31): --finder fit (default) is the fitting deviation below, unchanged; --finder pca flags by
+the PCA reconstruction error of scripts/pca_threshold.py (score and per-point residuals read from
+results/finder_comparison/pca_cache/videoNN_pca.npz, threshold = that file's per-video threshold, a multiple of the
+video's median score); --finder either flags a frame when either finder does, candidate points = the union of the two
+candidate sets. Candidate point of a PCA-flagged frame: the point with the largest residual, if it is a pupil point, none when
+the largest residual sits on an eye-outline point (candidates_pca; the reconstruction residual spreads over all 8
+points, so the strict fitting rule repairs nothing here, see the function for the rules tried). The repair
+and the acceptance tests are the same for every finder.
+Output folder videoNN_<accept> for fit (as before), videoNN_<finder>_<accept> for pca and either; --out overrides it
+(verification). With pca or either the outputs carry the extra columns pca_rel, flag_fit, flag_pca, finder; with fit
+they are unchanged. The acceptance test "fit" is only defined for the fitting finder.
 
 Decisions of 2026-10-30 (user): (1) errors and thresholds are measured in units of the eye width (median corner-to-corner
 distance of the plateau model's predictions, label-free), so the numbers carry over to another camera; (2) the only
@@ -36,6 +49,7 @@ Outputs in results/flag_and_repair/videoNN_<accept>[<margin>]/: summary.csv (tru
 truth_frames.csv, frames_all.csv.gz (every frame, local only). Nothing existing is modified."""
 import argparse
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -94,12 +108,31 @@ def candidates(dev, i, thr):
     return cand if cand and len(cand) == len(over) else None
 
 
-def repair_fit(G, xy, p2, pm, dev, i, thr, flagged):
+def candidates_pca(res, i, thr):
+    """PCA finder: the point with the largest reconstruction residual, if it is a pupil point; None when the largest
+    residual sits on an eye-outline point (nothing to repair there). The residual spreads over all 8 points, so the
+    strict fitting rule (every point over the threshold) repairs nothing here; of four rules tried on videos 1, 8, 12, 15
+    (that strict rule plus the worst pupil point; the worst pupil point alone; the worst plus the pupil points with at
+    least half its residual; all four pupil points) the worst point alone repaired by far the most frames (video 1:
+    3665 against 146 / 282 / 66) and repaired the truth frames as well as the fitting finder does (6 of 8 in video 1,
+    the one of video 8); the others repaired 1 of 8. 2026-10-31."""
+    r = np.nan_to_num(res[i], nan=-1)
+    worst = BPS[int(np.argmax(r))]
+    return [worst] if worst in P4 else None
+
+
+def candidates_either(dev, res, i, thr, thr_pca, flagged_fit, flagged_pca):
+    """Union of the candidate sets of the finders that flagged the frame; None when none of them names a pupil point."""
+    sets = [c for c in ((candidates(dev, i, thr) if flagged_fit else None), (candidates_pca(res, i, thr_pca) if flagged_pca else None)) if c]
+    return [b for b in P4 if any(b in c for c in sets)] if sets else None
+
+
+def repair_fit(G, xy, p2, pm, dev, i, thr, flagged, cand_fn=None):
     if G.closed[i]:
         return "closed", (), xy_frame(xy, i)
     if not flagged:
         return "ok", (), xy_frame(xy, i)
-    cand = candidates(dev, i, thr)
+    cand = cand_fn(i) if cand_fn else candidates(dev, i, thr)
     if not cand:
         return "flagged_not_repaired", (), xy_frame(xy, i)
     new = xy_frame(xy, i)
@@ -111,12 +144,12 @@ def repair_fit(G, xy, p2, pm, dev, i, thr, flagged):
     return "repaired", tuple(cand), new
 
 
-def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n):
+def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None):
     if G.closed[i]:
         return "closed", (), xy_frame(xy, i)
     if not flagged:
         return "ok", (), xy_frame(xy, i)
-    cand = candidates(dev, i, thr)
+    cand = cand_fn(i) if cand_fn else candidates(dev, i, thr)
     if not cand or any(not np.isfinite(p2[b][i]).all() for b in cand):
         return "flagged_not_repaired", (), xy_frame(xy, i)
     new = xy_frame(xy, i)
@@ -143,11 +176,14 @@ def main():
     ap.add_argument("--thr", type=float, default=None, help="flagging threshold in eye widths; default = results/fit_threshold/chosen.csv, first row")
     ap.add_argument("--k-mad", type=float, default=5.0)
     ap.add_argument("--margin", type=float, default=None, help="labelregion only: widen the label range by this fraction; output folder videoNN_labelregion<margin*100>")
+    ap.add_argument("--finder", choices=["fit", "pca", "either"], default="fit", help="which finder flags the frames (default fit, unchanged behaviour)")
+    ap.add_argument("--out", default=None, help="output folder override (verification only)")
     a = ap.parse_args()
+    assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
     thr = a.thr if a.thr is not None else float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_eye_widths)
     line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
     tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
-    out = OUT / f"video{a.video:02d}_{tag}"
+    out = Path(a.out) if a.out else OUT / (f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}")
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
@@ -159,9 +195,24 @@ def main():
     assert dev_px.shape == (n, len(BPS))
     dev = dev_px / G.Wm
     fit = np.nanmax(dev, axis=1)
-    flag = fit > thr
-    worst = np.array(BPS)[np.nanargmax(np.nan_to_num(dev, nan=-1), axis=1)]
-    print(f"video {a.video}: {n} frames, eye width {G.Wm:.0f} px, fit_o200_max > {thr:.3f} eye widths (≈ {thr * G.Wm:.0f} px) flags {100 * flag.mean():.2f} %, acceptance = {tag}")
+    flag_fit = fit > thr
+    cand_fn, cdev = None, dev                               # how the candidate points of a flagged frame are picked (None = the fitting rule)
+    if a.finder == "fit":
+        flag, pca_rel, flag_pca, thr_pca = flag_fit, None, None, np.nan
+    else:
+        z = np.load(RES / "finder_comparison" / "pca_cache" / f"video{a.video:02d}_pca.npz")
+        pca_res, pca_rel, thr_pca = z["residuals"], z["score"], float(z["threshold"])
+        assert pca_res.shape == (n, len(BPS)) and abs(float(z["eye_width_px"]) - G.Wm) < 0.5
+        flag_pca = pca_rel > thr_pca
+        if a.finder == "pca":
+            flag, cdev = flag_pca, pca_res
+            cand_fn = lambda i: candidates_pca(pca_res, i, thr_pca)  # noqa: E731
+        else:
+            flag, cdev = flag_fit | flag_pca, np.fmax(dev / thr, pca_res / thr_pca)
+            cand_fn = lambda i: candidates_either(dev, pca_res, i, thr, thr_pca, bool(flag_fit[i]), bool(flag_pca[i]))  # noqa: E731
+    worst = np.array(BPS)[np.nanargmax(np.nan_to_num(cdev, nan=-1), axis=1)]
+    print(f"video {a.video}: {n} frames, eye width {G.Wm:.0f} px, finder {a.finder}: fit_o200_max > {thr:.3f} eye widths (≈ {thr * G.Wm:.0f} px)"
+          + (f", pca > {thr_pca:.4f} eye widths (≈ {thr_pca * G.Wm:.0f} px)" if a.finder != "fit" else "") + f" flags {100 * flag.mean():.2f} %, acceptance = {tag}")
     pm = predictions_cached(a.video, d, dev_px) if a.accept == "fit" else None
     cutv, R = None, None
     if a.accept in ("conf", "jump"):
@@ -183,18 +234,22 @@ def main():
     status, reps, new_xy = [], [], {b: xy[b].copy() for b in BPS}
     for i in range(n):
         if a.accept == "fit":
-            st, rep, new = repair_fit(G, xy, p2, pm, dev, i, thr, bool(flag[i]))
+            st, rep, new = repair_fit(G, xy, p2, pm, dev, i, thr, bool(flag[i]), cand_fn)
         elif a.accept == "geometry":
             st, rep, new = repair_triggered(G, xy, p2, i, a.k_mad, bool(flag[i]), worst[i])
             st = {"flagged_ok": "flagged_passes_check", "drop": "flagged_not_repaired"}.get(st, st)
         else:
-            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n)
+            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn)
         status.append(st)
         reps.append("+".join(rep))
         for b in rep:
             new_xy[b][i] = new[b]
     status = np.array(status)
     F = pd.DataFrame({"frame": np.arange(n), "status": status, "points": reps, "fit_rel": fit, "fit_px": fit * G.Wm, "flag": flag, "worst_point": worst})
+    extra = {} if a.finder == "fit" else {"finder": a.finder, "thr_pca_eye_widths": thr_pca, "flagged_fit_pct": round(100 * flag_fit.mean(), 2), "flagged_pca_pct": round(100 * flag_pca.mean(), 2),
+                                           "flagged_both_pct": round(100 * (flag_fit & flag_pca).mean(), 2)}
+    if a.finder != "fit":
+        F["pca_rel"], F["flag_fit"], F["flag_pca"] = pca_rel, flag_fit, flag_pca
     for b in P4:
         F[f"{b}_moved_px"] = np.hypot(*(new_xy[b] - xy[b]).T)
     F.to_csv(out / "frames_all.csv.gz", index=False, float_format="%.4f")
@@ -203,7 +258,7 @@ def main():
                        "flagged_pct": round(100 * flag.mean(), 2), "flagged_closed": int((flag & G.closed).sum()), **counts,
                        "repaired_pct": round(100 * counts["repaired"] / n, 2), "flagged_not_repaired_pct": round(100 * counts["flagged_not_repaired"] / n, 2),
                        "worst_not_pupil_among_flagged": int((flag & ~np.isin(worst, P4) & ~G.closed).sum()),
-                       **{f"repaired_{b}": int((F.points.str.contains(b).to_numpy() & (status == "repaired")).sum()) for b in P4}}])
+                       **{f"repaired_{b}": int((F.points.str.contains(b).to_numpy() & (status == "repaired")).sum()) for b in P4}, **extra}])
     W.to_csv(out / "whole_video.csv", index=False)
     print(W.T.to_string())
 
@@ -214,6 +269,8 @@ def main():
         rb, ra = frame_rmse(before, hr), frame_rmse(after, hr)
         r = {"frame": f, "set": hr.set, "status": status[f], "points": reps[f], "error_before": rb / G.Wm, "error_after": ra / G.Wm,
              "error_before_px": rb, "error_after_px": ra, "rmse_file": hr.frame_rmse_px, "flag": bool(flag[f]), "fit_rel": fit[f], "worst_point": worst[f]}
+        if a.finder != "fit":
+            r.update({"pca_rel": pca_rel[f], "flag_fit": bool(flag_fit[f]), "flag_pca": bool(flag_pca[f]), "finder": a.finder})
         for b in P4:
             hx, hy = hr[f"human_{b}_x"], hr[f"human_{b}_y"]
             r[f"{b}_before"] = np.hypot(before[b][0] - hx, before[b][1] - hy) / G.Wm
@@ -236,7 +293,7 @@ def main():
          "good_flagged_not_repaired": int((good & nr).sum()),
          "median_error_before_pct": round(100 * float(T.error_before.median()), 2), "median_error_after_pct": round(100 * float(T.error_after.median()), 2),
          "repaired_median_before_pct": round(100 * float(T.error_before[rep].median()), 2) if rep.any() else np.nan,
-         "repaired_median_after_pct": round(100 * float(T.error_after[rep].median()), 2) if rep.any() else np.nan}
+         "repaired_median_after_pct": round(100 * float(T.error_after[rep].median()), 2) if rep.any() else np.nan, **extra}
     pd.DataFrame([S]).to_csv(out / "summary.csv", index=False)
     print(pd.Series(S).to_string())
     pd.set_option("display.width", 250)
