@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 17:26 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1019,225 +1019,101 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
     </ol>
   </div>
-  <h3><span lang="zh">8.1 模型训练饱和后，如何有效选出不可信的帧：比较三种纠错算法的适用场景</span><span lang="en">8.1 After training has saturated, how to pick out unreliable frames: the three outlier algorithms by use case</span></h3>
+  <h3><span lang="zh">8.1 什么算错帧：一条线，眼宽的 14%</span><span lang="en">8.1 What counts as a wrong frame: one line, 14% of the eye width</span></h3>
   <div class="text" lang="zh">
-    <p><b>目的。</b>第 3 步比较了三种纠错算法（jump、uncertain、fitting）哪一种最适合在主动学习里挑下一批要标注的帧，选了 jump。这里的问题不同：模型训练饱和、对整段视频预测完之后，哪些帧的预测不可信。所以把同样三种算法再比一次：量每种算法标出的帧里有多少真的不可信、真的不可信的帧里有多少被标出，再按三种用途（人工复核、挑训练帧、剔除不可信帧）分别看哪一种合适。</p>
-    <p><b>用的帧。</b>每个视频（视频 0–18）的 50 帧测试帧和 20 帧验证帧，共 19 × 70 = 1330 帧。这些帧按时间等间隔取，不是任何算法挑的；每帧都有人工标注；模型没有用它们训练。</p>
-    <p><b>真值和一条线。</b>每帧用该视频平台点的模型算帧 RMSE：预测的 8 个点和标注的 8 个点之间的距离（公式见页面开头），再除以该视频的眼宽（两个眼角之间距离的中位数，由模型预测算出，不用标注），这样换一台相机或换一个拍摄距离，数字仍然可比。把 1330 帧的这个值画成直方图（图 8-0）：主体是一个光滑的鼓包，在眼宽的 13% 左右收尾，再往右是稀疏的一条尾巴，那些帧里有一个点被甩到了很远的地方。我们把线放在鼓包收尾处，<b>眼宽的 14%</b>（在这些视频上约 55–69 px）：帧误差超过它的叫<b>错帧</b>，1330 帧里有 23 帧；不超过的都算对的帧。这条线是看着直方图定的，和第 10 步的眨眼阈值一样。本节下文和 8.2 里早先按 50 px、20 px 两档报告的结果保留原样：50 px 约合眼宽的 11%，和这条线接近；20 px 一档按肉眼判断属于标注噪声（人自己重标也放不准到这个程度），以后不再作为一档统计。</p>
-    <p><b>三种算法：每种算什么、阈值多少、阈值从哪来。</b>每种算法对每一帧算出一个数，只用模型的预测，不用标注；这个数越过它的阈值，就把这一帧标为不可信。</p>
-    <ul>
-      <li><b>jump。</b>算什么：8 个点里相对上一帧移动最远的那个点的位移，除以该视频眼宽的中位数。阈值：0.03，即眼宽的 3%，在各视频上约 11–15 px。来源：DLC 自带的 jump 用固定的 20 px，第 3 步用的就是它；第 5 步起改为眼宽的 3%，使眼宽不同的视频用同一个相对标准；这里用的就是这条规则。</li>
-      <li><b>uncertain。</b>算什么：8 个点里最低的置信度。阈值：0.6。来源：DLC 配置里 <code>pcutoff</code> 的默认值，DLC 画图和过滤时把置信度低于它的点当不可信。DLC 自带的 uncertain 算法用的是 0.01；在这 1330 帧上，0.01 一帧都标不出来，所以没有用。</li>
-      <li><b>fitting。</b>算什么：对每个点的 x 坐标和 y 坐标，各自在整段视频上拟合 SARIMAX(3,0,1) 时间序列模型（置信度低于 0.01 的点当缺失，序列先减去均值）；一个点的偏差 = 模型预测的位置和时间序列一步预测的位置之间的距离；fitting = 8 个点偏差的平均。阈值：20 px。来源：DLC 的默认值，没有改。算法按 DLC 文档用 statsmodels 重新实现，因为 DLC 的函数只输出整段视频的标记，不输出每帧的偏差。</li>
-    </ul>
-    <p><b>另外两条规则。</b>（4）<b>uncertain 平均</b>：8 个点置信度的平均值低于 t。t 不是默认值，是在这 1330 帧上选的：把 19 个视频中的一个拿出来，用其余 18 个视频的 1260 帧选出让轻微不可信帧（超过 20 px）的检出率减误报率最大的 t，再用这个 t 判定拿出来的那个视频的 70 帧；19 个视频轮流拿出一次，所以每一帧都是用没有见过它所在视频的 t 判定的。在全部 1330 帧上选出的 t 是 0.79。（5）<b>jump 或 uncertain</b>：两条里任一条标出就标出。图和表里五条规则的名字：jump、uncertain（最低置信度 &lt; 0.6）、uncertain 平均（平均置信度 &lt; t）、jump 或 uncertain、fitting。</p>
-    <p><b>怎么评。</b>每条规则报两个数：准确率 = 标出的帧里真的不可信的比例；检出率 = 真的不可信的帧里被标出的比例。另外对每种算法算 AUC：把阈值从最小值到最大值逐个试，每个阈值得到一对（误报率，检出率），连成曲线，AUC 是曲线下的面积；1 表示所有不可信帧的数都比可信帧更极端，0.5 表示和随机挑一样。AUC 不依赖阈值。</p>
-    <p><b>脚本和结果。</b><code>scripts/unreliable_frames.py</code>；<code>results/unreliable_frames/</code>（每帧一行的 <code>unreliable_frames_all_videos.csv</code>，每条规则一行的 <code>unreliable_rules_all_videos.csv</code>，每个视频一行的 <code>unreliable_signals_all_videos.csv</code>）。</p>
+    <table>
+      <thead><tr><th>项目</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>真值帧</td><td>每个视频 50 帧测试 + 20 帧验证，最后 4 分钟内等间隔，从未参与训练；19 个视频共 1330 帧</td></tr>
+        <tr><td>模型</td><td>每个视频自己的平台点模型，对整段视频预测</td></tr>
+        <tr><td>误差</td><td>帧 RMSE：预测的 8 个点和人工标注的 8 个点之间的距离（公式见页面开头），除以该视频的眼宽</td></tr>
+        <tr><td>眼宽</td><td>两个眼角距离在整段视频预测里的中位数，不用标注；19 个视频 392–497 px</td></tr>
+        <tr><td>错帧的线</td><td>眼宽的 14%，在这些视频上约 55–69 px；1330 帧里 23 帧超过</td></tr>
+        <tr><td>脚本 / 结果</td><td><code>scripts/error_tier.py</code> / <code>results/error_tier/</code></td></tr>
+      </tbody>
+    </table>
+    <p>所有误差和阈值都用眼宽的倍数，换相机或换拍摄距离不用重定。把 1330 帧的误差画成直方图（图 8-0）：主体是一个鼓包，在眼宽的 13% 左右收尾，再往右是稀疏的一条尾巴，那些帧里有一个点被甩到了很远。线放在鼓包收尾处，眼宽的 14%，12.7% 到 15.4% 之间没有帧。超过线的叫<b>错帧</b>，其余都算对的帧。以前用过的 20 px 一档是标注噪声，人自己重标也放不准到这个程度，不再用。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Purpose.</b> Step 3 compared the three outlier algorithms (jump, uncertain, fitting) as pickers of the next frames to label in active learning and chose jump. The question here is different: once training has saturated and the model has predicted a whole video, which frames are unreliable. So the same three algorithms are compared again: for each, the share of flagged frames that are truly unreliable and the share of truly unreliable frames that are flagged, and then, for three uses (human review, picking training frames, removing unreliable frames), which algorithm suits.</p>
-    <p><b>Frames used.</b> The 50 test frames and 20 validation frames of every video (videos 0–18), 19 × 70 = 1330 frames. They are evenly spaced in time, not picked by any algorithm; every frame is human-labeled; no model was trained on them.</p>
-    <p><b>Truth and one line.</b> For each frame the frame RMSE of the video's plateau-point model: the distance between the 8 predicted and the 8 labeled points (formula at the top of the page), divided by the video's eye width (the median distance between the two corners, taken from the model's predictions, no labels needed), so that the numbers stay comparable on another camera or at another distance. The histogram of this value over the 1330 frames (Figure 8-0) has a smooth main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which one point was thrown far away. We put the line where the main group ends, at <b>14% of the eye width</b> (about 55–69 px on these videos): a frame above it is a <b>wrong frame</b>, 23 of the 1330; every other frame counts as right. The line was read off the histogram by eye, like the blink threshold of step 10. The results below and in 8.2 that were reported earlier at two levels, 50 px and 20 px, are left as they were: 50 px is about 11% of the eye width, close to this line; the 20-px level is label noise to the eye (a person relabeling cannot place the points to that precision) and is not reported as a level any more.</p>
+    <table>
+      <thead><tr><th>Item</th><th>What</th></tr></thead>
+      <tbody>
+        <tr><td>Truth frames</td><td>50 test + 20 validation frames per video, evenly spaced in the last 4 minutes, never trained on; 1330 frames over the 19 videos</td></tr>
+        <tr><td>Model</td><td>each video's own plateau-point model, predicting the whole video</td></tr>
+        <tr><td>Error</td><td>frame RMSE: the distance between the 8 predicted and the 8 labeled points (formula at the top of the page), divided by the video's eye width</td></tr>
+        <tr><td>Eye width</td><td>the median corner-to-corner distance over the video's predictions, no labels needed; 392–497 px on the 19 videos</td></tr>
+        <tr><td>Line for a wrong frame</td><td>14% of the eye width, about 55–69 px on these videos; 23 of the 1330 frames are above it</td></tr>
+        <tr><td>Script / results</td><td><code>scripts/error_tier.py</code> / <code>results/error_tier/</code></td></tr>
+      </tbody>
+    </table>
+    <p>All errors and thresholds are fractions of the eye width, so nothing has to be re-set for another camera or distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which a point was thrown far. The line is put where the main group ends, at 14% of the eye width; there is no frame between 12.7% and 15.4%. A frame above the line is a <b>wrong frame</b>; every other frame counts as right. The 20-px level used earlier is label noise, a person relabeling cannot place the points to that precision, and is not used any more.</p>
+  </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>
-    <figcaption lang="zh"><span class="tag">图 8-0：</span>1330 帧真值帧的帧误差，以眼宽为单位，横轴是对数刻度。蓝色是主体，红色是线右边的 23 帧错帧，虚线是眼宽 14% 的线。</figcaption>
+    <figcaption lang="zh"><span class="tag">图 8-0：</span>1330 帧真值帧的帧误差，以眼宽为单位，横轴对数刻度。蓝色是主体，红色是线右边的 23 帧错帧，虚线是眼宽 14% 的线。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 8-0:</span>Frame error of the 1330 truth frames in units of the eye width, log scale. Blue: the main group; red: the 23 wrong frames to the right of the line; dashed: the line at 14% of the eye width.</figcaption>
   </figure>
-    <p><b>The three algorithms: what each computes, its threshold, where the threshold comes from.</b> Each algorithm gives every frame one number from the model's predictions alone, without labels; the frame is flagged as unreliable when that number crosses the threshold.</p>
-    <ul>
-      <li><b>jump.</b> Computes: the displacement of the keypoint that moved farthest from the previous frame, divided by the video's median eye width. Threshold: 0.03, i.e. 3% of the eye width, about 11–15 px per video. Origin: DLC's own jump uses a fixed 20 px, which step 3 used; from step 5 on it is 3% of the eye width, so that videos with different eye widths share one relative standard; that is the rule used here.</li>
-      <li><b>uncertain.</b> Computes: the lowest confidence of the 8 points. Threshold: 0.6. Origin: the default <code>pcutoff</code> of the DLC config, below which DLC treats a point as unreliable when plotting and filtering. DLC's own uncertain algorithm uses 0.01; on these 1330 frames 0.01 flags no frame at all, so it was not used.</li>
-      <li><b>fitting.</b> Computes: for each keypoint's x and y coordinate a SARIMAX(3,0,1) time-series model fitted to the whole video (points with confidence below 0.01 treated as missing, mean subtracted first); deviation of a keypoint = distance between the model's predicted position and the one-step prediction of the time series; fitting = mean deviation over the 8 keypoints. Threshold: 20 px. Origin: DLC's default, unchanged. The algorithm is re-implemented with statsmodels after DLC's documentation, because DLC's function only outputs the flags for a whole video, not the per-frame deviation.</li>
-    </ul>
-    <p><b>Two further rules.</b> (4) <b>uncertain mean</b>: the mean confidence of the 8 points below t. t is not a default; it was chosen on these 1330 frames: one of the 19 videos is set aside, on the 1260 frames of the other 18 the t that maximizes recall minus false-alarm rate for the mildly unreliable frames (above 20 px) is chosen, and that t judges the 70 frames of the set-aside video; each of the 19 videos is set aside once, so every frame is judged with a t chosen without its own video. On all 1330 frames the chosen t is 0.79. (5) <b>jump or uncertain</b>: flagged when either of the two flags. The five rules are named in the figure and table as: jump, uncertain (lowest confidence &lt; 0.6), uncertain mean (mean confidence &lt; t), jump or uncertain, fitting.</p>
-    <p><b>How they are scored.</b> Two numbers per rule: precision = share of the flagged frames that are truly unreliable; recall = share of the truly unreliable frames that are flagged. In addition an AUC per algorithm: the threshold is moved from the smallest to the largest value, each value gives one pair (false-alarm rate, recall), the pairs form a curve, and the AUC is the area under it; 1 means every unreliable frame has a more extreme value than every reliable frame, 0.5 means no better than random picking. The AUC does not depend on the threshold.</p>
-    <p><b>Script and results.</b> <code>scripts/unreliable_frames.py</code>; <code>results/unreliable_frames/</code> (one row per frame in <code>unreliable_frames_all_videos.csv</code>, one per rule in <code>unreliable_rules_all_videos.csv</code>, one per video in <code>unreliable_signals_all_videos.csv</code>).</p>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_unreliable.jpg" alt="Jump, confidence and fitting deviation against the frame error"></div>
-    <figcaption lang="zh"><span class="tag">图 8-3：</span>三种算法的值和帧误差的关系（A–C），以及五条规则的检出率和准确率（D）。
-      <ul>
-        <li>A：每个点是一帧。横轴是 jump 的值：这一帧的预测和上一帧的预测之间的距离（8 个点取最大，除以眼宽），只用模型输出。纵轴是这一帧的预测和人工标注之间的距离（帧 RMSE）。都是对数刻度。灰色 = 帧 RMSE 不超过 20 px，橙色 = 20–50 px，红色 = 超过 50 px。竖虚线是 jump 的阈值，线右边的帧被标出。</li>
-        <li>A 里两群红点的区别：右上角的红点一帧之内位移了眼宽的 30%–200%，是这一帧单独出错、上一帧还对，jump 能抓到。左上角的红点位移不到眼宽 3%，和正常帧一样小，但误差 50–200 px，是上一帧已经错在同一个位置、连续几帧持续错，jump 看不出来。</li>
-        <li>B：画法同 A，横轴换成 uncertain 的值（最低置信度）。线左边（低于 0.6）的帧被标出。</li>
-        <li>C：画法同 A，横轴换成 fitting 的值（对数刻度）。竖虚线是 DLC 默认的 20 px，线右边的帧被标出。</li>
-        <li>D：五条规则各两根柱。实心 = 检出率（不可信的帧里被标出的比例），斜线 = 准确率（标出的帧里不可信的比例）。红色对应非常不可信（超过 50 px），橙色对应轻微不可信（超过 20 px）。横轴下方是每条规则标出的帧占 1330 帧的比例。</li>
-      </ul>
-    </figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The value of each algorithm against the frame error (A–C), and recall and precision of the five rules (D).
-      <ul>
-        <li>A: one dot per frame. x = the value of jump: the distance between the prediction of this frame and the prediction of the previous frame (largest of the 8 points, divided by the eye width), model output only. y = the distance between the prediction of this frame and the human labels (frame RMSE). Both log scale. Grey = frame RMSE up to 20 px, orange = 20–50 px, red = above 50 px. The dashed line is jump's threshold; frames to its right are flagged.</li>
-        <li>The two groups of red dots in A: the red dots at the top right moved 30%–200% of the eye width within one frame, so this frame alone is wrong and the previous one was still right; jump catches them. The red dots at the top left moved less than 3% of the eye width, as little as a normal frame, yet are 50–200 px off: the previous frame was already wrong at the same place, the error persists over several frames, and jump cannot see it.</li>
-        <li>B: as A, with the value of uncertain (lowest confidence) on x. Frames to the left of the line (below 0.6) are flagged.</li>
-        <li>C: as A, with the value of fitting on x (log scale). The dashed line is DLC's default 20 px; frames to its right are flagged.</li>
-        <li>D: two bars per rule. Solid = recall (share of the unreliable frames that are flagged), hatched = precision (share of the flagged frames that are unreliable). Red = very unreliable (above 50 px), orange = mildly unreliable (above 20 px). Under the axis, the share of the 1330 frames each rule flags.</li>
-      </ul>
-    </figcaption>
-  </figure>
-  <div class="concl" lang="zh"><span class="tag">结论：</span>按用途分：人工复核用 fitting；挑训练帧用 jump；剔除不可信帧，五条规则都不能在少剔的同时找到全部不可信帧。
-    <ol>
-      <li><b>人工复核：用 fitting。</b>人工复核要求标出的帧少、标出的帧中不可信的比例高，五条规则里只有 fitting 的准确率超过 50%。它标出 2.0% 的帧（27 帧），其中 85% 是非常不可信的帧（超过 50 px）；32 帧非常不可信的帧里找到 23 帧（72%）。</li>
-      <li><b>挑训练帧（主动学习）：用 jump，第 3 步的选择成立。</b>它标出 11.7% 的帧（156 帧），其中 44% 帧 RMSE 超过 20 px；32 帧非常不可信的帧里找到 21 帧（66%）。挑训练帧只要求标出的帧中不可信的比例高，不要求找到全部不可信帧。fitting 的准确率更高，为什么仍用 jump：
-        <ul>
-          <li>第 3 步是直接实验：三种算法各自挑帧、各训练 11 轮，量测试集误差，jump 16.4 px、fitting 17.0 px，相差 0.6 px，小于重复训练一次的波动。图 8-3 量的只是标出的帧误差大不大，不是标了它模型进步多少。</li>
-          <li>每批只标 20 帧，要覆盖不同的出错情形。jump 标出的帧多（11.7%），再聚成 20 类取中心，情形各异；fitting 只标 2%，而且集中在突然偏离轨迹的一种错法，挑出的帧彼此相似。</li>
-        </ul>
-      </li>
-      <li><b>剔除不可信帧（算面积、眨眼之前）：要找到全部 32 帧非常不可信的帧，就要剔除一半的帧。</b>uncertain（最低置信度低于 0.6）找到 32 帧，剔除 51.9%（690 帧）；uncertain 平均找到 30 帧，剔除 33.2%（442 帧）；jump 剔除 11.7%（156 帧），找到 21 帧，漏掉的 11 帧是预测点离标注很远、但与上一帧位置相近的帧；jump 或 uncertain 找到 32 帧，剔除 53.6%（713 帧），比 uncertain 单独用多剔 23 帧。</li>
-      <li><b>轻微不可信（20–50 px）：没有一条规则能在标出的帧少的同时找到大部分。</b>帧 RMSE 超过 20 px 的 155 帧里，fitting 找到 16%，jump 44%；uncertain 找到 88%，但要剔除 51.9% 的帧。这一档现有信号识别不了；减少它只能靠降低模型误差。</li>
-      <li><b>四种算法的排序不依赖阈值。</b>以帧 RMSE 超过 50 px 为真错算 AUC：fitting 0.97、uncertain 0.94、uncertain 平均 0.91、jump 0.85。阈值里 jump 的 3% 是 DLC 默认 20 px 按眼宽换算的，uncertain 的 0.6 和 fitting 的 20 px 是 DLC 默认，只有 uncertain 平均的 0.79 是在这些帧上选的（选法见上文）。</li>
-      <li><b>各视频差别很大。</b>每个视频 70 帧里帧 RMSE 超过 20 px 的帧从 0 帧（视频 17，Terra 2025-10-09）到 38 帧（视频 8，Pluto 2025-10-24）；同一种算法的 AUC（20 px 档）在各视频上从 0.30（uncertain，视频 6，Pluto 2025-10-28）到 1.00（jump 在视频 0 和 16，fitting 在视频 11 和 16）；12 个视频没有超过 50 px 的帧，50 px 档的 AUC 在这些视频上算不出来。合并 1330 帧得到的数字不能当作每个视频都成立。</li>
-      <li><b>限制。</b>
-        <ul>
-          <li>样本小且集中：非常不可信的帧只有 32 帧，其中 17 帧来自视频 1 和视频 8。差一两帧，检出率就变 3%，而且数字主要反映这两个视频的错法。</li>
-          <li>按帧评、不按段评：模型错起来往往连续多帧，这里每帧单独算对错。连续 10 帧出错时 jump 只在第一帧跳，按帧算漏 9 帧，按段算就算抓到。</li>
-          <li>合用只试了一种组合：只试了 jump 或 uncertain，没试含 fitting 的组合。</li>
-        </ul>
-      </li>
-    </ol>
-  </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion:</span>By use: human review with fitting; picking training frames with jump; for removing unreliable frames none of the five rules finds all unreliable frames without removing a large share of the frames.
-    <ol>
-      <li><b>Human review: use fitting.</b> Human review requires few flagged frames and a high share of unreliable frames among them, and of the five rules only fitting has a precision above 50%. It flags 2.0% of the frames (27), 85% of which are very unreliable (above 50 px); it finds 23 of the 32 very unreliable frames (72%).</li>
-      <li><b>Picking training frames (active learning): use jump; the choice of step 3 stands.</b> It flags 11.7% of the frames (156), 44% of which have a frame RMSE above 20 px; it finds 21 of the 32 very unreliable frames (66%). Picking training frames only requires a high share of unreliable frames among the flagged ones, not finding all of them. Fitting has the higher precision; why jump is still used:
-        <ul>
-          <li>Step 3 is the direct experiment: each algorithm picked its own frames for 11 rounds of training, scored on the test set; jump 16.4 px, fitting 17.0 px, a difference of 0.6 px, less than the variation of one retraining. Figure 8-3 only measures whether a flagged frame has a large error, not how much the model improves when it is labeled.</li>
-          <li>Each batch labels only 20 frames, which should cover different kinds of errors. jump flags many frames (11.7%), which are then clustered into 20 groups and one centre taken from each, so the kinds differ; fitting flags only 2%, concentrated in one kind of error (a sudden departure from the trajectory), so the frames it picks resemble each other.</li>
-        </ul>
-      </li>
-      <li><b>Removing unreliable frames (before area or blink analysis): finding all 32 very unreliable frames costs half of the frames.</b> uncertain (lowest confidence below 0.6) finds 32 and removes 51.9% (690 frames); uncertain mean finds 30 and removes 33.2% (442); jump removes 11.7% (156) and finds 21, the 11 it misses being frames whose predicted points are far from the labels but close to the previous frame's position; jump or uncertain finds 32 and removes 53.6% (713), 23 frames more than uncertain alone.</li>
-      <li><b>Mildly unreliable frames (20–50 px): no rule finds most of them while flagging few frames.</b> Of the 155 frames with a frame RMSE above 20 px, fitting finds 16%, jump 44%; uncertain finds 88%, but only by removing 51.9% of the frames. This level is not identifiable with the present signals; only a lower model error reduces it.</li>
-      <li><b>The ranking of the four algorithms does not depend on the thresholds.</b> AUC with frame RMSE above 50 px as the truth: fitting 0.97, uncertain 0.94, uncertain mean 0.91, jump 0.85. Of the thresholds, jump's 3% is DLC's default 20 px converted to a share of the eye width, uncertain's 0.6 and fitting's 20 px are DLC defaults, and only the 0.79 of uncertain mean was chosen on these frames (procedure above).</li>
-      <li><b>Videos differ a lot.</b> Per video (70 frames) the frames with a frame RMSE above 20 px range from 0 (video 17, Terra 2025-10-09) to 38 (video 8, Pluto 2025-10-24); the AUC of one algorithm (20-px level) ranges across videos from 0.30 (uncertain, video 6, Pluto 2025-10-28) to 1.00 (jump on videos 0 and 16, fitting on videos 11 and 16); 12 videos have no frame above 50 px, so the 50-px AUC cannot be computed for them. Numbers pooled over the 1330 frames must not be taken as valid for every video.</li>
-      <li><b>Limits.</b>
-        <ul>
-          <li>Small, concentrated sample: only 32 very unreliable frames, 17 of them from videos 1 and 8. One or two frames move a recall by 3%, and the numbers mainly reflect the errors of these two videos.</li>
-          <li>Scored per frame, not per run: the model is usually wrong over several consecutive frames, but each frame is scored on its own. In a run of 10 wrong frames jump fires only on the first, so per frame it misses 9, per run it would count as caught.</li>
-          <li>Only one combination tried: jump or uncertain; no combination with fitting.</li>
-        </ul>
-      </li>
-    </ol>
-  </div>
-  <h3><span lang="zh">8.2 能不能更准地找出不可信帧：换信号、调阈值、用真值训练检测器、重新推理取热图、换种子再训一个模型，检出率都停在同一处</span><span lang="en">8.2 Can unreliable frames be found more precisely: other signals, other thresholds, detectors trained on our truth, the heatmap shape from a new inference pass and a second model trained with another seed all stop at the same recall</span></h3>
+
+  <h3><span lang="zh">8.2 找错帧：三种算法里 fitting 最好，阈值就是那条线</span><span lang="en">8.2 Finding wrong frames: of the three algorithms fitting is best, and its threshold is the line itself</span></h3>
   <div class="text" lang="zh">
-    <p><b>目的。</b>8.1 的五条规则里 fitting 最适合人工复核，但 155 帧轻微不可信的帧（帧 RMSE 超过 20 px）它只找到 16%。这里的问题是：只用模型的输出（必要时加上图像），能不能把这些帧找得更准。</p>
-    <p><b>用的帧、真值、评法。</b>帧和真值同 8.1：1330 帧，超过 20 px 的 155 帧，超过 50 px 的 32 帧。每种信号报三样：AUC（定义见 8.1）；标出 5% 和 10% 的帧时的检出率和准确率；要找到一半超过 20 px 的帧需要标出多少帧。凡是在数据上拟合出来的东西（阈值、检测器）都留一个视频：用其余 18 个视频拟合，再判留出的那个视频的 70 帧，19 个视频轮流留出，所以每一帧都是由没有见过它所在视频的规则判定的。需要重新跑推理的两种信号（下面第四类）只在视频 8 上试：它的 70 帧里 38 帧超过 20 px、9 帧超过 50 px，是 19 个视频里错帧最多的。这个视频过半的帧是错帧，“标出 5% 时的检出率”只对应 3 帧，没有意义，所以这两种信号只报 AUC（标出 10%、20%、30% 时的检出率在结果文件里）。</p>
-    <p><b>试过的信号，四类。</b></p>
-    <ul>
-      <li><b>fitting 的变体。</b>阈值从 2 px 到 60 px 逐个试；8 个点的偏差改成取最大、只取 4 个瞳孔点的平均（下称 fit_pupil）、只取 4 个眼睑眼角点的平均、超出 99% 预测区间的点数；时间序列模型的阶数换成 (1,0,0)、(2,0,0)、(5,0,1)、(3,1,1)；正向加反向各预测一次取大者；偏差除以眼宽。</li>
-      <li><b>只看单帧、不看时间的信号。</b>姿态 PCA 重构误差：用该视频标注过的姿态（8 点 16 维）做主成分分析，保留解释 99% 方差的成分，量预测姿态被重构后的误差；同一视频各训练步模型之间的分歧：每个点在各模型间的标准差，按置信度加权；几何约束：瞳孔两条轴的中点偏离、瞳孔是否在上下眼睑之间、眼宽偏离该视频中位数的程度。</li>
-      <li><b>用真值训练的检测器。</b>训练样本不用新标注：每个视频已有的各训练步模型（20、40、60 帧那些步，共 65 个模型文件）对它没有训练过的标注帧（之后批次的帧和测试、验证帧）的预测，每个样本有已知的误差，共 7010 个样本，其中 1235 个超过 20 px。表格检测器：梯度提升分类器，93 个特征，包括 8 个点的置信度、8 个点相对眼角中点的位置、每个点相对前后帧的位移、每个点和居中 31 帧中位数的差（只作特征，不平滑任何输出）、每个点的 fitting 偏差、瞳孔的宽高和轴中点偏离、以及这些量在前一帧和后一帧的值。图像检测器：ResNet-18，输入眼睛区域的裁剪图和画上去的 8 个预测点，输出每个点是否错超过 20 px 和整帧是否错超过 20 px；另一版在训练时人工挪动预测点造出已知误差的样本。最后把这两种检测器和 fit_pupil 合并（逻辑回归、排名平均）。</li>
-      <li><b>需要重新跑推理的信号（只在视频 8 试）。</b>热图形状：网络对每个点输出一张热图，取最高的格子作为坐标，置信度就是这个格子的值，保存的预测文件里只有这两样。把视频 8 的平台点模型对整段视频（71 748 帧）重新推理一遍（算出的坐标和保存的文件完全一致），每帧每个点多记四个数：离最高峰至少 3 格的第二个局部极大值的高度与最高峰之比、高于最高峰 0.3 倍的局部极大值个数、热图的归一化熵（0 = 只有一格，1 = 完全平坦）、最高峰 12 px 内的质量占比；帧分数取 4 个瞳孔点或 8 个点的最大或平均，共 16 种；热图本身不保存。换种子的第二个模型：用和平台点模型完全相同的 420 帧训练集和 20 帧验证集（逐张核对）、相同配置，只把随机种子从 42 换成 7，再训一个模型；两个模型都在 70 帧真值上预测，分数是两个模型对同一个点的预测之间的距离，取 8 个点或 4 个瞳孔点的最大或平均。主线坐标仍是平台点模型的，第二个模型只用来打分。</li>
-    </ul>
-    <p><b>脚本和结果。</b><code>scripts/unreliable_frames_sweep.py</code> → <code>results/unreliable_frames_sweep/</code>（每帧每个信号的值、每个信号的 AUC、工作点、曲线）；<code>scripts/error_detector.py</code>、<code>scripts/error_detector_image.py</code> → <code>results/error_detector/</code>（7010 个训练样本的真值和特征、两种检测器在 1330 帧上的分数、AUC 和工作点）；<code>scripts/heatmap_signals.py</code> → <code>results/heatmap_signals/</code>（视频 8 每帧每个点的热图数字、70 帧上的 AUC）；<code>scripts/seed_disagreement.py</code> → <code>results/seed_disagreement/</code>（两个模型在 70 帧上的坐标、分歧、AUC）。</p>
+    <p>DeepLabCut 自带三种找可疑帧的算法，只用模型的预测，不用标注。<b>jump</b>：相对上一帧移动最远的点的位移。<b>uncertain</b>：8 个点里最低的置信度。<b>fitting</b>：对每个点的轨迹拟合一个时间序列模型，预报它在这一帧的位置，量预报位置和实际预测的距离。拿它们在 1330 帧真值帧上找 23 帧错帧：</p>
+    <table>
+      <thead><tr><th>算法</th><th>AUC</th><th>标出 3.8% 的帧时找到的错帧</th><th>要找全 23 帧需要标出多少对的帧</th></tr></thead>
+      <tbody>
+        <tr><td>jump</td><td>0.91</td><td>20 / 23</td><td>86%</td></tr>
+        <tr><td>uncertain</td><td>0.93</td><td>10 / 23</td><td>25%</td></tr>
+        <tr><td>fitting，DLC 默认：8 个点偏差的平均</td><td>1.00</td><td>23 / 23</td><td>0.3%</td></tr>
+        <tr><td>fitting，本页用的：8 个点偏差取最大</td><td>1.00</td><td>23 / 23</td><td>1.0%</td></tr>
+      </tbody>
+    </table>
+    <p>fitting 把 23 帧错帧和对的帧几乎完全分开，jump 和 uncertain 做不到。我们用 fitting 的"8 个点取最大"这一种，因为它量的就是"有一个点偏离了多远"，阈值可以直接取错帧的线：<b>某个点的偏差超过眼宽的 14%，这一帧就标出</b>，不另设数。23 帧错帧的偏差都在眼宽的 25% 以上，所以轮流留出一个视频、用其余 18 个验证，每一轮都全部找到；代价是 1307 帧对的帧里标出 28 帧，占全部真值帧的 3.8%，多数是眼睛快速移动的帧。早先还试过别的信号和用真值训练的检测器，都没有超过 fitting，记录在仓库 <code>results/unreliable_frames_sweep/</code>、<code>results/tier50_reeval/</code>。脚本 / 结果：<code>scripts/fit_threshold.py</code> / <code>results/fit_threshold/</code>。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Purpose.</b> Of the five rules of 8.1, fitting suits human review best, but of the 155 mildly unreliable frames (frame RMSE above 20 px) it finds only 16%. The question here: using only the model's output (and, where needed, the image), can these frames be found more precisely.</p>
-    <p><b>Frames, truth, scoring.</b> Frames and truth as in 8.1: 1330 frames, 155 above 20 px, 32 above 50 px. Three things per signal: the AUC (defined in 8.1); recall and precision when 5% and 10% of the frames are flagged; the share of frames that must be flagged to find half of the frames above 20 px. Everything fitted on data (thresholds, detectors) is fitted with one video left out: the other 18 videos fit it, it then judges the 70 frames of the left-out video, and each of the 19 videos is left out in turn, so every frame is judged by a rule that never saw its video. The two signals that need a new inference pass (the fourth group below) were tried on video 8 only: of its 70 frames 38 are above 20 px and 9 above 50 px, the most wrong frames of the 19 videos. With more than half of its frames wrong, “recall at 5% flagged” corresponds to 3 frames and means nothing, so these two signals are reported by AUC only (recall at 10%, 20% and 30% flagged is in the result files).</p>
-    <p><b>Signals tried, in four groups.</b></p>
-    <ul>
-      <li><b>Variants of fitting.</b> Every threshold from 2 px to 60 px; the 8 deviations combined as the maximum, the mean of the 4 pupil points only (called fit_pupil below), the mean of the 4 eyelid and corner points only, the count of points outside the 99% prediction interval; the order of the time-series model changed to (1,0,0), (2,0,0), (5,0,1), (3,1,1); forward and backward prediction, the larger deviation; deviation divided by the eye width.</li>
-      <li><b>Signals that look at one frame only, not at time.</b> Pose-PCA reconstruction error: a principal-component analysis of the video's labeled poses (8 points, 16 dimensions) keeping the components that explain 99% of the variance, and the error of the predicted pose after reconstruction; disagreement between the video's models from its training steps: the standard deviation of each point across the models, confidence-weighted; geometric constraints: the offset between the midpoints of the two pupil axes, whether the pupil lies between the eyelids, the deviation of the eye width from the video's median.</li>
-      <li><b>Detectors trained on our truth.</b> No new labels: the training examples are the predictions of each video's existing models from its training steps (the 20-, 40-, 60-label steps, 65 model files in all) on the labeled frames they had not been trained on (the frames of later batches and the test and validation frames); each example has a known error; 7010 examples, 1235 of them above 20 px. Tabular detector: a gradient-boosting classifier on 93 features, among them the 8 confidences, the 8 points relative to the corner midpoint, each point's displacement from the previous and to the next frame, each point's distance to its centred 31-frame median (a feature only; no output is smoothed), each point's fitting deviation, the pupil's width, height and axis-midpoint offset, and these quantities at the previous and the next frame. Image detector: a ResNet-18 given the crop of the eye region with the 8 predicted points drawn in, outputting whether each point is wrong by more than 20 px and whether the frame is; a second version adds training examples made by displacing predicted points by a known amount. Finally both detectors combined with fit_pupil (logistic regression, rank average).</li>
-      <li><b>Signals that need a new inference pass (video 8 only).</b> Heatmap shape: the network outputs one heatmap per key point and takes its highest cell as the coordinate; the confidence is that cell's value, and the saved prediction files keep nothing else. The plateau-point model of video 8 was run on the whole video again (71,748 frames; the coordinates equal the saved file exactly), recording four numbers per frame and point: the height of the second local maximum at least 3 cells from the peak relative to the peak, the number of local maxima above 0.3 of the peak, the normalised entropy of the map (0 = one cell, 1 = flat), and the share of the map's mass within 12 px of the peak; frame scores are the maximum or mean over the 4 pupil points or over the 8 points, 16 scores in all; the heatmaps themselves are not stored. A second model with another seed: trained on the identical 420-frame training set and 20-frame validation set of the plateau-point model (checked image by image) with the same recipe, only the random seed changed from 42 to 7; both models predict the 70 truth frames, and the score is the distance between the two models' predictions of the same point, maximum or mean over the 8 points or the 4 pupil points. The main-line coordinates remain those of the plateau-point model; the second model only scores.</li>
-    </ul>
-    <p><b>Scripts and results.</b> <code>scripts/unreliable_frames_sweep.py</code> → <code>results/unreliable_frames_sweep/</code> (every signal at every frame, AUC per signal, operating points, curves); <code>scripts/error_detector.py</code>, <code>scripts/error_detector_image.py</code> → <code>results/error_detector/</code> (truth and features of the 7010 training examples, the two detectors' scores on the 1330 frames, AUC and operating points); <code>scripts/heatmap_signals.py</code> → <code>results/heatmap_signals/</code> (the heatmap numbers of every frame and point of video 8, AUC on the 70 frames); <code>scripts/seed_disagreement.py</code> → <code>results/seed_disagreement/</code> (both models' coordinates on the 70 frames, disagreement, AUC).</p>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_detectors.jpg" alt="Recall against flagged share for every signal and detector"></div>
-    <figcaption lang="zh"><span class="tag">图 8-4：</span>每种信号和检测器在 1330 帧上的检出率随标出比例的变化。
-      <ul>
-        <li>A：真值是帧 RMSE 超过 20 px（155 帧）。横轴是标出的帧占 1330 帧的比例，纵轴是这 155 帧里被标出的比例（检出率）。每条曲线是一种信号，把它的阈值从最严到最松逐个试，每个阈值得到一个点。竖虚线是标出 5% 和 10% 的位置。曲线越靠左上越好；图例里的数是 AUC。</li>
-        <li>B：同 A，真值换成帧 RMSE 超过 50 px（32 帧）。</li>
-        <li>fit_pupil 和 fitting 是 8.1 的 fitting 算法只取 4 个瞳孔点 / 取 8 个点的版本；jump 和 uncertain 是 8.1 的算法；D1、D2 是用真值训练的表格检测器和图像检测器，每个视频的帧由没有用它训练的检测器判定。</li>
-      </ul>
-    </figcaption>
-    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Recall of every signal and detector on the 1330 frames against the share of frames flagged.
-      <ul>
-        <li>A: truth = frame RMSE above 20 px (155 frames). x = flagged frames as a share of the 1330, y = the share of the 155 that are flagged (recall). One curve per signal, its threshold moved from strictest to loosest, one point per threshold. Dotted lines at 5% and 10% flagged. The closer a curve is to the top left the better; the number in the legend is the AUC.</li>
-        <li>B: as A, with frame RMSE above 50 px (32 frames) as the truth.</li>
-        <li>fit_pupil and fitting are the fitting algorithm of 8.1 over the 4 pupil points / over the 8 points; jump and uncertain are the algorithms of 8.1; D1 and D2 are the tabular and the image detector trained on our truth, each video's frames judged by a detector not trained with them.</li>
-      </ul>
-    </figcaption>
-  </figure>
-  <div class="text" lang="zh"><p>下表是视频 8 的 70 帧上各信号的 AUC（真值和评法同上）。这两种信号只在这一个视频上有值，所以单列一表，不进图 8-4；70 帧上的数只是第一眼，不是结论。</p></div>
-  <div class="text" lang="en"><p>The table gives the AUC of each signal on the 70 frames of video 8 (truth and scoring as above). The two new signals exist for this video only, so they are tabulated here and not drawn in figure 8-4; numbers on 70 frames are a first look, not a conclusion.</p></div>
-  <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">信号（视频 8，70 帧）</span><span lang="en">Signal (video 8, 70 frames)</span></th><th><span lang="zh">AUC，20 px 档（38 帧）</span><span lang="en">AUC, 20-px level (38 frames)</span></th><th><span lang="zh">AUC，50 px 档（9 帧）</span><span lang="en">AUC, 50-px level (9 frames)</span></th></tr></thead>
-    <tbody>
-      <tr><td>fit_pupil</td><td>0.894</td><td>0.729</td></tr>
-      <tr><td><span lang="zh">fitting（8 点）</span><span lang="en">fitting (8 points)</span></td><td>0.873</td><td>0.703</td></tr>
-      <tr><td>uncertain</td><td>0.830</td><td>0.741</td></tr>
-      <tr><td>jump</td><td>0.752</td><td>0.500</td></tr>
-      <tr><td><span lang="zh">热图熵，4 个瞳孔点平均</span><span lang="en">heatmap entropy, mean of the 4 pupil points</span></td><td>0.868</td><td>0.809</td></tr>
-      <tr><td><span lang="zh">热图第二峰之比，4 个瞳孔点平均</span><span lang="en">heatmap second-peak ratio, mean of the 4 pupil points</span></td><td>0.864</td><td>0.780</td></tr>
-      <tr><td><span lang="zh">其余 14 种热图分数</span><span lang="en">the other 14 heatmap scores</span></td><td>0.59–0.86</td><td>0.57–0.79</td></tr>
-      <tr><td><span lang="zh">两个种子的分歧，8 点平均</span><span lang="en">seed disagreement, mean of the 8 points</span></td><td>0.762</td><td>0.536</td></tr>
-      <tr><td><span lang="zh">分歧的其余 3 种取法</span><span lang="en">the other 3 disagreement scores</span></td><td>0.69–0.71</td><td>0.46–0.50</td></tr>
-      <tr><td><span lang="zh">fit_pupil + 热图熵（排名平均）</span><span lang="en">fit_pupil + heatmap entropy (rank average)</span></td><td>0.926</td><td>0.798</td></tr>
-      <tr><td><span lang="zh">fit_pupil + 分歧（排名平均）</span><span lang="en">fit_pupil + disagreement (rank average)</span></td><td>0.888</td><td>0.649</td></tr>
-      <tr><td><span lang="zh">fit_pupil + 热图熵 + 分歧（排名平均）</span><span lang="en">fit_pupil + heatmap entropy + disagreement (rank average)</span></td><td>0.911</td><td>0.719</td></tr>
-    </tbody>
-  </table></div>
-  <div class="concl" lang="zh"><span class="tag">结论：</span>没有一种信号或检测器明显超过只取 4 个瞳孔点的 fitting（fit_pupil）；标出 5% 的帧只能找到约 35% 超过 20 px 的帧，找到一半要标出 9–10% 的帧；需要重新推理的两种信号（只在视频 8 试）也不改变这一点。
-    <ol>
-      <li><b>最好的信号是 fit_pupil</b>，AUC 0.850（20 px 档）、0.973（50 px 档）。两个可用的阈值：12.8 px 标出 5% 的帧，找到 20 px 档的 35%（准确率 82%）和 50 px 档的 78%；8.0 px 标出 9.2% 的帧，找到 20 px 档的 50%（准确率 64%）和 50 px 档的 90%。8.1 的 fitting（8 点平均，阈值 20 px）标出 2% 的帧，找到 20 px 档的 16%（准确率 89%）。fit_pupil 不看眼睑和眼角：155 帧错帧里最大误差在眼睑或眼角的有 12 帧（其中 10 帧瞳孔同时也错），标出 5% 时 fit_pupil 靠瞳孔连带找到其中 5 帧。并行加一条只取 4 个眼睑眼角点的同样规则（fit_eye ≥ 14.4 px，多标 1.5% 的帧）可以找到 8 帧，但同样多出的帧用来放宽 fit_pupil 的阈值，总检出率更高（标 7.1% 时 46% 对 41%），准确率也更高（77% 对 67%），原因是眼睑眼角的错帧只占 8%，多数已经通过瞳孔被找到。所以眼周规则只在眼睑眼角点对后续分析重要时才并行使用（<code>scripts/eye_rule.py</code> → <code>results/eye_rule/</code>）。</li>
-      <li><b>fitting 的其他变体 AUC 0.83–0.84</b>，彼此相差不到 0.01；反向预测、除以眼宽、换阶数都不改变结果。</li>
-      <li><b>只看单帧的信号更差</b>：姿态 PCA 0.78、uncertain 0.78、模型间分歧 0.75、几何约束 0.73、jump 0.72。原因是：每个视频只有 17–59 帧标注姿态，而且头固定的眼睛姿态本身变化小，一个瞳孔点错了对重构误差的影响比 2–5 px 的测量噪声还小；"各模型"是同一视频各训练步的模型，标注集嵌套、骨干相同，错起来一起错（视频 5、7、12 只有一个模型，分歧为 0）；卡住的帧里瞳孔四点多数仍是合理的椭圆，几何约束看不出。</li>
-      <li><b>用真值训练的检测器也不更好</b>：表格检测器 AUC 0.83–0.85，图像检测器 0.77，和 fit_pupil 合并最多提高 0.02，标出 5% 和 10% 时的检出率不变。用早期弱模型的错例训练反而把 50 px 档的 AUC 从 0.965 降到 0.927，原因是弱模型的错法和平台点模型不同；人工造的错例让图像检测器更差（0.76）。</li>
-      <li><b>漏掉的帧长什么样。</b>fit_pupil 标出 5% 时漏掉 101 帧超过 20 px 的帧：帧 RMSE 中位数 26 px（四分之三低于 34 px），最低置信度中位数 0.52，相对上一帧不跳动，图像检测器也把它们判为正常。155 帧里 92% 的最大误差落在瞳孔点（pupil_left 79 帧、pupil_right 27、pupil_top 22、pupil_bottom 15）；pupil_left 的偏差多为 40–70 px，61% 是模型的点比标注更靠图像左侧。这些帧是模型错还是标注本身有歧义，要标注者逐帧核对（清单在 <code>results/error_detector/missed_frames_to_verify/</code>）；核对之前这一档的检出率不会再提高。</li>
-      <li><b>需要重新推理的两种信号也不改变结论</b>（只在视频 8 的 70 帧上试）。热图熵单独 AUC 0.868，低于 fit_pupil 的 0.894，高于置信度的 0.830，是 50 px 档最高的单一信号（0.809，只有 9 帧）；和 fit_pupil 排名平均后 20 px 档的 AUC 提高 0.031，对 70 帧重采样 2000 次，提高量的 95% 区间是 −0.013 到 +0.090，90% 的重采样里为正；fit_pupil 排在前 38 名之外的 6 帧错帧里，它把 3 帧提进前 38 名。它和 fit_pupil 的秩相关 0.64、和置信度 0.77，不是独立的信号。两个种子的分歧单独 0.762，和 fit_pupil 合并后反而低 0.005，50 px 档更差。原因是两个模型错的是同样的帧：逐帧误差的秩相关 0.89；平台点模型错超过 20 px 的 38 帧，第二个模型全部也错（另多错 4 帧）；超过 50 px 的 9 帧里 6 帧相同；两个模型的预测在错帧上只差 4.9 px（中位数），在对的帧上差 3.4 px；第二个模型的误差中位数 25.3 px，平台点模型 21.5 px，是正常的种子间差别。这说明这些错帧不是训练不稳定造成的：只要用这套标注训练，模型就会落在同样的位置。问题在标注（瞳孔边缘的定义）或训练集里缺少这类情形的例子，不在检测器能看到的地方。</li>
-      <li><b>限制。</b>同 8.1：样本小且集中，按帧评不按段评。需要重新跑推理的两种信号只在一个视频、一个额外种子、70 帧上试过；热图的 16 种分数里挑了最好的一种，在同一批帧上算，会偏乐观；第二个模型没有对整段视频推理。扩到更多视频每个要约 80 分钟推理或约 4 小时训练，没有做，原因是结果不会改变下一步（核对漏掉的 101 帧）。</li>
-    </ol>
-  </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion:</span>No signal or detector clearly beats fitting over the 4 pupil points (fit_pupil); flagging 5% of the frames finds about 35% of the frames above 20 px, and finding half of them costs 9–10% of the frames; the two signals that need a new inference pass (tried on video 8 only) do not change this.
-    <ol>
-      <li><b>The best signal is fit_pupil</b>, AUC 0.850 (20-px level) and 0.973 (50-px level). Two usable thresholds: 12.8 px flags 5% of the frames and finds 35% of the 20-px level (precision 82%) and 78% of the 50-px level; 8.0 px flags 9.2% and finds 50% of the 20-px level (precision 64%) and 90% of the 50-px level. The fitting of 8.1 (mean of 8 points, threshold 20 px) flags 2% and finds 16% of the 20-px level (precision 89%). fit_pupil does not look at the eyelids and corners: of the 155 wrong frames, 12 have their largest error on an eyelid or corner point (in 10 of them the pupil is wrong too), and at 5% flagged fit_pupil finds 5 of them through the pupil. A parallel rule of the same kind over the 4 eyelid and corner points only (fit_eye ≥ 14.4 px, 1.5% more frames) finds 8, but the same extra frames spent on a looser fit_pupil threshold give a higher total recall (46% against 41% at 7.1% flagged) and a higher precision (77% against 67%), because eyelid and corner errors are 8% of the wrong frames and most of them are already found through the pupil. The eye rule is therefore worth running in parallel only when the eyelid and corner points matter downstream (<code>scripts/eye_rule.py</code> → <code>results/eye_rule/</code>).</li>
-      <li><b>The other variants of fitting have an AUC of 0.83–0.84</b>, within 0.01 of each other; backward prediction, division by the eye width and other orders do not change the result.</li>
-      <li><b>Signals that look at one frame only are worse</b>: pose-PCA 0.78, uncertain 0.78, disagreement between models 0.75, geometric constraints 0.73, jump 0.72. The reasons: each video has only 17–59 labeled poses, and the pose of a head-fixed eye varies little, so one wrong pupil point changes the reconstruction error by less than the 2–5 px of measurement noise; "the models" are the training-step models of the same video, trained on nested label sets with the same backbone, and they fail together (videos 5, 7 and 12 have one model, so the disagreement is 0); in a stuck frame the four pupil points are usually still a plausible ellipse, which the geometric constraints cannot see.</li>
-      <li><b>Detectors trained on our truth are not better either</b>: tabular detector AUC 0.83–0.85, image detector 0.77, combined with fit_pupil at most 0.02 higher, with unchanged recall at 5% and 10% flagged. Training on the errors of the earlier, weaker models even lowers the 50-px AUC from 0.965 to 0.927, because those models fail differently from the plateau-point model; artificially made errors make the image detector worse (0.76).</li>
-      <li><b>What the missed frames look like.</b> At 5% flagged fit_pupil misses 101 frames above 20 px: median frame RMSE 26 px (three quarters below 34 px), median lowest confidence 0.52, no jump from the previous frame, and the image detector also calls them normal. In 92% of the 155 frames the largest error is on a pupil point (pupil_left 79 frames, pupil_right 27, pupil_top 22, pupil_bottom 15); the pupil_left offsets are mostly 40–70 px, and in 61% the model's point lies further to the image's left than the label. Whether these frames are model errors or ambiguities of the label itself has to be checked by the labeler frame by frame (list in <code>results/error_detector/missed_frames_to_verify/</code>); until then the recall at this level will not improve.</li>
-      <li><b>The two signals that need a new inference pass do not change the conclusion either</b> (tried on the 70 frames of video 8 only). Heatmap entropy alone has an AUC of 0.868, below fit_pupil's 0.894 but above the confidence's 0.830, and it is the best single signal at the 50-px level (0.809, only 9 frames); rank-averaged with fit_pupil it raises the 20-px AUC by 0.031; over 2000 resamples of the 70 frames the 95% interval of the gain is −0.013 to +0.090 and the gain is positive in 90% of them; of the 6 wrong frames that fit_pupil ranks outside its top 38, it moves 3 into the top 38. Its rank correlation with fit_pupil is 0.64 and with the confidence 0.77: not an independent signal. The disagreement between the two seeds is 0.762 alone and 0.005 lower than fit_pupil when combined with it, worse at the 50-px level. The reason is that the two models make the same errors: the rank correlation of their per-frame errors is 0.89; all 38 frames the plateau-point model gets wrong by more than 20 px the second model also gets wrong (plus 4 more); 6 of the 9 frames above 50 px are shared; the two predictions are 4.9 px apart (median) on the wrong frames and 3.4 px on the right ones; the second model's median error is 25.3 px against the plateau-point model's 21.5 px, the usual difference between seeds. So these wrong frames are not training instability: any model trained on these labels lands at the same positions. The problem lies in the labels (the definition of the pupil edge) or in training examples missing for these situations, not where a detector can see it.</li>
-      <li><b>Limits.</b> As in 8.1: a small, concentrated sample, scored per frame and not per run. The two signals that need a new inference pass were tried on one video, one extra seed and 70 frames; the best of the 16 heatmap scores was chosen on the same frames, which flatters it; the second model was not run on the whole video. Extending to more videos costs about 80 minutes of inference or about 4 hours of training per video and was not done, because the result would not change the next step (checking the 101 missed frames).</li>
-    </ol>
+    <p>DeepLabCut ships three algorithms for suspicious frames; they use only the model's predictions, no labels. <b>jump</b>: the displacement of the point that moved farthest since the previous frame. <b>uncertain</b>: the lowest confidence of the 8 points. <b>fitting</b>: a time-series model fitted to each point's trajectory predicts the point's position in this frame, and the distance between the predicted and the actual position is measured. Finding the 23 wrong frames among the 1330 truth frames:</p>
+    <table>
+      <thead><tr><th>algorithm</th><th>AUC</th><th>wrong frames found when 3.8% of frames are flagged</th><th>right frames to flag to find all 23</th></tr></thead>
+      <tbody>
+        <tr><td>jump</td><td>0.91</td><td>20 / 23</td><td>86%</td></tr>
+        <tr><td>uncertain</td><td>0.93</td><td>10 / 23</td><td>25%</td></tr>
+        <tr><td>fitting, DLC default: mean deviation of the 8 points</td><td>1.00</td><td>23 / 23</td><td>0.3%</td></tr>
+        <tr><td>fitting, used here: largest deviation of the 8 points</td><td>1.00</td><td>23 / 23</td><td>1.0%</td></tr>
+      </tbody>
+    </table>
+    <p>Fitting separates the 23 wrong frames from the right ones almost completely; jump and uncertain do not. We use the largest-of-8 form of fitting because it measures exactly "how far one point strayed", so its threshold can be the line itself: <b>a frame is flagged when one point's deviation exceeds 14% of the eye width</b>, no extra number. All 23 wrong frames have deviations above 25% of the eye width, so holding out each video in turn and checking with the other 18 finds all of them in every round; the cost is 28 flagged frames among the 1307 right ones, 3.8% of all truth frames, mostly frames in which the eye moved fast. Other signals and detectors trained on our truth were tried earlier and did not beat fitting; the record is in the repository, <code>results/unreliable_frames_sweep/</code> and <code>results/tier50_reeval/</code>. Script / results: <code>scripts/fit_threshold.py</code> / <code>results/fit_threshold/</code>.</p>
   </div>
 
-  <h3><span lang="zh">8.3 找、修、验三步走：找出错帧，用热图第二峰修，再验收；19 个视频上 23 帧错帧全部找到，修好 12 帧</span><span lang="en">8.3 Find, repair, check: the wrong frames are found, repaired from the heatmap's second peak and the repair is checked; on the 19 videos all 23 wrong frames are found and 12 repaired</span></h3>
+  <h3><span lang="zh">8.3 修和验：用热图第二峰修，验收通过才算修好；23 帧错帧修好 12 帧，其余仍标出</span><span lang="en">8.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged</span></h3>
   <div class="text" lang="zh">
-    <p><b>单位和线。</b>这一节所有的误差和阈值都是该视频眼宽的倍数（眼宽 = 两个眼角距离的中位数，由模型预测算出），换相机或换距离不用重定。错帧的线是眼宽的 14%，来源见 8.1 开头和图 8-0。</p>
-    <p><b>找。</b>用 DeepLabCut 自带的 fitting 量：对 8 个点各自用它之前的轨迹预报它在这一帧的位置，量预报位置和实际预测的距离，8 个点取最大，超过眼宽的 14% 就把这一帧标出。阈值就是错帧的线本身，不另设数：找的是"有一个点偏离了足以构成错帧的距离"的帧。23 帧错帧的这个量都在眼宽的 25% 以上，所以每一轮留一视频验证都全部找到；代价是 1307 帧对的帧里标出 28 帧，占全部真值帧的 3.8%。</p>
-    <p><b>修。</b>被标出的帧里，哪个瞳孔点的偏离超过线，就把它换成这个点热图上的第二个峰。模型预测每个点时输出一张热图，第一个峰是它给出的位置，点被甩飞时第二个峰往往在正确位置。眼睑距离判为闭眼的帧不动。</p>
-    <p><b>验。</b>换完以后要判断新位置像不像瞳孔上的点，通过才算修好，不通过就不换、帧仍然标出。没有任何帧被删除，修不了的帧留着标出，要不要去掉由用数据的人决定。验收的标准比较了七种，同样的 19 个视频、同样的真值帧，两种最好：一种是手定的几何规则（四个瞳孔点相对眼角、眼睑的比例落在该视频中位数附近的带内）；另一种不含任何手定的数，用 1330 帧人工标注张成的范围做"合理"的范围，范围的余量用留一视频定，并且先问"这帧本来是否合理"，合理就不动。两种各修好 12 帧错帧，留 7 帧标出，都没有把对的帧修坏到越过线。把找帧的同一个 fitting 量拿来做验收反而最差：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因为眼睛快动而被标出时，预报滞后，靠近预报的错误第二峰被接受。找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的证据。</p>
+    <p><b>修。</b>被标出的帧里，偏差超过线的瞳孔点换成这个点热图上的第二个峰。模型预测每个点时输出一张热图，第一个峰是它给出的位置，点被甩飞时第二个峰往往在正确位置。眼睑距离判为闭眼的帧不动。</p>
+    <p><b>验。</b>换完以后要判断新位置像不像瞳孔上的点：通过算修好，不通过就不换，帧仍然标出。没有任何帧被删除，修不了的帧留着标出，要不要去掉由用数据的人决定。验收标准在同样的 19 个视频、同样的真值帧上比较了七种，两种最好：手定的几何规则（四个瞳孔点相对眼角、眼睑的比例落在该视频中位数附近的带内），以及不含任何手定数的<b>人工标注范围</b>：用 1330 帧人工标注张成的范围判断合理，范围的余量由留一视频定，并且先问"这帧本来是否合理"，合理就不动。把找帧用的 fitting 量拿来验收最差：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因眼睛快动被标出时预报滞后，靠近预报的错误第二峰被接受。找帧问"这帧和过去一不一致"，验收需要这一帧自己的证据。</p>
     <table>
-      <thead><tr><th></th><th>几何规则（手定）</th><th>人工标注范围，两步，留一视频定余量</th><th>同一个 fitting 量</th></tr></thead>
+      <thead><tr><th></th><th>人工标注范围</th><th>几何规则（手定）</th><th>同一个 fitting 量</th></tr></thead>
       <tbody>
         <tr><td>23 帧错帧里修好的</td><td>12</td><td>12</td><td>5</td></tr>
         <tr><td>错帧仍标出</td><td>7</td><td>7</td><td>14</td></tr>
         <tr><td>错帧因判为闭眼未动</td><td>4</td><td>4</td><td>4</td></tr>
-        <tr><td>28 帧被标出的对的帧里被修的 / 修坏的</td><td>4 / 0</td><td>1 / 1</td><td>10 / 2</td></tr>
-        <tr><td>对的帧仍标出</td><td>7</td><td>6</td><td>18</td></tr>
-        <tr><td>全视频：修的 / 仍标出的帧比例</td><td>1.0% / 0.9%</td><td>0.8% / 1.2%</td><td>1.0% / 2.4%</td></tr>
+        <tr><td>28 帧被标出的对的帧里被修的 / 修坏的</td><td>1 / 1</td><td>4 / 0</td><td>10 / 2</td></tr>
+        <tr><td>对的帧仍标出</td><td>6</td><td>7</td><td>18</td></tr>
+        <tr><td>全视频：修的 / 仍标出的帧比例</td><td>0.8% / 1.2%</td><td>1.0% / 0.9%</td><td>1.0% / 2.4%</td></tr>
       </tbody>
     </table>
-    <p><b>没修好的。</b>7 帧仍标出的错帧是多个点同时甩出、第二峰也不在瞳孔上的帧（视频 1、2、14）和视频 8 的一帧；4 帧未动的是眼睑规则判为闭眼的帧（视频 10、11），其中两帧是模型的眼睑点本身错了。被标出的对的帧，多数是眼睛快速移动的帧。整段视频里被修和仍标出的帧各约 1%，视频 1 和 8 最多；这些帧是不是真错，真值帧回答不了，已按同一规则从每个视频抽出修复帧和仍标出帧各 10 帧待人眼核对。脚本和结果：<code>scripts/error_tier.py</code>、<code>fit_threshold.py</code>、<code>acceptance_thresholds.py</code>、<code>flag_and_repair.py</code>；<code>results/error_tier/</code>、<code>results/fit_threshold/</code>、<code>results/acceptance_thresholds/</code>、<code>results/flag_and_repair/</code>。</p>
+    <p><b>没修好的。</b>仍标出的 7 帧错帧是多个点同时甩出、第二峰也不在瞳孔上的帧（视频 1、2、14）和视频 8 的一帧；未动的 4 帧是眼睑规则判为闭眼的帧（视频 10、11），其中两帧是模型的眼睑点本身错了。整段视频里被修和仍标出的帧各约 1%，视频 1 和 8 最多；这些帧是不是真错，真值帧回答不了，已从每个视频各抽修复帧和仍标出帧 10 帧待人眼核对。脚本 / 结果：<code>scripts/acceptance_thresholds.py</code>、<code>scripts/flag_and_repair.py</code> / <code>results/acceptance_thresholds/</code>、<code>results/flag_and_repair/</code>。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Units and the line.</b> Every error and threshold in this section is a fraction of the video's eye width (the median distance between the two corners, taken from the model's predictions), so nothing has to be re-set for another camera or distance. The line for a wrong frame is 14% of the eye width; see the start of 8.1 and Figure 8-0.</p>
-    <p><b>Find.</b> DeepLabCut's own fitting score: for each of the 8 points the position in this frame is predicted from the point's earlier trajectory, the distance between the predicted and the actual position is measured, the largest of the 8 is taken, and the frame is flagged when it exceeds 14% of the eye width. The threshold is the line itself, no extra number: what is looked for is a frame in which one point moved by the distance that makes a frame wrong. All 23 wrong frames have this score above 25% of the eye width, so every leave-one-video-out fold finds all of them; the cost is 28 flagged frames among the 1307 right ones, 3.8% of all truth frames.</p>
-    <p><b>Repair.</b> In a flagged frame, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap. The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. Frames the eyelid distance calls closed are left alone.</p>
-    <p><b>Check.</b> After the replacement something has to judge whether the new position looks like a pupil point; if it passes, the frame counts as repaired, otherwise nothing is changed and the frame stays flagged. No frame is deleted: frames that cannot be repaired stay flagged, and whether to leave them out is for whoever uses the data. Seven acceptance tests were compared on the same 19 videos and the same truth frames; two are best. One is a hand-made geometry rule (the ratios of the four pupil points relative to the corners and eyelids inside bands around the video's median). The other contains no hand-set number: the range spanned by the 1330 human labels is the "plausible" range, its margin is set by leave-one-video-out, and it first asks whether the frame was plausible to begin with, leaving it alone if so. Both repair 12 of the 23 wrong frames and leave 7 flagged, and neither pushes a right frame over the line. Using the finder's own fitting score as the acceptance test is the worst option: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused, while a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; accepting needs evidence from the frame itself.</p>
+    <p><b>Repair.</b> In a flagged frame, each pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap. The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. Frames the eyelid distance calls closed are left alone.</p>
+    <p><b>Check.</b> After the replacement something has to judge whether the new position looks like a pupil point: if it passes the frame counts as repaired, otherwise nothing is changed and the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and whether to leave them out is for whoever uses the data. Seven acceptance tests were compared on the same 19 videos and truth frames; two are best: a hand-made geometry rule (the ratios of the four pupil points relative to the corners and eyelids inside bands around the video's median), and the <b>human-label range</b>, which has no hand-set number: the range spanned by the 1330 human labels defines what is plausible, its margin is set by leave-one-video-out, and it first asks whether the frame was plausible to begin with, leaving it alone if so. Using the finder's own fitting score as the check is the worst option: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused, while a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</p>
     <table>
-      <thead><tr><th></th><th>geometry rule (hand-made)</th><th>human-label range, two steps, margin by leave-one-video-out</th><th>the same fitting score</th></tr></thead>
+      <thead><tr><th></th><th>human-label range</th><th>geometry rule (hand-made)</th><th>the same fitting score</th></tr></thead>
       <tbody>
         <tr><td>repaired, of the 23 wrong frames</td><td>12</td><td>12</td><td>5</td></tr>
         <tr><td>wrong frames still flagged</td><td>7</td><td>7</td><td>14</td></tr>
         <tr><td>wrong frames left alone as closed-eye</td><td>4</td><td>4</td><td>4</td></tr>
-        <tr><td>of the 28 flagged right frames: repaired / made worse</td><td>4 / 0</td><td>1 / 1</td><td>10 / 2</td></tr>
-        <tr><td>right frames still flagged</td><td>7</td><td>6</td><td>18</td></tr>
-        <tr><td>whole videos: repaired / still flagged, share of all frames</td><td>1.0% / 0.9%</td><td>0.8% / 1.2%</td><td>1.0% / 2.4%</td></tr>
+        <tr><td>of the 28 flagged right frames: repaired / made worse</td><td>1 / 1</td><td>4 / 0</td><td>10 / 2</td></tr>
+        <tr><td>right frames still flagged</td><td>6</td><td>7</td><td>18</td></tr>
+        <tr><td>whole videos: repaired / still flagged, share of all frames</td><td>0.8% / 1.2%</td><td>1.0% / 0.9%</td><td>1.0% / 2.4%</td></tr>
       </tbody>
     </table>
-    <p><b>What is not repaired.</b> The 7 wrong frames that stay flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14), plus one frame of video 8; the 4 untouched frames are the ones the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong. The flagged right frames are mostly frames in which the eye moved fast. Over the whole videos about 1% of the frames are repaired and about 1% stay flagged, most in videos 1 and 8; whether those are real errors the truth frames cannot say, so 10 repaired and 10 still-flagged frames per video were drawn by the same rule for a check by eye. Scripts and results: <code>scripts/error_tier.py</code>, <code>fit_threshold.py</code>, <code>acceptance_thresholds.py</code>, <code>flag_and_repair.py</code>; <code>results/error_tier/</code>, <code>results/fit_threshold/</code>, <code>results/acceptance_thresholds/</code>, <code>results/flag_and_repair/</code>.</p>
+    <p><b>What is not repaired.</b> The 7 wrong frames that stay flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14), plus one frame of video 8; the 4 untouched frames are the ones the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong. Over the whole videos about 1% of the frames are repaired and about 1% stay flagged, most in videos 1 and 8; whether those are real errors the truth frames cannot say, so 10 repaired and 10 still-flagged frames per video were drawn for a check by eye. Scripts / results: <code>scripts/acceptance_thresholds.py</code>, <code>scripts/flag_and_repair.py</code> / <code>results/acceptance_thresholds/</code>, <code>results/flag_and_repair/</code>.</p>
   </div>
 </section>
 
