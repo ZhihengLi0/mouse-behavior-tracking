@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:40 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1021,10 +1021,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <h3><span lang="zh">8.1 什么算错帧：误差以眼宽为单位，线在眼宽的 14%</span><span lang="en">8.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
   <div class="text" lang="zh">
-    <p><b>问题。</b>每个视频的模型到平台点之后，整段视频预测完，仍有少数帧预测得明显不对。第 3 步比较过 DeepLabCut 的三种纠错算法，是为了在主动学习里挑下一批要标注的帧，选了 jump。这里的问题不同：训练已经饱和，不再加标注，（1）哪些帧的预测不可信，要不用标注就找出来；（2）找出来的帧怎么用最少的人力修好。8.1 先定什么算错帧，8.2 找，8.3 修和验。</p>
+    <p><b>问题。</b>每个视频的模型到平台点之后，整段视频预测完，仍有少数帧预测得明显不对。训练已经饱和，不再加标注，问题是：（1）哪些帧的预测不可信，要不用标注就找出来；（2）找出来的帧怎么用最少的人力修好。8.1 先定什么算错帧，8.2 找，8.3 修和验。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>The question.</b> Once a video's model has reached its plateau and the whole video is predicted, a few frames are still clearly wrong. Step 3 compared DeepLabCut's three outlier algorithms as pickers of the next frames to label in active learning and chose jump. The question here is different: training has saturated and no labels are added, so (1) which frames cannot be trusted, to be found without labels, and (2) how to repair them with the least human effort. 8.1 defines a wrong frame, 8.2 finds them, 8.3 repairs and checks.</p>
+    <p><b>The question.</b> Once a video's model has reached its plateau and the whole video is predicted, a few frames are still clearly wrong. Training has saturated and no labels are added, so the question is: (1) which frames cannot be trusted, to be found without labels, and (2) how to repair them with the least human effort. 8.1 defines a wrong frame, 8.2 finds them, 8.3 repairs and checks.</p>
   </div>
   <p class="text"><b><span lang="zh">基本信息（8.1–8.3 共用）</span><span lang="en">Basic information (shared by 8.1–8.3)</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
