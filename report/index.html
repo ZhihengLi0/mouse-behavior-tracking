@@ -1199,14 +1199,36 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li><b>修：</b>被标出且未被判为闭眼的帧里，偏差超过线的瞳孔点换成这个点热图上的第二个峰（峰所在格子乘步长，加该点"回归坐标减第一峰格子"的中位数偏移）。模型对每个点输出一张热图，第一个峰是它给出的位置，点被甩飞时第二个峰往往在正确位置。被 PCA 标出的帧换残差最大的那个瞳孔点：残差摊在 8 个点上，按超阈值挑点一帧都修不了，在四个视频上试过四种挑法，换最大的那一个修得最多，真值帧上和 fitting 一样好；两者任一标出的帧换两边候选的并集。</li>
       <li><b>验：</b>换完以后判断新位置像不像瞳孔上的点，通过算修好，不通过就不换，帧仍然标出。不删任何帧；修不了的帧留着标出，要不要去掉由用数据的人决定。</li>
-      <li><b>比较的验收标准（七种，同样的帧）：</b>（a）<b>人工标注范围</b>：在该帧自己的眼睛坐标系里算四个瞳孔点的 12 个无量纲量（沿眼角方向的位置、在眼睑带内的位置、相对另外三点的比例），全部落在 1330 帧人工标注张成的范围内才算合理；范围每边放宽其宽度的 42%，这是留出任一视频时其余 18 个视频的范围能包住它全部标注所需的最小余量；先问这一帧本来是否合理，合理就不动。（b）<b>几何规则</b>：同样的量，但范围手定（该视频中位数 ± 5 个 MAD，点在眼角之内、眼睑带之内，左右上下顺序正确）。（c）<b>同一个 fitting 量</b>：换上去的点和同一个预报位置的距离降到线以下。（d）第二峰的置信度不低于 0.238；（e）换上去的点相对前后帧的位移不超过眼宽的 0.485；（f）标注范围不放宽、不先问合理；（g）标注范围不放宽、先问合理。(d)、(e) 的数是在 37 个候选修复上选的，使"该修的被接受"减"不该修的被接受"最大。</li>
+      <li><b>比较的验收标准（七种，同样的帧）：</b>
+        <ul>
+          <li>（a）<b>人工标注范围</b>：在该帧自己的眼睛坐标系里算四个瞳孔点的 12 个无量纲量（沿眼角方向的位置、在眼睑带内的位置、相对另外三点的比例），全部落在 1330 帧人工标注张成的范围内才算合理。范围每边放宽其宽度的 42%，这是留出任一视频时其余 18 个视频的范围能包住它全部标注所需的最小余量。先问这一帧本来是否合理，合理就不动。</li>
+          <li>（b）<b>几何规则</b>：同样的量，但范围手定：该视频中位数 ± 5 个 MAD，点在眼角之内、眼睑带之内，左右上下顺序正确。</li>
+          <li>（c）<b>同一个 fitting 量</b>：换上去的点和同一个预报位置的距离降到线以下。</li>
+          <li>（d）<b>第二峰的置信度</b>不低于 0.238。</li>
+          <li>（e）<b>跳变</b>：换上去的点相对前后帧的位移不超过眼宽的 0.485。</li>
+          <li>（f）标注范围不放宽、不先问合理。</li>
+          <li>（g）标注范围不放宽、先问合理。</li>
+        </ul>
+        (d)、(e) 的数是在 37 个候选修复上选的，使"该修的被接受"减"不该修的被接受"最大。
+      </li>
     </ol>
   </div>
   <div class="text" lang="en">
     <ol>
       <li><b>Repair:</b> in a flagged frame not judged closed, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap (the peak's cell times the stride, plus the point's median offset between regressed coordinate and first-peak cell). The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. In a frame flagged by the PCA the pupil point with the largest residual is replaced: the residual spreads over all 8 points, picking points over the threshold repairs nothing, and of four rules tried on four videos replacing the single largest repaired the most and did as well as fitting on the truth frames; in a frame flagged by either finder the union of both candidate sets is replaced.</li>
       <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data.</li>
-      <li><b>Acceptance tests compared (seven, same frames):</b> (a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels; the range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th; the frame is first checked as it is and left alone if already plausible. (b) <b>geometry rule</b>: the same quantities with hand-set bands (video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order). (c) <b>the same fitting score</b>: the replaced point's distance to the same prediction falls below the line. (d) second-peak confidence at least 0.238; (e) displacement of the replaced point to the previous and next frame at most 0.485 eye widths; (f) label range without margin and without the plausibility check first; (g) label range without margin, with the check first. The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise "right repairs accepted" minus "wrong repairs accepted".</li>
+      <li><b>Acceptance tests compared (seven, same frames):</b>
+        <ul>
+          <li>(a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels. The range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th. The frame is first checked as it is and left alone if already plausible.</li>
+          <li>(b) <b>geometry rule</b>: the same quantities with hand-set bands: video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order.</li>
+          <li>(c) <b>the same fitting score</b>: the replaced point's distance to the same prediction falls below the line.</li>
+          <li>(d) <b>second-peak confidence</b> at least 0.238.</li>
+          <li>(e) <b>jump</b>: displacement of the replaced point to the previous and next frame at most 0.485 eye widths.</li>
+          <li>(f) label range without margin and without the plausibility check first.</li>
+          <li>(g) label range without margin, with the check first.</li>
+        </ul>
+        The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise "right repairs accepted" minus "wrong repairs accepted".
+      </li>
     </ol>
   </div>
   <div class="text" lang="zh">
