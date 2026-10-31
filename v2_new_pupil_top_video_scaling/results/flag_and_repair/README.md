@@ -126,5 +126,5 @@ threshold or the label range, and the frames are one per episode, so the shares 
 `videoNN_<test>/`: `summary.csv` (truth frames), `whole_video.csv`, `truth_frames.csv` (errors in eye widths and in px);
 `frames_all.csv.gz` and `cache/videoNN_pred200.npy` local only. `all_videos/`: `whole_video_all.csv`,
 `truth_summary_all.csv`, `totals.csv`, `comparison.csv`, `touched_structure.csv`, `error_before_after.csv`, `share_per_video.png`, `error_before_after.png`,
-`spotcheck_sample.csv`; `spotcheck_review/`: `items.csv`, `spotcheck_review_verdicts.csv`, `spotcheck_review_result.{csv,png}` (page and crops local only). Threshold and line: `results/error_tier/`, `results/fit_threshold/`,
+`spotcheck_sample.csv`; `spotcheck_review/`: `items.csv`, `spotcheck_review_verdicts.csv`, `spotcheck_review_result.{csv,png}`, `heatmap_examples.png` (`scripts/heatmap_example_figure.py`: three repaired frames with the full heatmap of the thrown point, both peaks marked), `review_examples.jpg` (`scripts/review_examples_figure.py`: before / after pairs of judged frames); page and crops local only. Threshold and line: `results/error_tier/`, `results/fit_threshold/`,
 `results/acceptance_thresholds/`.
