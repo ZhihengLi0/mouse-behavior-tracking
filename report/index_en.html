@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:31 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -112,8 +112,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>20 labels already come close to saturation; could the first batch be cut to 5 or 10?</b> They cannot replace 20: 5 labels are enough on only 5 of the 19 videos and 10 labels on 7, one cannot tell in advance which, and the result depends on which frames happen to be taken. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 3.5–6.0 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
-      <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 940 test frames of 19 videos the four-point area has a median error of 5.4% against 8.4% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 9).</li>
-      <li><b>How to detect blinks?</b> Definition: not open = the eye is closed or the lid covers part of the pupil. The analysis here is static, frame by frame; blink dynamics are a separate analysis. Criterion: one pixel threshold per mouse, not open when the eyelid distance is below it, Pluto 147.5 px, Terra 150.5 px. The threshold is chosen on 327 judged frames (the labeler judged open / not open from the raw frame alone), 94% (Pluto) and 89% (Terra) accurate. The model's eyelid distance is within 2 px of the labels on 949 test frames. In 9 videos (3, 4, 8–12, 15, 18) 20–79% of the frames are below the threshold: a half-covered eye is the resting state of those recordings, and blinks are a subset (step 10).</li>
+      <li><b>Which frames of a whole video cannot be trusted, and how to repair them?</b> A frame error above 14% of the eye width is a wrong frame, 23 of the 1330 truth frames; DeepLabCut's fitting deviation with the same line as threshold finds all 23 and flags 2% of the right frames; a thrown point is replaced by the second peak of its heatmap and accepted by the human-label range, 12 frames repaired, the rest stay flagged, nothing deleted; on the whole videos about six of seven repairs are right by eye (step 9).</li>
+      <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 940 test frames of 19 videos the four-point area has a median error of 5.4% against 8.4% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 10).</li>
+      <li><b>How to detect blinks?</b> Definition: not open = the eye is closed or the lid covers part of the pupil. The analysis here is static, frame by frame; blink dynamics are a separate analysis. Criterion: one pixel threshold per mouse, not open when the eyelid distance is below it, Pluto 147.5 px, Terra 150.5 px. The threshold is chosen on 327 judged frames (the labeler judged open / not open from the raw frame alone), 94% (Pluto) and 89% (Terra) accurate. The model's eyelid distance is within 2 px of the labels on 949 test frames. In 9 videos (3, 4, 8–12, 15, 18) 20–79% of the frames are below the threshold: a half-covered eye is the resting state of those recordings, and blinks are a subset (step 11).</li>
     </ol>
     <p><b>Status:</b> 19 videos finished (videos 0–18).</p>
   </div>
@@ -143,11 +144,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><a href="#s6"><span lang="en">Asked afterwards: would a first batch of 5 or 10 labels be enough</span></a></li>
       <li><a href="#s7"><span lang="en">Do new videos hurt old ones</span></a></li>
       <li><a href="#s8"><span lang="en">Error and confidence of each keypoint</span></a></li>
-      <li><a href="#s9"><span lang="en">Pupil area: the four-point rule</span></a></li>
-      <li><a href="#s10"><span lang="en">Blinks (static, per frame): one pixel threshold per mouse, Pluto 147.5 / Terra 150.5 px</span></a></li>
-      <li><a href="#s11"><span lang="en">Time series of the whole videos</span></a></li>
-      <li><a href="#s12"><span lang="en">Where there is no conclusion yet</span></a></li>
-      <li><a href="#s13"><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
+      <li><a href="#s9"><span lang="en">Unreliable frames: define, find, repair</span></a></li>
+      <li><a href="#s10"><span lang="en">Pupil area: the four-point rule</span></a></li>
+      <li><a href="#s11"><span lang="en">Blinks (static, per frame): one pixel threshold per mouse, Pluto 147.5 / Terra 150.5 px</span></a></li>
+      <li><a href="#s12"><span lang="en">Time series of the whole videos</span></a></li>
+      <li><a href="#s13"><span lang="en">Where there is no conclusion yet</span></a></li>
+      <li><a href="#s14"><span lang="en">Appendix: the selection sheet of every batch of every video</span></a></li>
     </ol>
   </nav>
 </header>
@@ -792,12 +794,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
     </ol>
   </div>
-  <h3><span lang="en">8.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="no">9</span><span lang="en">Unreliable frames: what counts as wrong, how to find them, how to repair them; all 23 wrong frames found, 12 repaired, nothing deleted</span></h2>
   
   <div class="text" lang="en">
-    <p><b>The question.</b> Once a video's model has reached its plateau and the whole video is predicted, a few frames are still clearly wrong. Training has saturated and no labels are added, so the question is: (1) which frames cannot be trusted, to be found without labels, and (2) how to repair them with the least human effort. 8.1 defines a wrong frame, 8.2 finds them, 8.3 repairs and checks.</p>
+    <p><b>The question.</b> Once a video's model has reached its plateau and the whole video is predicted, a few frames are still clearly wrong. Step 8 showed that confidence cannot serve as the criterion, pupil top is 8.3 px off even at high confidence, so the search below uses the time series, not the confidence. Training has saturated and no labels are added, so the question is: (1) which frames cannot be trusted, to be found without labels, and (2) how to repair them with the least human effort. 9.1 defines a wrong frame, 9.2 finds them, 9.3 repairs and checks.</p>
   </div>
-  <p class="text"><b><span lang="en">Basic information (shared by 8.1–8.3)</span></b></p>
+  <p class="text"><b><span lang="en">Basic information (shared by 9.1–9.3)</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra).</span></td></tr>
     <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5), predicting every frame of the whole video.</span></td></tr>
@@ -805,25 +811,26 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Error</span></th><td><span lang="en">Frame RMSE (distance between the 8 predicted and the 8 labeled points, formula at the top of the page) divided by the video's eye width. Eye width = the median corner-to-corner distance over the video's predictions, no labels needed; 392–497 px on the 19 videos.</span></td></tr>
     <tr><th><span lang="en">Scripts and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/error_tier.py</code>, <code>fit_threshold.py</code>, <code>acceptance_thresholds.py</code>, <code>flag_and_repair.py</code>; results in the <code>results/</code> folders of the same names.</span></td></tr>
   </tbody></table></div>
+  <h3><span lang="en">9.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
   
   <div class="text" lang="en">
-    <p>Errors are in units of eye width rather than pixels so that the same numbers hold on another camera or at another distance. The histogram of the 1330 errors (Figure 8-3) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail. <b>The line is at 14% of the eye width</b>; there is no frame between 12.7% and 15.4%. Frames above the line are wrong frames, every other frame counts as right. The line was read off the histogram, as the blink threshold of step 10 was.</p>
+    <p>Errors are in units of eye width rather than pixels so that the same numbers hold on another camera or at another distance. The histogram of the 1330 errors (Figure 9-1) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail. <b>The line is at 14% of the eye width</b>; there is no frame between 12.7% and 15.4%. Frames above the line are wrong frames, every other frame counts as right. The line was read off the histogram, as the blink threshold of step 11 was.</p>
     <p>Where the gap comes from: below the line the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, which cannot exceed the pupil's size (in the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4); above the line the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border (in the 23 wrong frames the worst point is at a median 5 radii). The pupil is surrounded by uniform iris, where the heatmap forms no peak, so there is no frame "just outside the pupil".</p>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-3:</span>Frame error of the 1330 truth frames in units of the eye width, log scale. Blue: the main group; red: the 23 wrong frames to the right of the line; dashed: the line at 14% of the eye width.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-1:</span>Frame error of the 1330 truth frames in units of the eye width, log scale. Blue: the main group; red: the 23 wrong frames to the right of the line; dashed: the line at 14% of the eye width.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_above.jpg" alt="Every truth frame above the line, with the human labels and the model's points"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-4a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has left the eye.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-2a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has left the eye.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_below.jpg" alt="Every truth frame with error between 7 and 14 percent of eye width"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-4b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The points are all near the pupil edge; the blurry pupil of video 8 makes up most of them.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-2b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The points are all near the pupil edge; the blurry pupil of video 8 makes up most of them.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on wrong frames:</span>one line, 14% of the eye width.
@@ -834,7 +841,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="en">8.2 Finding wrong frames: fitting finds all 23, its threshold is the line itself</span></h3>
+  <h3><span lang="en">9.2 Finding wrong frames: fitting finds all 23, its threshold is the line itself</span></h3>
   
   <div class="text" lang="en">
     <p>DeepLabCut ships three algorithms for suspicious frames; each gives every frame one number from the model's predictions alone, no labels, and the frame is flagged when the number crosses a threshold. The course of the work: the three were compared on the 1330 frames and fitting was best; attempts to beat it, before the line was set, with other signals, detectors trained on our truth, the heatmap shape and a second model trained with another seed did not succeed; once the line was set at 14% of the eye width fitting found every wrong frame, so the finding step was settled and the question moved to the repair.</p>
@@ -848,7 +855,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_finder_curves.png" alt="Share of wrong frames found against share of right frames flagged, for the three algorithms over every threshold"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-5:</span>The three algorithms at every threshold: share of the 1307 right frames flagged (log scale) against share of the 23 wrong frames found; up and to the left is better. The dot is the threshold used here.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-3:</span>The three algorithms at every threshold: share of the 1307 right frames flagged (log scale) against share of the 23 wrong frames found; up and to the left is better. The dot is the threshold used here.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting separates the wrong frames from the right ones almost completely; jump and uncertain do not.
@@ -860,7 +867,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="en">8.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged, nothing deleted</span></h3>
+  <h3><span lang="en">9.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged, nothing deleted</span></h3>
   
   <div class="text" lang="en">
     <ol>
@@ -871,32 +878,32 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   
   <div class="text" lang="en">
-    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus a small offset inside it, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the pupil edge usually still holds a local high cell, at least 3 cells away from the highest: the second peak. The repair moves the thrown point to the second peak, and the check then decides whether that place looks like a pupil point. Figure 8-6 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
+    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus a small offset inside it, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the pupil edge usually still holds a local high cell, at least 3 cells away from the highest: the second peak. The repair moves the thrown point to the second peak, and the check then decides whether that place looks like a pupil point. Figure 9-4 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-6:</span>Three repaired frames. Left to right: before, red = the model's 8 points, the thrown point outside the view; the heatmap of that point over the whole frame, red ring = peak 1 (the reported position), blue ring = peak 2, dashed box = the view of the other panels; the same heatmap inside the view, peak 2 on the pupil edge; after, blue = the point moved to peak 2.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Three repaired frames. Left to right: before, red = the model's 8 points, the thrown point outside the view; the heatmap of that point over the whole frame, red ring = peak 1 (the reported position), blue ring = peak 2, dashed box = the view of the other panels; the same heatmap inside the view, peak 2 on the pupil edge; after, blue = the point moved to peak 2.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-7:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-5:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-8:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-9:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-10:</span>Repaired frames from the check by eye, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>Repaired frames from the check by eye, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
@@ -906,14 +913,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
-      <li>Whole videos (Figure 8-9): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
+      <li>Whole videos (Figure 9-7): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
     </ol>
   </div>
 </section>
 
-<!-- 9 -->
-<section id="s9">
-  <h2><span class="no">9</span><span lang="en">Pupil area: the four-point rule has the lowest error; on videos 4 and 8 the area is still not accurate</span></h2>
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="no">10</span><span lang="en">Pupil area: the four-point rule has the lowest error; on videos 4 and 8 the area is still not accurate</span></h2>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra).</span></td></tr>
@@ -936,7 +943,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox"><img src="assets/fig_eye_area.jpg" alt="Area rules on all videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-1:</span>Left: the 940 test frames of the 19 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 31-frame median filter (dark).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 10-1:</span>Left: the 940 test frames of the 19 videos pooled; one bar per rule = median area error (%, lower is better), dash = 90th percentile. Right: on the 50 test frames of each video, the median error of the four-point rule (green), the three-point rule (grey) and the four-point rule with a 31-frame median filter (dark).</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on the area:</span>Among these rules the four-point rule has the lowest error, but on some videos the area is still not accurate.
@@ -951,9 +958,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 </section>
 
-<!-- 10 -->
-<section id="s10">
-  <h2><span class="no">10</span><span lang="en">Blinks, static per-frame analysis: not open = the eye is closed or the lid covers part of the pupil; the criterion is an eyelid distance below the mouse's threshold (Pluto 147.5 px, Terra 150.5 px), 94% (Pluto) and 89% (Terra) accurate on the 327 judged frames (the 289 with plausible eyelid points); 9 videos have 20–79% of their frames below the threshold</span></h2>
+<!-- 11 -->
+<section id="s11">
+  <h2><span class="no">11</span><span lang="en">Blinks, static per-frame analysis: not open = the eye is closed or the lid covers part of the pupil; the criterion is an eyelid distance below the mouse's threshold (Pluto 147.5 px, Terra 150.5 px), 94% (Pluto) and 89% (Terra) accurate on the 327 judged frames (the 289 with plausible eyelid points); 9 videos have 20–79% of their frames below the threshold</span></h2>
   
   <p class="text" lang="en"><span class="hl">Scope: a static per-frame analysis with two states per frame, open / not open.</span></p>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
@@ -973,7 +980,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The camera is fixed and the mouse is placed at the same position every day (checked below), so the pixel distance between the two eyelid points is itself comparable across days and needs no division by the eye width.</li>
       <li>Eye size differs between mice, so each mouse gets its own threshold.</li>
     </ul>
-    <p>Example frames at the threshold and at 180 px were drawn so that the eye opening at the threshold can be checked by eye (Figure 10-2).</p>
+    <p>Example frames at the threshold and at 180 px were drawn so that the eye opening at the threshold can be checked by eye (Figure 11-2).</p>
     <p><b>Criterion (per frame).</b> One threshold T per mouse: <b>Pluto 147.5 px, Terra 150.5 px</b> (shown as 148 / 150 in the figures). Mouse A cannot be set: all 12 of its judged frames are open.</p>
     <ol>
       <li>Frames with plausible eyelid points: O &lt; T → not open; O ≥ T → open.</li>
@@ -983,12 +990,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   
   <div class="text" lang="en">
-    <p><b>Where the threshold is (Figure 10-1).</b> Conclusion: Pluto 147.5 px, Terra 150.5 px, the candidate with the highest recall − false-alarm rate; leave-one-video-out ranges Pluto 147.5–160.5 px, Terra 143.5–154.5 px. The computation follows the figure.</p>
+    <p><b>Where the threshold is (Figure 11-1).</b> Conclusion: Pluto 147.5 px, Terra 150.5 px, the candidate with the highest recall − false-alarm rate; leave-one-video-out ranges Pluto 147.5–160.5 px, Terra 143.5–154.5 px. The computation follows the figure.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_scan.jpg" alt="Threshold scan per mouse on the judged frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-1:</span>At which threshold T each mouse agrees best with the labeler. One panel per mouse; the first pools all three, for reference only, thresholds are set per mouse.
+    <figcaption lang="en"><span class="tag">Figure 11-1:</span>At which threshold T each mouse agrees best with the labeler. One panel per mouse; the first pools all three, for reference only, thresholds are set per mouse.
       <ul>
         <li>x: candidate threshold T in pixels.</li>
         <li>Blue: agreement, the share of all judged frames on which "O &lt; T → not open" agrees with the labeler.</li>
@@ -1000,7 +1007,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   
   <div class="text" lang="en">
-    <p><b>How the threshold is chosen (Figure 10-1).</b> Each mouse uses only its own judged frames. Candidate T runs from 60 to 300 px in steps of 1 px.</p>
+    <p><b>How the threshold is chosen (Figure 11-1).</b> Each mouse uses only its own judged frames. Candidate T runs from 60 to 300 px in steps of 1 px.</p>
     <p>Each T splits the frames into four cells:</p>
     <ul>
       <li>hit: truth not open, O &lt; T</li>
@@ -1033,35 +1040,35 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   
   <div class="text" lang="en">
-    <p><b>What the eye looks like at the threshold (Figure 10-2).</b> Conclusion: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open.</p>
+    <p><b>What the eye looks like at the threshold (Figure 11-2).</b> Conclusion: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open.</p>
   </div>
   <figure>
     <div class="figbox scroll"><img src="assets/fig_blink_examples.jpg" style="width:4200px;max-width:none" alt="The eye at the mouse threshold and at 180 px, one frame per video"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-2:</span>The eye at the threshold: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open. Two rows per mouse (threshold row, Terra 150 px and Pluto 148 px; 180 px row), one frame per video whose opening in the whole-video predictions is within 3 px of that value; yellow = eyelid points, blue = eye corners. Scroll sideways.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-2:</span>The eye at the threshold: the upper lid already covers the top of the pupil, which is the definition of not open; at 180 px the eye is fully open. Two rows per mouse (threshold row, Terra 150 px and Pluto 148 px; 180 px row), one frame per video whose opening in the whole-video predictions is within 3 px of that value; yellow = eyelid points, blue = eye corners. Scroll sideways.</figcaption>
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Check one: do the judged frames separate on the distribution of the eye opening over all frames of the mouse (Figure 10-3).</b> Conclusion: they do; the misjudged frames almost all lie within 20 px of the threshold (one Terra frame excepted).</p>
+    <p><b>Check one: do the judged frames separate on the distribution of the eye opening over all frames of the mouse (Figure 11-3).</b> Conclusion: they do; the misjudged frames almost all lie within 20 px of the threshold (one Terra frame excepted).</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_dist.jpg" alt="Eye opening distribution per mouse with the judged frames overlaid"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-3:</span>One column per mouse.
+    <figcaption lang="en"><span class="tag">Figure 11-3:</span>One column per mouse.
       <ul>
-        <li>Top row: histogram of the eye opening over every frame of all the mouse's videos (gray), dashed line = the threshold. Terra is bimodal and the threshold sits in the valley; Pluto is unimodal and the threshold cuts the left slope. This is why Terra's peak in Figure 10-1 is sharp and Pluto's flat.</li>
+        <li>Top row: histogram of the eye opening over every frame of all the mouse's videos (gray), dashed line = the threshold. Terra is bimodal and the threshold sits in the valley; Pluto is unimodal and the threshold cuts the left slope. This is why Terra's peak in Figure 11-1 is sharp and Pluto's flat.</li>
         <li>Bottom row: the judged frames. Red = judged not open, green = judged open, x = the opening the model gives that frame. Almost all red dots lie left of the threshold, almost all green ones right of it. Misjudged frames: Pluto 9, all within 14 px of the threshold; Terra 14, 13 within 17 px and one 37 px away. Mouse A's 12 frames are all open, so no boundary can be drawn.</li>
       </ul>
     </figcaption>
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Check two: how far the model's eyelid distance is from the labeler's own labels (Figure 10-4).</b> Data: the 50 test frames held out per video (never trained on, 949 frames over the 19 videos), the distance from the labeled eyelid points against the distance from the model's points on the same frame. Conclusion: median difference 2 px, no bias, only 2–4% of the test frames change side of the threshold, so most errors near the threshold are not the model's.</p>
+    <p><b>Check two: how far the model's eyelid distance is from the labeler's own labels (Figure 11-4).</b> Data: the 50 test frames held out per video (never trained on, 949 frames over the 19 videos), the distance from the labeled eyelid points against the distance from the model's points on the same frame. Conclusion: median difference 2 px, no bias, only 2–4% of the test frames change side of the threshold, so most errors near the threshold are not the model's.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_labelcheck.jpg" alt="Eyelid distance from the labels against the model on the test frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-4:</span>One dot per test frame. x = the distance between the labeler's two eyelid points, y = the distance between the model's two. Black diagonal = equal, dotted lines = ±10 px, dashed line = the mouse threshold.
+    <figcaption lang="en"><span class="tag">Figure 11-4:</span>One dot per test frame. x = the distance between the labeler's two eyelid points, y = the distance between the model's two. Black diagonal = equal, dotted lines = ±10 px, dashed line = the mouse threshold.
       <ul>
         <li>The dots hug the diagonal: the model hardly errs on this quantity. Median difference Pluto 1.9 px (499 frames), Terra 2.2 px (400 frames), 90% of the frames within 6.3 px, no bias.</li>
         <li>Frames moved to the other side of the threshold by the model's error: Pluto 12 (2.4%), Terra 14 (3.5%), all within 20 px of the threshold.</li>
@@ -1126,42 +1133,42 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   
   <div class="text" lang="en">
-    <p><b>Terra day by day over time (Figure 10-5).</b> Conclusion: videos 11 and 18 are below the threshold most of the time, videos 13, 16 and 17 above it almost throughout; not-open is a sustained state in these recordings, not an occasional event.</p>
+    <p><b>Terra day by day over time (Figure 11-5).</b> Conclusion: videos 11 and 18 are below the threshold most of the time, videos 13, 16 and 17 above it almost throughout; not-open is a sustained state in these recordings, not an occasional event.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_blink_opening_terra.jpg" alt="Terra: eye opening over time per video with the mouse threshold"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 10-5:</span>One row per Terra video; x = time in minutes, the line is the median eye opening of each 10 s, the band reaches down to the 10th percentile, the black line is the mouse threshold 150 px. Where the line is above the black line the eye is open (13, 16, 17 almost throughout), where it is below the eye is narrowed (11 and 18 most of the time). Without any threshold, this line is the eye opening as a continuous variable. The same figures for Pluto and mouse A are in the results folder.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 11-5:</span>One row per Terra video; x = time in minutes, the line is the median eye opening of each 10 s, the band reaches down to the 10th percentile, the black line is the mouse threshold 150 px. Where the line is above the black line the eye is open (13, 16, 17 almost throughout), where it is below the eye is narrowed (11 and 18 most of the time). Without any threshold, this line is the eye opening as a continuous variable. The same figures for Pluto and mouse A are in the results folder.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion:</span>One pixel threshold per mouse, <b>Pluto 147.5 px, Terra 150.5 px</b>, almost the same for the two mice.
     <ul>
-      <li><b>Basis:</b> on the mouse's judged frames, the threshold with the highest recall − false-alarm rate (Figure 10-1). Accuracy Pluto 94.0%, Terra 88.9%.</li>
+      <li><b>Basis:</b> on the mouse's judged frames, the threshold with the highest recall − false-alarm rate (Figure 11-1). Accuracy Pluto 94.0%, Terra 88.9%.</li>
       <li><b>Stability:</b> leave-one-video-out ranges Pluto 147.5–160.5 px, Terra 143.5–154.5 px. Pluto's optimum is flat (92–94% accuracy from 147 to 160 px); Terra's is sharp because many frames of videos 11 and 18 have their opening right at the threshold.</li>
-      <li><b>Two checks:</b> the judged frames separate on the distribution of all frames, the misjudged ones almost all within 20 px of the threshold (Figure 10-3); the model's eyelid distance is within a median 2 px of the labels and moves only 2–4% of the test frames across the threshold (Figure 10-4). So most errors near the threshold come from borderline frames being hard to judge, not from the model.</li>
+      <li><b>Two checks:</b> the judged frames separate on the distribution of all frames, the misjudged ones almost all within 20 px of the threshold (Figure 11-3); the model's eyelid distance is within a median 2 px of the labels and moves only 2–4% of the test frames across the threshold (Figure 11-4). So most errors near the threshold come from borderline frames being hard to judge, not from the model.</li>
       <li><b>Day by day:</b> videos 0, 5, 6, 7, 13, 16, 17 have at most 1.1% of their frames below the threshold; videos 1, 2, 14 have 3–14%; videos 3, 4, 8, 9, 10, 11, 12, 15, 18 have 20–79%, among them videos 9, 10, 11, 18 with 59–79%, a narrowed eye all day. Not-open is a sustained state in these recordings; blinks are only a subset of it.</li>
       <li><b>Limits:</b> one judge, repeatability not measured. The sample is stratified by opening, so the accuracies are those of the stratified sample, not per-frame accuracies of whole videos. The threshold is scored on the frames it was chosen on; leave-one-video-out is the only check of that. On Pluto's three earliest days the eye width is 3–12% smaller; the same threshold is used (see the premise check). All 17 judged frames of video 18 are not open, so Terra's threshold is driven mainly by the days narrowed all day. Mouse A cannot be set. 330 frames drawn, 3 not judged.</li>
     </ul>
   </div>
 </section>
 
-<!-- 11 -->
-<section id="s11">
-  <h2><span class="no">11</span><span lang="en">Time series of the whole videos: pupil area, eye opening and confidence of every frame over time</span></h2>
+<!-- 12 -->
+<section id="s12">
+  <h2><span class="no">12</span><span lang="en">Time series of the whole videos: pupil area, eye opening and confidence of every frame over time</span></h2>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra). Video 0 is 5 min long, the others 19.9 min (71,748 frames at 60 frames/s).</span></td></tr>
     <tr><th><span lang="en">Label standard</span></th><td><span lang="en">The keypoint definitions made explicit on 2026-09-20 (step 4).</span></td></tr>
     <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5; videos 7 and 12, whose plateau is at 0 labels, use their 20-label models). ResNet-50, batch 2, 120 epochs, final snapshot; every frame of the whole video is predicted, with no confidence cut-off, no smoothing and no frame removed.</span></td></tr>
-    <tr><th><span lang="en">Per-frame quantities</span></th><td><span lang="en">Four-point area = π/4 × |x(pupil right) − x(pupil left)| × |y(pupil bottom) − y(pupil top)| (definition of step 9); eye opening O = y(eyelid bottom) − y(eyelid top) (definition of step 10); lowest pupil confidence = minimum of the four pupil points' confidence; pupil centre = (mean x of left and right, mean y of top and bottom), drawn minus its median position over the video.</span></td></tr>
+    <tr><th><span lang="en">Per-frame quantities</span></th><td><span lang="en">Four-point area = π/4 × |x(pupil right) − x(pupil left)| × |y(pupil bottom) − y(pupil top)| (definition of step 10); eye opening O = y(eyelid bottom) − y(eyelid top) (definition of step 11); lowest pupil confidence = minimum of the four pupil points' confidence; pupil centre = (mean x of left and right, mean y of top and bottom), drawn minus its median position over the video.</span></td></tr>
     <tr><th><span lang="en">Script and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/area_timeseries.py</code>; results in <code>v2_new_pupil_top_video_scaling/results/area_timeseries/</code>; the time series of each video is <code>area_timeseries_videoNN.png</code> there, the frame count and median area of each video are in <code>area_timeseries_all_videos.csv</code>.</span></td></tr>
   </tbody></table></div>
   
-  <p class="text" lang="en"><span class="tag">Scope:</span>This section only plots the per-frame quantities against time and draws no conclusion. Closed frames are judged frame by frame by the rule of step 10 and are not marked here; the time course of blinks (start to end of a blink, duration, frequency) is a separate analysis.</p>
+  <p class="text" lang="en"><span class="tag">Scope:</span>This section only plots the per-frame quantities against time and draws no conclusion. Closed frames are judged frame by frame by the rule of step 11 and are not marked here; the time course of blinks (start to end of a blink, duration, frequency) is a separate analysis.</p>
   <figure>
     <div class="figbox wide"><img src="assets/fig_eye_timeseries.jpg" alt="Pupil area over time in every video"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 11-1:</span>One row per video; y = four-point area divided by the video's median area (1 = median, range 0–2), x = time (s).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 12-1:</span>One row per video; y = four-point area divided by the video's median area (1 = median, range 0–2), x = time (s).</figcaption>
   </figure>
   <figure>
     <div class="figbox scroll"><div class="strip">
@@ -1186,17 +1193,17 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/eyets_video18.jpg" alt="eyets video 18" loading="lazy"><div class="cap"><span lang="en">Video 18 (Terra, 2025-10-08)</span></div></div>
     </div></div>
     
-    <figcaption lang="en"><span class="tag">Figure 11-2:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area (px²), eye opening O (px), lowest pupil confidence, pupil centre relative to its median position (px, blue x, yellow y); x = time (s).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 12-2:</span>One time-series figure per video in one row; scroll sideways. Top to bottom in each: four-point area (px²), eye opening O (px), lowest pupil confidence, pupil centre relative to its median position (px, blue x, yellow y); x = time (s).</figcaption>
   </figure>
 </section>
 
-<!-- 12 -->
-<section id="s12">
-  <h2><span class="no">12</span><span lang="en">Where there is no conclusion yet</span></h2>
+<!-- 13 -->
+<section id="s13">
+  <h2><span class="no">13</span><span lang="en">Where there is no conclusion yet</span></h2>
   
   <div class="text" lang="en">
     <ul>
-      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (8.3): all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how to cut the two in five false alarms among the still-flagged frames.</li>
+      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (9.3): all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how to cut the two in five false alarms among the still-flagged frames.</li>
       <li><b>Videos 4, 5 and 8 have larger errors</b> (video 8 above 25 px). The cause is a blurry image: the points are hard to place even by eye, so the labeler's own judgement is unstable. Whole-image sharpness and brightness do not differ from the other Pluto videos; the blur is local, at the pupil edge, and has not been quantified.</li>
       <li><b>Area:</b> the four-point rule is used; median error 5.4% on all test frames against 8.4% for the three-point rule. But on 4 of the 19 videos (videos 1, 2, 5, 7) the three-point rule is lower, and on videos 4 and 8 both rules are inaccurate (43.8%, 24.0%); neither is explained. <b>Plateau points</b> cluster at 20–40 labels (20 and 40 labels: 7 videos each; 0 labels: 2; 60 labels: 2; 80 labels: 1), but each point is a single training run on 50 test frames, so differences within ±20 labels cannot be resolved.</li>
     </ul>
@@ -1204,7 +1211,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 </section>
 
 <!-- appendix -->
-<section id="s13">
+<section id="s14">
   <h2><span class="no"><span lang="en">A</span></span><span lang="en">Appendix: the selection sheet of every batch of every video</span></h2>
   
   <p class="text" lang="en">A record of the process; no new conclusion. One row per video, from batch 1 to the last batch; scroll sideways. Batch 1 has no model to use: 20 frames picked by clustering the appearance of all frames. From batch 2 on, the model predicts the whole video, the jump rule flags candidate frames and 20 of them are picked by appearance clustering. Algorithm and how to read a sheet: section 5.1 and Figure 5-1 of step 5. Batches after the plateau point are shown too (they were labeled but not carried into later videos).</p>
@@ -1348,9 +1355,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <div class="item"><img src="assets/selection_video18_batch03.jpg" alt="Video 18 batch 3" loading="lazy"><div class="cap"><span lang="en">Video 18, batch 3 (picked by the jump rule of the 40-label model)</span></div></div>
       <div class="item"><img src="assets/selection_video18_batch04.jpg" alt="Video 18 batch 4" loading="lazy"><div class="cap"><span lang="en">Video 18, batch 4 (picked by the jump rule of the 60-label model)</span></div></div>
   </div></div></figure>
-  <h3><span lang="en">A2: the judged frames of step 10 (open / not open): the labeler's verdicts on the original frames</span></h3>
+  <h3><span lang="en">A2: the judged frames of step 11 (open / not open): the labeler's verdicts on the original frames</span></h3>
   
-  <p class="text" lang="en">The 239 judged frames of videos 0–13 of step 10 (240 drawn, at most 18 per video, drawn at random in five strata of the model's eye opening). The labeler saw only the single original frame, no values, and judged "open" or "not open (closed, or the lid covers part of the pupil)". Frame border and bottom band: green = open, red = not open; the r on the band (eye opening ÷ the video's median) was added afterwards. One row per video; scroll sideways.</p>
+  <p class="text" lang="en">The 239 judged frames of videos 0–13 of step 11 (240 drawn, at most 18 per video, drawn at random in five strata of the model's eye opening). The labeler saw only the single original frame, no values, and judged "open" or "not open (closed, or the lid covers part of the pupil)". Frame border and bottom band: green = open, red = not open; the r on the band (eye opening ÷ the video's median) was added afterwards. One row per video; scroll sideways.</p>
   <figure><div class="figbox scroll"><div class="strip tall">
       <div class="item"><img src="assets/notopen_video00.jpg" alt="notopen video 0" loading="lazy"><div class="cap"><span lang="en">Video 0 (mouse A, 5-min): judged frames (at most 18)</span></div></div>
       <div class="item"><img src="assets/notopen_video01.jpg" alt="notopen video 1" loading="lazy"><div class="cap"><span lang="en">Video 1 (Pluto, 2025-10-31): judged frames (at most 18)</span></div></div>
