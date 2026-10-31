@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:46 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:49 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -860,7 +860,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>PCA:</b> the human-labeled poses the video's model was trained on (8 points, 16 coordinates, the 17–73 frames up to the plateau) go through a principal component analysis keeping 99% of the variance, which gives the subspace of "normal poses"; the predicted pose of every frame is projected onto it and reconstructed, and the RMS of the 8 points' reconstruction residuals divided by the eye width is the frame's score; a single point's residual says which point to repair. It does not look at neighbouring frames, so a single frame suffices, but it needs the video's own training labels.</li>
       <li><b>Threshold of fitting = the line, 14% of the eye width.</b>
         <ul>
-          <li>The line is the one read off the error histogram in 9.1 (Figure 9-1), no extra number. It can serve as the threshold because the largest-of-8 form of fitting measures exactly how far the farthest point strayed, in eye widths, the same quantity that defines a wrong frame.</li>
+          <li>The line of the histogram in 9.1 (Figure 9-1): there a frame whose error exceeds 14% of the eye width is a wrong frame, here a frame whose farthest point deviates by more than 14% of the eye width is flagged; the same number with the same meaning.</li>
         </ul>
       </li>
       <li><b>Threshold of the PCA = 3.9 × the median score of all frames of the video.</b>
