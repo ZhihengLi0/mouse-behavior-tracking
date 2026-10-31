@@ -1049,7 +1049,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全错帧，但在整段视频上找到的不是同一批，两者互补。
     <ol>
-      <li>两档（图 9-3）：第一档找全 23 帧时误标的对帧都在十几帧以内，23 帧错帧分不出它们的高下；第二档误标多一个量级。fitting 用取最大值的形式，是因为它量的就是"一个点偏了多少"，阈值可以直接用线。</li>
+      <li>图 9-3 里的信号分两类：fitting、PCA、训练出来的检测器和信号组合这几种，找全 23 帧错帧时只误标十几帧对帧，彼此分不出高下；置信度、jump、几何量、双模型分歧要误标上百帧。fitting 用 8 个点取最大值的形式，因为它量的就是"一个点偏了多少"，阈值可以直接用线。</li>
       <li>fitting，阈值 = 线：23 帧全部找到，1307 帧对的帧标出 28 帧；整段视频标出 3.8% 的帧（图 9-5）。被标出的对的帧多是眼睛快速移动、预报跟不上的帧。</li>
       <li>PCA，阈值 = 中位数的 3.9 倍：23 帧全部找到，对的帧标出 14 帧；留一视频每轮全部找到；整段视频标出 2.4%。</li>
       <li>意见不同的帧（图 9-6）：只有 PCA 标的 70 帧里 39 帧真错，错法几乎都是四个瞳孔点缩成一团停在瞳孔旁边、一连多帧如此，点没有跳，fitting 看不见；只有 fitting 标的 75 帧里 8 帧真错，其余是眼睛快动时的误报。两者都标的帧没有单独核对。</li>
@@ -1059,7 +1059,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong frame, but not the same ones on the whole videos, and complement each other.
     <ol>
-      <li>Two tiers (Figure 9-3): the first tier finds all 23 frames while flagging at most a dozen right frames, and 23 wrong frames cannot rank its members; the second tier flags an order of magnitude more. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself can be its threshold.</li>
+      <li>The signals of Figure 9-3 fall into two groups: fitting, the PCA, trained detectors and combinations of signals flag only a dozen right frames when finding all 23 wrong ones and cannot be ranked among themselves; confidence, jump, geometry and two-model disagreement flag hundreds. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself is its threshold.</li>
       <li>Fitting, threshold = the line: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5). The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
       <li>The PCA, threshold = 3.9 × the median: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
       <li>Frames the two disagree on (Figure 9-6): of 70 flagged by the PCA alone 39 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of 75 flagged by fitting alone 8 are wrong, the rest false alarms from fast eye movements. Frames flagged by both were not checked separately.</li>

@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:13 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -894,7 +894,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong frame, but not the same ones on the whole videos, and complement each other.
     <ol>
-      <li>Two tiers (Figure 9-3): the first tier finds all 23 frames while flagging at most a dozen right frames, and 23 wrong frames cannot rank its members; the second tier flags an order of magnitude more. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself can be its threshold.</li>
+      <li>The signals of Figure 9-3 fall into two groups: fitting, the PCA, trained detectors and combinations of signals flag only a dozen right frames when finding all 23 wrong ones and cannot be ranked among themselves; confidence, jump, geometry and two-model disagreement flag hundreds. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself is its threshold.</li>
       <li>Fitting, threshold = the line: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5). The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
       <li>The PCA, threshold = 3.9 × the median: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
       <li>Frames the two disagree on (Figure 9-6): of 70 flagged by the PCA alone 39 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of 75 flagged by fitting alone 8 are wrong, the rest false alarms from fast eye movements. Frames flagged by both were not checked separately.</li>
