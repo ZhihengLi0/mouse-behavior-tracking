@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:46 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -798,7 +798,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 9 -->
 <section id="s9">
-  <h2><span class="no">9</span><span lang="en">Unreliable frames: once active learning has brought the error to its plateau, which frames of a whole video are still not to be trusted, how to find them without labels, and how to repair them with the least human effort</span></h2>
+  <h2><span class="no">9</span><span lang="en">Once active learning has brought the error to its plateau, which frames of a whole video are still not to be trusted, how to find them without labels, and how to repair them with the least human effort</span></h2>
   
   <div class="text" lang="en">
     <p><b>The question.</b> Once a video's model has reached its plateau and the whole video is predicted, a few frames are still clearly wrong. Step 8 showed that confidence cannot serve as the criterion, pupil top is 8.3 px off even at high confidence, so the search below uses the time series, not the confidence. Training has saturated and no labels are added, so the question is: (1) which frames cannot be trusted, to be found without labels, and (2) how to repair them with the least human effort. 9.1 defines a wrong frame, 9.2 finds them, 9.3 repairs and checks.</p>

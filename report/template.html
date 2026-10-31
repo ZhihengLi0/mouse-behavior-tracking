@@ -918,7 +918,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <!-- 9 -->
 <section id="s9">
-  <h2><span class="no">9</span><span lang="zh">不可信帧：主动学习把误差降到饱和以后，整段视频里哪些帧的预测仍不可信，怎么不用标注把它们找出来，怎么用最少的人力修好</span><span lang="en">Unreliable frames: once active learning has brought the error to its plateau, which frames of a whole video are still not to be trusted, how to find them without labels, and how to repair them with the least human effort</span></h2>
+  <h2><span class="no">9</span><span lang="zh">主动学习把误差降到饱和以后，整段视频里哪些帧的预测仍不可信，怎么不用标注把它们找出来，怎么用最少的人力修好</span><span lang="en">Once active learning has brought the error to its plateau, which frames of a whole video are still not to be trusted, how to find them without labels, and how to repair them with the least human effort</span></h2>
   <div class="text" lang="zh">
     <p><b>问题。</b>每个视频的模型到平台点之后，整段视频预测完，仍有少数帧预测得明显不对。第 8 步说明置信度不能当错帧的判据，瞳孔上点置信度高时误差也有 8.3 px，所以下面找帧不用置信度，用时序。训练已经饱和，不再加标注，问题是：（1）哪些帧的预测不可信，要不用标注就找出来；（2）找出来的帧怎么用最少的人力修好。9.1 先定什么算错帧，9.2 找，9.3 修和验。</p>
   </div>
