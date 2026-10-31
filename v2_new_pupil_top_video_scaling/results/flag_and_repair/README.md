@@ -141,6 +141,13 @@ same number of repairs; the union flags more but repairs barely more: the errors
 `results/finder_comparison/README.md` §3) have no usable second peak or fail the check and stay flagged. A gain in finding
 that is not yet a gain in repair.
 
+## Acceptance tests under the PCA finder (`scripts/acceptance_by_finder.py`, `all_videos/acceptance_by_finder.*`)
+
+Same repair, frames flagged by the PCA (`videoNN_pca_<accept>/`; the test "fit" is defined only for the fitting finder).
+23 wrong frames repaired to good / flagged right frames (14) repaired, made worse: label range two steps with margin 11 /
+1, 0; geometry 12 / 5, 2; label range two steps no margin 10 / 4, 0; confidence 9 / 11, 3; label range one step 10 / 13, 4;
+jump 4 / 13, 4. The ranking is the one of the fitting route.
+
 ## Files
 
 `videoNN_<test>/`: `summary.csv` (truth frames), `whole_video.csv`, `truth_frames.csv` (errors in eye widths and in px);

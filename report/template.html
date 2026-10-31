@@ -1049,9 +1049,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><b>Check by eye: when the two signals disagree, which is right?</b> On the whole videos the two signals flag different frames. The frames one flags and the other does not have no labels, so only the eye can say whether they are real errors or false alarms.</p>
   </div>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="zh">帧</span><span lang="en">Frames</span></th><td><span lang="zh">两组：只有 PCA 标出的、只有 fitting 标出的；每个视频每组随机抽 4 帧，共 148 帧，判了 145 帧。抽帧时 PCA 用的还是第一版的固定阈值，统计时只保留在现在的阈值（中位数的 3.9 倍）下仍属同一组的 117 帧。</span><span lang="en">Two groups: flagged by the PCA only, flagged by fitting only; 4 frames per video and group drawn at random, 148 in all, 145 judged. The frames were drawn with the PCA at its first, fixed threshold; the count keeps only the 117 frames that stay in the same group under the threshold in use (3.9 × the median).</span></td></tr>
+    <tr><th><span lang="zh">帧</span><span lang="en">Frames</span></th><td><span lang="zh">两组：只有 PCA 标出的、只有 fitting 标出的；每个视频每组随机抽最多 4 帧，共 117 帧。</span><span lang="en">Two groups: flagged by the PCA only, flagged by fitting only; up to 4 frames per video and group drawn at random, 117 in all.</span></td></tr>
     <tr><th><span lang="zh">判法</span><span lang="en">How judged</span></th><td><span lang="zh">盲判：每帧只给原帧和模型的 8 个点，不显示是哪个信号标的。三个选项：有一个点真错了 / 都对 / 看不清。</span><span lang="en">Blind: each frame shown as the raw frame and the model's 8 points, without saying which signal flagged it. Three choices: a point is really wrong / all points fine / cannot tell.</span></td></tr>
-    <tr><th><span lang="zh">什么算错</span><span lang="en">What counts as wrong</span></th><td><span lang="zh">有一个点离开了它该在的结构（瞳孔边缘、睑缘、眼角）；沿着结构滑了一点不算错。</span><span lang="en">A point off the structure it belongs to (pupil edge, lid margin, corner); a point that merely slid along its structure is not wrong.</span></td></tr>
+    <tr><th><span lang="zh">什么算错</span><span lang="en">What counts as wrong</span></th><td><span lang="zh">有一个点离开了它该在的位置，偏差明显超出标注本身的噪声；在噪声范围内的偏差不算错。</span><span lang="en">A point away from where it belongs by clearly more than the noise of the labels themselves; a deviation within that noise is not wrong.</span></td></tr>
     <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><code>finder_disagreement_review.py</code>, <code>finder_disagreement_eval.py</code>; <code>results/finder_comparison/disagreement_review/</code></td></tr>
   </tbody></table></div>
   <figure>
@@ -1060,27 +1060,29 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 9-6:</span>Blind verdicts by eye on the frames the two signals disagree on.</figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p><b>结果：</b>只有 PCA 标出的 51 帧里 33 帧真错，错法几乎都是四个瞳孔点缩成一团停在瞳孔旁边、一连多帧如此，点没有跳，fitting 看不见；只有 fitting 标出的 66 帧里 3 帧真错，56 帧 8 个点都对。也就是说，PCA 多找出一类 fitting 看不见的错；fitting 单独标出的帧多数不是错。</p>
+    <p><b>结果：</b>只有 PCA 标出的 51 帧里 33 帧真错、13 帧都对；只有 fitting 标出的 66 帧里 3 帧真错、56 帧都对。也就是说，PCA 单独标出的帧多数是 fitting 漏掉的错；fitting 单独标出的帧多数不是错。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Result:</b> of the 51 frames flagged by the PCA only, 33 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of the 66 flagged by fitting only, 3 are wrong and in 56 all points are fine. That is, the PCA adds a kind of error fitting cannot see; the frames fitting alone flags are mostly not errors.</p>
+    <p><b>Result:</b> of the 51 frames flagged by the PCA only, 33 are really wrong and 13 fine; of the 66 flagged by fitting only, 3 are wrong and 56 fine. That is, most frames the PCA alone flags are errors fitting missed; most frames fitting alone flags are not errors.</p>
   </div>
-  <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全真值帧里的错帧；在整段视频上 PCA 还标出一类 fitting 看不见的错，fitting 单独标出的帧多数不是错。
+  <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全真值帧里的错帧；在整段视频上，PCA 单独标出的帧多数是 fitting 漏掉的错，fitting 单独标出的帧多数不是错。
     <ol>
-      <li>图 9-3：不需要训练、不需要组合的信号里，fitting 和 PCA 找全 23 帧错帧时只误标十几帧对帧，其余的要误标上百帧。fitting 用 8 个点取最大值的形式，因为它量的就是"一个点偏了多少"，阈值可以直接用线。</li>
-      <li>fitting，阈值 = 线：23 帧全部找到，1307 帧对的帧标出 28 帧；整段视频标出 3.8% 的帧（图 9-5）。被标出的对的帧多是眼睛快速移动、预报跟不上的帧。</li>
-      <li>PCA，阈值 = 中位数的 3.9 倍：23 帧全部找到，对的帧标出 14 帧；留一视频每轮全部找到；整段视频标出 2.4%。</li>
-      <li>意见不同的帧（图 9-6）：只有 PCA 标的 51 帧里 33 帧真错，错法几乎都是四个瞳孔点缩成一团停在瞳孔旁边、一连多帧如此，点没有跳，fitting 看不见；只有 fitting 标的 66 帧里 3 帧真错，56 帧 8 个点都对。两者都标的帧没有单独核对。</li>
+      <li>图 9-3：不需要训练、不需要组合的信号里，fitting 和 PCA 找全 23 帧错帧时只误标十几帧对帧，其余的要误标上百帧。</li>
+      <li>阈值：fitting 用 8 个点取最大值的形式，量的就是"一个点偏了多少眼宽"，所以阈值直接用 9.1 的线，眼宽的 14%。PCA 的分数大小随训练标注的数量变，固定百分比不行，阈值用本视频中位数的 3.9 倍（图 9-4）。</li>
+      <li>fitting：23 帧全部找到，1307 帧对的帧标出 28 帧；整段视频标出 3.8% 的帧（图 9-5）。</li>
+      <li>PCA：23 帧全部找到，对的帧标出 14 帧；留一视频每轮全部找到；整段视频标出 2.4%。</li>
+      <li>意见不同的帧（图 9-6）：只有 PCA 标的 51 帧里 33 帧真错；只有 fitting 标的 66 帧里 3 帧真错。两者都标的帧没有单独核对。</li>
       <li>各自需要什么（图 9-4）：PCA 需要本视频的训练标注，20 帧以后底噪稳定；训练标注里没出现过的正常姿态会被整段标出，视频 18 的眯眼帧就是，用中位数倍数做阈值才压下来。fitting 不需要标注；它单独标出的帧多数不是错（图 9-6）。</li>
       <li>全部比较的记录在 <code>results/finder_comparison/</code>。</li>
     </ol>
   </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong truth frame; on the whole videos the PCA also flags a kind of error fitting cannot see, while the frames fitting alone flags are mostly not errors.
+  <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong truth frame; on the whole videos most frames the PCA alone flags are errors fitting missed, and most frames fitting alone flags are not errors.
     <ol>
-      <li>Figure 9-3: of the signals that need no training and no combination, fitting and the PCA flag only a dozen right frames when finding all 23 wrong ones; the others flag hundreds. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself is its threshold.</li>
-      <li>Fitting, threshold = the line: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5). The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
-      <li>The PCA, threshold = 3.9 × the median: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
-      <li>Frames the two disagree on (Figure 9-6): of 51 flagged by the PCA alone 33 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of 66 flagged by fitting alone 3 are wrong and in 56 all points are fine. Frames flagged by both were not checked separately.</li>
+      <li>Figure 9-3: of the signals that need no training and no combination, fitting and the PCA flag only a dozen right frames when finding all 23 wrong ones; the others flag hundreds.</li>
+      <li>Thresholds: fitting in its largest-of-8 form measures how far one point strayed in eye widths, so its threshold is the line of 9.1, 14% of the eye width. The size of the PCA score depends on the number of training labels, a fixed share will not do, so its threshold is 3.9 × the video's median (Figure 9-4).</li>
+      <li>Fitting: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5).</li>
+      <li>The PCA: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
+      <li>Frames the two disagree on (Figure 9-6): of 51 flagged by the PCA alone 33 are really wrong; of 66 flagged by fitting alone 3 are wrong. Frames flagged by both were not checked separately.</li>
       <li>What each needs (Figure 9-4): the PCA needs the video's own training labels, and its background settles after 20 of them; a normal pose absent from the training labels is flagged wholesale, as the narrowed-eye frames of video 18 are, and only the median-multiple threshold brings that down. Fitting needs no labels; the frames it alone flags are mostly not errors (Figure 9-6).</li>
       <li>The record of every comparison is in <code>results/finder_comparison/</code>.</li>
     </ol>
@@ -1090,8 +1092,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="zh">
     <ol>
       <li><b>修：</b>被标出且未被判为闭眼的帧里，偏差超过线的瞳孔点换成这个点热图上的第二个峰（峰所在格子乘步长，加该点"回归坐标减第一峰格子"的中位数偏移）。模型对每个点输出一张热图，第一个峰是它给出的位置，点被甩飞时第二个峰往往在正确位置。被 PCA 标出的帧换残差最大的那个瞳孔点：残差摊在 8 个点上，按超阈值挑点一帧都修不了，在四个视频上试过四种挑法，换最大的那一个修得最多，真值帧上和 fitting 一样好；两者任一标出的帧换两边候选的并集。</li>
-      <li><b>验：</b>换完以后判断新位置像不像瞳孔上的点，通过算修好，不通过就不换，帧仍然标出。不删任何帧；修不了的帧留着标出，要不要去掉由用数据的人决定。</li>
-      <li><b>比较的验收标准（七种，同样的帧）：</b>
+      <li><b>验：</b>换完以后判断新位置像不像瞳孔上的点，通过算修好，不通过就不换，帧仍然标出。不删任何帧；修不了的帧留着标出，要不要去掉由用数据的人决定。修法只有这一种；fitting 找出的帧和 PCA 找出的帧各走一遍，分别统计，比较的是哪种验收合适。</li>
+      <li><b>比较的验收标准（七种；(c) 只对 fitting 找出的帧有定义）：</b>
         <ul>
           <li>（a）<b>人工标注范围</b>：在该帧自己的眼睛坐标系里算四个瞳孔点的 12 个无量纲量（沿眼角方向的位置、在眼睑带内的位置、相对另外三点的比例），全部落在 1330 帧人工标注张成的范围内才算合理。范围每边放宽其宽度的 42%，这是留出任一视频时其余 18 个视频的范围能包住它全部标注所需的最小余量。先问这一帧本来是否合理，合理就不动。</li>
           <li>（b）<b>几何规则</b>：同样的量，但范围手定：该视频中位数 ± 5 个 MAD，点在眼角之内、眼睑带之内，左右上下顺序正确。</li>
@@ -1108,8 +1110,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="en">
     <ol>
       <li><b>Repair:</b> in a flagged frame not judged closed, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap (the peak's cell times the stride, plus the point's median offset between regressed coordinate and first-peak cell). The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. In a frame flagged by the PCA the pupil point with the largest residual is replaced: the residual spreads over all 8 points, picking points over the threshold repairs nothing, and of four rules tried on four videos replacing the single largest repaired the most and did as well as fitting on the truth frames; in a frame flagged by either finder the union of both candidate sets is replaced.</li>
-      <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data.</li>
-      <li><b>Acceptance tests compared (seven, same frames):</b>
+      <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data. There is only this one repair; the frames fitting flags and the frames the PCA flags each go through it and are counted separately, and what is compared is which check suits.</li>
+      <li><b>Acceptance tests compared (seven; (c) is defined only for the frames fitting flags):</b>
         <ul>
           <li>(a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels. The range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th. The frame is first checked as it is and left alone if already plausible.</li>
           <li>(b) <b>geometry rule</b>: the same quantities with hand-set bands: video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order.</li>
@@ -1131,19 +1133,19 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
-    <figcaption lang="zh"><span class="tag">图 9-7：</span>三帧修复的实例，每行一帧。从左到右：修复前，红 = 模型的 8 个点，被甩的那个点在视野外；该点的热图画在整帧上，每 8 px 一格，只画分数不低于最高分 6% 的格子，绿到黄 = 分数低到高，红圈 = 峰 1，也就是模型报出的位置，蓝圈 = 峰 2，虚线框 = 其他三格放大显示的范围；第三格是虚线框里的内容，峰 2 落在瞳孔边缘上；修复后，蓝 = 挪到峰 2 的点。每行下面是视频、帧号和两个峰的分数。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Three repaired frames, one per row. Left to right: before, red = the model's 8 points, the thrown point outside the view; the heatmap of that point drawn over the whole frame, one cell per 8 px, only cells scoring at least 6% of the maximum drawn, green to yellow = low to high score, red ring = peak 1, the position the model reported, blue ring = peak 2, dashed box = the area the other three panels enlarge; the third panel is the inside of that box, peak 2 sits on the pupil edge; after, blue = the point moved to peak 2. Under each row: video, frame and the two peaks' scores.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-7：</span>三帧修复的实例。从左到右：修复前（红 = 模型的点，被甩的点在视野外）；该点的热图画在整帧上，红圈 = 峰 1，蓝圈 = 峰 2，虚线框 = 其他三格的范围；虚线框内的热图，峰 2 在瞳孔边缘上；修复后（蓝 = 挪到峰 2 的点）。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Three repaired frames. Left to right: before (red = the model's points, the thrown point outside the view); the point's heatmap over the whole frame, red ring = peak 1, blue ring = peak 2, dashed box = the area of the other panels; the heatmap inside the box, peak 2 on the pupil edge; after (blue = the point moved to peak 2).</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
-    <figcaption lang="zh"><span class="tag">图 9-8：</span>七种验收标准。左：23 帧错帧里修好的（蓝）、仍标出的（橙）、因判为闭眼未动的（灰）。右：28 帧被标出的对的帧里被修的、修坏的、仍标出的。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
+    <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
+    <figcaption lang="zh"><span class="tag">图 9-8：</span>验收标准的比较，上排 fitting 找出的帧，下排 PCA 找出的帧。左：23 帧错帧里修好的（蓝）、仍标出的（橙）、判为闭眼未动的（灰）。右：被标出的对帧里被修的、修坏的、仍标出的。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The acceptance tests, top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired, made worse, still flagged.</figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p><b>换找法，修法和验收不变。</b>fitting、PCA、两者任一，三种找法各在 19 个视频上跑一遍（图 9-9）。真值帧上三者几乎一样：23 帧错帧都找全，分别修好 12、11、12 帧，对的帧变差 1、0、1 帧。整段视频上 PCA 标出 2.4% 的帧、修好 0.72%，fitting 标出 3.8%、修好 0.78%，并集标出 4.2%、修好 0.80%。并集多标出的帧几乎都修不了：PCA 单独找到的错帧是瞳孔点成团偏移，第二峰不在正确位置，或者过不了验收，留在"标出未修"里。所以找帧的进步没有变成修复的进步，这类帧要另找修法。</p>
+    <p><b>换找法，修法和验收不变。</b>fitting、PCA、两者任一，三种找法各在 19 个视频上跑一遍（图 9-9）。真值帧上三者几乎一样：23 帧错帧都找全，分别修好 12、11、12 帧，对的帧变差 1、0、1 帧。整段视频上 PCA 标出 2.4% 的帧、修好 0.72%，fitting 标出 3.8%、修好 0.78%，并集标出 4.2%、修好 0.80%。并集多标出的帧几乎都修不了：PCA 单独找到的错帧，第二峰过不了验收，留在"标出未修"里。所以找帧的进步没有变成修复的进步，这类帧要另找修法。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Another finder, the same repair and check.</b> Fitting, the PCA and either of the two were each run on the 19 videos (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: the errors the PCA alone finds are bunched pupil points whose second peak is not at the right place either, or fails the check, so they stay flagged and unrepaired. The gain in finding does not turn into a gain in repair; these frames need another repair.</p>
+    <p><b>Another finder, the same repair and check.</b> Fitting, the PCA and either of the two were each run on the 19 videos (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: for the errors the PCA alone finds the second peak fails the check, so they stay flagged and unrepaired. The gain in finding does not turn into a gain in repair; these frames need another repair.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
@@ -1185,24 +1187,24 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <div class="concl" lang="zh"><span class="tag">修和验的结论：</span>人工标注范围和手定几何规则并列最好，各修好 12 帧；用找帧的量做验收最差。
     <ol>
-      <li>23 帧错帧：人工标注范围修好 12 帧、7 帧仍标出、4 帧因判为闭眼未动；几何规则相同；同一个 fitting 量修好 5 帧；置信度 10 帧，跳变 5 帧。</li>
-      <li>28 帧被标出的对的帧：人工标注范围修了 1 帧（变差 1 帧）、6 帧仍标出；几何规则修了 4 帧（没有变差）、7 帧仍标出；fitting 修了 10 帧（变差 2 帧）、18 帧仍标出。没有一种把对的帧修到线以上。</li>
-      <li>人工标注范围不含手定的数，结果与手定规则相同，所以采用它；几何规则作为对照保留。</li>
+      <li>23 帧错帧，fitting 找出的：人工标注范围修好 12 帧、7 帧仍标出、4 帧因判为闭眼未动；几何规则相同；置信度 10 帧，跳变 5 帧，同一个 fitting 量 5 帧。PCA 找出的：标注范围 11 帧，几何规则 12 帧，置信度 9 帧，跳变 4 帧。</li>
+      <li>被标出的对的帧，fitting 找出的 28 帧：人工标注范围修了 1 帧（变差 1 帧）、6 帧仍标出；几何规则修了 4 帧（没有变差）、7 帧仍标出；fitting 量修了 10 帧（变差 2 帧）、18 帧仍标出。PCA 找出的 14 帧：标注范围修了 1 帧（没有变差），几何规则修了 5 帧（变差 2 帧），置信度 11 帧（变差 3 帧），跳变 13 帧（变差 4 帧）。没有一种把对的帧修到线以上。</li>
+      <li>两条线路上人工标注范围和手定几何规则都并列最好，标注范围不含手定的数、修坏的更少，所以采用它；几何规则作为对照保留。</li>
       <li>fitting 不能兼做验收的原因：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因眼睛快动被标出时预报滞后，靠近预报的错误第二峰被接受。找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的证据。</li>
       <li>仍标出的 7 帧是多个点同时甩出、第二峰也不在瞳孔上的帧（视频 1、2、14 各有，视频 8 一帧）；未动的 4 帧是眼睑规则判为闭眼的帧（视频 10、11），其中两帧是模型的眼睑点本身错了。</li>
       <li>整段视频：人工标注范围修 0.8%、仍标出 1.2% 的帧，视频 1 和 8 最多；人眼核对（图 9-11）：修复帧约七分之六修对，仍标出帧约五分之三真错。</li>
-      <li>换 PCA 或并集找帧，修好的数量不变（图 9-9）：PCA 多找出的成团偏移的瞳孔点第二峰修不了，是下一步要修的对象。</li>
+      <li>换 PCA 或并集找帧，修好的数量不变（图 9-9）：PCA 多找出的错帧第二峰修不了，是下一步要修的对象。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
     <ol>
-      <li>The 23 wrong frames: the human-label range repairs 12, leaves 7 flagged and 4 untouched as closed-eye; the geometry rule the same; the same fitting score repairs 5; confidence 10, jump 5.</li>
-      <li>The 28 flagged right frames: the human-label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4 (none worse), 7 flagged; fitting repairs 10 (2 worse), 18 flagged. No test pushes a right frame over the line.</li>
-      <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
+      <li>The 23 wrong frames, flagged by fitting: the human-label range repairs 12, leaves 7 flagged and 4 untouched as closed-eye; the geometry rule the same; confidence 10, jump 5, the same fitting score 5. Flagged by the PCA: label range 11, geometry rule 12, confidence 9, jump 4.</li>
+      <li>The flagged right frames, 28 by fitting: the human-label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4 (none worse), 7 flagged; the fitting score repairs 10 (2 worse), 18 flagged. 14 by the PCA: label range repairs 1 (none worse), geometry rule 5 (2 worse), confidence 11 (3 worse), jump 13 (4 worse). No test pushes a right frame over the line.</li>
+      <li>On both routes the human-label range and the hand-made geometry rule are jointly best; the label range has no hand-set number and makes fewer frames worse, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
       <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8; by eye (Figure 9-11) about six of seven repairs are right and about three of five still-flagged frames are real errors.</li>
-      <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the bunched pupil points the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
+      <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the errors the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
     </ol>
   </div>
 </section>
@@ -1582,14 +1584,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h2><span class="no">13</span><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></h2>
   <div class="text" lang="zh">
     <ul>
-      <li><b>不可信帧：</b>找出错帧和修复已有一条流水线（9.2、9.3）：两种找帧信号，fitting 看时间上的突变，PCA 看形状上的异常；23 帧错帧全部找到，修好 12 帧。整段视频的人眼核对：修复帧约七分之六修对，仍标出的帧约五分之三真错。还没有结论的是剩下的 11 帧（多点同时甩出的 7 帧、被判为闭眼的 4 帧）怎么办，PCA 多找出的成团偏移的瞳孔点怎么修，以及仍标出帧里五分之二的误报怎么减少。</li>
+      <li><b>不可信帧：</b>找出错帧和修复已有一条流水线（9.2、9.3）：两种找帧信号，fitting 看时间上的突变，PCA 看形状上的异常；23 帧错帧全部找到，修好 12 帧。整段视频的人眼核对：修复帧约七分之六修对，仍标出的帧约五分之三真错。还没有结论的是剩下的 11 帧（多点同时甩出的 7 帧、被判为闭眼的 4 帧）怎么办，PCA 多找出的错帧怎么修，以及仍标出帧里五分之二的误报怎么减少。</li>
       <li><b>视频 4、5、8 误差偏大</b>（视频 8 在 25 px 以上）。原因是画面模糊，肉眼也难定点，标注者本身的判断就不稳定。整幅画面的清晰度和亮度与其他 Pluto 视频无差别，模糊在瞳孔边缘的局部，还没有量化。</li>
       <li><b>面积：</b>用四点法，全部测试帧上中位误差 5.4%，三点法 8.4%；但 19 个视频里有 4 个（视频 1、2、5、7）三点法更低，视频 4、8 两种算法都不准（43.8%、24.0%），这两点还没有解释。<b>平台点</b>集中在 20–40 帧（20 帧和 40 帧各 7 个视频，0 帧 2 个，60 帧 2 个，80 帧 1 个），但每个点只训练一次、测试集 50 帧，±20 帧内分不出。</li>
     </ul>
   </div>
   <div class="text" lang="en">
     <ul>
-      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (9.2, 9.3): two finders, fitting for jumps in time and the PCA for implausible shapes; all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye), how to repair the bunched pupil points the PCA adds, and how to cut the two in five false alarms among the still-flagged frames.</li>
+      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (9.2, 9.3): two finders, fitting for jumps in time and the PCA for implausible shapes; all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye), how to repair the errors the PCA adds, and how to cut the two in five false alarms among the still-flagged frames.</li>
       <li><b>Videos 4, 5 and 8 have larger errors</b> (video 8 above 25 px). The cause is a blurry image: the points are hard to place even by eye, so the labeler's own judgement is unstable. Whole-image sharpness and brightness do not differ from the other Pluto videos; the blur is local, at the pupil edge, and has not been quantified.</li>
       <li><b>Area:</b> the four-point rule is used; median error 5.4% on all test frames against 8.4% for the three-point rule. But on 4 of the 19 videos (videos 1, 2, 5, 7) the three-point rule is lower, and on videos 4 and 8 both rules are inaccurate (43.8%, 24.0%); neither is explained. <b>Plateau points</b> cluster at 20–40 labels (20 and 40 labels: 7 videos each; 0 labels: 2; 60 labels: 2; 80 labels: 1), but each point is a single training run on 50 test frames, so differences within ±20 labels cannot be resolved.</li>
     </ul>

@@ -1,0 +1,2 @@
+video,frames,accept,eye_width_px,thr_eye_widths,thr_px,flagged_pct,flagged_closed,ok,closed,flagged_passes_check,unflagged_violation,repaired,flagged_not_repaired,repaired_pct,flagged_not_repaired_pct,worst_not_pupil_among_flagged,repaired_pupil_top,repaired_pupil_bottom,repaired_pupil_left,repaired_pupil_right,finder,thr_pca_eye_widths,flagged_fit_pct,flagged_pca_pct,flagged_both_pct
+1,71748,labelregion0,433.3,0.14,60.7,8.53,474,65631,474,46,0,3309,2288,4.61,3.19,323,22,25,3233,29,pca,0.03669251014926814,15.25,8.53,8.46

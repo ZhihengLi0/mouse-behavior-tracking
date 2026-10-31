@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:37 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -891,9 +891,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p><b>Check by eye: when the two signals disagree, which is right?</b> On the whole videos the two signals flag different frames. The frames one flags and the other does not have no labels, so only the eye can say whether they are real errors or false alarms.</p>
   </div>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Frames</span></th><td><span lang="en">Two groups: flagged by the PCA only, flagged by fitting only; 4 frames per video and group drawn at random, 148 in all, 145 judged. The frames were drawn with the PCA at its first, fixed threshold; the count keeps only the 117 frames that stay in the same group under the threshold in use (3.9 × the median).</span></td></tr>
+    <tr><th><span lang="en">Frames</span></th><td><span lang="en">Two groups: flagged by the PCA only, flagged by fitting only; up to 4 frames per video and group drawn at random, 117 in all.</span></td></tr>
     <tr><th><span lang="en">How judged</span></th><td><span lang="en">Blind: each frame shown as the raw frame and the model's 8 points, without saying which signal flagged it. Three choices: a point is really wrong / all points fine / cannot tell.</span></td></tr>
-    <tr><th><span lang="en">What counts as wrong</span></th><td><span lang="en">A point off the structure it belongs to (pupil edge, lid margin, corner); a point that merely slid along its structure is not wrong.</span></td></tr>
+    <tr><th><span lang="en">What counts as wrong</span></th><td><span lang="en">A point away from where it belongs by clearly more than the noise of the labels themselves; a deviation within that noise is not wrong.</span></td></tr>
     <tr><th><span lang="en">Script and results</span></th><td><code>finder_disagreement_review.py</code>, <code>finder_disagreement_eval.py</code>; <code>results/finder_comparison/disagreement_review/</code></td></tr>
   </tbody></table></div>
   <figure>
@@ -903,15 +903,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Result:</b> of the 51 frames flagged by the PCA only, 33 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of the 66 flagged by fitting only, 3 are wrong and in 56 all points are fine. That is, the PCA adds a kind of error fitting cannot see; the frames fitting alone flags are mostly not errors.</p>
+    <p><b>Result:</b> of the 51 frames flagged by the PCA only, 33 are really wrong and 13 fine; of the 66 flagged by fitting only, 3 are wrong and 56 fine. That is, most frames the PCA alone flags are errors fitting missed; most frames fitting alone flags are not errors.</p>
   </div>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong truth frame; on the whole videos the PCA also flags a kind of error fitting cannot see, while the frames fitting alone flags are mostly not errors.
+  <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong truth frame; on the whole videos most frames the PCA alone flags are errors fitting missed, and most frames fitting alone flags are not errors.
     <ol>
-      <li>Figure 9-3: of the signals that need no training and no combination, fitting and the PCA flag only a dozen right frames when finding all 23 wrong ones; the others flag hundreds. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself is its threshold.</li>
-      <li>Fitting, threshold = the line: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5). The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
-      <li>The PCA, threshold = 3.9 × the median: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
-      <li>Frames the two disagree on (Figure 9-6): of 51 flagged by the PCA alone 33 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of 66 flagged by fitting alone 3 are wrong and in 56 all points are fine. Frames flagged by both were not checked separately.</li>
+      <li>Figure 9-3: of the signals that need no training and no combination, fitting and the PCA flag only a dozen right frames when finding all 23 wrong ones; the others flag hundreds.</li>
+      <li>Thresholds: fitting in its largest-of-8 form measures how far one point strayed in eye widths, so its threshold is the line of 9.1, 14% of the eye width. The size of the PCA score depends on the number of training labels, a fixed share will not do, so its threshold is 3.9 × the video's median (Figure 9-4).</li>
+      <li>Fitting: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5).</li>
+      <li>The PCA: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
+      <li>Frames the two disagree on (Figure 9-6): of 51 flagged by the PCA alone 33 are really wrong; of 66 flagged by fitting alone 3 are wrong. Frames flagged by both were not checked separately.</li>
       <li>What each needs (Figure 9-4): the PCA needs the video's own training labels, and its background settles after 20 of them; a normal pose absent from the training labels is flagged wholesale, as the narrowed-eye frames of video 18 are, and only the median-multiple threshold brings that down. Fitting needs no labels; the frames it alone flags are mostly not errors (Figure 9-6).</li>
       <li>The record of every comparison is in <code>results/finder_comparison/</code>.</li>
     </ol>
@@ -922,8 +923,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="en">
     <ol>
       <li><b>Repair:</b> in a flagged frame not judged closed, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap (the peak's cell times the stride, plus the point's median offset between regressed coordinate and first-peak cell). The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. In a frame flagged by the PCA the pupil point with the largest residual is replaced: the residual spreads over all 8 points, picking points over the threshold repairs nothing, and of four rules tried on four videos replacing the single largest repaired the most and did as well as fitting on the truth frames; in a frame flagged by either finder the union of both candidate sets is replaced.</li>
-      <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data.</li>
-      <li><b>Acceptance tests compared (seven, same frames):</b>
+      <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data. There is only this one repair; the frames fitting flags and the frames the PCA flags each go through it and are counted separately, and what is compared is which check suits.</li>
+      <li><b>Acceptance tests compared (seven; (c) is defined only for the frames fitting flags):</b>
         <ul>
           <li>(a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels. The range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th. The frame is first checked as it is and left alone if already plausible.</li>
           <li>(b) <b>geometry rule</b>: the same quantities with hand-set bands: video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order.</li>
@@ -944,16 +945,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Three repaired frames, one per row. Left to right: before, red = the model's 8 points, the thrown point outside the view; the heatmap of that point drawn over the whole frame, one cell per 8 px, only cells scoring at least 6% of the maximum drawn, green to yellow = low to high score, red ring = peak 1, the position the model reported, blue ring = peak 2, dashed box = the area the other three panels enlarge; the third panel is the inside of that box, peak 2 sits on the pupil edge; after, blue = the point moved to peak 2. Under each row: video, frame and the two peaks' scores.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Three repaired frames. Left to right: before (red = the model's points, the thrown point outside the view); the point's heatmap over the whole frame, red ring = peak 1, blue ring = peak 2, dashed box = the area of the other panels; the heatmap inside the box, peak 2 on the pupil edge; after (blue = the point moved to peak 2).</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
+    <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The acceptance tests, top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired, made worse, still flagged.</figcaption>
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Another finder, the same repair and check.</b> Fitting, the PCA and either of the two were each run on the 19 videos (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: the errors the PCA alone finds are bunched pupil points whose second peak is not at the right place either, or fails the check, so they stay flagged and unrepaired. The gain in finding does not turn into a gain in repair; these frames need another repair.</p>
+    <p><b>Another finder, the same repair and check.</b> Fitting, the PCA and either of the two were each run on the 19 videos (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: for the errors the PCA alone finds the second peak fails the check, so they stay flagged and unrepaired. The gain in finding does not turn into a gain in repair; these frames need another repair.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
@@ -992,13 +993,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
     <ol>
-      <li>The 23 wrong frames: the human-label range repairs 12, leaves 7 flagged and 4 untouched as closed-eye; the geometry rule the same; the same fitting score repairs 5; confidence 10, jump 5.</li>
-      <li>The 28 flagged right frames: the human-label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4 (none worse), 7 flagged; fitting repairs 10 (2 worse), 18 flagged. No test pushes a right frame over the line.</li>
-      <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
+      <li>The 23 wrong frames, flagged by fitting: the human-label range repairs 12, leaves 7 flagged and 4 untouched as closed-eye; the geometry rule the same; confidence 10, jump 5, the same fitting score 5. Flagged by the PCA: label range 11, geometry rule 12, confidence 9, jump 4.</li>
+      <li>The flagged right frames, 28 by fitting: the human-label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4 (none worse), 7 flagged; the fitting score repairs 10 (2 worse), 18 flagged. 14 by the PCA: label range repairs 1 (none worse), geometry rule 5 (2 worse), confidence 11 (3 worse), jump 13 (4 worse). No test pushes a right frame over the line.</li>
+      <li>On both routes the human-label range and the hand-made geometry rule are jointly best; the label range has no hand-set number and makes fewer frames worse, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
       <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8; by eye (Figure 9-11) about six of seven repairs are right and about three of five still-flagged frames are real errors.</li>
-      <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the bunched pupil points the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
+      <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the errors the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
     </ol>
   </div>
 </section>
@@ -1288,7 +1289,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="text" lang="en">
     <ul>
-      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (9.2, 9.3): two finders, fitting for jumps in time and the PCA for implausible shapes; all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye), how to repair the bunched pupil points the PCA adds, and how to cut the two in five false alarms among the still-flagged frames.</li>
+      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (9.2, 9.3): two finders, fitting for jumps in time and the PCA for implausible shapes; all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye), how to repair the errors the PCA adds, and how to cut the two in five false alarms among the still-flagged frames.</li>
       <li><b>Videos 4, 5 and 8 have larger errors</b> (video 8 above 25 px). The cause is a blurry image: the points are hard to place even by eye, so the labeler's own judgement is unstable. Whole-image sharpness and brightness do not differ from the other Pluto videos; the blur is local, at the pupil edge, and has not been quantified.</li>
       <li><b>Area:</b> the four-point rule is used; median error 5.4% on all test frames against 8.4% for the three-point rule. But on 4 of the 19 videos (videos 1, 2, 5, 7) the three-point rule is lower, and on videos 4 and 8 both rules are inaccurate (43.8%, 24.0%); neither is explained. <b>Plateau points</b> cluster at 20–40 labels (20 and 40 labels: 7 videos each; 0 labels: 2; 60 labels: 2; 80 labels: 1), but each point is a single training run on 50 test frames, so differences within ±20 labels cannot be resolved.</li>
     </ul>
