@@ -22,8 +22,8 @@ from second_peak_repair import RES  # noqa: E402
 FAR = RES / "flag_and_repair"
 OUT = FAR / "all_videos"
 ORDER = ["labelregion", "geometry", "labelregion0", "conf", "labelgeo", "jump", "fit"]
-NAMES = {"geometry": "geometry rule\n(hand-made)", "fit": "same fitting\nscore", "conf": "second-peak\nconfidence", "jump": "jump", "labelgeo": "label range,\none step",
-         "labelregion0": "label range,\ntwo steps", "labelregion": "label range,\ntwo steps,\nwith margin"}
+NAMES = {"geometry": "(b) geometry rule\n(hand-made)", "fit": "(c) same fitting\nscore", "conf": "(d) second-peak\nconfidence", "jump": "(e) jump", "labelgeo": "(f) label range,\none step",
+         "labelregion0": "(g) label range,\ntwo steps", "labelregion": "(a) label range,\ntwo steps,\nwith margin"}
 FINDERS = [("fit", "fitting finder", "videoNN_{a}"), ("pca", "PCA finder", "videoNN_pca_{a}")]
 
 
