@@ -98,12 +98,22 @@ def fig_signals(T):
     T = T.iloc[::-1].reset_index(drop=True)
     fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
     x = 100 * T.good_flagged_share.clip(lower=0.0004)
+    used_pca = T.signal.str.startswith("PCA of this video")
     cols = ["#2f6db3" if "[used]" in s else "#d1495b" if s.startswith("PCA of this video") else "0.55" for s in T.signal]
     ax.barh(T.index, x, color=cols, height=0.62)
     for i, r in T.iterrows():
-        ax.text(x[i] * 1.08, i, f"{100 * r.good_flagged_share:.1f} %   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="0.25")
+        if used_pca[i]:
+            ax.plot(0.045, i, marker=">", color="#d1495b", ms=11, clip_on=False)
+            ax.text(x[i] * 1.08, i, f"0 of 1307   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="#d1495b")
+        else:
+            ax.text(x[i] * 1.08, i, f"{100 * r.good_flagged_share:.1f} %   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="0.25")
     ax.set_yticks(T.index)
-    ax.set_yticklabels(T.signal, fontsize=9)
+    ax.set_yticklabels([s + "  [used]" if u else s for s, u in zip(T.signal, used_pca)], fontsize=9)
+    for lab in ax.get_yticklabels():
+        if "[used]" in lab.get_text():
+            lab.set_color("#d1495b" if lab.get_text().startswith("PCA") else "#2f6db3")
+            lab.set_fontweight("bold")
+    ax.text(0.5, -0.11, "blue = the fitting form used on this page; red = the PCA used on this page (flags no right frame, so no bar)", transform=ax.transAxes, ha="center", fontsize=9, color="0.3")
     ax.set_xscale("log")
     ax.set_xlim(0.04, 400)
     ax.set_xticks([0.1, 1, 10, 100])
