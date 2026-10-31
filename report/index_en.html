@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:33 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -792,21 +792,19 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Videos differ: on videos 4 and 8 all four pupil points are poor (9.7–29.8 px), on video 5 only pupil top (38.8 px).</li>
     </ol>
   </div>
-  <h3><span lang="en">8.1 What counts as a wrong frame: one line, 14% of the eye width</span></h3>
+  <h3><span lang="en">8.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
+  <p class="text"><b><span lang="en">Basic information (shared by 8.1–8.3)</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">All 19 videos (videos 0–18; 1 of mouse A, 10 of Pluto, 8 of Terra).</span></td></tr>
+    <tr><th><span lang="en">Model</span></th><td><span lang="en">For each video the model at its own plateau point (table of step 5), predicting every frame of the whole video.</span></td></tr>
+    <tr><th><span lang="en">Truth frames</span></th><td><span lang="en">Each video's frozen 50 test and 20 validation frames, from the last 4 minutes of the video, never trained on; 1330 frames over the 19 videos.</span></td></tr>
+    <tr><th><span lang="en">Error</span></th><td><span lang="en">Frame RMSE (distance between the 8 predicted and the 8 labeled points, formula at the top of the page) divided by the video's eye width. Eye width = the median corner-to-corner distance over the video's predictions, no labels needed; 392–497 px on the 19 videos.</span></td></tr>
+    <tr><th><span lang="en">Scripts and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/error_tier.py</code>, <code>fit_threshold.py</code>, <code>acceptance_thresholds.py</code>, <code>flag_and_repair.py</code>; results in the <code>results/</code> folders of the same names.</span></td></tr>
+  </tbody></table></div>
   
   <div class="text" lang="en">
-    <table>
-      <thead><tr><th>Item</th><th>What</th></tr></thead>
-      <tbody>
-        <tr><td>Truth frames</td><td>50 test + 20 validation frames per video, evenly spaced in the last 4 minutes, never trained on; 1330 frames over the 19 videos</td></tr>
-        <tr><td>Model</td><td>each video's own plateau-point model, predicting the whole video</td></tr>
-        <tr><td>Error</td><td>frame RMSE: the distance between the 8 predicted and the 8 labeled points (formula at the top of the page), divided by the video's eye width</td></tr>
-        <tr><td>Eye width</td><td>the median corner-to-corner distance over the video's predictions, no labels needed; 392–497 px on the 19 videos</td></tr>
-        <tr><td>Line for a wrong frame</td><td>14% of the eye width, about 55–69 px on these videos; 23 of the 1330 frames are above it</td></tr>
-        <tr><td>Script / results</td><td><code>scripts/error_tier.py</code> / <code>results/error_tier/</code></td></tr>
-      </tbody>
-    </table>
-    <p>All errors and thresholds are fractions of the eye width, so nothing has to be re-set for another camera or distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail of frames in which a point was thrown far. The line is put where the main group ends, at 14% of the eye width; there is no frame between 12.7% and 15.4%. Where the gap comes from: in the main group the model's points sit near the pupil edge and differ only in which ring of the edge they sit on, a deviation that cannot exceed the pupil's radius; above the line the heatmap's highest peak has moved to another structure, a corner, an eyelid, a glint or the image border, the point has left the pupil altogether, and the error is tens of per cent at once. The peak is either on the pupil or not, so the middle stays empty. A frame above the line is a <b>wrong frame</b>; every other frame counts as right. The 20-px level used earlier is label noise, a person relabeling cannot place the points to that precision, and is not used any more.</p>
+    <p>Errors are in units of eye width rather than pixels so that the same numbers hold on another camera or at another distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail. <b>The line is at 14% of the eye width</b>; there is no frame between 12.7% and 15.4%. Frames above the line are wrong frames, every other frame counts as right. The line was read off the histogram, as the blink threshold of step 10 was.</p>
+    <p>Where the gap comes from: below the line the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, which cannot exceed the pupil's size (in the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4); above the line the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border (in the 23 wrong frames the worst point is at a median 5 radii). The pupil is surrounded by uniform iris, where the heatmap forms no peak, so there is no frame "just outside the pupil". The 20-px level used earlier is label noise and is not used any more.</p>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>
@@ -816,63 +814,78 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_above.jpg" alt="Every truth frame above the line, with the human labels and the model's points"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-1a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has visibly left the eye.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has left the eye.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_error_sheet_below.jpg" alt="Every truth frame with error between 7 and 14 percent of eye width"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-1b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The model's points are still near the pupil edge; what differs is where on the edge, which is exactly what a person cannot place precisely either; the blurry pupil of video 8 makes up most of them. So frames below the line are not counted as wrong.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The points are all near the pupil edge; the blurry pupil of video 8 makes up most of them.</figcaption>
   </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on wrong frames:</span>one line, 14% of the eye width.
+    <ol>
+      <li>23 of the 1330 frames are above it (videos 1: 8, 2: 4, 4: 2, 8: 1, 10: 3, 11: 4, 14: 1); on these videos the line is about 55–69 px.</li>
+      <li>Below the line the points are still on the pupil edge, above it a point has left the eye; the gap between the two makes the exact position of the line uncritical.</li>
+      <li>Every threshold that follows uses the same unit and the same line.</li>
+    </ol>
+  </div>
 
-  <h3><span lang="en">8.2 Finding wrong frames: of the three algorithms fitting is best, and its threshold is the line itself</span></h3>
+  <h3><span lang="en">8.2 Finding wrong frames: fitting finds all 23, its threshold is the line itself</span></h3>
   
   <div class="text" lang="en">
-    <p>DeepLabCut ships three algorithms for suspicious frames; they use only the model's predictions, no labels. <b>jump</b>: the displacement of the point that moved farthest since the previous frame. <b>uncertain</b>: the lowest confidence of the 8 points. <b>fitting</b>: a time-series model fitted to each point's trajectory predicts the point's position in this frame, and the distance between the predicted and the actual position is measured. Finding the 23 wrong frames among the 1330 truth frames:</p>
-    <table>
-      <thead><tr><th>algorithm</th><th>AUC</th><th>wrong frames found when 3.8% of frames are flagged</th><th>right frames to flag to find all 23</th></tr></thead>
-      <tbody>
-        <tr><td>jump</td><td>0.91</td><td>20 / 23</td><td>86%</td></tr>
-        <tr><td>uncertain</td><td>0.93</td><td>10 / 23</td><td>25%</td></tr>
-        <tr><td>fitting, DLC default: mean deviation of the 8 points</td><td>1.00</td><td>23 / 23</td><td>0.3%</td></tr>
-        <tr><td>fitting, used here: largest deviation of the 8 points</td><td>1.00</td><td>23 / 23</td><td>1.0%</td></tr>
-      </tbody>
-    </table>
-    <p>Fitting separates the 23 wrong frames from the right ones almost completely; jump and uncertain do not. We use the largest-of-8 form of fitting because it measures exactly "how far one point strayed", so its threshold can be the line itself: <b>a frame is flagged when one point's deviation exceeds 14% of the eye width</b>, no extra number. All 23 wrong frames have deviations above 25% of the eye width, so holding out each video in turn and checking with the other 18 finds all of them in every round; the cost is 28 flagged frames among the 1307 right ones, 3.8% of all truth frames, mostly frames in which the eye moved fast. Other signals and detectors trained on our truth were tried earlier and did not beat fitting; the record is in the repository, <code>results/unreliable_frames_sweep/</code> and <code>results/tier50_reeval/</code>. Script / results: <code>scripts/fit_threshold.py</code> / <code>results/fit_threshold/</code>.</p>
+    <p>DeepLabCut ships three algorithms for suspicious frames; each gives every frame one number from the model's predictions alone, no labels, and the frame is flagged when the number crosses a threshold.</p>
+    <ol>
+      <li><b>jump:</b> the displacement of the point that moved farthest since the previous frame, divided by the eye width.</li>
+      <li><b>uncertain:</b> the lowest confidence of the 8 points.</li>
+      <li><b>fitting:</b> a time-series model (SARIMAX, one fit per whole video, points with confidence below 0.01 treated as missing) fitted to each point's x and y trajectory predicts the point's position in this frame from the preceding frames; a point's deviation = distance between predicted and actual position, divided by the eye width. DeepLabCut's default takes the mean deviation of the 8 points, order (3,0,1); this page takes the largest of the 8, order (2,0,0).</li>
+      <li><b>Threshold:</b> the largest-of-8 form measures exactly "how far one point strayed", so its threshold is the line for a wrong frame: a frame is flagged when one point's deviation exceeds 14% of the eye width. No extra number.</li>
+    </ol>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_finder_curves.png" alt="Share of wrong frames found against share of right frames flagged, for the three algorithms over every threshold"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-2:</span>The three algorithms at every threshold: share of right frames flagged (log scale) against share of the 23 wrong frames found. Up and to the left is better. Both fitting curves find all 23 before 1% of the right frames are flagged; jump and uncertain need tens of per cent. The dot is the threshold used here.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-2:</span>The three algorithms at every threshold: share of the 1307 right frames flagged (log scale) against share of the 23 wrong frames found; up and to the left is better. The dot is the threshold used here.</figcaption>
   </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting separates the wrong frames from the right ones almost completely; jump and uncertain do not.
+    <ol>
+      <li>AUC: fitting 1.00 (default form and the form used here alike), uncertain 0.93, jump 0.91. To find all 23 frames fitting flags 0.3–1.0% of the right frames, uncertain 25%, jump 86%: a thrown point usually stays where it landed and does not jump again, so jump cannot see it; confidence is only loosely tied to error (start of step 8).</li>
+      <li>Threshold = the line (14% of the eye width): all 23 found, 28 of the 1307 right frames flagged, 3.8% of all truth frames. All 23 wrong frames have deviations above 25% of the eye width, so holding out each video in turn and checking with the other 18 finds all of them in every round.</li>
+      <li>The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
+      <li>Other signals and detectors trained on our truth, tried earlier at the 20-px level, did not beat fitting; the record is in <code>results/unreliable_frames_sweep/</code> and <code>results/tier50_reeval/</code> and is not repeated here.</li>
+    </ol>
+  </div>
 
-  <h3><span lang="en">8.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged</span></h3>
+  <h3><span lang="en">8.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged, nothing deleted</span></h3>
   
   <div class="text" lang="en">
-    <p><b>Repair.</b> In a flagged frame, each pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap. The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. Frames the eyelid distance calls closed are left alone.</p>
-    <p><b>Check.</b> After the replacement something has to judge whether the new position looks like a pupil point: if it passes the frame counts as repaired, otherwise nothing is changed and the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and whether to leave them out is for whoever uses the data. Seven acceptance tests were compared on the same 19 videos and truth frames; two are best: a hand-made geometry rule (the ratios of the four pupil points relative to the corners and eyelids inside bands around the video's median), and the <b>human-label range</b>, which has no hand-set number: the range spanned by the 1330 human labels defines what is plausible, its margin is set by leave-one-video-out, and it first asks whether the frame was plausible to begin with, leaving it alone if so. Using the finder's own fitting score as the check is the worst option: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused, while a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</p>
-    <table>
-      <thead><tr><th></th><th>human-label range</th><th>geometry rule (hand-made)</th><th>the same fitting score</th></tr></thead>
-      <tbody>
-        <tr><td>repaired, of the 23 wrong frames</td><td>12</td><td>12</td><td>5</td></tr>
-        <tr><td>wrong frames still flagged</td><td>7</td><td>7</td><td>14</td></tr>
-        <tr><td>wrong frames left alone as closed-eye</td><td>4</td><td>4</td><td>4</td></tr>
-        <tr><td>of the 28 flagged right frames: repaired / made worse</td><td>1 / 1</td><td>4 / 0</td><td>10 / 2</td></tr>
-        <tr><td>right frames still flagged</td><td>6</td><td>7</td><td>18</td></tr>
-        <tr><td>whole videos: repaired / still flagged, share of all frames</td><td>0.8% / 1.2%</td><td>1.0% / 0.9%</td><td>1.0% / 2.4%</td></tr>
-      </tbody>
-    </table>
-    <p><b>What is not repaired.</b> The 7 wrong frames that stay flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14), plus one frame of video 8; the 4 untouched frames are the ones the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong. Over the whole videos about 1% of the frames are repaired and about 1% stay flagged, most in videos 1 and 8; whether those are real errors the truth frames cannot say, so 10 repaired and 10 still-flagged frames per video were drawn for a check by eye. Scripts / results: <code>scripts/acceptance_thresholds.py</code>, <code>scripts/flag_and_repair.py</code> / <code>results/acceptance_thresholds/</code>, <code>results/flag_and_repair/</code>.</p>
+    <ol>
+      <li><b>Repair:</b> in a flagged frame not judged closed, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap (the peak's cell times the stride, plus the point's median offset between regressed coordinate and first-peak cell). The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place.</li>
+      <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data.</li>
+      <li><b>Acceptance tests compared (seven, same frames):</b> (a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels; the range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th; the frame is first checked as it is and left alone if already plausible. (b) <b>geometry rule</b>: the same quantities with hand-set bands (video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order). (c) <b>the same fitting score</b>: the replaced point's distance to the same prediction falls below the line. (d) second-peak confidence at least 0.238; (e) displacement of the replaced point to the previous and next frame at most 0.485 eye widths; (f) label range without margin and without the plausibility check first; (g) label range without margin, with the check first. The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise "right repairs accepted" minus "wrong repairs accepted".</li>
+    </ol>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The seven acceptance tests side by side. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged. The two on the left are best.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The seven acceptance tests. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Top: repaired wrong frames; red = model, blue = the accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged; several points thrown at once, and the second peak is not on the pupil either.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
+    <ol>
+      <li>The 23 wrong frames: the human-label range repairs 12, leaves 7 flagged and 4 untouched as closed-eye; the geometry rule the same; the same fitting score repairs 5; confidence 10, jump 5.</li>
+      <li>The 28 flagged right frames: the human-label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4 (none worse), 7 flagged; fitting repairs 10 (2 worse), 18 flagged. No test pushes a right frame over the line.</li>
+      <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
+      <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
+      <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
+      <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. Whether those are real errors the truth frames cannot say; 10 repaired and 10 still-flagged frames per video were drawn by the same rule for a check by eye.</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 9 -->
