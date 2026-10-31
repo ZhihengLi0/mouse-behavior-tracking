@@ -57,5 +57,5 @@ real errors. The repair with this finder is in `results/flag_and_repair/videoNN_
 ## Conclusion
 
 Fitting and the PCA both find every wrong frame at the line but not the same frames on the whole videos: fitting sees jumps in
-time, the PCA sees implausible shapes. Fitting stays the main finder (no labels needed, threshold = the line, checked by eye on
-the whole videos); the PCA is the complement, with a per-video threshold and the video's training labels as its one dependence.
+time, the PCA sees implausible shapes; the two are used side by side. Fitting needs no labels and has the line as its threshold;
+the PCA needs the video's training labels and a per-video threshold.
