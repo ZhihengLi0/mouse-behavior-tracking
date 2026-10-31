@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -813,6 +813,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 8-0:</span>Frame error of the 1330 truth frames in units of the eye width, log scale. Blue: the main group; red: the 23 wrong frames to the right of the line; dashed: the line at 14% of the eye width.</figcaption>
   </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_error_sheet_above.jpg" alt="Every truth frame above the line, with the human labels and the model's points"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-1a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has visibly left the eye.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_error_sheet_below.jpg" alt="Every truth frame with error between 7 and 14 percent of eye width"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-1b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The model's points are still near the pupil edge; what differs is where on the edge, which is exactly what a person cannot place precisely either; the blurry pupil of video 8 makes up most of them. So frames below the line are not counted as wrong.</figcaption>
+  </figure>
 
   <h3><span lang="en">8.2 Finding wrong frames: of the three algorithms fitting is best, and its threshold is the line itself</span></h3>
   
@@ -829,6 +839,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </table>
     <p>Fitting separates the 23 wrong frames from the right ones almost completely; jump and uncertain do not. We use the largest-of-8 form of fitting because it measures exactly "how far one point strayed", so its threshold can be the line itself: <b>a frame is flagged when one point's deviation exceeds 14% of the eye width</b>, no extra number. All 23 wrong frames have deviations above 25% of the eye width, so holding out each video in turn and checking with the other 18 finds all of them in every round; the cost is 28 flagged frames among the 1307 right ones, 3.8% of all truth frames, mostly frames in which the eye moved fast. Other signals and detectors trained on our truth were tried earlier and did not beat fitting; the record is in the repository, <code>results/unreliable_frames_sweep/</code> and <code>results/tier50_reeval/</code>. Script / results: <code>scripts/fit_threshold.py</code> / <code>results/fit_threshold/</code>.</p>
   </div>
+  <figure>
+    <div class="figbox"><img src="assets/fig_finder_curves.png" alt="Share of wrong frames found against share of right frames flagged, for the three algorithms over every threshold"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-2:</span>The three algorithms at every threshold: share of right frames flagged (log scale) against share of the 23 wrong frames found. Up and to the left is better. Both fitting curves find all 23 before 1% of the right frames are flagged; jump and uncertain need tens of per cent. The dot is the threshold used here.</figcaption>
+  </figure>
 
   <h3><span lang="en">8.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged</span></h3>
   
@@ -848,6 +863,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </table>
     <p><b>What is not repaired.</b> The 7 wrong frames that stay flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14), plus one frame of video 8; the 4 untouched frames are the ones the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong. Over the whole videos about 1% of the frames are repaired and about 1% stay flagged, most in videos 1 and 8; whether those are real errors the truth frames cannot say, so 10 repaired and 10 still-flagged frames per video were drawn for a check by eye. Scripts / results: <code>scripts/acceptance_thresholds.py</code>, <code>scripts/flag_and_repair.py</code> / <code>results/acceptance_thresholds/</code>, <code>results/flag_and_repair/</code>.</p>
   </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The seven acceptance tests side by side. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged. The two on the left are best.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Top: repaired wrong frames; red = model, blue = the accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged; several points thrown at once, and the second peak is not on the pupil either.</figcaption>
+  </figure>
 </section>
 
 <!-- 9 -->

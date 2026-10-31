@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-30 19:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1053,6 +1053,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">图 8-0：</span>1330 帧真值帧的帧误差，以眼宽为单位，横轴对数刻度。蓝色是主体，红色是线右边的 23 帧错帧，虚线是眼宽 14% 的线。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 8-0:</span>Frame error of the 1330 truth frames in units of the eye width, log scale. Blue: the main group; red: the 23 wrong frames to the right of the line; dashed: the line at 14% of the eye width.</figcaption>
   </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_error_sheet_above.jpg" alt="Every truth frame above the line, with the human labels and the model's points"></div>
+    <figcaption lang="zh"><span class="tag">图 8-1a：</span>线以上的全部 23 帧，误差从大到小。绿圈是人工标注，红点是模型，黄线连起误差超过眼宽 7% 的点。每一帧都能一眼看出有点被甩出了眼睛。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1a:</span>All 23 frames above the line, largest error first. Green ring = human label, red = model, yellow line joins the two where a point's error exceeds 7% of the eye width. In every frame a point has visibly left the eye.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_error_sheet_below.jpg" alt="Every truth frame with error between 7 and 14 percent of eye width"></div>
+    <figcaption lang="zh"><span class="tag">图 8-1b：</span>线以下、主体上端的全部 48 帧：误差在眼宽的 7% 到 14% 之间，同样的颜色。模型的点都还在瞳孔边缘附近，差的是边缘放在哪里，这正是人自己也放不准的地方，视频 8 的模糊瞳孔占了大半。所以线以下不算错帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-1b:</span>All 48 frames below the line in the upper part of the main group, error between 7% and 14% of the eye width, same colours. The model's points are still near the pupil edge; what differs is where on the edge, which is exactly what a person cannot place precisely either; the blurry pupil of video 8 makes up most of them. So frames below the line are not counted as wrong.</figcaption>
+  </figure>
 
   <h3><span lang="zh">8.2 找错帧：三种算法里 fitting 最好，阈值就是那条线</span><span lang="en">8.2 Finding wrong frames: of the three algorithms fitting is best, and its threshold is the line itself</span></h3>
   <div class="text" lang="zh">
@@ -1081,6 +1091,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </table>
     <p>Fitting separates the 23 wrong frames from the right ones almost completely; jump and uncertain do not. We use the largest-of-8 form of fitting because it measures exactly "how far one point strayed", so its threshold can be the line itself: <b>a frame is flagged when one point's deviation exceeds 14% of the eye width</b>, no extra number. All 23 wrong frames have deviations above 25% of the eye width, so holding out each video in turn and checking with the other 18 finds all of them in every round; the cost is 28 flagged frames among the 1307 right ones, 3.8% of all truth frames, mostly frames in which the eye moved fast. Other signals and detectors trained on our truth were tried earlier and did not beat fitting; the record is in the repository, <code>results/unreliable_frames_sweep/</code> and <code>results/tier50_reeval/</code>. Script / results: <code>scripts/fit_threshold.py</code> / <code>results/fit_threshold/</code>.</p>
   </div>
+  <figure>
+    <div class="figbox"><img src="assets/fig_finder_curves.png" alt="Share of wrong frames found against share of right frames flagged, for the three algorithms over every threshold"></div>
+    <figcaption lang="zh"><span class="tag">图 8-2：</span>三种算法在每一个阈值下的表现：横轴是对的帧里被标出的比例（对数刻度），纵轴是 23 帧错帧里找到的比例。曲线越靠左上越好。fitting 的两条曲线在标出 1% 的对的帧之前就找全 23 帧，jump 和 uncertain 要标出几十个百分点才找得全。圆点是本页用的阈值。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-2:</span>The three algorithms at every threshold: share of right frames flagged (log scale) against share of the 23 wrong frames found. Up and to the left is better. Both fitting curves find all 23 before 1% of the right frames are flagged; jump and uncertain need tens of per cent. The dot is the threshold used here.</figcaption>
+  </figure>
 
   <h3><span lang="zh">8.3 修和验：用热图第二峰修，验收通过才算修好；23 帧错帧修好 12 帧，其余仍标出</span><span lang="en">8.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged</span></h3>
   <div class="text" lang="zh">
@@ -1115,6 +1130,16 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </table>
     <p><b>What is not repaired.</b> The 7 wrong frames that stay flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14), plus one frame of video 8; the 4 untouched frames are the ones the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong. Over the whole videos about 1% of the frames are repaired and about 1% stay flagged, most in videos 1 and 8; whether those are real errors the truth frames cannot say, so 10 repaired and 10 still-flagged frames per video were drawn for a check by eye. Scripts / results: <code>scripts/acceptance_thresholds.py</code>, <code>scripts/flag_and_repair.py</code> / <code>results/acceptance_thresholds/</code>, <code>results/flag_and_repair/</code>.</p>
   </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_acceptance_bars.png" alt="Seven acceptance tests: outcome on the 23 wrong frames and on the 28 flagged right frames"></div>
+    <figcaption lang="zh"><span class="tag">图 8-3：</span>七种验收标准并排。左：23 帧错帧里修好的（蓝）、仍标出的（橙）、因判为闭眼未动的（灰）。右：28 帧被标出的对的帧里被修的、修坏的、仍标出的。最左两种最好。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-3:</span>The seven acceptance tests side by side. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the 28 flagged right frames, repaired, made worse, still flagged. The two on the left are best.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
+    <figcaption lang="zh"><span class="tag">图 8-4：</span>上排：修好的错帧，红点是模型，蓝点是接受的第二峰，绿圈是人工标注。下排：没修好、仍标出的错帧，多个点同时甩出，第二峰也不在瞳孔上。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-4:</span>Top: repaired wrong frames; red = model, blue = the accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged; several points thrown at once, and the second peak is not on the pupil either.</figcaption>
+  </figure>
 </section>
 
 <!-- 9 -->
