@@ -996,7 +996,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>PCA：</b>把这个视频训练模型时用的人工标注姿态（8 个点的 16 个坐标，到平台点为止的 17–73 帧）做主成分分析，保留 99% 的方差，得到"正常姿态"的子空间；每一帧预测的姿态投到子空间再还原，8 个点还原残差的均方根除以眼宽就是帧分数，单个点的残差用来指出该修哪个点。它不看前后帧，单帧就能算，但需要本视频的训练标注。</li>
       <li><b>fitting 的阈值 = 线，眼宽的 14%。</b>
         <ul>
-          <li>它量的就是"偏得最远的那个点偏了多少眼宽"，和错帧的定义是同一个量，所以线可以直接当阈值，不另设数。</li>
+          <li>这条线就是 9.1 从误差直方图上读出的那条线（图 9-1），没有另外定数。能直接拿来当阈值，是因为 fitting 取最大值的形式量的就是"偏得最远的那个点偏了多少眼宽"，和错帧的定义是同一个量。</li>
           <li>23 帧错帧的最大偏差都在眼宽 25% 以上，线留了近一倍余量；轮流留出一个视频、用其余 18 个验证，每轮都全部找到。</li>
         </ul>
       </li>
@@ -1018,7 +1018,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>PCA:</b> the human-labeled poses the video's model was trained on (8 points, 16 coordinates, the 17–73 frames up to the plateau) go through a principal component analysis keeping 99% of the variance, which gives the subspace of "normal poses"; the predicted pose of every frame is projected onto it and reconstructed, and the RMS of the 8 points' reconstruction residuals divided by the eye width is the frame's score; a single point's residual says which point to repair. It does not look at neighbouring frames, so a single frame suffices, but it needs the video's own training labels.</li>
       <li><b>Threshold of fitting = the line, 14% of the eye width.</b>
         <ul>
-          <li>It measures exactly how far the farthest point strayed, in eye widths, the same quantity that defines a wrong frame, so the line itself is the threshold, no extra number.</li>
+          <li>The line is the one read off the error histogram in 9.1 (Figure 9-1), no extra number. It can serve as the threshold because the largest-of-8 form of fitting measures exactly how far the farthest point strayed, in eye widths, the same quantity that defines a wrong frame.</li>
           <li>All 23 wrong frames have a largest deviation above 25% of the eye width, so the line leaves a margin of almost two; holding out each video in turn and checking with the other 18 finds all of them in every round.</li>
         </ul>
       </li>
