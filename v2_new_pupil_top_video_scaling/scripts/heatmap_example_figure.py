@@ -94,8 +94,8 @@ def heatmaps(video, frames):
 def main():
     rows = pick()
     fig, axes = plt.subplots(len(rows), 4, figsize=(17, 3.7 * len(rows)), constrained_layout=True)
-    heads = ["before: red = the model's 8 points", "heatmap of the thrown point, whole frame, 8 px per cell\ngreen to yellow = low to high; red = peak 1 (reported), blue = peak 2\ndashed box = the area the other panels show",
-             "the same heatmap inside the dashed box", "after: blue = the point moved to peak 2"]
+    heads = ["before: red = the model's 8 points", "heatmap of the thrown point, whole frame, 8 px per cell\ngreen to yellow = low to high; red = peak 1 (reported), blue = peak 2\ndashed box = the area panel 3 enlarges",
+             "the dashed box enlarged: peak 2 on the pupil edge", "after: blue = the point moved to peak 2"]
     for i, (v, f, b, pts) in enumerate(rows):
         imgs, store, xy, p2, off, G, Wd = heatmaps(v, [f])
         img, (Hm, s) = imgs[0], store[0]
@@ -108,6 +108,9 @@ def main():
         x0, y0, x1, y1 = cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2
         px, py = xy[b][f]
         nx, ny = p2[b][f]
+        wz = 0.9 * Wd[f]                                      # the zoom of panel 3: about one eye width around the pupil centre
+        hz = wz * 0.75
+        zx0, zy0, zx1, zy1 = cx - wz / 2, cy - hz / 2, cx + wz / 2, cy + hz / 2
         hext = (off[b][0] - s / 2, hm.shape[1] * s + off[b][0] - s / 2, hm.shape[0] * s + off[b][1] - s / 2, off[b][1] - s / 2)
         v1 = hm.max()
         v2 = hm[int(round((ny - off[b][1]) / s)), int(round((nx - off[b][0]) / s))]
@@ -131,17 +134,17 @@ def main():
         ax.imshow(hmask, extent=hext, cmap="summer", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
         ax.plot(px, py, "o", mfc="none", mec="#ff3c3c", mew=2.5, ms=16)
         ax.plot(nx, ny, "o", mfc="none", mec="#5078ff", mew=2.5, ms=16)
-        ax.add_patch(plt.Rectangle((x0, y0), w, h, fill=False, ec="white", lw=1.2, ls="--"))
+        ax.add_patch(plt.Rectangle((zx0, zy0), wz, hz, fill=False, ec="white", lw=1.2, ls="--"))
         ax.set_xlim(0, img.shape[1])
         ax.set_ylim(img.shape[0], 0)
         ax = axes[i][2]
         ax.imshow(img)
         ax.imshow(hmask, extent=hext, cmap="summer", alpha=0.95, vmin=0, vmax=hm.max(), interpolation="nearest")
         ax.plot(nx, ny, "o", mfc="none", mec="#5078ff", mew=2.5, ms=16)
-        if not outside:
+        if zx0 <= px <= zx1 and zy0 <= py <= zy1:
             ax.plot(px, py, "o", mfc="none", mec="#ff3c3c", mew=2.5, ms=16)
-        ax.set_xlim(x0, x1)
-        ax.set_ylim(y1, y0)
+        ax.set_xlim(zx0, zx1)
+        ax.set_ylim(zy1, zy0)
         ax = axes[i][3]
         ax.imshow(img)
         for bb in BPS:
