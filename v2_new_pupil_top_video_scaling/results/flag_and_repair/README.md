@@ -121,6 +121,26 @@ threshold or the label range, and the frames are one per episode, so the shares 
 - For a user of the data: the repaired frames (0.8 % of all frames) can be used; the still-flagged frames (1.2 %)
   contain about 0.7 % real errors and 0.5 % right frames, and that is where human time goes if it goes anywhere.
 
+## Three finders: fitting, PCA, either (`flag_and_repair.py --finder`, 2026-10-31)
+
+`--finder pca` flags by the PCA reconstruction error of `results/finder_comparison/pca_threshold.py` (threshold = 3.93 × the
+video's median score) and replaces the pupil point with the largest residual (of four candidate rules tried on videos 1, 8,
+12, 15 the only one that repairs anything, see the function `candidates_pca`); `--finder either` flags when either finder
+does and replaces the union of the two candidate sets. Repair and acceptance (human-label range) unchanged. Results in
+`videoNN_pca_labelregion/`, `videoNN_either_labelregion/`, compared in `all_videos/finders.csv`, `finders_by_video.csv`,
+`finders.png`, `finders_share_by_video.png` (`scripts/finder_repair_comparison.py`).
+
+| finder | wrong flagged / 23 | repaired to good | wrong after | good made worse | flagged, all frames | repaired | flagged, not repaired | flagged, passes check |
+|---|---|---|---|---|---|---|---|---|
+| fitting | 23 | 12 | 11 | 1 | 3.82 % | 0.78 % | 1.16 % | 1.42 % |
+| PCA | 23 | 11 | 12 | 0 | 2.39 % | 0.72 % | 0.82 % | 0.42 % |
+| either | 23 | 12 | 11 | 1 | 4.20 % | 0.80 % | 1.18 % | 1.74 % |
+
+On the truth frames the three are the same within one frame. On the whole videos the PCA flags fewer frames for almost the
+same number of repairs; the union flags more but repairs barely more: the errors the PCA alone finds (bunched pupil points,
+`results/finder_comparison/README.md` §3) have no usable second peak or fail the check and stay flagged. A gain in finding
+that is not yet a gain in repair.
+
 ## Files
 
 `videoNN_<test>/`: `summary.csv` (truth frames), `whole_video.csv`, `truth_frames.csv` (errors in eye widths and in px);
