@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 15:04 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 15:08 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -865,7 +865,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       </li>
       <li><b>Threshold of the PCA = 3.9 × the video's median.</b> The rule has two numbers:
         <ul>
-          <li>The median: computed per video, the median PCA score of all its frames. Most frames are normal, so it is the video's own background; it comes from the predictions, needs no labels, and is there for any new video. A fixed share of the eye width, as for fitting, will not do, because the size of the PCA score depends on how many training labels it saw (the share that just finds all wrong frames: 11.5% with 10 labels, 6% with 20, 5% with 30); one fixed share flags 18% of video 18, the multiple of its own median 3% (Figure 9-6).</li>
+          <li>The median: computed per video, the median PCA score of all its frames. Most frames are normal, so it is the video's own background; it comes from the predictions, needs no labels, and is there for any new video. A fixed share of the eye width, as for fitting, will not do, because the size of the PCA score depends on how many training labels it saw: a fixed share flags most of a video when labels are few and still 17% of the worst video when they are many; as a multiple of the median the share flagged no longer depends on the number of labels and the worst video is at 9% (Figure 9-6).</li>
           <li>3.9: one number shared by all videos, set once on the truth frames. Dividing each of the 23 wrong frames' scores by its video's median, the smallest is 7.2, so a threshold at 7.2 × the median just encloses all 23; widened by the same factor by which the fitting line at 14% sits below its nearest wrong frame at 25.7%, 1.84, that gives 7.2 / 1.84 = 3.9. Set on 18 videos and tested on the held-out 19th, it finds all of them in every round.</li>
         </ul>
       </li>
@@ -889,7 +889,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_pca_vs_labels.png" alt="The PCA finder against the number of labeled poses it is fitted on"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-6:</span>The PCA against the number of labels it saw. Left: on the truth frames, the threshold needed to find all wrong frames and the misflags at one fixed threshold; right: share flagged on whole videos at that fixed threshold, one grey line per video.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Share of whole-video frames flagged when the PCA is fitted on different numbers of labels, median and worst video under each threshold rule; blue numbers: wrong truth frames found by the median rule.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong frame, but not the same ones, and complement each other; fitting is the main signal, the PCA the complement.
