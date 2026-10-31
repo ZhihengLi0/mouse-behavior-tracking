@@ -94,17 +94,37 @@ With the adopted test only six videos change at all (1, 2, 4, 8, 10, 11, the vid
 goes from 6.5 % to 4.5 % mean error and from 8 to 2 wrong frames. The median does not move because the repair touches
 about 1 % of the frames; the mean falls because the thrown points were far.
 
-## Spot check by eye, same rule on every video
+## Spot check by eye, same rule on every video: the check of the repair on the whole videos
 
-`all_videos/spotcheck_sample.csv`: per video and per test, up to 10 repaired and 10 still-flagged frames, one per
-episode (touched frames at most 5 frames apart), episodes drawn at random (seed 0); sheets `all_videos/spotcheck/
-videoNN_<test>.jpg` (local only; red = model, blue = accepted second peak; caption: frame, status, points, episode
-length, fitting deviation in % of eye width). The `verdict` column is empty: real error / false alarm / cannot tell.
+Sample: `all_videos/spotcheck_sample.csv`, per video and per test up to 10 repaired and 10 still-flagged frames, one per
+episode (touched frames at most 5 frames apart), episodes drawn at random (seed 0). For the adopted test
+(`labelregion`, 358 frames) `scripts/spotcheck_review.py` writes a review page (`spotcheck_review/spotcheck_review.html`,
+crops in `spotcheck_review/items/`, local only): for a repaired frame the frame, the model's points before and the point
+put in after; for a still-flagged frame the frame and the model's points. One question per frame, nothing else shown
+(no fitting value, no episode length). The labeler judged 355 of the 358 frames on 2026-10-30
+(`spotcheck_review/spotcheck_review_verdicts.csv`); `scripts/spotcheck_review_eval.py` gives
+`spotcheck_review/spotcheck_review_result.{csv,png}`. None of these frames took part in setting the line, the
+threshold or the label range, and the frames are one per episode, so the shares are shares of episodes.
+
+| judged by eye | frames shown | verdict |
+|---|---|---|
+| repaired frames: is the point put in on the pupil where it belongs? | 174 | **149 yes (87 % of the judged)**, 19 closer but still not right, 4 not better, 2 cannot tell |
+| still-flagged frames: is a model point really wrong? | 184 | **101 yes (59 % of the judged)**, 69 false alarm, 14 cannot tell |
+
+- **The repair is right in about seven of eight episodes it touches**, and it almost never makes a frame worse (4 of
+  174). The 19 "closer but not right" frames sit mostly in the Terra videos 14, 17 and 18 (10 of the 19): the second peak
+  lands on the iris or the eyelid instead of the pupil edge. This matches the truth frames, where 12 of 13 repairs were
+  right.
+- **Of the frames that stay flagged, about three in five are real errors and two in five are false alarms.** On the
+  truth frames the still-flagged set was 7 wrong and 6 good, the same proportion. The false alarms concentrate in
+  videos 5, 7, 11, 12 and 15 (7 or 8 of 10 each; video 11: 8 of 8 judged); why these videos is not examined yet.
+- For a user of the data: the repaired frames (0.8 % of all frames) can be used; the still-flagged frames (1.2 %)
+  contain about 0.7 % real errors and 0.5 % right frames, and that is where human time goes if it goes anywhere.
 
 ## Files
 
 `videoNN_<test>/`: `summary.csv` (truth frames), `whole_video.csv`, `truth_frames.csv` (errors in eye widths and in px);
 `frames_all.csv.gz` and `cache/videoNN_pred200.npy` local only. `all_videos/`: `whole_video_all.csv`,
 `truth_summary_all.csv`, `totals.csv`, `comparison.csv`, `touched_structure.csv`, `error_before_after.csv`, `share_per_video.png`, `error_before_after.png`,
-`spotcheck_sample.csv`. Threshold and line: `results/error_tier/`, `results/fit_threshold/`,
+`spotcheck_sample.csv`; `spotcheck_review/`: `items.csv`, `spotcheck_review_verdicts.csv`, `spotcheck_review_result.{csv,png}` (page and crops local only). Threshold and line: `results/error_tier/`, `results/fit_threshold/`,
 `results/acceptance_thresholds/`.
