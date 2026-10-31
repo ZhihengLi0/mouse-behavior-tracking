@@ -92,34 +92,64 @@ def truth_table():
 
 
 def fig_signals(T):
+    """One row per family of signals; the form used on the page gives the bar, the other forms of the family the whisker."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    T = T.iloc[::-1].reset_index(drop=True)
-    fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
-    x = 100 * T.good_flagged_share.clip(lower=0.0004)
-    used_pca = T.signal.str.startswith("PCA of this video")
-    cols = ["#2f6db3" if "[used]" in s else "#d1495b" if s.startswith("PCA of this video") else "0.55" for s in T.signal]
-    ax.barh(T.index, x, color=cols, height=0.62)
-    for i, r in T.iterrows():
-        if used_pca[i]:
-            ax.plot(0.045, i, marker=">", color="#d1495b", ms=11, clip_on=False)
-            ax.text(0.058, i, f"0 of 1307   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="#d1495b")
+    fam = [("PCA of this video's training poses  [used]", "PCA", lambda n: n.startswith("PCA of this video"), "#d1495b"),
+           ("fitting: largest of 8, order (2,0,0)  [used]\n(whisker: the other 5 forms of fitting over 8 points)", "fitting variant", lambda n: "[used]" in n, "#2f6db3"),
+           ("trained detector (leave-one-video-out), 2 forms", "trained detector", lambda n: n.startswith("trained detector D1 (leave"), "0.55"),
+           ("combinations of signals, 2 forms", "combination", lambda n: n.startswith("rank combination"), "0.55"),
+           ("two models trained with different seeds: disagreement", "ensemble", lambda n: n.startswith("two models"), "0.55"),
+           ("PCA of the mouse's training poses (other videos)", "PCA", lambda n: n.startswith("PCA of the mouse"), "0.55"),
+           ("confidence (DLC uncertain), 2 forms", "DeepLabCut", lambda n: n.startswith("uncertain"), "0.55"),
+           ("jump (DLC): largest move since the previous frame", "DeepLabCut", lambda n: n.startswith("jump"), "0.55"),
+           ("geometry of the pupil points, 2 forms", "geometry", lambda n: n.startswith("geometry"), "0.55")]
+    fig, ax = plt.subplots(figsize=(10, 5.6), constrained_layout=True)
+    labels = []
+    for i, (label, family, pick, col) in enumerate(fam):
+        main = T[T.signal.apply(pick)]
+        assert len(main) >= 1, label
+        group = T[(T.family == family)] if family in ("fitting variant", "trained detector", "combination", "geometry") else main
+        if family == "fitting variant":
+            group = T[T.signal.str.startswith("fitting") & ~T.signal.str.contains("4 pupil")]
+        if "confidence" in label:
+            group = T[T.signal.str.startswith("uncertain") | T.signal.str.startswith("mean confidence")]
+        r = main.iloc[0]
+        x = max(100 * r.good_flagged_share, 0.045)
+        ax.barh(i, x, color=col, height=0.6)
+        if r.good_flagged_share == 0:
+            ax.plot(0.045, i, marker=">", color=col, ms=11, clip_on=False)
+            txt = f"0 of 1307 right frames flagged"
         else:
-            ax.text(x[i] * 1.08, i, f"{100 * r.good_flagged_share:.1f} %   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="0.25")
-    ax.set_yticks(T.index)
-    ax.set_yticklabels([s + "  [used]" if u else s for s, u in zip(T.signal, used_pca)], fontsize=9)
+            txt = f"{100 * r.good_flagged_share:.1f} %"
+        if len(group) > 1:
+            lo, hi = 100 * group.good_flagged_share.min(), 100 * group.good_flagged_share.max()
+            ax.plot([max(lo, 0.045), hi], [i, i], color="0.2", lw=1.4)
+            ax.plot([max(lo, 0.045), hi], [i, i], "|", color="0.2", ms=9)
+            txt += f"   (forms: {lo:.1f}–{hi:.1f} %)"
+            xt = hi
+        else:
+            xt = x
+        txt += f"   held-out videos: {int(r.lovo_caught)} of 23 found"
+        ax.text(xt * 1.12, i, txt, va="center", fontsize=8.5, color=col if col != "0.55" else "0.25")
+        labels.append(label)
+    ax.set_yticks(range(len(fam)))
+    ax.set_yticklabels(labels, fontsize=9)
     for lab in ax.get_yticklabels():
         if "[used]" in lab.get_text():
             lab.set_color("#d1495b" if lab.get_text().startswith("PCA") else "#2f6db3")
             lab.set_fontweight("bold")
-    ax.text(0.5, -0.11, "blue = the fitting form used on this page; red = the PCA used on this page (flags no right frame, so no bar)", transform=ax.transAxes, ha="center", fontsize=9, color="0.3")
+    ax.invert_yaxis()
+    ax.axhline(3.5, color="0.4", lw=1, ls="--")
+    ax.text(380, 3.38, "first tier", ha="right", va="bottom", fontsize=9, color="0.35", style="italic")
+    ax.text(380, 3.62, "second tier", ha="right", va="top", fontsize=9, color="0.35", style="italic")
     ax.set_xscale("log")
     ax.set_xlim(0.04, 400)
     ax.set_xticks([0.1, 1, 10, 100])
     ax.set_xticklabels(["0.1 %", "1 %", "10 %", "100 %"])
     ax.set_xlabel("share of the 1307 right truth frames flagged when the threshold is set to find all 23 wrong frames (log scale)")
-    ax.set_title("Every candidate finder at the error line (14 % of eye width), 1330 truth frames: lower is better")
+    ax.set_title("Candidate finders at the error line (14 % of eye width), 1330 truth frames: further left is better", fontsize=11)
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="x", color="0.92")
     ax.set_axisbelow(True)

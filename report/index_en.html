@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:08 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:13 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -852,7 +852,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="en">9.2 Finding wrong frames: fitting sees jumps in time, the PCA sees implausible shapes, the two complement each other</span></h3>
   
   <div class="text" lang="en">
-    <p>A finder looks only at the model's predictions, gives every frame one number and flags the frame when the number crosses a threshold. The candidates compared: DeepLabCut's three algorithms and their variants, the disagreement of two models trained with different seeds, geometric quantities, the PCA reconstruction error of the pose, and detectors trained on the truth frames. At the 14% line the fitting family and the PCA all find every one of the 23 wrong frames at the cost of a dozen of the 1307 right frames; the other signals are an order of magnitude behind (Figure 9-3). Two are kept: fitting and the PCA.</p>
+    <p>A finder looks only at the model's predictions, gives every frame one number and flags the frame when the number crosses a threshold. Every candidate we could think of was compared at the 14% line (Figure 9-3) and they fall into two tiers: fitting, the PCA, detectors trained on the truth frames and combinations of signals all find the 23 wrong frames while flagging at most a dozen of the 1307 right frames, and cannot be ranked among themselves; confidence, jump, geometry and two-model disagreement flag an order of magnitude more. Of the first tier the two that need no training and no combination are used: fitting sees jumps in time, the PCA sees implausible shapes.</p>
     <ol>
       <li><b>jump:</b> the displacement of the point that moved farthest since the previous frame, divided by the eye width.</li>
       <li><b>uncertain:</b> the lowest confidence of the 8 points.</li>
@@ -864,7 +864,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_all_signals.png" alt="Every candidate finder at the error line: share of right truth frames flagged when all 23 wrong frames are found"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-3:</span>Every signal compared: the share of the 1307 right truth frames flagged when its threshold is set to find all 23 wrong frames (log scale), further left is better; the text gives the wrong frames found when each video is held out in turn and the threshold set on the other 18. Blue = the fitting form used on this page, red = the PCA used on this page; it flags no right frame, so it has a marker instead of a bar.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-3:</span>Candidate signals, one row per family: the share of the 1307 right truth frames flagged when the threshold is set to find all 23 wrong frames (log scale), further left is better; the whisker spans the other forms of the family, the text gives the wrong frames found with each video held out in turn. Above the dashed line is the first tier. Red = the PCA used on this page, which flags no right frame and so has a marker instead of a bar; blue = the fitting form used on this page.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_share.png" alt="Share of every frame flagged by fitting and by the PCA, per video"></div>
@@ -884,12 +884,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong frame, but not the same ones, and complement each other; fitting is the main signal, the PCA the complement.
     <ol>
-      <li>The first tier (Figure 9-3): with the threshold set to just find all 23 frames the PCA flags 0 right frames, the mean form of fitting 4, the largest-of-8 form used here 13, the detector trained on the truth 8; two-model disagreement, confidence, jump and the geometric quantities are an order of magnitude behind. 23 wrong frames cannot rank these few.</li>
+      <li>Two tiers (Figure 9-3): the first tier finds all 23 frames while flagging at most a dozen right frames, and 23 wrong frames cannot rank its members; the second tier flags an order of magnitude more. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself can be its threshold.</li>
       <li>Fitting, threshold = the line: all 23 found, 28 of the 1307 right frames flagged; every held-out video finds all of them; 3.8% of all frames flagged on the whole videos (Figure 9-4). The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
       <li>The PCA, threshold = 3.9 × the median: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
       <li>Frames the two disagree on (Figure 9-5): of 70 flagged by the PCA alone 39 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of 75 flagged by fitting alone 8 are wrong, the rest false alarms from fast eye movements. Frames flagged by both were not checked separately.</li>
       <li>What the PCA depends on (Figure 9-6): the video's own training labels; the background settles after 20 labels; a normal pose absent from the training labels is flagged wholesale, as the narrowed-eye frames of video 18 are, and only the median-multiple threshold brings that down. Fitting has neither dependence, its threshold means the same on another video or camera.</li>
-      <li>Earlier attempts are recorded in <code>results/unreliable_frames_sweep/</code>, <code>results/error_detector/</code> and <code>results/finder_comparison/</code> and are not repeated here.</li>
+      <li>The record of every comparison is in <code>results/finder_comparison/</code>.</li>
     </ol>
   </div>
 

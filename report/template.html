@@ -988,7 +988,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
   <h3><span lang="zh">9.2 找错帧：fitting 看时间上的突变，PCA 看形状上的异常，两者互补</span><span lang="en">9.2 Finding wrong frames: fitting sees jumps in time, the PCA sees implausible shapes, the two complement each other</span></h3>
   <div class="text" lang="zh">
-    <p>找错帧的信号只看模型的预测，给每一帧一个数，超过阈值就标出这一帧。比过的候选有 DeepLabCut 自带的三种算法和它们的变体、两个随机种子模型的分歧、几何量、姿态的主成分重建误差（PCA）、用真值帧训练的检测器。在 14% 的线上，fitting 一族和 PCA 都能找全 23 帧错帧，代价只是 1307 帧对的帧里的十几帧，其余信号差一个量级（图 9-3）。本页保留两个：fitting 和 PCA。</p>
+    <p>找错帧的信号只看模型的预测，给每一帧一个数，超过阈值就标出这一帧。把能想到的候选都在 14% 的线上比了一遍（图 9-3），分成两档：fitting、PCA、用真值训练的检测器和信号组合都能找全 23 帧错帧，误标的对帧不超过 1307 帧里的十几帧，彼此分不出高下；置信度、jump、几何量、双模型分歧误标多一个量级。第一档里只取不需要训练、不需要组合的两个：fitting 看时间上的突变，PCA 看形状上的异常。</p>
     <ol>
       <li><b>jump：</b>8 个点里相对上一帧移动最远的点的位移，除以眼宽。</li>
       <li><b>uncertain：</b>8 个点里最低的置信度。</li>
@@ -998,7 +998,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
   <div class="text" lang="en">
-    <p>A finder looks only at the model's predictions, gives every frame one number and flags the frame when the number crosses a threshold. The candidates compared: DeepLabCut's three algorithms and their variants, the disagreement of two models trained with different seeds, geometric quantities, the PCA reconstruction error of the pose, and detectors trained on the truth frames. At the 14% line the fitting family and the PCA all find every one of the 23 wrong frames at the cost of a dozen of the 1307 right frames; the other signals are an order of magnitude behind (Figure 9-3). Two are kept: fitting and the PCA.</p>
+    <p>A finder looks only at the model's predictions, gives every frame one number and flags the frame when the number crosses a threshold. Every candidate we could think of was compared at the 14% line (Figure 9-3) and they fall into two tiers: fitting, the PCA, detectors trained on the truth frames and combinations of signals all find the 23 wrong frames while flagging at most a dozen of the 1307 right frames, and cannot be ranked among themselves; confidence, jump, geometry and two-model disagreement flag an order of magnitude more. Of the first tier the two that need no training and no combination are used: fitting sees jumps in time, the PCA sees implausible shapes.</p>
     <ol>
       <li><b>jump:</b> the displacement of the point that moved farthest since the previous frame, divided by the eye width.</li>
       <li><b>uncertain:</b> the lowest confidence of the 8 points.</li>
@@ -1009,8 +1009,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_all_signals.png" alt="Every candidate finder at the error line: share of right truth frames flagged when all 23 wrong frames are found"></div>
-    <figcaption lang="zh"><span class="tag">图 9-3：</span>比过的每一种信号，阈值定到刚好找全 23 帧错帧时，1307 帧对的帧里被标出的比例（对数刻度），越靠左越好；右侧文字是轮流留出一个视频、用其余 18 个定阈值时找到的错帧数。蓝 = 本页用的 fitting 形式，红 = 本页用的 PCA，它一帧都不误标，所以没有柱子，只有一个标记。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-3:</span>Every signal compared: the share of the 1307 right truth frames flagged when its threshold is set to find all 23 wrong frames (log scale), further left is better; the text gives the wrong frames found when each video is held out in turn and the threshold set on the other 18. Blue = the fitting form used on this page, red = the PCA used on this page; it flags no right frame, so it has a marker instead of a bar.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-3：</span>候选信号按族各一行，阈值定到刚好找全 23 帧错帧时，1307 帧对的帧里被标出的比例（对数刻度），越靠左越好；短横线是同一族其他形式的范围，右侧文字是轮流留出一个视频时找到的错帧数。虚线上方是第一档。红 = 本页用的 PCA，一帧对帧都不误标，所以只有标记没有柱子；蓝 = 本页用的 fitting 形式。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-3:</span>Candidate signals, one row per family: the share of the 1307 right truth frames flagged when the threshold is set to find all 23 wrong frames (log scale), further left is better; the whisker spans the other forms of the family, the text gives the wrong frames found with each video held out in turn. Above the dashed line is the first tier. Red = the PCA used on this page, which flags no right frame and so has a marker instead of a bar; blue = the fitting form used on this page.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_share.png" alt="Share of every frame flagged by fitting and by the PCA, per video"></div>
@@ -1029,22 +1029,22 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全错帧，但找到的不是同一批，两者互补；fitting 为主，PCA 为补。
     <ol>
-      <li>第一梯队（图 9-3）：阈值定到刚好找全 23 帧时，PCA 误标 0 帧，fitting 的平均形式 4 帧，本页用的最大值形式 13 帧，用真值训练的检测器 8 帧；双模型分歧、置信度、jump、几何量差一个量级。23 帧错帧分不出这几种的高下。</li>
+      <li>两档（图 9-3）：第一档找全 23 帧时误标的对帧都在十几帧以内，23 帧错帧分不出它们的高下；第二档误标多一个量级。fitting 用取最大值的形式，是因为它量的就是"一个点偏了多少"，阈值可以直接用线。</li>
       <li>fitting，阈值 = 线：23 帧全部找到，1307 帧对的帧标出 28 帧；轮流留出一个视频每轮都全部找到；整段视频标出 3.8% 的帧（图 9-4）。被标出的对的帧多是眼睛快速移动、预报跟不上的帧。</li>
       <li>PCA，阈值 = 中位数的 3.9 倍：23 帧全部找到，对的帧标出 14 帧；留一视频每轮全部找到；整段视频标出 2.4%。</li>
       <li>意见不同的帧（图 9-5）：只有 PCA 标的 70 帧里 39 帧真错，错法几乎都是四个瞳孔点缩成一团停在瞳孔旁边、一连多帧如此，点没有跳，fitting 看不见；只有 fitting 标的 75 帧里 8 帧真错，其余是眼睛快动时的误报。两者都标的帧没有单独核对。</li>
       <li>PCA 的依赖（图 9-6）：需要本视频的训练标注；标注 20 帧以后底噪稳定；训练标注里没出现过的正常姿态会被整段标出，视频 18 的眯眼帧就是，用中位数倍数做阈值才压下来。fitting 没有这两层依赖，换视频、换相机阈值的意思不变。</li>
-      <li>更早的尝试记录在 <code>results/unreliable_frames_sweep/</code>、<code>results/error_detector/</code>、<code>results/finder_comparison/</code>，网页不再展开。</li>
+      <li>全部比较的记录在 <code>results/finder_comparison/</code>。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong frame, but not the same ones, and complement each other; fitting is the main signal, the PCA the complement.
     <ol>
-      <li>The first tier (Figure 9-3): with the threshold set to just find all 23 frames the PCA flags 0 right frames, the mean form of fitting 4, the largest-of-8 form used here 13, the detector trained on the truth 8; two-model disagreement, confidence, jump and the geometric quantities are an order of magnitude behind. 23 wrong frames cannot rank these few.</li>
+      <li>Two tiers (Figure 9-3): the first tier finds all 23 frames while flagging at most a dozen right frames, and 23 wrong frames cannot rank its members; the second tier flags an order of magnitude more. Fitting is used in its largest-of-8 form because that form measures exactly how far one point strayed, so the line itself can be its threshold.</li>
       <li>Fitting, threshold = the line: all 23 found, 28 of the 1307 right frames flagged; every held-out video finds all of them; 3.8% of all frames flagged on the whole videos (Figure 9-4). The flagged right frames are mostly frames in which the eye moved fast and the prediction lagged.</li>
       <li>The PCA, threshold = 3.9 × the median: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
       <li>Frames the two disagree on (Figure 9-5): of 70 flagged by the PCA alone 39 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of 75 flagged by fitting alone 8 are wrong, the rest false alarms from fast eye movements. Frames flagged by both were not checked separately.</li>
       <li>What the PCA depends on (Figure 9-6): the video's own training labels; the background settles after 20 labels; a normal pose absent from the training labels is flagged wholesale, as the narrowed-eye frames of video 18 are, and only the median-multiple threshold brings that down. Fitting has neither dependence, its threshold means the same on another video or camera.</li>
-      <li>Earlier attempts are recorded in <code>results/unreliable_frames_sweep/</code>, <code>results/error_detector/</code> and <code>results/finder_comparison/</code> and are not repeated here.</li>
+      <li>The record of every comparison is in <code>results/finder_comparison/</code>.</li>
     </ol>
   </div>
 
