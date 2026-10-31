@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 19:40 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 22:18 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -808,7 +808,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="text" lang="en">
     <p>Errors are in units of eye width rather than pixels so that the same numbers hold on another camera or at another distance. The histogram of the 1330 errors (Figure 8-0) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail. <b>The line is at 14% of the eye width</b>; there is no frame between 12.7% and 15.4%. Frames above the line are wrong frames, every other frame counts as right. The line was read off the histogram, as the blink threshold of step 10 was.</p>
-    <p>Where the gap comes from: below the line the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, which cannot exceed the pupil's size (in the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4); above the line the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border (in the 23 wrong frames the worst point is at a median 5 radii). The pupil is surrounded by uniform iris, where the heatmap forms no peak, so there is no frame "just outside the pupil". The 20-px level used earlier is label noise and is not used any more.</p>
+    <p>Where the gap comes from: below the line the model's points are still on the pupil edge and the deviation is only which ring of the edge they sit on, which cannot exceed the pupil's size (in the 1307 frames of the main group the model's worst pupil point is at a median 1.16 pupil radii from the pupil centre, nine in ten within 1.4); above the line the heatmap's highest peak has jumped to another structure, a corner, an eyelid, a glint or the image border (in the 23 wrong frames the worst point is at a median 5 radii). The pupil is surrounded by uniform iris, where the heatmap forms no peak, so there is no frame "just outside the pupil".</p>
   </div>
   <figure>
     <div class="figbox"><img src="assets/fig_error_line.png" alt="Histogram of the frame errors of the 1330 truth frames in units of eye width, with the line at 14 percent"></div>
@@ -837,7 +837,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h3><span lang="en">8.2 Finding wrong frames: fitting finds all 23, its threshold is the line itself</span></h3>
   
   <div class="text" lang="en">
-    <p>DeepLabCut ships three algorithms for suspicious frames; each gives every frame one number from the model's predictions alone, no labels, and the frame is flagged when the number crosses a threshold. The course of the work: the three were compared on the 1330 frames and fitting was best; attempts to beat it at the 20-px level with other signals, detectors trained on our truth, the heatmap shape and a second model trained with another seed did not succeed; once the line was set at 14% of the eye width fitting found every wrong frame, so the finding step was settled and the question moved to the repair.</p>
+    <p>DeepLabCut ships three algorithms for suspicious frames; each gives every frame one number from the model's predictions alone, no labels, and the frame is flagged when the number crosses a threshold. The course of the work: the three were compared on the 1330 frames and fitting was best; attempts to beat it, before the line was set, with other signals, detectors trained on our truth, the heatmap shape and a second model trained with another seed did not succeed; once the line was set at 14% of the eye width fitting found every wrong frame, so the finding step was settled and the question moved to the repair.</p>
     <ol>
       <li><b>jump:</b> the displacement of the point that moved farthest since the previous frame, divided by the eye width.</li>
       <li><b>uncertain:</b> the lowest confidence of the 8 points.</li>
@@ -879,6 +879,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 8-4:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_error_before_after.png" alt="Error of the 1330 truth frames before and after the repair, per video and per frame"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-5:</span>Error before and after the repair on the 1330 truth frames of all 19 videos. Left: mean error of each video's 70 frames, grey = before, blue = after (human-label range), black marker = geometry rule; the numbers are the frames above the line before→after. Right: every frame before against after, log axes, dashed = the 14% line.</figcaption>
+  </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
     <ol>
@@ -887,6 +892,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
+      <li>Before and after (Figure 8-5): the mean error of the 1330 frames falls from 3.1% to 2.9% of the eye width, the frames above the line from 23 to 11, one frame gets worse; the median does not move because only 1% of the frames are changed. Only the six videos with wrong frames change; video 1 goes from 6.5% to 4.5%.</li>
       <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. Whether those are real errors the truth frames cannot say; 10 repaired and 10 still-flagged frames per video were drawn by the same rule for a check by eye.</li>
     </ol>
   </div>
