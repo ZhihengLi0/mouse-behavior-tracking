@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Review page for the spot check of the adopted repair (acceptance = labelregion): one frame at a time, yes / no.
 
-    python spotcheck_review.py
+    python spotcheck_review.py [--html-only]
 
 Takes the frames of results/flag_and_repair/all_videos/spotcheck_sample.csv for the adopted test (up to 10 repaired and
 10 still-flagged frames per video, one per episode, drawn at random by flag_and_repair_all_videos.py) and writes for
 each one a pair of crops, the frame as it is and the frame with the model's points (red) and, for a repaired frame, the
 accepted second peak (blue), plus an HTML page with one question per frame:
-  repaired frame      Is the blue point on the right place of the pupil?   yes / no / cannot tell
+  repaired frame      Is the blue point on the right place of the pupil?   yes / better, but still not right / no / cannot tell
   still-flagged frame Is the red point really wrong?                       yes / no / cannot tell
 The page shows nothing else (no fitting value, no episode length). Verdicts are kept in the browser and downloaded as a
 CSV with the button at the top; spotcheck_review_eval.py reads that CSV. None of these frames took part in setting the
@@ -102,9 +102,11 @@ def main():
     P["item"] = [f"video{v:02d}_f{f:06d}" for v, f in zip(P.video, P.frame)]
     P[["item", "video", "frame", "status", "points", "episode_len", "fit_rel", "worst_point"]].to_csv(OUT / "items.csv", index=False)
     for v, g in P.groupby("video"):
+        if all((ITEMS / f"{it}.jpg").exists() for it in g.item) and "--html-only" in sys.argv:
+            continue
         render(int(v), list(g.itertuples()))
         print("video", v, len(g))
-    Q = {"repaired": ("Is the blue point on the right place of the pupil?", ["yes", "no", "cannot tell"]),
+    Q = {"repaired": ("Is the blue point on the right place of the pupil?", ["yes", "better, but still not right", "no", "cannot tell"]),
          "flagged_not_repaired": ("Is the red point really wrong?", ["yes", "no", "cannot tell"])}
     parts, last = [], None
     for r in P.itertuples():
@@ -121,9 +123,9 @@ def main():
 img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{margin-top:8px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}}.q{{font-weight:600;margin-right:6px}}
 .done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
 button{{font:inherit;padding:4px 12px}}h2{{font-size:17px;margin:26px 0 10px}}</style>
-<div id="bar"><b>Spot check of the repair</b> ({n} frames, acceptance = human-label range). Repaired frame, three panels: the frame, BEFORE (red = the model's 8 points; a point thrown outside the crop is shown as an arrow at the border), AFTER (blue = the point the repair put in). Question: is the blue point where the pupil point belongs?
+<div id="bar"><b>Spot check of the repair</b> ({n} frames, acceptance = human-label range). Repaired frame, three panels: the frame, BEFORE (red = the model's 8 points; a point thrown outside the crop is shown as an arrow at the border), AFTER (blue = the point the repair put in). Question: is the blue point where the pupil point belongs? "yes" only if it sits on the pupil edge where that point belongs; closer than before but not on the pupil = "better, but still not right".
 Still-flagged frame, two panels: the frame and the model's points. Question: is a red point really wrong (not on the pupil)? Answer from the images only.<br>
-修复帧三张图：原帧、修复前（红 = 模型的 8 个点，被甩到框外的点在边上用箭头标出）、修复后（蓝 = 修复换上去的点），问蓝点是不是在瞳孔该在的位置。仍标出帧两张图：原帧、模型的点，问红点是不是真的错了。
+修复帧三张图：原帧、修复前（红 = 模型的 8 个点，被甩到框外的点在边上用箭头标出）、修复后（蓝 = 修复换上去的点），问蓝点是不是在瞳孔该在的位置：落在瞳孔边缘该点的位置才选 yes，比原来近了但还不在瞳孔上选 better, but still not right。仍标出帧两张图：原帧、模型的点，问红点是不是真的错了。
 &nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {"".join(parts)}
 <script>
