@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:37 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:38 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -908,14 +908,21 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong truth frame; on the whole videos most frames the PCA alone flags are errors fitting missed, and most frames fitting alone flags are not errors.
     <ol>
-      <li>Figure 9-3: of the signals that need no training and no combination, fitting and the PCA flag only a dozen right frames when finding all 23 wrong ones; the others flag hundreds.</li>
-      <li>Thresholds: fitting in its largest-of-8 form measures how far one point strayed in eye widths, so its threshold is the line of 9.1, 14% of the eye width. The size of the PCA score depends on the number of training labels, a fixed share will not do, so its threshold is 3.9 × the video's median (Figure 9-4).</li>
-      <li>Fitting: all 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5).</li>
-      <li>The PCA: all 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
-      <li>Frames the two disagree on (Figure 9-6): of 51 flagged by the PCA alone 33 are really wrong; of 66 flagged by fitting alone 3 are wrong. Frames flagged by both were not checked separately.</li>
-      <li>What each needs (Figure 9-4): the PCA needs the video's own training labels, and its background settles after 20 of them; a normal pose absent from the training labels is flagged wholesale, as the narrowed-eye frames of video 18 are, and only the median-multiple threshold brings that down. Fitting needs no labels; the frames it alone flags are mostly not errors (Figure 9-6).</li>
-      <li>The record of every comparison is in <code>results/finder_comparison/</code>.</li>
+      <li><b>Which signals are good</b> (Figure 9-3): of the signals that need no training and no combination, fitting and the PCA flag only a dozen right frames when finding all 23 wrong ones; the others flag hundreds.</li>
+      <li><b>How each is set, and what it gives</b>
+        <ul>
+          <li>Fitting: largest of the 8 points, which measures how far one point strayed in eye widths, so the threshold is the line of 9.1, 14% of the eye width. All 23 found, 28 of the 1307 right frames flagged; 3.8% of all frames flagged on the whole videos (Figure 9-5).</li>
+          <li>PCA: the size of its score depends on the number of training labels, a fixed share will not do, so the threshold is 3.9 × the video's median (Figure 9-4). All 23 found, 14 right frames flagged; every held-out video finds all of them; 2.4% of all frames flagged.</li>
+        </ul>
+      </li>
+      <li><b>The two compared</b>
+        <ul>
+          <li>Frames they disagree on (Figure 9-6): of 51 flagged by the PCA alone 33 are really wrong; of 66 flagged by fitting alone 3 are wrong. Frames flagged by both were not checked separately.</li>
+          <li>What each needs: the PCA needs the video's own training labels, and its background settles after 20 of them; a normal pose absent from the training labels is flagged wholesale, as the narrowed-eye frames of video 18 are, and only the median-multiple threshold brings that down. Fitting needs no labels; the frames it alone flags are mostly not errors.</li>
+        </ul>
+      </li>
     </ol>
+    The record of every comparison is in <code>results/finder_comparison/</code>.
   </div>
 
   <h3><span lang="en">9.3 Repair and check: the heatmap's second peak repairs, a check decides; 12 of the 23 wrong frames repaired, the rest stay flagged, nothing deleted</span></h3>
