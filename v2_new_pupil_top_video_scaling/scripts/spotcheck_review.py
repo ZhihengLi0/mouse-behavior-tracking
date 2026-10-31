@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""Review page for the spot check of the adopted repair (acceptance = labelregion): one frame at a time, yes / no.
+
+    python spotcheck_review.py
+
+Takes the frames of results/flag_and_repair/all_videos/spotcheck_sample.csv for the adopted test (up to 10 repaired and
+10 still-flagged frames per video, one per episode, drawn at random by flag_and_repair_all_videos.py) and writes for
+each one a pair of crops, the frame as it is and the frame with the model's points (red) and, for a repaired frame, the
+accepted second peak (blue), plus an HTML page with one question per frame:
+  repaired frame      Is the blue point on the right place of the pupil?   yes / no / cannot tell
+  still-flagged frame Is the red point really wrong?                       yes / no / cannot tell
+The page shows nothing else (no fitting value, no episode length). Verdicts are kept in the browser and downloaded as a
+CSV with the button at the top; spotcheck_review_eval.py reads that CSV. None of these frames took part in setting the
+line, the threshold or the label range, so the verdicts are the check of the repair on the whole videos.
+Outputs (results/flag_and_repair/spotcheck_review/, local only): items/videoNN_fFFFFFF.jpg, spotcheck_review.html,
+items.csv. Nothing existing is modified."""
+import sys
+from pathlib import Path
+
+import cv2
+import numpy as np
+import pandas as pd
+from PIL import Image, ImageDraw, ImageFont
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from second_peak_repair import BPS, RES, Geometry, load, peak2_pixels, pooled_bands  # noqa: E402
+
+TEST = "labelregion"
+FAR = RES / "flag_and_repair"
+OUT = FAR / "spotcheck_review"
+ITEMS = OUT / "items"
+PW, PH = 480, 360
+try:
+    FONT = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 14)
+except OSError:
+    FONT = ImageFont.load_default()
+
+
+def render(v, rows):
+    rr, d, Pk, H, truth, fwd, sig = load(v)
+    xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
+    p2, off = peak2_pixels(d, Pk)
+    B, scale = pooled_bands(RES / "second_peak_repair")
+    G = Geometry(xy, scale)
+    Wd = np.linalg.norm(xy["eye_temporal_corner"] - xy["eye_nasal_corner"], axis=1)
+    cap = cv2.VideoCapture(str(RES.parent / rr.unit / f"{rr.unit}.mp4"))
+    for r in rows:
+        f = int(r.frame)
+        cap.set(cv2.CAP_PROP_POS_FRAMES, f)
+        ok, img = cap.read()
+        assert ok, (v, f)
+        img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        cx, cy = G.C[f]
+        w = max(1.7 * Wd[f], 240)
+        h = w * PH / PW
+        box = (int(cx - w / 2), int(cy - h / 2), int(cx + w / 2), int(cy + h / 2))
+        raw = img.crop(box).resize((PW, PH), Image.LANCZOS)
+        ann = raw.copy()
+        sc = PW / (box[2] - box[0])
+        dr = ImageDraw.Draw(ann)
+        pts = [p for p in str(r.points).split("+") if p and p != "nan"]
+        for b in BPS:
+            px, py = (xy[b][f] - box[:2]) * sc
+            dr.ellipse([px - 5, py - 5, px + 5, py + 5], outline=(255, 60, 60), width=2)
+            if r.status == "repaired" and b in pts:
+                nx, ny = (p2[b][f] - box[:2]) * sc
+                dr.line([px, py, nx, ny], fill=(80, 120, 255), width=2)
+                dr.ellipse([nx - 5, ny - 5, nx + 5, ny + 5], outline=(80, 120, 255), width=2)
+        S = Image.new("RGB", (2 * PW + 10, PH + 22), (255, 255, 255))
+        S.paste(raw, (0, 22))
+        S.paste(ann, (PW + 10, 22))
+        d2 = ImageDraw.Draw(S)
+        d2.text((4, 3), "frame as it is", fill=(0, 0, 0), font=FONT)
+        d2.text((PW + 14, 3), "red = model" + (", blue = the accepted second peak (the repair)" if r.status == "repaired" else ""), fill=(0, 0, 0), font=FONT)
+        S.save(ITEMS / f"video{v:02d}_f{f:06d}.jpg", quality=90)
+    cap.release()
+
+
+def main():
+    ITEMS.mkdir(parents=True, exist_ok=True)
+    P = pd.read_csv(FAR / "all_videos" / "spotcheck_sample.csv", dtype={"points": str})
+    P = P[P.accept == TEST].sort_values(["video", "status", "frame"], ascending=[True, False, True]).reset_index(drop=True)
+    P["item"] = [f"video{v:02d}_f{f:06d}" for v, f in zip(P.video, P.frame)]
+    P[["item", "video", "frame", "status", "points", "episode_len", "fit_rel", "worst_point"]].to_csv(OUT / "items.csv", index=False)
+    for v, g in P.groupby("video"):
+        render(int(v), list(g.itertuples()))
+        print("video", v, len(g))
+    Q = {"repaired": ("Is the blue point on the right place of the pupil?", ["yes", "no", "cannot tell"]),
+         "flagged_not_repaired": ("Is the red point really wrong?", ["yes", "no", "cannot tell"])}
+    parts, last = [], None
+    for r in P.itertuples():
+        if r.video != last:
+            parts.append(f'<h2>video {r.video}</h2>')
+            last = r.video
+        q, opts = Q[r.status]
+        parts.append(f'<div class="it" data-item="{r.item}"><div class="h">{"REPAIRED" if r.status == "repaired" else "STILL FLAGGED"} &nbsp; frame {r.frame}</div>'
+                     f'<img src="items/{r.item}.jpg" loading="lazy"><div class="b"><span class="q">{q}</span>' +
+                     "".join(f'<label><input type="radio" name="{r.item}" value="{o}"> {o}</label>' for o in opts) + "</div></div>")
+    n = len(P)
+    (OUT / "spotcheck_review.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Repair spot check</title>
+<style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{margin:0 0 22px;padding:8px;background:#fff;border:1px solid #ddd;max-width:{2 * PW + 30}px}}
+img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{margin-top:8px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}}.q{{font-weight:600;margin-right:6px}}
+.done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
+button{{font:inherit;padding:4px 12px}}h2{{font-size:17px;margin:26px 0 10px}}</style>
+<div id="bar"><b>Spot check of the repair</b> ({n} frames, acceptance = human-label range). Left: the frame. Right: red = the model's 8 points; on a repaired frame blue = the point the repair put in.
+Repaired frame: is the blue point where the pupil point belongs? Still-flagged frame: is the red point really wrong (not on the pupil)? Answer from the image only.
+&nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
+{"".join(parts)}
+<script>
+const K='repair_spotcheck_{TEST}';let V={{}};try{{V=JSON.parse(localStorage.getItem(K)||'{{}}')}}catch(e){{}}
+function upd(){{document.getElementById('n').textContent=Object.keys(V).length+' of {n} judged.';document.querySelectorAll('.it').forEach(d=>d.classList.toggle('done',!!V[d.dataset.item]))}}
+document.querySelectorAll('input[type=radio]').forEach(r=>{{if(V[r.name]===r.value)r.checked=true;r.addEventListener('change',()=>{{V[r.name]=r.value;try{{localStorage.setItem(K,JSON.stringify(V))}}catch(e){{}}upd()}})}});upd();
+function save(){{const rows=['item,verdict'].concat(Object.keys(V).sort().map(k=>k+',"'+V[k]+'"'));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\\n')],{{type:'text/csv'}}));a.download='spotcheck_review_verdicts.csv';a.click()}}
+</script>""", encoding="utf-8")
+    print(n, "items ->", OUT / "spotcheck_review.html")
+
+
+if __name__ == "__main__":
+    main()
