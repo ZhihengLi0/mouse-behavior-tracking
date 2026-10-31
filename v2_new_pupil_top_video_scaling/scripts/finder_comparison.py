@@ -104,7 +104,7 @@ def fig_signals(T):
     for i, r in T.iterrows():
         if used_pca[i]:
             ax.plot(0.045, i, marker=">", color="#d1495b", ms=11, clip_on=False)
-            ax.text(x[i] * 1.08, i, f"0 of 1307   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="#d1495b")
+            ax.text(0.058, i, f"0 of 1307   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="#d1495b")
         else:
             ax.text(x[i] * 1.08, i, f"{100 * r.good_flagged_share:.1f} %   leave-one-video-out: {r.lovo_caught} of 23 found", va="center", fontsize=8.5, color="0.25")
     ax.set_yticks(T.index)
