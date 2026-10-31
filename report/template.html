@@ -1044,8 +1044,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_pca_vs_labels.png" alt="The PCA finder against the number of labeled poses it is fitted on"></div>
-    <figcaption lang="zh"><span class="tag">图 9-6：</span>PCA 用不同数量的标注拟合时，整段视频被标出的比例，两种阈值规则各画中位视频和最差视频；蓝色数字是中位数倍数规则找到的错帧数。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Share of whole-video frames flagged when the PCA is fitted on different numbers of labels, median and worst video under each threshold rule; blue numbers: wrong truth frames found by the median rule.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-6：</span>PCA 用不同数量的标注拟合时，整段视频被标出的比例，两种阈值规则各画中位视频和最差视频；两种规则找到的错帧数相同（蓝色数字），比的只是标出多少。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Share of whole-video frames flagged when the PCA is fitted on different numbers of labels, median and worst video under each threshold rule; both rules find the same number of wrong truth frames (blue numbers), so only the amount flagged differs.</figcaption>
   </figure>
   <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全错帧，但在整段视频上找到的不是同一批，两者互补。
     <ol>
