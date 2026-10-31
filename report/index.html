@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 16:17 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 16:20 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1150,11 +1150,29 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">图 9-5：</span>按定好的阈值，两种信号在每段视频上标出的帧的比例；两者都找全了每个视频的错帧。横轴第二行是该视频 PCA 用的标注数。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-5:</span>Share of frames each signal flags per video at its threshold; both find every wrong truth frame of every video. Second line of the axis: labels the video's PCA used.</figcaption>
   </figure>
+  <div class="text" lang="zh">
+    <p><b>人眼核对：两种信号意见不同的帧，谁对？</b>两种信号在整段视频上标出的帧不一样。一方标出、另一方没标的帧没有人工标注，只能靠人眼判断它们是真错还是误报。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Check by eye: when the two signals disagree, which is right?</b> On the whole videos the two signals flag different frames. The frames one flags and the other does not have no labels, so only the eye can say whether they are real errors or false alarms.</p>
+  </div>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">帧</span><span lang="en">Frames</span></th><td><span lang="zh">两组：只有 PCA 标出的、只有 fitting 标出的；每个视频每组随机抽 4 帧，共 148 帧，判了 145 帧。PCA 这里用的是早先的固定阈值（眼宽的 3%），fitting 用线。</span><span lang="en">Two groups: flagged by the PCA only, flagged by fitting only; 4 frames per video and group drawn at random, 148 in all, 145 judged. The PCA here used its earlier fixed threshold (3% of the eye width), fitting the line.</span></td></tr>
+    <tr><th><span lang="zh">判法</span><span lang="en">How judged</span></th><td><span lang="zh">盲判：每帧只给原帧和模型的 8 个点，不显示是哪个信号标的。三个选项：有一个点真错了 / 都对 / 看不清。</span><span lang="en">Blind: each frame shown as the raw frame and the model's 8 points, without saying which signal flagged it. Three choices: a point is really wrong / all points fine / cannot tell.</span></td></tr>
+    <tr><th><span lang="zh">什么算错</span><span lang="en">What counts as wrong</span></th><td><span lang="zh">有一个点离开了它该在的结构（瞳孔边缘、睑缘、眼角）；沿着结构滑了一点不算错。</span><span lang="en">A point off the structure it belongs to (pupil edge, lid margin, corner); a point that merely slid along its structure is not wrong.</span></td></tr>
+    <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><code>finder_disagreement_review.py</code>, <code>finder_disagreement_eval.py</code>; <code>results/finder_comparison/disagreement_review/</code></td></tr>
+  </tbody></table></div>
   <figure>
     <div class="figbox"><img src="assets/fig_finder_disagreement.png" alt="By-eye verdicts on frames flagged by only one of the two finders"></div>
-    <figcaption lang="zh"><span class="tag">图 9-6：</span>两种信号意见不同的帧的人眼盲判，每个视频每组随机 4 帧：只有 PCA 标的帧过半真错，只有 fitting 标的帧九成都对。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Blind check by eye of frames flagged by one signal only, 4 per video and group: over half of the PCA-only frames are wrong, nine in ten of the fitting-only frames are fine.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-6：</span>两种信号意见不同的帧的人眼盲判结果。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Blind verdicts by eye on the frames the two signals disagree on.</figcaption>
   </figure>
+  <div class="text" lang="zh">
+    <p><b>结果：</b>只有 PCA 标出的 70 帧里 39 帧真错，错法几乎都是四个瞳孔点缩成一团停在瞳孔旁边、一连多帧如此，点没有跳，fitting 看不见；只有 fitting 标出的 75 帧里 8 帧真错，其余是眼睛快动时的误报。两种信号找到的错不是同一种，互补。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Result:</b> of the 70 frames flagged by the PCA only, 39 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of the 75 flagged by fitting only, 8 are wrong, the rest false alarms from fast eye movements. The two signals find different errors and complement each other.</p>
+  </div>
   <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全错帧，但在整段视频上找到的不是同一批，两者互补。
     <ol>
       <li>图 9-3：不需要训练、不需要组合的信号里，fitting 和 PCA 找全 23 帧错帧时只误标十几帧对帧，其余的要误标上百帧。fitting 用 8 个点取最大值的形式，因为它量的就是"一个点偏了多少"，阈值可以直接用线。</li>
@@ -1223,11 +1241,29 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">图 9-10：</span>上排：修好的错帧，红 = 模型，蓝 = 接受的第二峰，绿圈 = 人工标注。下排：没修好、仍标出的错帧。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-10:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
+  <div class="text" lang="zh">
+    <p><b>人眼核对：修复在整段视频上对不对？</b>真值帧只有 1330 帧，修复动到的帧绝大多数没有标注。被修的帧换上去的点是不是落在该在的位置，仍标出的帧是不是真的错了，只能靠人眼判断。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Check by eye: is the repair right on the whole videos?</b> There are only 1330 truth frames; nearly all frames the repair touches have no labels. Whether the point put in sits where it belongs, and whether a still-flagged frame is really wrong, only the eye can say.</p>
+  </div>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">帧</span><span lang="en">Frames</span></th><td><span lang="zh">两组：修复帧、仍标出帧；每个视频每组最多 10 帧，每段连续被动的帧只抽一帧，共 358 帧，判了 355 帧。找帧用 fitting，验收用人工标注范围。</span><span lang="en">Two groups: repaired frames, still-flagged frames; up to 10 per video and group, one per run of touched frames, 358 in all, 355 judged. Finder fitting, acceptance the human-label range.</span></td></tr>
+    <tr><th><span lang="zh">判法</span><span lang="en">How judged</span></th><td><span lang="zh">修复帧三张图：原帧、修复前（红 = 模型的 8 个点）、修复后（蓝 = 换上去的点）；问蓝点是不是在瞳孔该在的位置，四个选项：是 / 近了但还不对 / 否 / 看不清。仍标出帧两张图：原帧、模型的点；问红点是不是真的错了，三个选项：是 / 否 / 看不清。</span><span lang="en">Repaired frame, three panels: the frame, before (red = the model's 8 points), after (blue = the point put in); is the blue point where the pupil point belongs: yes / better but still not right / no / cannot tell. Still-flagged frame, two panels: the frame, the model's points; is a red point really wrong: yes / no / cannot tell.</span></td></tr>
+    <tr><th><span lang="zh">什么算对</span><span lang="en">What counts as right</span></th><td><span lang="zh">蓝点落在瞳孔边缘上该点的位置才算对；比原来近了但不在瞳孔上算"近了但还不对"。</span><span lang="en">The blue point counts as right only on the pupil edge where that point belongs; closer than before but not on the pupil is "better but still not right".</span></td></tr>
+    <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><code>spotcheck_review.py</code>, <code>spotcheck_review_eval.py</code>; <code>results/flag_and_repair/spotcheck_review/</code></td></tr>
+  </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
-    <figcaption lang="zh"><span class="tag">图 9-11：</span>整段视频的人眼核对，每个视频最多 10 帧修复帧和 10 帧仍标出帧。左：修复帧，换上去的点在瞳孔该在的位置（蓝）、近了但还不对（橙）、没变好（红）、看不清（灰）。右：仍标出帧，确实有点错了（蓝）、误报（橙）、看不清（灰）。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-11:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-11：</span>整段视频修复的人眼核对结果。左：修复帧；右：仍标出帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-11:</span>Verdicts by eye on the repair over the whole videos. Left: repaired frames; right: still-flagged frames.</figcaption>
   </figure>
+  <div class="text" lang="zh">
+    <p><b>结果：</b>174 帧修复帧里 149 帧换上去的点落在瞳孔该在的位置，19 帧近了但还不在瞳孔上（多在视频 14、17、18），4 帧没变好；184 帧仍标出帧里 101 帧确实有点错了，69 帧是误报，14 帧看不清。这些帧都没参与定线、定阈值、定范围。图 9-12 是其中的例子。</p>
+  </div>
+  <div class="text" lang="en">
+    <p><b>Result:</b> of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range. Figure 9-12 shows examples.</p>
+  </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
     <figcaption lang="zh"><span class="tag">图 9-12：</span>人眼核对里的修复帧，修复前（红 = 模型）和修复后（蓝 = 换上去的点）并排。上面八帧判为换上去的点在瞳孔该在的位置，每个视频一帧；下面两帧判为近了但还不对，第二峰也不在瞳孔边缘上。被甩到视野外的点在边上用红色实心点标出。</figcaption>
@@ -1240,7 +1276,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>人工标注范围不含手定的数，结果与手定规则相同，所以采用它；几何规则作为对照保留。</li>
       <li>fitting 不能兼做验收的原因：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因眼睛快动被标出时预报滞后，靠近预报的错误第二峰被接受。找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的证据。</li>
       <li>仍标出的 7 帧是多个点同时甩出、第二峰也不在瞳孔上的帧（视频 1、2、14 各有，视频 8 一帧）；未动的 4 帧是眼睑规则判为闭眼的帧（视频 10、11），其中两帧是模型的眼睑点本身错了。</li>
-      <li>整段视频（图 9-11）：人工标注范围修 0.8%、仍标出 1.2% 的帧，视频 1 和 8 最多。这些帧没有标注，按同一规则从每个视频各抽最多 10 帧修复帧和 10 帧仍标出帧（每段连续被动的帧只抽一帧）人眼核对：174 帧修复帧里 149 帧换上去的点落在瞳孔该在的位置，19 帧近了但还不在瞳孔上（多在视频 14、17、18），4 帧没变好；184 帧仍标出帧里 101 帧确实有点错了，69 帧是误报，14 帧看不清。这些帧都没参与定线、定阈值、定范围。</li>
+      <li>整段视频：人工标注范围修 0.8%、仍标出 1.2% 的帧，视频 1 和 8 最多；人眼核对（图 9-11）：修复帧约七分之六修对，仍标出帧约五分之三真错。</li>
       <li>换 PCA 或并集找帧，修好的数量不变（图 9-9）：PCA 多找出的成团偏移的瞳孔点第二峰修不了，是下一步要修的对象。</li>
     </ol>
   </div>
@@ -1251,7 +1287,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
-      <li>Whole videos (Figure 9-11): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
+      <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8; by eye (Figure 9-11) about six of seven repairs are right and about three of five still-flagged frames are real errors.</li>
       <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the bunched pupil points the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
     </ol>
   </div>

@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:17 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 16:20 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -886,11 +886,25 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 9-5:</span>Share of frames each signal flags per video at its threshold; both find every wrong truth frame of every video. Second line of the axis: labels the video's PCA used.</figcaption>
   </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Check by eye: when the two signals disagree, which is right?</b> On the whole videos the two signals flag different frames. The frames one flags and the other does not have no labels, so only the eye can say whether they are real errors or false alarms.</p>
+  </div>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Frames</span></th><td><span lang="en">Two groups: flagged by the PCA only, flagged by fitting only; 4 frames per video and group drawn at random, 148 in all, 145 judged. The PCA here used its earlier fixed threshold (3% of the eye width), fitting the line.</span></td></tr>
+    <tr><th><span lang="en">How judged</span></th><td><span lang="en">Blind: each frame shown as the raw frame and the model's 8 points, without saying which signal flagged it. Three choices: a point is really wrong / all points fine / cannot tell.</span></td></tr>
+    <tr><th><span lang="en">What counts as wrong</span></th><td><span lang="en">A point off the structure it belongs to (pupil edge, lid margin, corner); a point that merely slid along its structure is not wrong.</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><code>finder_disagreement_review.py</code>, <code>finder_disagreement_eval.py</code>; <code>results/finder_comparison/disagreement_review/</code></td></tr>
+  </tbody></table></div>
   <figure>
     <div class="figbox"><img src="assets/fig_finder_disagreement.png" alt="By-eye verdicts on frames flagged by only one of the two finders"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Blind check by eye of frames flagged by one signal only, 4 per video and group: over half of the PCA-only frames are wrong, nine in ten of the fitting-only frames are fine.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-6:</span>Blind verdicts by eye on the frames the two signals disagree on.</figcaption>
   </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Result:</b> of the 70 frames flagged by the PCA only, 39 are really wrong, almost all in one way, the four pupil points bunched beside the pupil for many frames in a row, no jump, invisible to fitting; of the 75 flagged by fitting only, 8 are wrong, the rest false alarms from fast eye movements. The two signals find different errors and complement each other.</p>
+  </div>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on finding:</span>fitting and the PCA both find every wrong frame, but not the same ones on the whole videos, and complement each other.
     <ol>
@@ -940,11 +954,25 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 9-10:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Check by eye: is the repair right on the whole videos?</b> There are only 1330 truth frames; nearly all frames the repair touches have no labels. Whether the point put in sits where it belongs, and whether a still-flagged frame is really wrong, only the eye can say.</p>
+  </div>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Frames</span></th><td><span lang="en">Two groups: repaired frames, still-flagged frames; up to 10 per video and group, one per run of touched frames, 358 in all, 355 judged. Finder fitting, acceptance the human-label range.</span></td></tr>
+    <tr><th><span lang="en">How judged</span></th><td><span lang="en">Repaired frame, three panels: the frame, before (red = the model's 8 points), after (blue = the point put in); is the blue point where the pupil point belongs: yes / better but still not right / no / cannot tell. Still-flagged frame, two panels: the frame, the model's points; is a red point really wrong: yes / no / cannot tell.</span></td></tr>
+    <tr><th><span lang="en">What counts as right</span></th><td><span lang="en">The blue point counts as right only on the pupil edge where that point belongs; closer than before but not on the pupil is "better but still not right".</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><code>spotcheck_review.py</code>, <code>spotcheck_review_eval.py</code>; <code>results/flag_and_repair/spotcheck_review/</code></td></tr>
+  </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-11:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-11:</span>Verdicts by eye on the repair over the whole videos. Left: repaired frames; right: still-flagged frames.</figcaption>
   </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Result:</b> of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range. Figure 9-12 shows examples.</p>
+  </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
     
@@ -958,7 +986,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>The human-label range has no hand-set number and matches the hand-made rule, so it is the one used; the geometry rule is kept as the comparison.</li>
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
-      <li>Whole videos (Figure 9-11): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
+      <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8; by eye (Figure 9-11) about six of seven repairs are right and about three of five still-flagged frames are real errors.</li>
       <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the bunched pupil points the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
     </ol>
   </div>
