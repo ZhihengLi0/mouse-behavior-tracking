@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 22:18 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-30 23:17 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -884,6 +884,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 8-5:</span>Error before and after the repair on the 1330 truth frames of all 19 videos. Left: mean error of each video's 70 frames, grey = before, blue = after (human-label range), black marker = geometry rule; the numbers are the frames above the line before→after. Right: every frame before against after, log axes, dashed = the 14% line.</figcaption>
   </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 8-6:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
+  </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
     <ol>
@@ -893,7 +898,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
       <li>Before and after (Figure 8-5): the mean error of the 1330 frames falls from 3.1% to 2.9% of the eye width, the frames above the line from 23 to 11, one frame gets worse; the median does not move because only 1% of the frames are changed. Only the six videos with wrong frames change; video 1 goes from 6.5% to 4.5%.</li>
-      <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. Whether those are real errors the truth frames cannot say; 10 repaired and 10 still-flagged frames per video were drawn by the same rule for a check by eye.</li>
+      <li>Whole videos (Figure 8-6): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
     </ol>
   </div>
 </section>
@@ -1183,7 +1188,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="text" lang="en">
     <ul>
-      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (8.3): all 23 wrong frames are found and 12 repaired. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how many of the roughly 1% repaired and 1% still-flagged frames of the whole videos are real errors, which awaits a check by eye.</li>
+      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (8.3): all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how to cut the two in five false alarms among the still-flagged frames.</li>
       <li><b>Videos 4, 5 and 8 have larger errors</b> (video 8 above 25 px). The cause is a blurry image: the points are hard to place even by eye, so the labeler's own judgement is unstable. Whole-image sharpness and brightness do not differ from the other Pluto videos; the blur is local, at the pupil edge, and has not been quantified.</li>
       <li><b>Area:</b> the four-point rule is used; median error 5.4% on all test frames against 8.4% for the three-point rule. But on 4 of the 19 videos (videos 1, 2, 5, 7) the three-point rule is lower, and on videos 4 and 8 both rules are inaccurate (43.8%, 24.0%); neither is explained. <b>Plateau points</b> cluster at 20–40 labels (20 and 40 labels: 7 videos each; 0 labels: 2; 60 labels: 2; 80 labels: 1), but each point is a single training run on 50 test frames, so differences within ±20 labels cannot be resolved.</li>
     </ul>

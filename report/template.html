@@ -1035,6 +1035,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="zh"><span class="tag">图 8-5：</span>修前和修后的误差，全部 19 个视频的 1330 帧真值帧。左：每个视频 70 帧的平均误差，灰 = 修前，蓝 = 修后（人工标注范围），黑点 = 几何规则；数字是线以上的帧数修前→修后。右：每一帧修前对修后，对数坐标，虚线是 14% 的线。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 8-5:</span>Error before and after the repair on the 1330 truth frames of all 19 videos. Left: mean error of each video's 70 frames, grey = before, blue = after (human-label range), black marker = geometry rule; the numbers are the frames above the line before→after. Right: every frame before against after, log axes, dashed = the 14% line.</figcaption>
   </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
+    <figcaption lang="zh"><span class="tag">图 8-6：</span>整段视频的人眼核对，每个视频最多 10 帧修复帧和 10 帧仍标出帧。左：修复帧，换上去的点在瞳孔该在的位置（蓝）、近了但还不对（橙）、没变好（红）、看不清（灰）。右：仍标出帧，确实有点错了（蓝）、误报（橙）、看不清（灰）。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 8-6:</span>Check by eye on the whole videos, up to 10 repaired and 10 still-flagged frames per video. Left: repaired frames, the point put in is on the pupil where it belongs (blue), closer but still not right (orange), not better (red), cannot tell (grey). Right: still-flagged frames, a point is really wrong (blue), false alarm (orange), cannot tell (grey).</figcaption>
+  </figure>
   <div class="concl" lang="zh"><span class="tag">修和验的结论：</span>人工标注范围和手定几何规则并列最好，各修好 12 帧；用找帧的量做验收最差。
     <ol>
       <li>23 帧错帧：人工标注范围修好 12 帧、7 帧仍标出、4 帧因判为闭眼未动；几何规则相同；同一个 fitting 量修好 5 帧；置信度 10 帧，跳变 5 帧。</li>
@@ -1043,7 +1048,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>fitting 不能兼做验收的原因：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因眼睛快动被标出时预报滞后，靠近预报的错误第二峰被接受。找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的证据。</li>
       <li>仍标出的 7 帧是多个点同时甩出、第二峰也不在瞳孔上的帧（视频 1、2、14 各有，视频 8 一帧）；未动的 4 帧是眼睑规则判为闭眼的帧（视频 10、11），其中两帧是模型的眼睑点本身错了。</li>
       <li>修前修后（图 8-5）：1330 帧的平均误差从眼宽的 3.1% 降到 2.9%，线以上的帧从 23 降到 11，变差 1 帧；中位数不动，因为只改了 1% 的帧。只有有错帧的六个视频变化，视频 1 从 6.5% 降到 4.5%。</li>
-      <li>整段视频：人工标注范围修 0.8%、仍标出 1.2% 的帧，视频 1 和 8 最多。这些帧是不是真错真值帧回答不了，已按同一规则从每个视频抽修复帧和仍标出帧各 10 帧待人眼核对。</li>
+      <li>整段视频（图 8-6）：人工标注范围修 0.8%、仍标出 1.2% 的帧，视频 1 和 8 最多。这些帧没有标注，按同一规则从每个视频各抽最多 10 帧修复帧和 10 帧仍标出帧（每段连续被动的帧只抽一帧）人眼核对：174 帧修复帧里 149 帧换上去的点落在瞳孔该在的位置，19 帧近了但还不在瞳孔上（多在视频 14、17、18），4 帧没变好；184 帧仍标出帧里 101 帧确实有点错了，69 帧是误报，14 帧看不清。这些帧都没参与定线、定阈值、定范围。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
@@ -1054,7 +1059,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
       <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
       <li>Before and after (Figure 8-5): the mean error of the 1330 frames falls from 3.1% to 2.9% of the eye width, the frames above the line from 23 to 11, one frame gets worse; the median does not move because only 1% of the frames are changed. Only the six videos with wrong frames change; video 1 goes from 6.5% to 4.5%.</li>
-      <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. Whether those are real errors the truth frames cannot say; 10 repaired and 10 still-flagged frames per video were drawn by the same rule for a check by eye.</li>
+      <li>Whole videos (Figure 8-6): the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8. These frames have no labels; by the same rule up to 10 repaired and 10 still-flagged frames per video (one per run of touched frames) were judged by eye: of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range.</li>
     </ol>
   </div>
 </section>
@@ -1434,14 +1439,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h2><span class="no">12</span><span lang="zh">还没有结论的地方</span><span lang="en">Where there is no conclusion yet</span></h2>
   <div class="text" lang="zh">
     <ul>
-      <li><b>不可信帧：</b>找出错帧和修复已有一条流水线（8.3）：23 帧错帧全部找到，修好 12 帧。还没有结论的是剩下的 11 帧（多点同时甩出的 7 帧、被判为闭眼的 4 帧）怎么办，以及整段视频里被修和仍标出的各约 1% 的帧有多少是真错，等人眼核对。</li>
+      <li><b>不可信帧：</b>找出错帧和修复已有一条流水线（8.3）：23 帧错帧全部找到，修好 12 帧。整段视频的人眼核对：修复帧约七分之六修对，仍标出的帧约五分之三真错。还没有结论的是剩下的 11 帧（多点同时甩出的 7 帧、被判为闭眼的 4 帧）怎么办，以及仍标出帧里五分之二的误报怎么减少。</li>
       <li><b>视频 4、5、8 误差偏大</b>（视频 8 在 25 px 以上）。原因是画面模糊，肉眼也难定点，标注者本身的判断就不稳定。整幅画面的清晰度和亮度与其他 Pluto 视频无差别，模糊在瞳孔边缘的局部，还没有量化。</li>
       <li><b>面积：</b>用四点法，全部测试帧上中位误差 5.4%，三点法 8.4%；但 19 个视频里有 4 个（视频 1、2、5、7）三点法更低，视频 4、8 两种算法都不准（43.8%、24.0%），这两点还没有解释。<b>平台点</b>集中在 20–40 帧（20 帧和 40 帧各 7 个视频，0 帧 2 个，60 帧 2 个，80 帧 1 个），但每个点只训练一次、测试集 50 帧，±20 帧内分不出。</li>
     </ul>
   </div>
   <div class="text" lang="en">
     <ul>
-      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (8.3): all 23 wrong frames are found and 12 repaired. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how many of the roughly 1% repaired and 1% still-flagged frames of the whole videos are real errors, which awaits a check by eye.</li>
+      <li><b>Unreliable frames:</b> finding and repairing wrong frames now has one pipeline (8.3): all 23 wrong frames are found and 12 repaired. The check by eye on the whole videos: about six of seven repairs are right, about three of five still-flagged frames are real errors. Open are the remaining 11 (7 with several points thrown at once, 4 judged closed-eye) and how to cut the two in five false alarms among the still-flagged frames.</li>
       <li><b>Videos 4, 5 and 8 have larger errors</b> (video 8 above 25 px). The cause is a blurry image: the points are hard to place even by eye, so the labeler's own judgement is unstable. Whole-image sharpness and brightness do not differ from the other Pluto videos; the blur is local, at the pupil edge, and has not been quantified.</li>
       <li><b>Area:</b> the four-point rule is used; median error 5.4% on all test frames against 8.4% for the three-point rule. But on 4 of the 19 videos (videos 1, 2, 5, 7) the three-point rule is lower, and on videos 4 and 8 both rules are inaccurate (43.8%, 24.0%); neither is explained. <b>Plateau points</b> cluster at 20–40 labels (20 and 40 labels: 7 videos each; 0 labels: 2; 60 labels: 2; 80 labels: 1), but each point is a single training run on 50 test frames, so differences within ±20 labels cannot be resolved.</li>
     </ul>
