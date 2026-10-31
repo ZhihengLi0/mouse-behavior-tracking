@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 15:02 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-10-31 15:04 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1137,23 +1137,23 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_all_signals.png" alt="Every candidate finder at the error line: share of right truth frames flagged when all 23 wrong frames are found"></div>
-    <figcaption lang="zh"><span class="tag">图 9-3：</span>候选信号按族各一行，阈值定到刚好找全 23 帧错帧时，1307 帧对的帧里被标出的比例（对数刻度），越靠左越好；短横线是同一族其他形式的范围，右侧文字是轮流留出一个视频时找到的错帧数。虚线上方是第一档。红 = 本页用的 PCA，一帧对帧都不误标，所以只有标记没有柱子；蓝 = 本页用的 fitting 形式。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-3:</span>Candidate signals, one row per family: the share of the 1307 right truth frames flagged when the threshold is set to find all 23 wrong frames (log scale), further left is better; the whisker spans the other forms of the family, the text gives the wrong frames found with each video held out in turn. Above the dashed line is the first tier. Red = the PCA used on this page, which flags no right frame and so has a marker instead of a bar; blue = the fitting form used on this page.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-3：</span>阈值定到刚好找全 23 帧错帧时，各族信号误标的对帧比例，对数刻度，越左越好。短横线是同族其他形式的范围；红、蓝是本页采用的两种，PCA 不误标所以只有标记。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-3:</span>Share of right truth frames each family of signals flags when its threshold just finds all 23 wrong frames, log scale, further left is better. Whiskers span the other forms of a family; red and blue are the two used here, the PCA flags none and so has only a marker.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_share.png" alt="Share of every frame flagged by fitting and by the PCA, per video"></div>
-    <figcaption lang="zh"><span class="tag">图 9-4：</span>按定好的阈值直接跑，整段视频上两种信号各标出多少比例的帧，按视频，这就是实际要人去看的量；横轴第二行是该视频的 PCA 用的标注姿态数。两种信号在每个视频上都把真值帧里的错帧全部找到，所以图里只比标出量。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Run with the thresholds as set, the share of every frame each signal flags, per video, which is what a person would have to look at; the second line of the axis gives the labeled poses the video's PCA was fitted on. Both signals find every wrong truth frame of every video, so the figure compares only how much they flag.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-4：</span>按定好的阈值，两种信号在每段视频上标出的帧的比例；两者都找全了每个视频的错帧。横轴第二行是该视频 PCA 用的标注数。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-4:</span>Share of frames each signal flags per video at its threshold; both find every wrong truth frame of every video. Second line of the axis: labels the video's PCA used.</figcaption>
   </figure>
   <figure>
     <div class="figbox"><img src="assets/fig_finder_disagreement.png" alt="By-eye verdicts on frames flagged by only one of the two finders"></div>
-    <figcaption lang="zh"><span class="tag">图 9-5：</span>两种信号意见不同的帧的人眼核对：每个视频每组随机抽 4 帧，共判了 145 帧，判的时候不显示是哪个信号标的。只有 PCA 标出的帧过半真错，只有 fitting 标出的帧九成都对。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-5:</span>Check by eye of the frames on which the two signals disagree: 4 frames per video and group drawn at random, 145 judged, the judge not told which signal flagged the frame. More than half of the frames flagged by the PCA alone are really wrong; nine in ten of those flagged by fitting alone are fine.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-5：</span>两种信号意见不同的帧的人眼盲判，每个视频每组随机 4 帧：只有 PCA 标的帧过半真错，只有 fitting 标的帧九成都对。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-5:</span>Blind check by eye of frames flagged by one signal only, 4 per video and group: over half of the PCA-only frames are wrong, nine in ten of the fitting-only frames are fine.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_pca_vs_labels.png" alt="The PCA finder against the number of labeled poses it is fitted on"></div>
-    <figcaption lang="zh"><span class="tag">图 9-6：</span>PCA 随它看到的标注数量变化，PCA 按主动学习的顺序用前 k 帧标注拟合。左：真值帧上，刚好找全错帧时误标的对帧比例，以及在一个固定阈值下误标的比例和找到的错帧数。右：整段视频上固定阈值标出的比例，灰线每个视频一条。标注少时底噪高，20 帧以后稳定；而刚好找全所需的阈值随标注数一直下降，所以阈值不能是固定的眼宽百分比。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-6:</span>The PCA finder against the number of labeled poses it saw, fitted on the first k labels in active-learning order. Left: on the truth frames, the share of right frames flagged when all wrong frames are found, and the share flagged and wrong frames found at one fixed threshold. Right: on the whole videos, the share flagged at that fixed threshold, one grey line per video. With few labels the background is high and settles after 20; the threshold that just finds all wrong frames keeps falling with the number of labels, so the threshold cannot be a fixed share of the eye width.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-6：</span>PCA 随它看到的标注数变化。左：真值帧上找全错帧所需的阈值，和一个固定阈值下的误标；右：整段视频上该固定阈值标出的比例，灰线每个视频一条。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-6:</span>The PCA against the number of labels it saw. Left: on the truth frames, the threshold needed to find all wrong frames and the misflags at one fixed threshold; right: share flagged on whole videos at that fixed threshold, one grey line per video.</figcaption>
   </figure>
   <div class="concl" lang="zh"><span class="tag">找错帧的结论：</span>fitting 和 PCA 都能找全错帧，但找到的不是同一批，两者互补；fitting 为主，PCA 为补。
     <ol>
@@ -1215,8 +1215,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
-    <figcaption lang="zh"><span class="tag">图 9-9：</span>三种找法下的修复，验收都是人工标注范围。左：23 帧错帧里被标出的、修好的、修后仍错的，下方是对的帧变差的数目。右：整段视频上修好的、标出未修的、标出但本来合理未动的比例，下方是标出的总比例。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-9:</span>The repair with each finder, acceptance = the human-label range throughout. Left: of the 23 wrong frames, flagged, repaired to good, still wrong after; below, right frames made worse. Right: on the whole videos, the shares repaired, flagged and not repaired, flagged but plausible and left alone; below, the share flagged in all.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-9：</span>三种找法下的修复，验收都是人工标注范围。左：23 帧错帧里被标出、修好、修后仍错的；右：整段视频上修好、标出未修、标出但本来合理的比例。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-9:</span>The repair with each finder, acceptance = the human-label range. Left: of the 23 wrong frames, flagged, repaired, still wrong; right: on whole videos, repaired, flagged and not repaired, flagged but plausible.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
