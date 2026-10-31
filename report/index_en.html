@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:49 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 14:52 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -863,11 +863,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
           <li>The line of the histogram in 9.1 (Figure 9-1): there a frame whose error exceeds 14% of the eye width is a wrong frame, here a frame whose farthest point deviates by more than 14% of the eye width is flagged; the same number with the same meaning.</li>
         </ul>
       </li>
-      <li><b>Threshold of the PCA = 3.9 × the median score of all frames of the video.</b>
+      <li><b>Threshold of the PCA = 3.9 × the video's median.</b> The rule has two numbers:
         <ul>
-          <li>Why per video: the scale of the PCA score drifts with the number of labels it saw. The score that just finds all wrong frames is 11.5% of the eye width with 10 labels, 6% with 20, 5% with 30; fixed to one share, video 18 gets 18% of its frames flagged (Figure 9-6).</li>
-          <li>Why the median: most frames of a video are normal, so the median is the video's own background, computed from the predictions without labels; as a multiple of the median the threshold no longer drifts with the number of labels.</li>
-          <li>How the multiple was set: on the truth frames. The lowest-scoring of the 23 wrong frames sits at 7.2 × its video's median; the fitting line at 14% is 1.84 times below its nearest wrong frame at 25.7%, and the PCA is widened by the same factor, 7.2 / 1.84 = 3.9. Every held-out video finds all of them; video 18 drops to 3%.</li>
+          <li>The median: computed per video, the median PCA score of all its frames. Most frames are normal, so it is the video's own background; it comes from the predictions, needs no labels, and is there for any new video. A fixed share of the eye width, as for fitting, will not do, because the size of the PCA score depends on how many training labels it saw (the share that just finds all wrong frames: 11.5% with 10 labels, 6% with 20, 5% with 30); one fixed share flags 18% of video 18, the multiple of its own median 3% (Figure 9-6).</li>
+          <li>3.9: one number shared by all videos, set once on the truth frames. Dividing each of the 23 wrong frames' scores by its video's median, the smallest is 7.2, so a threshold at 7.2 × the median just encloses all 23; widened by the same factor by which the fitting line at 14% sits below its nearest wrong frame at 25.7%, 1.84, that gives 7.2 / 1.84 = 3.9. Set on 18 videos and tested on the held-out 19th, it finds all of them in every round.</li>
         </ul>
       </li>
     </ol>
