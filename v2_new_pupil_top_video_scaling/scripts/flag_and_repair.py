@@ -17,6 +17,16 @@ Output folder videoNN_<accept> for fit (as before), videoNN_<finder>_<accept> fo
 (verification). With pca or either the outputs carry the extra columns pca_rel, flag_fit, flag_pca, finder; with fit
 they are unchanged. The acceptance test "fit" is only defined for the fitting finder.
 
+Points option (user, 2026-10-31 night): --points pupil (default) repairs pupil points only, as before (a frame whose
+over-threshold points include an eyelid or a corner is left flagged); --points all repairs every point: candidate
+points = every point over the threshold (fitting), the point with the largest residual whichever it is (PCA), the
+union (either); accepted by the two-step human-label range on the pupil quantities (unchanged) AND on the eight
+outline quantities of outline_region.py (corner distance, angle and midpoint against the video's medians; eyelid
+positions and opening in the frame's eye frame), each range with its own leave-one-video-out margin. A replaced corner
+moves the eye frame, so the pupil quantities are re-checked in the new frame. Only with --accept labelregion.
+Output folder gets the suffix _all; summary / whole_video / truth_frames carry a "points" column and per-point columns
+for all eight points.
+
 Decisions of 2026-10-30 (user): (1) errors and thresholds are measured in units of the eye width (median corner-to-corner
 distance of the plateau model's predictions, label-free), so the numbers carry over to another camera; (2) the only
 error line is results/error_tier/tier.csv (0.14 of the eye width): a truth frame above it is a wrong frame, every other
@@ -56,6 +66,7 @@ import pandas as pd
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 from acceptance_thresholds import eye_quantities, inside
+from outline_region import VideoRef, inside_outline, outline_quantities
 from second_peak_repair import BPS, P4, RES, Geometry, frame_rmse, load, peak2_pixels, pooled_bands, xy_frame
 from triggered_repair import repair_triggered
 
@@ -127,6 +138,29 @@ def candidates_either(dev, res, i, thr, thr_pca, flagged_fit, flagged_pca):
     return [b for b in P4 if any(b in c for c in sets)] if sets else None
 
 
+def candidates_all(dev, i, thr):
+    """--points all, fitting finder: every point over the threshold, outline points included."""
+    over = [b for b in BPS if dev[i, BPS.index(b)] > thr]
+    return over or None
+
+
+def candidates_pca_all(res, i):
+    """--points all, PCA finder: the point with the largest residual, whichever it is."""
+    r = np.nan_to_num(res[i], nan=-1)
+    return [BPS[int(np.argmax(r))]]
+
+
+def candidates_either_all(dev, res, i, thr, flagged_fit, flagged_pca):
+    sets = [c for c in ((candidates_all(dev, i, thr) if flagged_fit else None), (candidates_pca_all(res, i) if flagged_pca else None)) if c]
+    return [b for b in BPS if any(b in c for c in sets)] if sets else None
+
+
+def plausible(pts, G, R, R_out=None, ref=None):
+    """Two-step range test: pupil quantities inside the human-label range and, with --points all, the outline
+    quantities inside theirs."""
+    return inside(eye_quantities(pts, G.sign_lr, G.sign_tb), R) and (R_out is None or inside_outline(outline_quantities(pts, ref), R_out))
+
+
 def repair_fit(G, xy, p2, pm, dev, i, thr, flagged, cand_fn=None):
     if G.closed[i]:
         return "closed", (), xy_frame(xy, i)
@@ -144,7 +178,7 @@ def repair_fit(G, xy, p2, pm, dev, i, thr, flagged, cand_fn=None):
     return "repaired", tuple(cand), new
 
 
-def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None):
+def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None, R_out=None, ref=None):
     if G.closed[i]:
         return "closed", (), xy_frame(xy, i)
     if not flagged:
@@ -156,9 +190,9 @@ def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand
     for b in cand:
         new[b] = p2[b][i]
     if mode == "labelregion":
-        if inside(eye_quantities(xy_frame(xy, i), G.sign_lr, G.sign_tb), R):
+        if plausible(xy_frame(xy, i), G, R, R_out, ref):
             return "flagged_passes_check", (), xy_frame(xy, i)
-        ok = inside(eye_quantities(new, G.sign_lr, G.sign_tb), R)
+        ok = plausible(new, G, R, R_out, ref)
     elif mode == "conf":
         ok = min(peak2[b][i] for b in cand) >= cutv
     elif mode == "jump":
@@ -177,13 +211,15 @@ def main():
     ap.add_argument("--k-mad", type=float, default=5.0)
     ap.add_argument("--margin", type=float, default=None, help="labelregion only: widen the label range by this fraction; output folder videoNN_labelregion<margin*100>")
     ap.add_argument("--finder", choices=["fit", "pca", "either"], default="fit", help="which finder flags the frames (default fit, unchanged behaviour)")
+    ap.add_argument("--points", choices=["pupil", "all"], default="pupil", help="which points may be repaired (default pupil, unchanged behaviour)")
     ap.add_argument("--out", default=None, help="output folder override (verification only)")
     a = ap.parse_args()
     assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
+    assert a.points == "pupil" or a.accept == "labelregion", "--points all is only defined with --accept labelregion"
     thr = a.thr if a.thr is not None else float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_eye_widths)
     line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
     tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
-    out = Path(a.out) if a.out else OUT / (f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}")
+    out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else ""))
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
@@ -206,10 +242,12 @@ def main():
         flag_pca = pca_rel > thr_pca
         if a.finder == "pca":
             flag, cdev = flag_pca, pca_res
-            cand_fn = lambda i: candidates_pca(pca_res, i, thr_pca)  # noqa: E731
+            cand_fn = (lambda i: candidates_pca(pca_res, i, thr_pca)) if a.points == "pupil" else (lambda i: candidates_pca_all(pca_res, i))  # noqa: E731
         else:
             flag, cdev = flag_fit | flag_pca, np.fmax(dev / thr, pca_res / thr_pca)
-            cand_fn = lambda i: candidates_either(dev, pca_res, i, thr, thr_pca, bool(flag_fit[i]), bool(flag_pca[i]))  # noqa: E731
+            cand_fn = (lambda i: candidates_either(dev, pca_res, i, thr, thr_pca, bool(flag_fit[i]), bool(flag_pca[i]))) if a.points == "pupil" else (lambda i: candidates_either_all(dev, pca_res, i, thr, bool(flag_fit[i]), bool(flag_pca[i])))  # noqa: E731
+    if a.finder == "fit" and a.points == "all":
+        cand_fn = lambda i: candidates_all(dev, i, thr)  # noqa: E731
     worst = np.array(BPS)[np.nanargmax(np.nan_to_num(cdev, nan=-1), axis=1)]
     print(f"video {a.video}: {n} frames, eye width {G.Wm:.0f} px, finder {a.finder}: fit_o200_max > {thr:.3f} eye widths (≈ {thr * G.Wm:.0f} px)"
           + (f", pca > {thr_pca:.4f} eye widths (≈ {thr_pca * G.Wm:.0f} px)" if a.finder != "fit" else "") + f" flags {100 * flag.mean():.2f} %, acceptance = {tag}")
@@ -229,6 +267,11 @@ def main():
             w = R0["max"] - R0["min"]
             R = pd.DataFrame({"min": R0["min"] - a.margin * w, "max": R0["max"] + a.margin * w, "margin": a.margin})
         print(f"label region widened by margin {R.margin.iloc[0]:.2f}")
+    R_out, ref = None, None
+    if a.points == "all":
+        R_out = pd.read_csv(RES / "acceptance_thresholds" / "label_region_outline.csv").set_index("quantity")
+        ref = VideoRef(xy)
+        print(f"outline range (margin {R_out.margin.iloc[0]:.2f}) in use: all eight points may be repaired")
     peak2 = {b: H[f"{b}_peak2"].to_numpy(float) for b in BPS}
 
     status, reps, new_xy = [], [], {b: xy[b].copy() for b in BPS}
@@ -239,7 +282,7 @@ def main():
             st, rep, new = repair_triggered(G, xy, p2, i, a.k_mad, bool(flag[i]), worst[i])
             st = {"flagged_ok": "flagged_passes_check", "drop": "flagged_not_repaired"}.get(st, st)
         else:
-            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn)
+            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref)
         status.append(st)
         reps.append("+".join(rep))
         for b in rep:
@@ -250,7 +293,10 @@ def main():
                                            "flagged_both_pct": round(100 * (flag_fit & flag_pca).mean(), 2)}
     if a.finder != "fit":
         F["pca_rel"], F["flag_fit"], F["flag_pca"] = pca_rel, flag_fit, flag_pca
-    for b in P4:
+    PTS = BPS if a.points == "all" else P4
+    if a.points == "all":
+        extra["points"] = "all"
+    for b in PTS:
         F[f"{b}_moved_px"] = np.hypot(*(new_xy[b] - xy[b]).T)
     F.to_csv(out / "frames_all.csv.gz", index=False, float_format="%.4f")
     counts = {s: int((status == s).sum()) for s in STATUSES}
@@ -258,7 +304,7 @@ def main():
                        "flagged_pct": round(100 * flag.mean(), 2), "flagged_closed": int((flag & G.closed).sum()), **counts,
                        "repaired_pct": round(100 * counts["repaired"] / n, 2), "flagged_not_repaired_pct": round(100 * counts["flagged_not_repaired"] / n, 2),
                        "worst_not_pupil_among_flagged": int((flag & ~np.isin(worst, P4) & ~G.closed).sum()),
-                       **{f"repaired_{b}": int((F.points.str.contains(b).to_numpy() & (status == "repaired")).sum()) for b in P4}, **extra}])
+                       **{f"repaired_{b}": int((F.points.str.contains(b).to_numpy() & (status == "repaired")).sum()) for b in PTS}, **extra}])
     W.to_csv(out / "whole_video.csv", index=False)
     print(W.T.to_string())
 
@@ -271,7 +317,7 @@ def main():
              "error_before_px": rb, "error_after_px": ra, "rmse_file": hr.frame_rmse_px, "flag": bool(flag[f]), "fit_rel": fit[f], "worst_point": worst[f]}
         if a.finder != "fit":
             r.update({"pca_rel": pca_rel[f], "flag_fit": bool(flag_fit[f]), "flag_pca": bool(flag_pca[f]), "finder": a.finder})
-        for b in P4:
+        for b in PTS:
             hx, hy = hr[f"human_{b}_x"], hr[f"human_{b}_y"]
             r[f"{b}_before"] = np.hypot(before[b][0] - hx, before[b][1] - hy) / G.Wm
             r[f"{b}_after"] = np.hypot(after[b][0] - hx, after[b][1] - hy) / G.Wm
