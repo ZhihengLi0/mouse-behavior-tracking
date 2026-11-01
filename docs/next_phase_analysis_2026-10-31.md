@@ -286,3 +286,10 @@ the crop), pupil points moved in the same frames right in 18 of 32 judged with 1
 moved for nothing. So the outline repair itself works at the same rate as the pupil repair did (87 %); the cost is
 that the frame-level replacement moves pupil candidates that were fine. Next change: replace the smallest set of
 candidate points that makes the frame pass (outline points first), instead of all candidates at once.
+
+Smallest-subset replacement (`--replace smallest`): the outline candidates are tried first and the smallest set of
+candidate points that passes both ranges is put in. On the truth frames 15 of 23 wrong frames are repaired to good
+(12 with the whole replacement), 4 stay flagged, 1 good frame is made worse as before; on the whole videos repaired
+1.10 %, still flagged 0.51 %, and 805 of the frames repaired by both variants keep a pupil point the whole
+replacement would have moved. This is the pipeline to carry into self-training:
+`--finder either --accept labelregion --points all --replace smallest`.

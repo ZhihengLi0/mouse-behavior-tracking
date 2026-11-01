@@ -198,3 +198,13 @@ and were moved for nothing. These are frames the pupil-only run left flagged (an
 with all points allowed the frame fails the outline range, every candidate point is replaced at once, and a pupil
 candidate that was fine moves with the rest. The fix to test is the subset fallback: replace the outline candidates
 first and keep a pupil candidate only if the frame does not pass without moving it.
+
+**Smallest subset (`--replace smallest`, folders `videoNN_either_labelregion_all_smallest/`).** Instead of replacing
+every candidate at once, the smallest subset of candidate points that makes the frame pass both ranges is put in,
+outline points tried first, singles before pairs. Truth frames: 15 of 23 wrong frames repaired to good (12 before),
+still flagged 4 (7), good frames made worse 1 (1); the three gained are the eyelid frames of video 2 (68086, 68379)
+and video 4 (70429). Whole videos: repaired 1.10 % (0.96 %), still flagged 0.51 % (0.66 %), left alone 2.11 %;
+1878 frames repaired that the whole replacement sent back, none lost; of the 12,517 frames both variants repair, 805
+keep a pupil point the whole replacement would have moved (841 points). Points put in: 11,571 pupil, 1295 eyelid,
+2293 corner. This is the variant to carry forward; the by-eye count of pupil points moved for nothing (10 of 32)
+was taken on the whole replacement and should be repeated on this one.
