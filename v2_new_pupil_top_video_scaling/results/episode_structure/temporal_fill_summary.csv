@@ -1,0 +1,5 @@
+route,wrong,frames,error_before_median,error_before_wrong_after,error_before_nan,error_after_peak2_median,error_after_peak2_wrong_after,error_after_peak2_nan,interp_median,interp_wrong_after,interp_nan,nearest_median,nearest_wrong_after,nearest_nan,forecast_median,forecast_wrong_after,forecast_nan,interp_all8_median,interp_all8_wrong_after,interp_all8_nan
+fit,False,28.0,0.0528,0.0,0.0,0.0528,0.0,0.0,0.0501,1.0,0.0,0.0519,1.0,0.0,0.0811,3.0,0.0,0.0401,1.0,0.0
+fit,True,19.0,0.2692,19.0,0.0,0.0557,7.0,0.0,0.0463,2.0,0.0,0.0465,2.0,0.0,0.0868,5.0,0.0,0.0384,1.0,0.0
+pca,False,14.0,0.0482,0.0,0.0,0.0458,0.0,0.0,0.0375,0.0,0.0,0.0342,0.0,0.0,0.0376,0.0,0.0,0.0392,0.0,0.0
+pca,True,19.0,0.2692,19.0,0.0,0.0714,8.0,0.0,0.0544,6.0,0.0,0.0559,6.0,0.0,0.0992,8.0,0.0,0.0393,1.0,0.0
