@@ -181,3 +181,20 @@ PCA candidate is now sent back, because the eyelid's second peak fails the outli
 reverted. Whole videos: the still-flagged share halves, most of it moving to "plausible as it is", the rest repaired.
 By-eye check of the outline repairs: `scripts/outline_review.py` → `outline_review/` (page and crops local,
 `items.csv` committed), verdicts pending.
+
+By-eye verdicts (2026-10-31 night, `outline_review/outline_review_result.csv`, `scripts/outline_review_eval.py`): 90
+repaired frames with an eyelid or corner among the replaced points, 5 per video, one verdict per replaced point, 139
+points.
+
+| replaced point | right | closer, not right | not better | was right, moved for nothing | cannot tell |
+|---|---|---|---|---|---|
+| eyelid (43) | 39 | 2 | 0 | 0 | 2 |
+| corner (53) | 31 | 2 | 0 | 2 | 18 |
+| pupil, in the same frames (43) | 18 | 4 | 0 | 10 | 11 |
+
+Eyelid repairs are right in 39 of 41 judged; corner repairs in 31 of 35 judged, but a third of the corners could not
+be judged from the crop. The pupil points moved in these frames are the weak part: 10 of 32 judged were right before
+and were moved for nothing. These are frames the pupil-only run left flagged (an outline point over the threshold);
+with all points allowed the frame fails the outline range, every candidate point is replaced at once, and a pupil
+candidate that was fine moves with the rest. The fix to test is the subset fallback: replace the outline candidates
+first and keep a pupil candidate only if the frame does not pass without moving it.

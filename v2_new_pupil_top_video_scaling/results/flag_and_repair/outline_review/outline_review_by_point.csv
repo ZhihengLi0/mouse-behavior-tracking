@@ -1,0 +1,140 @@
+item,video,frame,point,kind,episode_len,verdict
+video00_f009640,0,9640,pupil_left,pupil,23,"already right before, should not have moved"
+video00_f009640,0,9640,eyelid_top,eyelid,23,yes
+video00_f011581,0,11581,pupil_bottom,pupil,25,"already right before, should not have moved"
+video00_f011581,0,11581,eyelid_top,eyelid,25,yes
+video00_f011581,0,11581,eye_temporal_corner,corner,25,yes
+video00_f014004,0,14004,pupil_left,pupil,9,"already right before, should not have moved"
+video00_f014004,0,14004,eyelid_top,eyelid,9,yes
+video00_f016319,0,16319,pupil_bottom,pupil,2,yes
+video00_f016319,0,16319,eyelid_bottom,eyelid,2,yes
+video00_f016466,0,16466,pupil_bottom,pupil,3,"already right before, should not have moved"
+video00_f016466,0,16466,eye_temporal_corner,corner,3,yes
+video01_f003206,1,3206,eye_nasal_corner,corner,13,yes
+video01_f005563,1,5563,eye_nasal_corner,corner,1,yes
+video01_f006294,1,6294,pupil_bottom,pupil,41,"already right before, should not have moved"
+video01_f006294,1,6294,eye_temporal_corner,corner,41,yes
+video01_f047592,1,47592,eye_nasal_corner,corner,2,yes
+video01_f049283,1,49283,eye_nasal_corner,corner,1,yes
+video02_f048305,2,48305,eyelid_top,eyelid,1,yes
+video02_f058028,2,58028,eye_nasal_corner,corner,1,cannot tell
+video02_f059597,2,59597,eye_temporal_corner,corner,1,yes
+video02_f065472,2,65472,eye_temporal_corner,corner,6,yes
+video02_f067619,2,67619,eye_nasal_corner,corner,2,yes
+video03_f001268,3,1268,eyelid_bottom,eyelid,6,yes
+video03_f001974,3,1974,pupil_left,pupil,32,yes
+video03_f001974,3,1974,eye_nasal_corner,corner,32,yes
+video03_f002073,3,2073,eye_nasal_corner,corner,4,cannot tell
+video03_f002716,3,2716,eye_nasal_corner,corner,3,yes
+video03_f018236,3,18236,eye_nasal_corner,corner,1,cannot tell
+video04_f000131,4,131,eyelid_top,eyelid,1,yes
+video04_f002163,4,2163,eye_temporal_corner,corner,3,yes
+video04_f002188,4,2188,eye_temporal_corner,corner,12,yes
+video04_f002635,4,2635,eyelid_top,eyelid,1,yes
+video04_f037032,4,37032,eyelid_bottom,eyelid,5,yes
+video05_f036323,5,36323,eye_temporal_corner,corner,2,yes
+video05_f036413,5,36413,eye_temporal_corner,corner,19,cannot tell
+video05_f036485,5,36485,eye_temporal_corner,corner,6,yes
+video05_f044336,5,44336,eye_temporal_corner,corner,1,cannot tell
+video05_f056796,5,56796,eye_temporal_corner,corner,1,cannot tell
+video06_f008405,6,8405,eyelid_top,eyelid,1,yes
+video06_f027171,6,27171,eye_nasal_corner,corner,13,yes
+video06_f027272,6,27272,pupil_left,pupil,1,yes
+video06_f027272,6,27272,eye_nasal_corner,corner,1,yes
+video06_f037964,6,37964,eye_nasal_corner,corner,1,yes
+video06_f038076,6,38076,eye_nasal_corner,corner,1,yes
+video07_f000049,7,49,pupil_top,pupil,2,yes
+video07_f000049,7,49,eyelid_top,eyelid,2,yes
+video07_f009443,7,9443,eyelid_top,eyelid,1,yes
+video07_f016406,7,16406,eye_temporal_corner,corner,7,cannot tell
+video07_f022179,7,22179,pupil_top,pupil,36,yes
+video07_f022179,7,22179,pupil_left,pupil,36,yes
+video07_f022179,7,22179,eye_nasal_corner,corner,36,yes
+video07_f022179,7,22179,eye_temporal_corner,corner,36,yes
+video07_f022607,7,22607,eye_temporal_corner,corner,1,yes
+video08_f010972,8,10972,pupil_bottom,pupil,5,cannot tell
+video08_f010972,8,10972,eye_nasal_corner,corner,5,cannot tell
+video08_f029513,8,29513,pupil_bottom,pupil,8,cannot tell
+video08_f029513,8,29513,eye_nasal_corner,corner,8,cannot tell
+video08_f031679,8,31679,eye_temporal_corner,corner,1,cannot tell
+video08_f044864,8,44864,eyelid_bottom,eyelid,4,yes
+video08_f062852,8,62852,eyelid_bottom,eyelid,4,yes
+video09_f008629,9,8629,pupil_bottom,pupil,9,cannot tell
+video09_f008629,9,8629,eyelid_bottom,eyelid,9,yes
+video09_f008700,9,8700,pupil_left,pupil,26,"already right before, should not have moved"
+video09_f008700,9,8700,eye_nasal_corner,corner,26,yes
+video09_f028148,9,28148,eyelid_bottom,eyelid,1,yes
+video09_f040168,9,40168,pupil_bottom,pupil,2,yes
+video09_f040168,9,40168,eyelid_bottom,eyelid,2,yes
+video09_f048586,9,48586,eye_nasal_corner,corner,2,yes
+video10_f007648,10,7648,eye_nasal_corner,corner,4,cannot tell
+video10_f007757,10,7757,pupil_top,pupil,5,cannot tell
+video10_f007757,10,7757,eye_nasal_corner,corner,5,cannot tell
+video10_f037908,10,37908,eye_temporal_corner,corner,1,yes
+video10_f043041,10,43041,pupil_top,pupil,7,yes
+video10_f043041,10,43041,pupil_right,pupil,7,yes
+video10_f043041,10,43041,eye_nasal_corner,corner,7,"already right before, should not have moved"
+video10_f043132,10,43132,pupil_top,pupil,7,cannot tell
+video10_f043132,10,43132,eye_nasal_corner,corner,7,cannot tell
+video11_f002849,11,2849,eye_temporal_corner,corner,4,"better, but still not right"
+video11_f003604,11,3604,pupil_top,pupil,7,"already right before, should not have moved"
+video11_f003604,11,3604,eye_nasal_corner,corner,7,"better, but still not right"
+video11_f005456,11,5456,eye_temporal_corner,corner,5,cannot tell
+video11_f021098,11,21098,eye_temporal_corner,corner,1,cannot tell
+video11_f033586,11,33586,pupil_top,pupil,5,yes
+video11_f033586,11,33586,eye_nasal_corner,corner,5,yes
+video12_f009565,12,9565,eyelid_top,eyelid,5,yes
+video12_f016095,12,16095,pupil_right,pupil,2,yes
+video12_f016095,12,16095,eyelid_top,eyelid,2,yes
+video12_f019516,12,19516,eyelid_top,eyelid,1,yes
+video12_f027023,12,27023,eyelid_top,eyelid,1,yes
+video12_f036243,12,36243,eyelid_bottom,eyelid,2,yes
+video13_f021503,13,21503,pupil_top,pupil,4,yes
+video13_f021503,13,21503,eye_temporal_corner,corner,4,yes
+video13_f029158,13,29158,pupil_top,pupil,1,cannot tell
+video13_f029158,13,29158,eye_temporal_corner,corner,1,cannot tell
+video13_f050351,13,50351,pupil_top,pupil,3,yes
+video13_f050351,13,50351,pupil_right,pupil,3,yes
+video13_f050351,13,50351,eyelid_bottom,eyelid,3,yes
+video13_f055447,13,55447,eyelid_top,eyelid,1,yes
+video13_f062009,13,62009,eyelid_top,eyelid,1,yes
+video14_f021289,14,21289,eyelid_top,eyelid,4,yes
+video14_f021827,14,21827,pupil_bottom,pupil,38,yes
+video14_f021827,14,21827,pupil_right,pupil,38,"already right before, should not have moved"
+video14_f021827,14,21827,eyelid_bottom,eyelid,38,yes
+video14_f021827,14,21827,eye_temporal_corner,corner,38,yes
+video14_f022240,14,22240,eye_temporal_corner,corner,80,yes
+video14_f022604,14,22604,pupil_top,pupil,20,"already right before, should not have moved"
+video14_f022604,14,22604,pupil_left,pupil,20,yes
+video14_f022604,14,22604,eyelid_top,eyelid,20,yes
+video14_f022783,14,22783,eyelid_top,eyelid,6,yes
+video15_f019545,15,19545,eyelid_top,eyelid,1,yes
+video15_f035496,15,35496,eyelid_top,eyelid,12,yes
+video15_f035496,15,35496,eye_temporal_corner,corner,12,"already right before, should not have moved"
+video15_f037051,15,37051,pupil_bottom,pupil,8,"better, but still not right"
+video15_f037051,15,37051,pupil_right,pupil,8,cannot tell
+video15_f037051,15,37051,eyelid_top,eyelid,8,cannot tell
+video15_f037051,15,37051,eyelid_bottom,eyelid,8,cannot tell
+video15_f037051,15,37051,eye_nasal_corner,corner,8,cannot tell
+video15_f037294,15,37294,pupil_top,pupil,3,"better, but still not right"
+video15_f037294,15,37294,eyelid_top,eyelid,3,"better, but still not right"
+video15_f051229,15,51229,pupil_top,pupil,2,"better, but still not right"
+video15_f051229,15,51229,eyelid_bottom,eyelid,2,yes
+video17_f002029,17,2029,pupil_left,pupil,8,"already right before, should not have moved"
+video17_f002029,17,2029,pupil_right,pupil,8,yes
+video17_f002029,17,2029,eyelid_top,eyelid,8,yes
+video17_f002336,17,2336,eye_temporal_corner,corner,6,cannot tell
+video17_f002988,17,2988,eyelid_top,eyelid,1,"better, but still not right"
+video17_f038500,17,38500,eyelid_top,eyelid,1,yes
+video17_f056466,17,56466,eyelid_bottom,eyelid,2,yes
+video18_f005577,18,5577,pupil_top,pupil,10,yes
+video18_f005577,18,5577,eyelid_top,eyelid,10,yes
+video18_f006252,18,6252,pupil_right,pupil,18,cannot tell
+video18_f006252,18,6252,eye_nasal_corner,corner,18,yes
+video18_f033692,18,33692,pupil_top,pupil,2,"better, but still not right"
+video18_f033692,18,33692,pupil_right,pupil,2,cannot tell
+video18_f033692,18,33692,eyelid_top,eyelid,2,yes
+video18_f056449,18,56449,pupil_bottom,pupil,1,cannot tell
+video18_f056449,18,56449,pupil_left,pupil,1,cannot tell
+video18_f056449,18,56449,eyelid_bottom,eyelid,1,yes
+video18_f062356,18,62356,eyelid_bottom,eyelid,1,yes

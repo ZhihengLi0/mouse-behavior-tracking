@@ -279,3 +279,10 @@ are put in. A by-eye page of the outline repairs is prepared (`results/flag_and_
 pending. One refinement worth testing: when the full replacement fails the range, fall back to the subsets of the
 candidate points (single points, then pairs) and accept the smallest that passes; the lost frame of video 4 would be
 recovered.
+
+By-eye verdicts on the all-point repair (90 frames, 139 replaced points, `results/flag_and_repair/outline_review/`):
+eyelid points right in 39 of 41 judged, corner points right in 31 of 35 judged (18 of 53 could not be judged from
+the crop), pupil points moved in the same frames right in 18 of 32 judged with 10 that were right before and were
+moved for nothing. So the outline repair itself works at the same rate as the pupil repair did (87 %); the cost is
+that the frame-level replacement moves pupil candidates that were fine. Next change: replace the smallest set of
+candidate points that makes the frame pass (outline points first), instead of all candidates at once.
