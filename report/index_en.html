@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 17:03 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-10-31 20:20 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -947,7 +947,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   
   <div class="text" lang="en">
-    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus a small offset inside it, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the pupil edge usually still holds a local high cell, at least 3 cells away from the highest: the second peak. The repair moves the thrown point to the second peak, and the check then decides whether that place looks like a pupil point. Figure 9-7 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
+    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus an offset inside the cell that the network outputs as well, so it is precise to the pixel rather than to 8 px, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the pupil edge usually still holds a local high cell, at least 3 cells away from the highest: the second peak. The repair moves the thrown point to the second peak, and the check then decides whether that place looks like a pupil point. The second peak is known only as a cell, the network's offset holds only for the highest cell, so a repaired coordinate is precise to the cell, within half a cell, which does not matter for a right-or-wrong decision at the scale of tens of px. Figure 9-7 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
