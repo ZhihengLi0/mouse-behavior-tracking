@@ -155,3 +155,29 @@ jump 4 / 13, 4. The ranking is the one of the fitting route.
 `truth_summary_all.csv`, `totals.csv`, `comparison.csv`, `touched_structure.csv`, `error_before_after.csv`, `share_per_video.png`, `error_before_after.png`,
 `spotcheck_sample.csv`; `spotcheck_review/`: `items.csv`, `spotcheck_review_verdicts.csv`, `spotcheck_review_result.{csv,png}`, `heatmap_examples.png` (`scripts/heatmap_example_figure.py`: three repaired frames with the full heatmap of the thrown point, both peaks marked), `review_examples.jpg` (`scripts/review_examples_figure.py`: before / after pairs of judged frames); page and crops local only. Threshold and line: `results/error_tier/`, `results/fit_threshold/`,
 `results/acceptance_thresholds/`.
+
+## All eight points (2026-10-31 night)
+
+The repair above touches pupil points only: a frame whose over-threshold points include an eyelid or a corner is left
+flagged. `flag_and_repair.py --points all` (default `pupil`, old outputs byte-identical) repairs every point:
+candidates = every point over the threshold (fitting), the point with the largest residual whichever it is (PCA), the
+union (either); accepted by the two-step human-label range on the pupil quantities and on eight outline quantities
+(`scripts/outline_region.py` → `results/acceptance_thresholds/label_region_outline.csv`: corner distance, angle and
+midpoint against the video's label-free medians, eyelid positions and opening in the frame's eye frame; own
+leave-one-video-out margin 0.23). Folders `videoNN_either_labelregion_all/`; comparison
+`scripts/full_repair_comparison.py` → `all_videos/full_repair.csv`, `full_repair_by_video.csv`, `full_repair.png`.
+
+| | pupil points only | all eight points |
+|---|---|---|
+| 23 wrong truth frames: flagged / repaired to good / still flagged / closed | 23 / 12 / 7 / 4 | 23 / 12 / 7 / 4 |
+| 40 right truth frames flagged: repaired / made worse / left alone as plausible | 2 / 1 / 32 | 2 / 1 / 38 |
+| whole videos: repaired / still flagged / left alone as plausible (% of frames) | 0.80 / 1.18 / 1.74 | 0.96 / 0.66 / 2.11 |
+| points put in: pupil / eyelid / corner | 11072 / 0 / 0 | 11140 / 959 / 1916 |
+
+On the truth frames the two runs differ on eight frames: six good frames whose corner tripped the finder are now
+judged plausible as they are and left alone instead of staying flagged; one wrong eyelid frame (video 2, 68086) is
+repaired to good; one wrong frame (video 4, 62186, eyelid_bottom worst) that the pupil-only run repaired through its
+PCA candidate is now sent back, because the eyelid's second peak fails the outline range and the whole replacement is
+reverted. Whole videos: the still-flagged share halves, most of it moving to "plausible as it is", the rest repaired.
+By-eye check of the outline repairs: `scripts/outline_review.py` → `outline_review/` (page and crops local,
+`items.csv` committed), verdicts pending.

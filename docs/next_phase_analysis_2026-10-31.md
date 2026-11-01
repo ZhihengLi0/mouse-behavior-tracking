@@ -264,3 +264,18 @@ Findings:
   repaired position (with the acceptance test unchanged), and how the anchors are guarded; then run it on the 19
   videos and re-judge a spot check by eye.
 - Direction 3: decide whether to run the pilot above on videos 1, 8 and 7.
+
+## Addendum, same night: the repair extended to all eight points
+
+Decision (user): the fixed pipeline for self-training is finder = fitting or PCA (union), repair = second peak,
+acceptance = two-step human-label range, and the repair is extended from the four pupil points to all eight
+(`flag_and_repair.py --points all`; outline range from `scripts/outline_region.py`, margin 0.23 by leave-one-video-out).
+Results on the 19 videos (`results/flag_and_repair/all_videos/full_repair.csv`, `full_repair.png`): the truth-frame
+numbers do not move (12 of 23 wrong frames repaired to good, 1 good frame made worse), one wrong eyelid frame is gained
+and one wrong frame is lost because its eyelid's second peak fails the outline range and the whole replacement is
+reverted; on the whole videos the still-flagged share falls from 1.18 % to 0.66 %, mostly into "plausible as it is,
+left alone" (1.74 % to 2.11 %) and partly into repaired (0.80 % to 0.96 %); 959 eyelid points and 1916 corner points
+are put in. A by-eye page of the outline repairs is prepared (`results/flag_and_repair/outline_review/`), verdicts
+pending. One refinement worth testing: when the full replacement fails the range, fall back to the subsets of the
+candidate points (single points, then pairs) and accept the smallest that passes; the lost frame of video 4 would be
+recovered.
