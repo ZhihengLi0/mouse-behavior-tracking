@@ -1,0 +1,5 @@
+point,frames,median_pct,p90_pct,over_line
+pupil_top,1286,2.27,6.83,4
+pupil_bottom,1288,0.92,4.31,4
+pupil_left,1286,0.95,4.78,43
+pupil_right,1289,1.23,4.62,10
