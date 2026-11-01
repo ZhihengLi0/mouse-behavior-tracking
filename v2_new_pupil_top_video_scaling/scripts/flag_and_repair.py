@@ -26,6 +26,10 @@ positions and opening in the frame's eye frame), each range with its own leave-o
 moves the eye frame, so the pupil quantities are re-checked in the new frame. Only with --accept labelregion.
 Output folder gets the suffix _all; summary / whole_video / truth_frames carry a "points" column and per-point columns
 for all eight points.
+--replace whole (default) replaces every candidate point at once and accepts or reverts the frame; --replace smallest
+(--points all only; by-eye check of 2026-10-31 night: 10 of 32 judged pupil points moved together with an outline
+point were right before) replaces the smallest subset of the candidate points that makes the frame pass, outline
+points tried first, then pupil points, singles before pairs; folder suffix _all_smallest.
 
 Decisions of 2026-10-30 (user): (1) errors and thresholds are measured in units of the eye width (median corner-to-corner
 distance of the plateau model's predictions, label-free), so the numbers carry over to another camera; (2) the only
@@ -59,6 +63,7 @@ Outputs in results/flag_and_repair/videoNN_<accept>[<margin>]/: summary.csv (tru
 truth_frames.csv, frames_all.csv.gz (every frame, local only). Nothing existing is modified."""
 import argparse
 import warnings
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -178,12 +183,26 @@ def repair_fit(G, xy, p2, pm, dev, i, thr, flagged, cand_fn=None):
     return "repaired", tuple(cand), new
 
 
-def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None, R_out=None, ref=None):
+def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None, R_out=None, ref=None, smallest=False):
     if G.closed[i]:
         return "closed", (), xy_frame(xy, i)
     if not flagged:
         return "ok", (), xy_frame(xy, i)
     cand = cand_fn(i) if cand_fn else candidates(dev, i, thr)
+    if smallest:
+        if not cand:
+            return "flagged_not_repaired", (), xy_frame(xy, i)
+        if plausible(xy_frame(xy, i), G, R, R_out, ref):
+            return "flagged_passes_check", (), xy_frame(xy, i)
+        pool = [b for b in cand if b not in P4 and np.isfinite(p2[b][i]).all()] + [b for b in cand if b in P4 and np.isfinite(p2[b][i]).all()]
+        for k in range(1, len(pool) + 1):
+            for sub in combinations(pool, k):
+                new = xy_frame(xy, i)
+                for b in sub:
+                    new[b] = p2[b][i]
+                if plausible(new, G, R, R_out, ref):
+                    return "repaired", tuple(sub), new
+        return "flagged_not_repaired", (), xy_frame(xy, i)
     if not cand or any(not np.isfinite(p2[b][i]).all() for b in cand):
         return "flagged_not_repaired", (), xy_frame(xy, i)
     new = xy_frame(xy, i)
@@ -212,14 +231,16 @@ def main():
     ap.add_argument("--margin", type=float, default=None, help="labelregion only: widen the label range by this fraction; output folder videoNN_labelregion<margin*100>")
     ap.add_argument("--finder", choices=["fit", "pca", "either"], default="fit", help="which finder flags the frames (default fit, unchanged behaviour)")
     ap.add_argument("--points", choices=["pupil", "all"], default="pupil", help="which points may be repaired (default pupil, unchanged behaviour)")
+    ap.add_argument("--replace", choices=["whole", "smallest"], default="whole", help="--points all only: replace every candidate at once (default) or the smallest subset that passes")
     ap.add_argument("--out", default=None, help="output folder override (verification only)")
     a = ap.parse_args()
+    assert a.replace == "whole" or a.points == "all", "--replace smallest is only defined with --points all"
     assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
     assert a.points == "pupil" or a.accept == "labelregion", "--points all is only defined with --accept labelregion"
     thr = a.thr if a.thr is not None else float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_eye_widths)
     line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
     tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
-    out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else ""))
+    out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else "") + ("_smallest" if a.replace == "smallest" else ""))
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
@@ -282,7 +303,7 @@ def main():
             st, rep, new = repair_triggered(G, xy, p2, i, a.k_mad, bool(flag[i]), worst[i])
             st = {"flagged_ok": "flagged_passes_check", "drop": "flagged_not_repaired"}.get(st, st)
         else:
-            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref)
+            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref, a.replace == "smallest")
         status.append(st)
         reps.append("+".join(rep))
         for b in rep:
@@ -296,6 +317,7 @@ def main():
     PTS = BPS if a.points == "all" else P4
     if a.points == "all":
         extra["points"] = "all"
+        extra["replace"] = a.replace
     for b in PTS:
         F[f"{b}_moved_px"] = np.hypot(*(new_xy[b] - xy[b]).T)
     F.to_csv(out / "frames_all.csv.gz", index=False, float_format="%.4f")

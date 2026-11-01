@@ -20,7 +20,8 @@ from second_peak_repair import BPS, P4, PL, RES  # noqa: E402
 FR = RES / "flag_and_repair"
 OUT = FR / "all_videos"
 LINE, WORSE = 0.14, 0.01
-RUNS = {"pupil": "video{v:02d}_either_labelregion", "all": "video{v:02d}_either_labelregion_all"}
+RUNS = {"pupil": "video{v:02d}_either_labelregion", "all": "video{v:02d}_either_labelregion_all", "smallest": "video{v:02d}_either_labelregion_all_smallest"}
+NAMES = {"pupil": "pupil points only", "all": "all eight points,\nevery candidate at once", "smallest": "all eight points,\nsmallest subset that passes"}
 KIND = {b: ("pupil" if b.startswith("pupil") else "eyelid" if b.startswith("eyelid") else "corner") for b in BPS}
 
 
@@ -63,19 +64,25 @@ def main():
     Tt.to_csv(OUT / "full_repair.csv")
     print(Tt.T.to_string())
     A.round(4).to_csv(OUT / "full_repair_truth_frames.csv", index=False)
-    chg = A[(A.run == "all")].merge(A[A.run == "pupil"][["video", "frame", "status", "error_after"]], on=["video", "frame"], suffixes=("", "_pupil"))
-    chg = chg[(chg.status != chg.status_pupil) | (np.abs(chg.error_after - chg.error_after_pupil) > 1e-6)]
-    print("\ntruth frames whose outcome differs between the two runs:")
-    print(chg[["video", "frame", "worst_point", "error_before", "status_pupil", "error_after_pupil", "status", "points", "error_after"]].round(3).to_string(index=False))
+    base = A[A.run == "pupil"].set_index(["video", "frame"])
+    chg = []
+    for run in [r for r in RUNS if r != "pupil"]:
+        o = A[A.run == run].set_index(["video", "frame"]).join(base[["status", "error_after"]], rsuffix="_pupil")
+        o = o[(o.status != o.status_pupil) | ((o.error_after - o.error_after_pupil).abs() > 1e-6)]
+        chg.append(o.reset_index())
+    chg = pd.concat(chg, ignore_index=True)
+    print("\ntruth frames whose outcome differs from the pupil-only run:")
+    print(chg[["run", "video", "frame", "worst_point", "error_before", "status_pupil", "error_after_pupil", "status", "points", "error_after"]].round(3).to_string(index=False))
     chg.round(4).to_csv(OUT / "full_repair_changed_truth_frames.csv", index=False)
 
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.4), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(16, 4.6), constrained_layout=True)
     ax = axes[0]
-    x = np.arange(2)
+    x = np.arange(len(RUNS))
     bw = 0.38
+    labels = [NAMES[r] for r in RUNS]
     cols = {"pupil": "#9bb7d4", "eyelid": "#7fb069", "corner": "#e0a458"}
     for j, run in enumerate(RUNS):
         bottom = 0
@@ -85,7 +92,7 @@ def main():
             bottom += n
         ax.text(j, bottom / 2, f"{bottom} of {Tt.loc[run, 'wrong_before']}", ha="center", va="center", fontsize=10, color="white")
     ax.set_xticks(x)
-    ax.set_xticklabels(["pupil points only", "all eight points"])
+    ax.set_xticklabels(labels, fontsize=8)
     ax.set_ylabel("wrong truth frames repaired to good")
     ax.set_title("The 23 wrong truth frames", pad=10)
     ax.legend(frameon=False, fontsize=8)
@@ -94,7 +101,7 @@ def main():
         ax.bar(j - bw / 2, Tt.loc[run, "good_repaired"], width=bw, color="#2f6db3", label="good frames repaired" if j == 0 else None)
         ax.bar(j + bw / 2, Tt.loc[run, "good_made_worse"], width=bw, color="#d1495b", label="of which made worse" if j == 0 else None)
     ax.set_xticks(x)
-    ax.set_xticklabels(["pupil points only", "all eight points"])
+    ax.set_xticklabels(labels, fontsize=8)
     ax.set_title(f"The {Tt.loc['pupil', 'good_flagged']} / {Tt.loc['all', 'good_flagged']} right truth frames the finders flagged")
     ax.legend(frameon=False, fontsize=8)
     ax = axes[2]
@@ -104,7 +111,7 @@ def main():
             ax.bar(j, Tt.loc[run, c], bottom=bottom, color=col, width=0.6, label=lab if j == 0 else None)
             bottom += Tt.loc[run, c]
     ax.set_xticks(x)
-    ax.set_xticklabels(["pupil points only", "all eight points"])
+    ax.set_xticklabels(labels, fontsize=8)
     ax.set_ylabel("% of all frames, 19 videos")
     ax.set_title("Whole videos: what happens to a flagged frame")
     ax.legend(frameon=False, fontsize=8)
