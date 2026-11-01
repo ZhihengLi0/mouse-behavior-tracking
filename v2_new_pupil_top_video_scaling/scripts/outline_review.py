@@ -97,12 +97,16 @@ def render(v, rows):
                 src = p2[b][f] if rep else xy[b][f]
                 px, py = (src - box[:2]) * sc
                 col = (80, 120, 255) if rep else (255, 60, 60)
+                if rep:  # a thin line from where the point was to where the repair put it
+                    ox, oy = (xy[b][f] - box[:2]) * sc
+                    dr.line([ox, oy, px, py], fill=(80, 120, 255), width=1)
+                    dr.ellipse([ox - 2, oy - 2, ox + 2, oy + 2], fill=(255, 60, 60))
                 if 0 <= px < PW and 0 <= py < PH:
                     if b in OUTLINE:
                         dr.rectangle([px - 5, py - 5, px + 5, py + 5], outline=col, width=2)
                     else:
                         dr.ellipse([px - 5, py - 5, px + 5, py + 5], outline=col, width=2)
-                    if rep:
+                    if rep or (not after and r.status == "repaired" and b in pts):
                         dr.text((min(px + 7, PW - 90), max(py - 16, 2)), SHORT[b], fill=col, font=FONT)
                 else:
                     cx0, cy0 = PW / 2, PH / 2
@@ -118,7 +122,7 @@ def render(v, rows):
 
         panels = [("frame as it is", raw)]
         if r.status == "repaired":
-            panels += [("BEFORE: red = model's 8 points (circle pupil, square outline)", panel(False)), (f"AFTER: blue = put in by the repair ({', '.join(pts)})", panel(True))]
+            panels += [("BEFORE: red = model's 8 points (circle pupil, square outline); named = will be moved", panel(False)), (f"AFTER: blue = put in by the repair ({', '.join(pts)})", panel(True))]
         else:
             panels += [("red = model's 8 points, not repaired (circle pupil, square outline)", panel(False))]
         S = Image.new("RGB", (len(panels) * PW + 10 * (len(panels) - 1), PH + 22), (255, 255, 255))
