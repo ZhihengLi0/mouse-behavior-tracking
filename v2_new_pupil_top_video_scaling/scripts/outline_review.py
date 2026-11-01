@@ -10,7 +10,7 @@ one per episode (frames within 5 of each other form an episode), random episodes
 crops: the frame as it is; BEFORE (red = the model's 8 points); for a repaired frame AFTER (blue = every point the
 repair put in, pupil or outline). Questions:
   repaired frame      Are the blue points on the right place (pupil edge, eyelid, eye corner)?
-                      yes / better, but still not right / no / cannot tell
+                      yes / better, but still not right / no / already right before, should not have moved / cannot tell
   still-flagged frame Is a red point really wrong?   yes / no / cannot tell
 Outputs (results/flag_and_repair/outline_review/, local only except items.csv): items/videoNN_fFFFFFF.jpg,
 outline_review.html, items.csv. Verdicts are kept in the browser and downloaded as outline_review_verdicts.csv.
@@ -112,9 +112,9 @@ def render(v, rows):
 
         panels = [("frame as it is", raw)]
         if r.status == "repaired":
-            panels += [("BEFORE: red = model's 8 points (circle = pupil, square = eyelid / corner)", panel(False)), (f"AFTER: blue = put in by the repair ({', '.join(pts)})", panel(True))]
+            panels += [("BEFORE: red = model's 8 points (circle pupil, square outline)", panel(False)), (f"AFTER: blue = put in by the repair ({', '.join(pts)})", panel(True))]
         else:
-            panels += [("red = model's 8 points (not repaired; circle = pupil, square = eyelid / corner)", panel(False))]
+            panels += [("red = model's 8 points, not repaired (circle pupil, square outline)", panel(False))]
         S = Image.new("RGB", (len(panels) * PW + 10 * (len(panels) - 1), PH + 22), (255, 255, 255))
         d2 = ImageDraw.Draw(S)
         for k, (title, im) in enumerate(panels):
@@ -134,7 +134,7 @@ def main():
             continue
         render(int(v), list(g.itertuples()))
         print("video", v, len(g))
-    Q = {"repaired": ("Are the blue points on the right place (pupil edge, eyelid, eye corner)?", ["yes", "better, but still not right", "no", "cannot tell"]),
+    Q = {"repaired": ("Are the blue points on the right place (pupil edge, eyelid, eye corner)?", ["yes", "better, but still not right", "no", "already right before, should not have moved", "cannot tell"]),
          "flagged_not_repaired": ("Is a red point really wrong?", ["yes", "no", "cannot tell"])}
     parts, last = [], None
     for r in P.itertuples():
@@ -151,9 +151,9 @@ def main():
 img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{margin-top:8px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}}.q{{font-weight:600;margin-right:6px}}
 .done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
 button{{font:inherit;padding:4px 12px}}h2{{font-size:17px;margin:26px 0 10px}}</style>
-<div id="bar"><b>Repair of all eight points, by-eye check</b> ({n} frames; finder = fitting or PCA, acceptance = human-label range on pupil and outline). Repaired frame, three panels: the frame, BEFORE (red = the model's 8 points; circle = pupil point, square = eyelid or corner), AFTER (blue = every point the repair put in). Question: are the blue points where they belong (pupil edge, eyelid, eye corner)? "yes" only if every blue point sits where it belongs; closer than before but not there = "better, but still not right".
+<div id="bar"><b>Repair of all eight points, by-eye check</b> ({n} frames; finder = fitting or PCA, acceptance = human-label range on pupil and outline). Repaired frame, three panels: the frame, BEFORE (red = the model's 8 points; circle = pupil point, square = eyelid or corner), AFTER (blue = every point the repair put in). Question: are the blue points where they belong (pupil edge, eyelid, eye corner)? "yes" only if every blue point sits where it belongs; closer than before but not there = "better, but still not right"; the red points were already right and the repair moved them for nothing = "already right before, should not have moved".
 Still-flagged frame, two panels: the frame and the model's points. Question: is a red point really wrong? Answer from the images only.<br>
-修复帧三张图：原帧、修复前（红 = 模型的 8 个点，圆 = 瞳孔点，方 = 眼睑或眼角点）、修复后（蓝 = 修复换上去的点，可能是瞳孔点也可能是眼睑、眼角点），问蓝点是不是都在该在的位置（瞳孔边缘、眼睑、眼角）：全部落在该在的位置才选 yes，近了但还不到位选 better, but still not right。仍标出帧两张图：原帧、模型的点，问红点是不是真的错了。
+修复帧三张图：原帧、修复前（红 = 模型的 8 个点，圆 = 瞳孔点，方 = 眼睑或眼角点）、修复后（蓝 = 修复换上去的点，可能是瞳孔点也可能是眼睑、眼角点），问蓝点是不是都在该在的位置（瞳孔边缘、眼睑、眼角）：全部落在该在的位置才选 yes，近了但还不到位选 better, but still not right；红点本来就对、修复是白动的，选 already right before, should not have moved。仍标出帧两张图：原帧、模型的点，问红点是不是真的错了。
 &nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {"".join(parts)}
 <script>
