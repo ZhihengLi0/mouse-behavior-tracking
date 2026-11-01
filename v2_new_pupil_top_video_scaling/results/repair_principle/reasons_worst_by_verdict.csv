@@ -1,0 +1,5 @@
+reason,worst_kind,cannot tell,no,not judged,yes
+outline point over threshold,corner,7,59,1,21
+outline point over threshold,eyelid,1,6,1,28
+outline point over threshold,pupil,2,4,0,22
+replaced frame still outside the range,pupil,2,0,0,30
