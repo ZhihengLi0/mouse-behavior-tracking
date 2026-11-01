@@ -4,9 +4,10 @@ at a time, yes / no, the same form as spotcheck_review.py.
 
     python outline_review.py [--html-only]
 
-Frames: from results/flag_and_repair/videoNN_either_labelregion_all/frames_all.csv.gz, per video up to 10 repaired frames
-whose replaced points include an eyelid or a corner (the new part of the repair) and up to 10 still-flagged frames,
-one per episode (frames within 5 of each other form an episode), random episodes, seed 0. For each frame a strip of
+Frames: from results/flag_and_repair/videoNN_either_labelregion_all/frames_all.csv.gz, per video up to 5 repaired frames
+whose replaced points include an eyelid or a corner (the new part of the repair), one per episode (frames within 5 of
+each other form an episode), random episodes, seed 0. Still-flagged frames are not shown (N_REP, WITH_FLAGGED): they
+were judged in the earlier spot check and the new repair only moves some of them to "left alone" or "repaired". For each frame a strip of
 crops: the frame as it is; BEFORE (red = the model's 8 points); for a repaired frame AFTER (blue = every point the
 repair put in, pupil or outline). Questions:
   repaired frame      Are the blue points on the right place (pupil edge, eyelid, eye corner)?
@@ -32,6 +33,7 @@ OUT = FAR / "outline_review"
 ITEMS = OUT / "items"
 PW, PH = 400, 300
 GAP, N_PER, SEED = 5, 10, 0
+N_REP, WITH_FLAGGED = 5, False  # user, 2026-10-31 night: 5 repaired frames per video, no still-flagged frames (those were judged in the spot check already)
 OUTLINE = ("eyelid_top", "eyelid_bottom", "eye_nasal_corner", "eye_temporal_corner")
 SHORT = {"pupil_top": "pupil top", "pupil_bottom": "pupil bottom", "pupil_left": "pupil left", "pupil_right": "pupil right",
          "eyelid_top": "eyelid top", "eyelid_bottom": "eyelid bottom", "eye_nasal_corner": "nasal corner", "eye_temporal_corner": "temporal corner"}
@@ -49,13 +51,13 @@ def sample():
         T = F[F.status.isin(["repaired", "flagged_not_repaired"])].copy()
         T["episode"] = np.cumsum(np.r_[True, np.diff(T.frame.to_numpy()) > GAP]) if len(T) else np.array([], int)
         T["outline"] = T.points.fillna("").apply(lambda s: any(b in s.split("+") for b in OUTLINE))
-        for st, sel in (("repaired", (T.status == "repaired") & T.outline), ("flagged_not_repaired", T.status == "flagged_not_repaired")):
+        for st, sel, k in (("repaired", (T.status == "repaired") & T.outline, N_REP), ("flagged_not_repaired", T.status == "flagged_not_repaired", N_PER if WITH_FLAGGED else 0)):
             S = T[sel]
-            if S.empty:
+            if S.empty or k == 0:
                 continue
             eps = S.episode.unique()
             rng.shuffle(eps)
-            for e in eps[:N_PER]:
+            for e in eps[:k]:
                 E = S[S.episode == e]
                 r = E.iloc[rng.integers(len(E))]
                 rows.append({"video": v, "frame": int(r.frame), "status": st, "points": r.points if isinstance(r.points, str) else "", "episode_len": int((T.episode == e).sum()),
