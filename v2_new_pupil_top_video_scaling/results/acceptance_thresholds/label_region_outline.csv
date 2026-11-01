@@ -1,0 +1,9 @@
+quantity,min,max,margin
+eye_width_ratio,0.5554,1.222,0.23
+eye_angle_dev,-8.2631,10.2424,0.23
+eye_centre_shift,-0.0434,0.2336,0.23
+eyelid_top_along,-0.133,0.1832,0.23
+eyelid_top_v,-0.3442,0.0267,0.23
+eyelid_bottom_along,-0.1515,0.1597,0.23
+eyelid_bottom_v,0.0031,0.4756,0.23
+eye_opening,0.0133,0.7597,0.23
