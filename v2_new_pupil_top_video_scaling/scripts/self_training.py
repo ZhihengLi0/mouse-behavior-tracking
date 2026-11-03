@@ -222,7 +222,10 @@ def teacher_training_set(v):
     f = glob.glob(str(PROJECT / "training-datasets" / "iteration-0" / "*" / f"Documentation_data-*shuffle{sh}.pickle"))[0]
     doc = pickle.load(open(f, "rb"))
     data, tr, te = doc[0], doc[1], doc[2]
-    cnt = Counter(data[i]["image"][1] for i in tr)
+    # the documentation's data list holds the training images only (in video 1's shuffle 211 the train indices run
+    # past its length, so they are not positions in that list); count the units over the list itself
+    assert len(data) == len(tr), (len(data), len(tr))
+    cnt = Counter(d["image"][1] for d in data)
     units = list(PL.unit)
     prior, own = [], 0
     for name, c in cnt.items():
