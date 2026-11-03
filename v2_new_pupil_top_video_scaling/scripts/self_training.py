@@ -5,7 +5,7 @@ flagged share move. Pilot videos: 1 and 8 (hard), 7 (clean control).
 
     python self_training.py pseudo   --video 8 --every 30
     python self_training.py train    --video 8 --every 30 --round 1 [--epochs E]
-    python self_training.py predict  --video 8 --shuffle 4081 --out DIR          (called by train in its own process)
+    python self_training.py predict  --video 8 --shuffle 4081 --out DIR          (train hands over to it with os.execv)
     python self_training.py evaluate --video 8 --teacher
     python self_training.py evaluate --video 8 --every 30 --round 1
     python self_training.py compare
@@ -46,6 +46,7 @@ student's heatmap peaks and is not implemented here. Nothing existing is modifie
 import argparse
 import glob
 import math
+import os
 import pickle
 import re
 import shutil
@@ -303,15 +304,19 @@ def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag=""):
     snaps = sorted(p.name for p in mdir.glob("snapshot-*.pt"))
     final = next(k for k, nm in enumerate(snaps) if nm in (f"snapshot-{E:03d}.pt", f"snapshot-best-{E:03d}.pt"))
     pred = mkdir(LOCAL / f"video{v:02d}" / name / "predictions")
-    t1 = time.time()
-    # the whole video is predicted in a separate process (the training process keeps several GB after training)
-    subprocess.run([sys.executable, str(Path(__file__).resolve()), "predict", "--video", str(v), "--shuffle", str(shuffle), "--out", str(pred)], check=True, cwd=str(HERE / "scripts"))
-    h5 = sorted(pred.glob("*.h5"))[-1]
-    log(f"whole video predicted in {(time.time() - t1) / 60:.0f} min: {h5.name}")
+    info = out / "train_info.csv"
     pd.DataFrame([{"video": v, "model": name, "shuffle": shuffle, "teacher_shuffle": tsh, "train_human": n_human, "train_pseudo": Ns - n_human, "val": Nv,
                    "teacher_iterations": it_teacher, "epochs": E, "iterations": E * math.ceil(Ns / BATCH), "milestones": "/".join(map(str, milestones)),
-                   "snapshot_every": s, "final_snapshot": snaps[final], "train_minutes": round(minutes, 1), "predict_minutes": round((time.time() - t1) / 60, 1),
-                   "prediction_h5": h5.name}]).to_csv(out / "train_info.csv", index=False)
+                   "snapshot_every": s, "final_snapshot": snaps[final], "train_minutes": round(minutes, 1), "predict_minutes": np.nan,
+                   "prediction_h5": ""}]).to_csv(info, index=False)
+    # the whole video is predicted by a fresh process that replaces this one (the training process keeps about 3 GB
+    # after training, which on the 16 GB machine pushed the swap to its limit while the predictor ran as a child);
+    # the predictor fills predict_minutes / prediction_h5 into train_info.csv when it is done
+    log(f"handing over to the prediction process: {pred}")
+    sys.stdout.flush(); sys.stderr.flush()
+    os.chdir(HERE / "scripts")
+    os.execv(sys.executable, [sys.executable, str(Path(__file__).resolve()), "predict", "--video", str(v), "--shuffle", str(shuffle),
+                              "--out", str(pred), "--info", str(info)])
 
 
 # ---------------------------------------------------------------------------------------------------- whole-video prediction
@@ -489,13 +494,22 @@ def main():
     ap.add_argument("--tag", default="", help="suffix of the model folder (smoke tests only)")
     ap.add_argument("--out", default=None, help="predict: output folder")
     ap.add_argument("--limit", type=int, default=0, help="predict: first N frames only (tests)")
+    ap.add_argument("--info", default=None, help="predict: train_info.csv to complete with predict_minutes / prediction_h5")
     a = ap.parse_args()
     if a.cmd == "pseudo":
         pseudo(a.video, a.every)
     elif a.cmd == "train":
         train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag)
     elif a.cmd == "predict":
+        t1 = time.time()
         predict_video(a.video, a.shuffle, Path(a.out), a.limit)
+        if a.info:
+            h5 = sorted(Path(a.out).glob("*.h5"))[-1]
+            log(f"whole video predicted in {(time.time() - t1) / 60:.0f} min: {h5.name}")
+            T = pd.read_csv(a.info)
+            T["predict_minutes"] = round((time.time() - t1) / 60, 1)
+            T["prediction_h5"] = h5.name
+            T.to_csv(a.info, index=False)
     elif a.cmd == "evaluate":
         evaluate(a.video, a.every, a.round, a.teacher, a.tag)
     else:
