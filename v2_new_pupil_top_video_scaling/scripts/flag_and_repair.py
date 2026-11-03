@@ -60,7 +60,8 @@ Repair: on a flagged open frame the candidate pupil points are replaced by their
 Cuts and ranges: results/acceptance_thresholds/ (scripts/acceptance_thresholds.py).
 
 Outputs in results/flag_and_repair/videoNN_<accept>[<margin>]/: summary.csv (truth frames), whole_video.csv,
-truth_frames.csv, frames_all.csv.gz (every frame, local only). Nothing existing is modified."""
+truth_frames.csv, frames_all.csv.gz (every frame, local only); --save-coords adds coords_after.csv.gz (the coordinates
+after repair, every frame, local only; self_training.py reads them). Nothing existing is modified."""
 import argparse
 import warnings
 from itertools import combinations
@@ -233,6 +234,7 @@ def main():
     ap.add_argument("--points", choices=["pupil", "all"], default="pupil", help="which points may be repaired (default pupil, unchanged behaviour)")
     ap.add_argument("--replace", choices=["whole", "smallest"], default="whole", help="--points all only: replace every candidate at once (default) or the smallest subset that passes")
     ap.add_argument("--out", default=None, help="output folder override (verification only)")
+    ap.add_argument("--save-coords", action="store_true", help="also write coords_after.csv.gz (x, y of the 8 points after repair, every frame); default outputs unchanged")
     a = ap.parse_args()
     assert a.replace == "whole" or a.points == "all", "--replace smallest is only defined with --points all"
     assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
@@ -321,6 +323,9 @@ def main():
     for b in PTS:
         F[f"{b}_moved_px"] = np.hypot(*(new_xy[b] - xy[b]).T)
     F.to_csv(out / "frames_all.csv.gz", index=False, float_format="%.4f")
+    if a.save_coords:
+        Cc = pd.DataFrame({"frame": np.arange(n), "status": status, "points": reps, **{f"{b}_{c}": new_xy[b][:, j] for b in BPS for j, c in enumerate("xy")}})
+        Cc.to_csv(out / "coords_after.csv.gz", index=False, float_format="%.3f")
     counts = {s: int((status == s).sum()) for s in STATUSES}
     W = pd.DataFrame([{"video": a.video, "frames": n, "accept": tag, "eye_width_px": round(G.Wm, 1), "thr_eye_widths": thr, "thr_px": round(thr * G.Wm, 1),
                        "flagged_pct": round(100 * flag.mean(), 2), "flagged_closed": int((flag & G.closed).sum()), **counts,
