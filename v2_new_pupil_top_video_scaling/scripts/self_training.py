@@ -5,6 +5,7 @@ flagged share move. Pilot videos: 1 and 8 (hard), 7 (clean control).
 
     python self_training.py pseudo   --video 8 --every 30
     python self_training.py train    --video 8 --every 30 --round 1 [--epochs E]
+    python self_training.py predict  --video 8 --shuffle 4081 --out DIR          (called by train in its own process)
     python self_training.py evaluate --video 8 --teacher
     python self_training.py evaluate --video 8 --every 30 --round 1
     python self_training.py compare
@@ -303,14 +304,56 @@ def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag=""):
     final = next(k for k, nm in enumerate(snaps) if nm in (f"snapshot-{E:03d}.pt", f"snapshot-best-{E:03d}.pt"))
     pred = mkdir(LOCAL / f"video{v:02d}" / name / "predictions")
     t1 = time.time()
-    deeplabcut.analyze_videos(str(CONFIG), [str(HERE / unit / f"{unit}.mp4")], shuffle=shuffle, trainingsetindex=tsi, snapshot_index=final,
-                              device="mps", batch_size=32, destfolder=str(pred))
+    # the whole video is predicted in a separate process (the training process keeps several GB after training)
+    subprocess.run([sys.executable, str(Path(__file__).resolve()), "predict", "--video", str(v), "--shuffle", str(shuffle), "--out", str(pred)], check=True, cwd=str(HERE / "scripts"))
     h5 = sorted(pred.glob("*.h5"))[-1]
     log(f"whole video predicted in {(time.time() - t1) / 60:.0f} min: {h5.name}")
     pd.DataFrame([{"video": v, "model": name, "shuffle": shuffle, "teacher_shuffle": tsh, "train_human": n_human, "train_pseudo": Ns - n_human, "val": Nv,
                    "teacher_iterations": it_teacher, "epochs": E, "iterations": E * math.ceil(Ns / BATCH), "milestones": "/".join(map(str, milestones)),
                    "snapshot_every": s, "final_snapshot": snaps[final], "train_minutes": round(minutes, 1), "predict_minutes": round((time.time() - t1) / 60, 1),
                    "prediction_h5": h5.name}]).to_csv(out / "train_info.csv", index=False)
+
+
+# ---------------------------------------------------------------------------------------------------- whole-video prediction
+def predict_video(v, shuffle, out, limit=0, batch=32, device="mps"):
+    """Predict every frame of the video with the final snapshot of a shuffle; streaming (frames read one by one with
+    cv2, multithreading off), written as a DeepLabCut-style h5 (scorer / bodyparts / x, y, likelihood) that
+    pupil_trace.load reads. A separate process from training, so memory stays at the model's size."""
+    import cv2
+    import torch
+    from deeplabcut.pose_estimation_pytorch.apis.utils import get_pose_inference_runner
+    unit = unit_of(v)
+    folder = next((PROJECT / "dlc-models-pytorch" / "iteration-0").glob(f"*shuffle{shuffle}")) / "train"
+    E = int(yaml.safe_load((folder / "pytorch_config.yaml").read_text())["train_settings"]["epochs"])
+    snap = next(p for p in (folder / f"snapshot-{E:03d}.pt", folder / f"snapshot-best-{E:03d}.pt") if p.exists())
+    runner = get_pose_inference_runner(model_config=folder / "pytorch_config.yaml", snapshot_path=snap, batch_size=batch, device=device,
+                                       inference_cfg={"multithreading": {"enabled": False}})
+    t0 = time.time()
+
+    def frames():
+        cap = cv2.VideoCapture(str(HERE / unit / f"{unit}.mp4"))
+        i = 0
+        while True:
+            ok, im = cap.read()
+            if not ok or (limit and i >= limit):
+                break
+            yield im[..., ::-1].copy()   # RGB, as DeepLabCut's video reader returns it
+            i += 1
+            if i % 5000 == 0:
+                log(f"{i} frames  {(time.time() - t0) / 60:.1f} min")
+        cap.release()
+
+    with torch.no_grad():
+        preds = [np.asarray(p["bodyparts"])[0, :, :3] for p in runner.inference(images=frames())]
+    poses = np.stack(preds)
+    scorer = f"DLC_Resnet50_{TASK}{DATE}shuffle{shuffle}_snapshot_{E:03d}"
+    cols = pd.MultiIndex.from_product([[scorer], BPS, ["x", "y", "likelihood"]], names=["scorer", "bodyparts", "coords"])
+    D = pd.DataFrame(poses.reshape(len(poses), -1), columns=cols)
+    mkdir(out)
+    f = out / f"{unit}{scorer}.h5"
+    D.to_hdf(f, key="df_with_missing", mode="w")
+    log(f"{len(D)} frames predicted with {snap.name} in {(time.time() - t0) / 60:.1f} min -> {f}")
+    return f
 
 
 # ---------------------------------------------------------------------------------------------------------- evaluation
@@ -436,7 +479,7 @@ def compare():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["pseudo", "train", "evaluate", "compare"])
+    ap.add_argument("cmd", choices=["pseudo", "train", "predict", "evaluate", "compare"])
     ap.add_argument("--video", type=int)
     ap.add_argument("--every", type=int, choices=sorted(VARIANT), default=None)
     ap.add_argument("--round", type=int, default=1)
@@ -444,11 +487,15 @@ def main():
     ap.add_argument("--epochs", type=int, default=None, help="override the iteration-matched epoch count (smoke tests only)")
     ap.add_argument("--shuffle", type=int, default=None, help="override the shuffle number (smoke tests only)")
     ap.add_argument("--tag", default="", help="suffix of the model folder (smoke tests only)")
+    ap.add_argument("--out", default=None, help="predict: output folder")
+    ap.add_argument("--limit", type=int, default=0, help="predict: first N frames only (tests)")
     a = ap.parse_args()
     if a.cmd == "pseudo":
         pseudo(a.video, a.every)
     elif a.cmd == "train":
         train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag)
+    elif a.cmd == "predict":
+        predict_video(a.video, a.shuffle, Path(a.out), a.limit)
     elif a.cmd == "evaluate":
         evaluate(a.video, a.every, a.round, a.teacher, a.tag)
     else:
