@@ -1,0 +1,2 @@
+video,unit,every,frames,usable_frames,near_truth_excluded,candidates,kept_frames,dropped_frames,kept_ok,kept_repaired,points_total,points_dropped_likelihood,points_dropped_fitting,points_dropped_pca,labeled_points_in_kept_frames,frames_with_8_points,eye_width_px,thr_eye_widths,thr_pca_eye_widths,guard_frames
+8,8_20251024_Pluto_spont1,30,71748,66798,240,1988,1829,159,1828,1,15904,0,2,431,14623,1820,428.4,0.14,0.03596445104360489,60
