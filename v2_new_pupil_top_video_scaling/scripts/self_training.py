@@ -230,6 +230,10 @@ def teacher_training_set(v):
     prior, own = [], 0
     for name, c in cnt.items():
         u = [x for x in units if x == name or x.endswith("_" + name)]
+        if not u and re.match(r"\d+_", name):
+            # units renamed after the early videos were trained (video 2's '2_pluton2', video 4's '3_20251031_pluto3'):
+            # the leading video number is the stable part
+            u = [unit_of(int(name.split("_")[0]))]
         assert len(u) == 1, (name, u)
         if u[0] == unit_of(v):
             own = c
@@ -365,7 +369,7 @@ def predict_video(v, shuffle, out, limit=0, batch=32, device="mps"):
 
 
 # ---------------------------------------------------------------------------------------------------------- evaluation
-def evaluate(v, every=None, rnd=None, teacher=False, tag=""):
+def evaluate(v, every=None, rnd=None, teacher=False, tag="", save_flags=False):
     unit, step = unit_of(v), step_of(v)
     name = model_name(every, rnd, teacher) + (f"_{tag}" if tag else "")
     out = mkdir(OUT / f"video{v:02d}" / name)
@@ -412,6 +416,9 @@ def evaluate(v, every=None, rnd=None, teacher=False, tag=""):
     mult = float(z["multiple"])
     flag_pca_own = score > mult * med
     flag_pca_teacher = score > float(z["threshold"])
+    if save_flags:   # per-frame finder state (for the blind test set's strata); default outputs unchanged
+        pd.DataFrame({"frame": np.arange(n), "fit_dev_eye": np.nanmax(dev_px, axis=1) / Wm, "pca_score": score,
+                      "fit_flag": flag_fit, "pca_flag": flag_pca_own}).to_csv(out / "flags.csv.gz", index=False, float_format="%.5f")
     wrong = T.error > LINE
     R = {"video": v, "model": name, "shuffle": shuffle, "eye_width_px": round(Wm, 1), "truth_frames": len(T),
          "median_error_pct": round(100 * float(T.error.median()), 2), "p90_error_pct": round(100 * float(T.error.quantile(0.9)), 2),
@@ -498,6 +505,7 @@ def main():
     ap.add_argument("--out", default=None, help="predict: output folder")
     ap.add_argument("--limit", type=int, default=0, help="predict: first N frames only (tests)")
     ap.add_argument("--info", default=None, help="predict: train_info.csv to complete with predict_minutes / prediction_h5")
+    ap.add_argument("--save-flags", action="store_true", help="evaluate: also write flags.csv.gz (per-frame finder state); default outputs unchanged")
     a = ap.parse_args()
     if a.cmd == "pseudo":
         pseudo(a.video, a.every)
@@ -514,7 +522,7 @@ def main():
             T["prediction_h5"] = h5.name
             T.to_csv(a.info, index=False)
     elif a.cmd == "evaluate":
-        evaluate(a.video, a.every, a.round, a.teacher, a.tag)
+        evaluate(a.video, a.every, a.round, a.teacher, a.tag, a.save_flags)
     else:
         compare()
 

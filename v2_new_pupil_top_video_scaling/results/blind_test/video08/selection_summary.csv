@@ -1,0 +1,2 @@
+video,unit,frames,eligible,excluded_truth_band,excluded_label_band,excluded_pseudo_band,share_A,share_B,share_C,share_D,drawn_A,drawn_B,drawn_C,drawn_D,eye_width_px,seed
+8,8_20251024_Pluto_spont1,71748,39130,8410,660,23807,0.0783,0.02648,0.87644,0.01878,13,12,13,12,428.4,42
