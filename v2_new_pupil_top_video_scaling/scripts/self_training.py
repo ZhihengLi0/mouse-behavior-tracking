@@ -455,8 +455,8 @@ def compare():
                     "p90_error_pct": round(100 * float(T.error_after.quantile(0.9)), 2), "wrong_frames": int((T.error_after > LINE).sum()),
                     "flagged_not_repaired_pct": W.flagged_not_repaired_pct})
     E = pd.concat([E, pd.DataFrame(ref)], ignore_index=True)
-    order = {"teacher": 0, "teacher + repair": 1}
-    E["o"] = E.model.map(lambda m: order.get(m, 2 + int(re.search(r"round(\d+)", m).group(1)) * 10 + VARIANT.get(int(re.search(r"every(\d+)", m).group(1)), 9)) if "round" in m else order[m])
+    order = {"teacher": 0, "teacher + repair": 1, "human40": 90}
+    E["o"] = E.model.map(lambda m: 2 + int(re.search(r"round(\d+)", m).group(1)) * 10 + VARIANT.get(int(re.search(r"every(\d+)", m).group(1)), 9) if "round" in m else order.get(m, 95))
     E = E.sort_values(["video", "o"]).drop(columns="o")
     E.to_csv(OUT / "comparison.csv", index=False)
     show = ["video", "model", "median_error_pct", "p90_error_pct", "wrong_frames", "test50_median_px", "flagged_fit_pct", "flagged_pca_pct", "flagged_either_pct"]
@@ -465,7 +465,7 @@ def compare():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    models = [m for m in ["teacher", "teacher + repair"] + sorted({m for m in E.model if "round" in m}) if m in set(E.model)]
+    models = [m for m in ["teacher", "teacher + repair"] + sorted({m for m in E.model if "round" in m}) + ["human40"] if m in set(E.model)]
     cols = {"teacher": "0.55", "teacher + repair": "0.8"}
     palette = ["#2f6db3", "#e0a458", "#7fb069", "#d1495b", "#8e6c8a"]
     for m in models:
