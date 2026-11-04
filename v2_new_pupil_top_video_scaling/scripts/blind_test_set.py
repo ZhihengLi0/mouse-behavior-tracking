@@ -179,7 +179,9 @@ def prelabel(v, points_csv):
     ld = label_dir(v)
     key = pd.read_csv(folder(v) / "selection_key.csv")
     P = pd.read_csv(points_csv)
+    P["blind_name"] = [nm if nm.endswith(".png") else nm + ".png" for nm in P.blind_name]
     assert set(P.bodypart) <= set(BPS), set(P.bodypart) - set(BPS)
+    assert set(P.blind_name) <= set(key.blind_name), set(P.blind_name) - set(key.blind_name)
     template = HERE / "8_20251024_Pluto_spont1" / "training-data" / "labels" / "test50" / "CollectedData_Zhiheng.h5"
     cols = pd.read_hdf(template).columns
     idx = pd.MultiIndex.from_tuples([(ld.parent.name, ld.name, nm) for nm in key.blind_name])
