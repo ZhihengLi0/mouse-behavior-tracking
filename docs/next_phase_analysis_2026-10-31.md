@@ -293,3 +293,57 @@ candidate points that passes both ranges is put in. On the truth frames 15 of 23
 1.10 %, still flagged 0.51 %, and 805 of the frames repaired by both variants keep a pupil point the whole
 replacement would have moved. This is the pipeline to carry into self-training:
 `--finder either --accept labelregion --points all --replace smallest`.
+
+## Addendum 2026-11-03: round 1 of the pilot, and what comes next
+
+Round 1 of section 3.3 was run on the Mac on 2026-11-02 and 2026-11-03 (`scripts/self_training.py`, results and a
+README in `results/self_training/`). Videos 1, 7, 8; teacher = the plateau model; pseudo labels every 30th frame
+(variant every30) or every 100th (every100, the stand-in for the 0.3 loss weight, which DeepLabCut cannot express);
+students retrained on the teacher's human frames plus the pseudo frames with the iteration count matched to the
+teacher's; everything evaluated through one code path on whole-video predictions.
+
+| video | model | median error, % eye width | wrong of 70 | flagged either finder, % of video |
+|---|---|---|---|---|
+| 1 | teacher | 2.94 | 8 | 15.3 |
+| 1 | teacher + repair | 2.90 | 2 | |
+| 1 | every30 | 2.67 | 2 | 1.3 |
+| 1 | every100 | 2.94 | 3 | 2.2 |
+| 7 | teacher | 1.29 | 0 | 1.0 |
+| 7 | every30 | 1.34 | 0 | 0.5 |
+| 7 | every100 | 1.34 | 0 | 0.5 |
+| 8 | teacher | 5.02 | 1 | 8.9 |
+| 8 | teacher + repair | 5.02 | 0 | |
+| 8 | every30 | 5.26 | 0 | 3.2 |
+| 8 | every100 | 5.11 | 0 | 2.5 |
+| 8 | 40 human labels (shuffle 912) | 6.10 | 0 | 2.7 |
+
+Findings:
+
+12. The typical accuracy does not move. Every student is within half a percent of eye width of its teacher on the
+    70 truth frames, in both directions, on all three videos, and the clean control (video 7) does not drift.
+13. The wrong frames move. On video 1 the every30 student fixes six of the teacher's eight wrong truth frames; they
+    are exactly the six the repair pipeline fixes, and the two it leaves (61431, 62186) are the two the repair
+    leaves. Student and repair are therefore not two independent fixes but one; the two remaining frames need
+    something else. On video 8 the single wrong frame is gone in both students.
+14. The flagged share falls to a third or a half in every student. This is the number to distrust: the finders
+    measure agreement with the fitting and with the model's own shape prior, and a model trained on its own
+    predictions agrees with its own prior more often. Whether the unflagged frames are right is not known.
+15. The sparse variant (every100) never beat the dense one, and on video 8 its test50 pixel error rose from 25 to
+    30 px. Twenty more human labels on video 8 (the scaling curve's shuffle 912) also remove the wrong frame and
+    also cut the flagged share, but raise the median error, so on this video the student is at least as good as
+    twenty labels.
+
+Finding 11 above expected that self-training alone would not cure errors that are systematic (the two-seed pilot).
+Round 1 says it cures some of them (six of eight on video 1) and not the rest; the ones it cures are the ones the
+second-peak repair cures, which suggests they were errors of the coordinate read-out, not of the heatmap.
+
+What is being done next (user decisions of 2026-11-03):
+
+- A blind, stratified test set of 50 new frames per video on videos 1 and 8 (`scripts/blind_test_set.py`): frames
+  drawn outside every truth, label and pseudo-label frame, stratified by what teacher and student say about them
+  (teacher flagged and student not; both; neither; student only), spread over the pose space inside each stratum,
+  pre-labeled from the images alone and corrected by the human without seeing any prediction. Scored with
+  continuous paired errors (frames better, worse, same; sign and Wilcoxon tests) for the teacher, the repaired
+  teacher, both students and the 40-label model. This is the ruler that finding 14 needs.
+- The every30 student on the other videos with wrong truth frames (2, 4, 10, 11), in the background.
+- Round 2 only if the blind set says the student's unflagged frames are right.

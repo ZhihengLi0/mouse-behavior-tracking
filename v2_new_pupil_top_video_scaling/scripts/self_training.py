@@ -369,15 +369,19 @@ def predict_video(v, shuffle, out, limit=0, batch=32, device="mps"):
 
 
 # ---------------------------------------------------------------------------------------------------------- evaluation
-def evaluate(v, every=None, rnd=None, teacher=False, tag="", save_flags=False):
+def evaluate(v, every=None, rnd=None, teacher=False, tag="", save_flags=False, h5_override=None, name_override=None):
     unit, step = unit_of(v), step_of(v)
-    name = model_name(every, rnd, teacher) + (f"_{tag}" if tag else "")
+    name = name_override or (model_name(every, rnd, teacher) + (f"_{tag}" if tag else ""))
     out = mkdir(OUT / f"video{v:02d}" / name)
     rr, dt, P, H, truth, fwd, sig = load(v)
     Wm = teacher_eye_width(dt)
     if teacher:
         h5, shuffle = teacher_h5(v), teacher_shuffle(v)
         d = dt
+    elif h5_override:                                       # any other model of the video (e.g. the 40-label model of the scaling curve)
+        h5 = Path(h5_override)
+        shuffle = int(re.search(r"shuffle(\d+)", h5.name).group(1))
+        d = pt.load(str(h5))
     else:
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))[-1]
         shuffle = student_shuffle(v, every, rnd)
@@ -506,6 +510,8 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="predict: first N frames only (tests)")
     ap.add_argument("--info", default=None, help="predict: train_info.csv to complete with predict_minutes / prediction_h5")
     ap.add_argument("--save-flags", action="store_true", help="evaluate: also write flags.csv.gz (per-frame finder state); default outputs unchanged")
+    ap.add_argument("--h5", default=None, help="evaluate: whole-video prediction of another model of the video (with --model-name)")
+    ap.add_argument("--model-name", default=None, help="evaluate: folder name under results/self_training/videoNN/ for --h5")
     a = ap.parse_args()
     if a.cmd == "pseudo":
         pseudo(a.video, a.every)
@@ -522,7 +528,7 @@ def main():
             T["prediction_h5"] = h5.name
             T.to_csv(a.info, index=False)
     elif a.cmd == "evaluate":
-        evaluate(a.video, a.every, a.round, a.teacher, a.tag, a.save_flags)
+        evaluate(a.video, a.every, a.round, a.teacher, a.tag, a.save_flags, a.h5, a.model_name)
     else:
         compare()
 
