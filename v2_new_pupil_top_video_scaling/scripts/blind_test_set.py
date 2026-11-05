@@ -198,6 +198,48 @@ def prelabel(v, points_csv):
     print(f"{df.notna().sum().sum() // 2} points on {len(df)} frames written to {ld / 'machinelabels.h5'}")
 
 
+def subset(v, counts):
+    """Keep a stratified subset of the drawn frames for labeling (user decision 2026-11-04: fewer frames, weighted to
+    the strata's shares). counts = {stratum: frames to keep}; within a stratum the lowest cluster ids are kept.
+    The other PNGs move to labeling/blind_unused, the pre-labels are cut to the kept frames (the full set is backed
+    up to prelabels_full/), and the key's weight becomes stratum share / kept count (NaN for unused frames)."""
+    ld = label_dir(v)
+    kp = folder(v) / "selection_key.csv"
+    key = pd.read_csv(kp)
+    keep = []
+    for s, n in counts.items():
+        g = key[key.stratum == s].sort_values("cluster")
+        assert n <= len(g), f"stratum {s}: {n} asked, {len(g)} drawn"
+        keep += list(g.blind_name.iloc[:n])
+    key["subset"] = key.blind_name.isin(keep)
+    for s in STRATA:
+        cnt = int((key.subset & (key.stratum == s)).sum())
+        share = float(key.loc[key.stratum == s, "stratum_share"].iloc[0])
+        key.loc[key.stratum == s, "weight"] = share / cnt if cnt else np.nan
+    key.loc[~key.subset, "weight"] = np.nan
+    unused = mkdir(ld.parent / "blind_unused")
+    for nm in key.blind_name[~key.subset]:
+        if (ld / nm).exists():
+            shutil.move(str(ld / nm), str(unused / nm))
+    bk = mkdir(folder(v) / "prelabels_full")
+    for f in ("machinelabels.h5", "machinelabels.csv"):
+        if (ld / f).exists() and not (bk / f).exists():
+            shutil.copy2(ld / f, bk / f)
+    ml = pd.read_hdf(bk / "machinelabels.h5")
+    ml = ml[[Path(i[-1] if isinstance(i, tuple) else i).name in keep for i in ml.index]]
+    ml.to_hdf(ld / "machinelabels.h5", key="df_with_missing", mode="w")
+    ml.to_csv(ld / "machinelabels.csv")
+    key.to_csv(kp, index=False)
+    sp = folder(v) / "selection_summary.csv"
+    S = pd.read_csv(sp)
+    for s in STRATA:
+        S[f"kept_{s}"] = int((key.subset & (key.stratum == s)).sum())
+    S.to_csv(sp, index=False)
+    assert len(list(ld.glob("img*.png"))) == len(keep) == len(ml)
+    print(f"video {v}: {len(keep)} frames kept for labeling (" + ", ".join(f"{s} {counts.get(s, 0)}" for s in STRATA)
+          + f"), {int((~key.subset).sum())} moved to {unused.name}; pre-labels cut to {len(ml)} rows (full set in {bk.name}/)")
+
+
 # ------------------------------------------------------------------------------------------------------------ scoring
 def read_labels(v):
     ld = label_dir(v)
@@ -367,15 +409,18 @@ def check(v):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["select", "prelabel", "score", "check"])
+    ap.add_argument("cmd", choices=["select", "subset", "prelabel", "score", "check"])
     ap.add_argument("--video", type=int, required=True)
     ap.add_argument("--n", type=int, default=50)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--points", default=None, help="prelabel: csv (blind_name, bodypart, x, y)")
+    ap.add_argument("--counts", default="A=10,B=3,C=8,D=3", help="subset: frames to keep per stratum")
     ap.add_argument("--extra", action="append", help="score: extra model as name=path (h5 or coords_after.csv.gz)")
     a = ap.parse_args()
     if a.cmd == "select":
         select(a.video, a.n, a.seed)
+    elif a.cmd == "subset":
+        subset(a.video, {kv.split("=")[0]: int(kv.split("=")[1]) for kv in a.counts.split(",")})
     elif a.cmd == "prelabel":
         prelabel(a.video, a.points)
     elif a.cmd == "score":
