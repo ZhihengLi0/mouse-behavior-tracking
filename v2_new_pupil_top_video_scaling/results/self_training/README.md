@@ -1,4 +1,4 @@
-# Self-training pilot, round 1
+# Self-training, round 1 (pilot and all-videos pass)
 
 Direction 3 of the 2026-10-31 meeting: retrain the plateau model of a video on its own human labels plus
 pseudo labels taken from its own predictions on frames the final pipeline passed, and see whether the retrained
@@ -6,15 +6,18 @@ model (the student) makes fewer wrong frames than the plateau model (the teacher
 `docs/next_phase_analysis_2026-10-31.md`, section 3.3. Script: `scripts/self_training.py`. Run on 2026-11-02 to
 2026-11-04 on the Mac (mps): videos 1, 7 and 8 with both pseudo densities first, then videos 2 and 4 with the denser
 one only. Videos 10 and 11 were planned for the same night and not started, because the driver does not start a
-video that cannot finish before the morning deadline.
+video that cannot finish before the morning deadline. After the blind test set (`../blind_test/`) confirmed
+the students' gain, the same every30 recipe is being run on all remaining videos, in order of the teacher's
+flagged share (highest first), two or three videos a night: videos 15, 6 and 0 on 2026-11-05 (driver
+`self_training_all.sh`, log `all_videos.log`).
 
 ## Basic information
 
 | item | value |
 |---|---|
-| videos | 1 and 8 (hard, many flagged frames), 7 (clean control); then 2 and 4 (every30 only) |
-| teacher | the plateau model of each video: video 1 shuffle 211, video 2 shuffle 321, video 4 shuffle 532, video 7 shuffle 811, video 8 shuffle 911 |
-| teacher training set | video 1: 120 human frames (100 of video 0 plus 20 of video 1); video 2: 220 (prior videos plus 20 of itself); video 4: 360 (prior videos plus 40 of itself); videos 7 and 8: 420 (prior videos plus 20 of the video itself); 20 validation frames each |
+| videos | 1 and 8 (hard, many flagged frames), 7 (clean control); then 2 and 4 (every30 only); then 15, 6 and 0 (every30 only, all-videos pass) |
+| teacher | the plateau model of each video: video 1 shuffle 211, video 2 shuffle 321, video 4 shuffle 532, video 7 shuffle 811, video 8 shuffle 911, video 15 shuffle 1612, video 6 shuffle 711, video 0 shuffle 113 |
+| teacher training set | video 1: 120 human frames (100 of video 0 plus 20 of video 1); video 2: 220 (prior videos plus 20 of itself); video 4: 360 (prior videos plus 40 of itself); videos 7 and 8: 420 (prior videos plus 20 of the video itself); video 15: 720 (700 carried plus 20 of itself); video 6: 400 (380 plus 20); video 0: 60 (its own first batch, no prior video); 20 validation frames each |
 | pseudo labels | the teacher's own coordinates after the final pipeline (`flag_and_repair.py --finder either --accept labelregion --points all --replace smallest`) on every 30th frame (variant every30) or every 100th frame (variant every100) |
 | frames excluded from pseudo labels | frames the pipeline could not pass, and 60 frames on each side of the 70 truth frames |
 | per-point filter | a point is dropped when its likelihood is under 0.01, its fitting deviation is over the video's threshold, or its PCA residual is over the video's PCA threshold; a frame is kept when all four pupil points and at least six points remain |
@@ -22,7 +25,7 @@ video that cannot finish before the morning deadline.
 | recipe | same as the plateau models: ResNet-50, batch 2, seed 42, two learning-rate drops at 80 and 95 percent of the epochs; epochs chosen so the number of iterations matches the teacher's |
 | shuffle numbers | 4000 + 10 x video + 1 (every30) or + 2 (every100) |
 | evaluation | one code path for teacher and student on whole-video predictions: error on the 70 truth frames as RMSE over the labeled points divided by the teacher's median eye width, wrong = over 0.14 eye widths; test50 median pixel RMSE; share of the video flagged by the fitting finder and by the PCA finder (same thresholds as the pipeline) |
-| time per student | training 22 min (video 1), 40 min (video 2), 66 min (video 4) or 75 min (videos 7, 8); whole-video prediction 87 to 90 min |
+| time per student | training 11 min (video 0), 22 min (video 1), 40 min (video 2), 66 min (video 4), 71 min (video 6), 75 min (videos 7, 8) or 126 min (video 15); whole-video prediction 87 to 90 min (video 0: 22 min, 18,014 frames) |
 | human-label control | the 40-label model of video 8 (shuffle 912, prediction from the plateau run) evaluated on the same code path, row "human40" |
 
 The every100 variant stands in for the "pseudo labels at 0.3 loss weight" variant of the design: DeepLabCut's loss
@@ -33,14 +36,17 @@ frame by about a third.
 
 | video | variant | candidates | kept frames | dropped frames | points dropped by fitting | points dropped by PCA | labeled points |
 |---|---|---|---|---|---|---|---|
+| 0 | every30 | 394 | 368 | 26 | 0 | 33 | 2943 |
 | 1 | every30 | 1935 | 1784 | 151 | 8 | 825 | 14255 |
 | 1 | every100 | 583 | 544 | 39 | 4 | 200 | 4345 |
 | 2 | every30 | 2065 | 2020 | 45 | 10 | 200 | 16144 |
 | 4 | every30 | 2068 | 1725 | 343 | 5 | 758 | 13738 |
+| 6 | every30 | 2022 | 1859 | 163 | 4 | 457 | 14872 |
 | 7 | every30 | 2095 | 2030 | 65 | 0 | 91 | 16239 |
 | 7 | every100 | 628 | 609 | 19 | 3 | 25 | 4872 |
 | 8 | every30 | 1988 | 1829 | 159 | 2 | 431 | 14623 |
 | 8 | every100 | 600 | 552 | 48 | 1 | 125 | 4411 |
+| 15 | every30 | 1909 | 1776 | 133 | 1 | 260 | 14207 |
 
 No point was dropped for low likelihood. The PCA filter removes far more points than the fitting filter; on the
 clean video 7 it removes almost nothing. Video 4 loses the most frames (343 of 2068): its PCA threshold is
@@ -51,14 +57,17 @@ the widest of the five videos and its per-point PCA residuals are often over it.
 
 | video | variant | human | pseudo | epochs | iterations | teacher iterations |
 |---|---|---|---|---|---|---|
+| 0 | every30 | 60 | 368 | 17 | 3638 | 3600 |
 | 1 | every30 | 120 | 1784 | 8 | 7616 | 7200 |
 | 1 | every100 | 120 | 544 | 22 | 7304 | 7200 |
 | 2 | every30 | 220 | 2020 | 12 | 13440 | 13200 |
 | 4 | every30 | 360 | 1725 | 21 | 21903 | 21600 |
+| 6 | every30 | 400 | 1859 | 21 | 23730 | 24000 |
 | 7 | every30 | 420 | 2030 | 21 | 25725 | 25200 |
 | 7 | every100 | 420 | 609 | 48 | 24720 | 25200 |
 | 8 | every30 | 420 | 1829 | 22 | 24750 | 25200 |
 | 8 | every100 | 420 | 552 | 52 | 25272 | 25200 |
+| 15 | every30 | 720 | 1776 | 34 | 42092 | 42000 |
 
 ## Results
 
@@ -69,6 +78,9 @@ labels), the control for "more human labels instead of self-training".
 
 | video | model | median error, % eye width | p90 | wrong of 70 | test50 median px | flagged fitting % | flagged PCA % | flagged either % |
 |---|---|---|---|---|---|---|---|---|
+| 0 | teacher | 2.25 | 3.37 | 0 | 12.04 | 1.00 | 1.03 | 1.22 |
+| 0 | teacher + repair | 2.25 | 3.36 | 0 | | | | |
+| 0 | every30 | 2.42 | 3.81 | 5 | 12.62 | 2.55 | 2.02 | 2.63 |
 | 1 | teacher | 2.94 | 19.25 | 8 | 10.37 | 15.25 | 8.53 | 15.31 |
 | 1 | teacher + repair | 2.90 | 5.43 | 2 | | | | |
 | 1 | every30 | 2.67 | 5.91 | 2 | 10.89 | 1.33 | 0.78 | 1.34 |
@@ -79,6 +91,9 @@ labels), the control for "more human labels instead of self-training".
 | 4 | teacher | 3.36 | 6.13 | 2 | 15.01 | 3.56 | 1.55 | 3.67 |
 | 4 | teacher + repair | 3.36 | 6.01 | 0 | | | | |
 | 4 | every30 | 3.38 | 5.38 | 0 | 16.36 | 0.98 | 0.60 | 1.07 |
+| 6 | teacher | 1.49 | 2.47 | 0 | 6.75 | 5.32 | 3.13 | 5.41 |
+| 6 | teacher + repair | 1.49 | 2.47 | 0 | | | | |
+| 6 | every30 | 1.44 | 2.45 | 0 | 6.51 | 0.39 | 0.34 | 0.44 |
 | 7 | teacher | 1.29 | 1.80 | 0 | 5.86 | 0.65 | 0.82 | 0.99 |
 | 7 | teacher + repair | 1.29 | 1.72 | 0 | | | | |
 | 7 | every30 | 1.34 | 1.77 | 0 | 5.97 | 0.35 | 0.40 | 0.45 |
@@ -88,6 +103,9 @@ labels), the control for "more human labels instead of self-training".
 | 8 | every30 | 5.26 | 11.53 | 0 | 26.04 | 3.16 | 1.12 | 3.22 |
 | 8 | every100 | 5.11 | 11.63 | 0 | 30.06 | 2.46 | 1.07 | 2.51 |
 | 8 | human40 | 6.10 | 11.76 | 0 | 30.03 | 2.54 | 1.44 | 2.68 |
+| 15 | teacher | 2.42 | 4.34 | 0 | 9.73 | 7.48 | 4.32 | 7.67 |
+| 15 | teacher + repair | 2.41 | 4.34 | 0 | | | | |
+| 15 | every30 | 2.39 | 4.75 | 0 | 10.25 | 2.54 | 1.59 | 2.69 |
 
 What the table says:
 
@@ -109,6 +127,16 @@ What the table says:
 - The share of the video flagged by the two finders falls to a half (video 7) or to a third or less (videos 1,
   2, 4 and 8) in every student.
 - The denser pseudo set (every30) is at least as good as the sparser one (every100) on all three videos.
+- All-videos pass, videos 15 and 6: the teachers have no wrong truth frame and the students keep it so, with the
+  median unchanged; the flagged share falls from 7.7 to 2.7 percent (video 15) and from 5.4 to 0.4 percent
+  (video 6), the largest drop so far.
+- Video 0 is the exception. Its teacher is the 60-label first-batch model (3600 iterations, no carried labels),
+  its pseudo set is small (368 frames of an 18,014-frame video) and its PCA threshold is the tightest of all
+  videos. The student has five wrong test frames where the teacher has none, all gross errors late in the video
+  (a pupil or eyelid point lands a whole eye width away, or the temporal corner two thirds of an eye width away;
+  frames 16250, 16323, 16911, 17205, 17719), and its flagged share doubles (1.2 to 2.6 percent). On this one
+  video self-training made the model worse; the small training set and the short schedule are the likely reason,
+  and the blind-test strata have not been built for it.
 
 Per truth frame: `videoNN/<model>/truth_errors.csv`.
 
@@ -129,13 +157,13 @@ Per truth frame: `videoNN/<model>/truth_errors.csv`.
 
 ## Status
 
-Round 1 is complete on videos 1, 7 and 8 with two variants and on videos 2 and 4 with every30. Videos 10 and 11
-are not run. Round 2 (pseudo labels from the student) was not started; the design asked for a second round only
-when the first lowers the median error and the wrong count, which happened on video 1 only. The decision is open
-for the next meeting. Because the finders are self-consistency measures and the truth frames are the plateau
-validation and test frames, a blind, independently labeled test set is being built for videos 1 and 8
-(`results/blind_test/`, script `scripts/blind_test_set.py`) to score teacher, repair, students and the 40-label
-control with paired per-frame errors.
+Round 1 is complete on videos 1, 7 and 8 with two variants and on videos 0, 2, 4, 6 and 15 with every30: eight
+of the 19 videos have an every30 student. Eleven remain (18, 12, 11, 14, 10, 3, 5, 9, 13, 17, 16, in the order
+the driver takes them); the driver resumes where it stopped and runs only what can finish before 07:30. The blind
+test set on videos 1 and 8 (`results/blind_test/README.md`) showed that the students' lower flagged share is real
+accuracy: in the stratum the teacher flagged and the student did not, the teacher is wrong on 15 of 20 frames and
+the every30 student on none. Round 2 (pseudo labels from the round-1 student's own prediction, student shuffle
+4000 + 10 x video + 3) is planned next on videos 1 and 8, to be scored on the same blind sets.
 
 ## Files
 
@@ -146,6 +174,6 @@ control with paired per-frame errors.
 - `videoNN/teacher/`, `videoNN/round1_everyNN/`: `eval.csv`, `truth_errors.csv`, `train_info.csv`
 - `comparison.csv`, `comparison.png`
 - `video08/human40/`: the 40-label control's `eval.csv`, `truth_errors.csv`
-- logs: `round1.log`, `round1b.log`, `train_v*_every*.log`, `eval_v*_every*.log`, `pseudo_all.log` (not committed)
+- logs: `round1.log`, `round1b.log`, `all_videos.log`, `train_v*_every*.log`, `eval_v*_every*.log`, `pseudo_all.log` (not committed)
 - models: `dlc_projects/.../dlc-models-pytorch/iteration-0/*shuffle40NN`; whole-video predictions in
   `local_data/self_training/videoNN/round1_everyNN/predictions/`
