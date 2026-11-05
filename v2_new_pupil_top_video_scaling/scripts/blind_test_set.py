@@ -277,7 +277,7 @@ def coords_of(path):
 def models_of(v, extra):
     unit = unit_of(v)
     m = {"teacher": teacher_h5(v), "teacher + repair": RES / "self_training" / f"video{v:02d}" / "repair" / "coords_after.csv.gz"}
-    for name in ("round1_every30", "round1_every100", "human40"):
+    for name in ("round1_every30", "round1_every100", "round2_every30", "human40"):
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))
         if h5:
             m[name] = h5[-1]
@@ -357,7 +357,7 @@ def figure(E, v, out):
     students = [m for m in E.model.unique() if m not in ("teacher",)]
     R = E[E.model == "teacher"].set_index("frame").error * 100
     fig, axes = plt.subplots(1, 4, figsize=(17, 4.4), sharex=True, sharey=True)
-    colors = {"teacher + repair": "#9e9e9e", "round1_every30": "#e69f00", "round1_every100": "#0072b2", "human40": "#009e73"}
+    colors = {"teacher + repair": "#9e9e9e", "round1_every30": "#e69f00", "round1_every100": "#0072b2", "round2_every30": "#cc79a7", "human40": "#009e73"}
     lim = max(float(np.nanmax(E.error)) * 100, LINE * 100) * 1.05
     for ax, s in zip(axes, STRATA):
         for m in students:

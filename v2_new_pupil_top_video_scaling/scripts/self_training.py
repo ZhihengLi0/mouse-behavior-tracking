@@ -102,8 +102,12 @@ def model_name(every=None, rnd=None, teacher=False):
     return "teacher" if teacher else f"round{rnd}_every{every}"
 
 
-def pseudo_unit(v, every):
-    return f"{unit_of(v)}_pseudo{every}"
+def pseudo_unit(v, every, rnd=1):
+    return f"{unit_of(v)}_pseudo{every}" + (f"r{rnd}" if rnd > 1 else "")
+
+
+def pseudo_dirname(every, rnd=1):
+    return f"pseudo_every{every}" + (f"_round{rnd}" if rnd > 1 else "")
 
 
 def teacher_eye_width(d):
@@ -116,29 +120,68 @@ def mkdir(p):
 
 
 # ------------------------------------------------------------------------------------------------------ pseudo labels
-def pseudo(v, every):
-    unit = unit_of(v)
-    out = mkdir(OUT / f"video{v:02d}" / f"pseudo_every{every}")
-    loc = mkdir(LOCAL / f"video{v:02d}" / f"pseudo_every{every}")
-    rep = OUT / f"video{v:02d}" / "repair"
-    if not (rep / "coords_after.csv.gz").exists():
-        log(f"video {v}: re-running the final pipeline into {rep}")
-        subprocess.run([sys.executable, str(HERE / "scripts" / "flag_and_repair.py"), "--video", str(v), *PIPE, "--out", str(rep), "--save-coords"],
-                       check=True, cwd=str(HERE / "scripts"), stdout=subprocess.DEVNULL)
-    for f in ("summary.csv", "whole_video.csv"):
-        a, b = pd.read_csv(rep / f), pd.read_csv(RES / "flag_and_repair" / FINAL.format(v=v) / f)
-        pd.testing.assert_frame_equal(a, b)
-    log(f"video {v}: re-run summary and whole_video identical to the committed run")
-    C = pd.read_csv(rep / "coords_after.csv.gz")
-    W = pd.read_csv(rep / "whole_video.csv").iloc[0]
-    Wm, thr = float(W.eye_width_px), float(W.thr_eye_widths)
-    rr, d, P, H, truth, fwd, sig = load(v)
-    n = len(C)
-    assert n == len(d) == len(fwd["200"])
-    lik = {b: d[b]["likelihood"].to_numpy(float) for b in BPS}
-    dev = fwd["200"] / Wm
+def student_source(v, every, rnd):
+    """Coordinates, likelihoods and finder state of the round-rnd student (the source of round rnd+1 pseudo labels):
+    the same fitting and PCA measures evaluate() computes, with the student's own PCA threshold (median x multiple),
+    as the pipeline uses the teacher's own threshold in round 1. Returns a coords table in the layout of the repair's
+    coords_after.csv.gz (status ok = passed by both finders, flagged otherwise; no repaired points)."""
+    unit, step = unit_of(v), step_of(v)
+    name = model_name(every, rnd)
+    h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))[-1]
+    d = pt.load(str(h5))
+    rr, dt, P, H, truth, fwd, sig = load(v)
+    Wm = teacher_eye_width(dt)
+    thr = float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_eye_widths)
+    xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
+    cache = OUT / f"video{v:02d}" / name / "pred200.npy"
+    pm = np.load(cache) if cache.exists() else one_step_prediction(d)
+    if not cache.exists():
+        np.save(cache, pm)
+    XY = np.stack([xy[b] for b in BPS], axis=1)
+    dev = np.hypot(*(XY - pm).transpose(2, 0, 1)) / Wm
     z = np.load(RES / "finder_comparison" / "pca_cache" / f"video{v:02d}_pca.npz")
-    res, thr_pca = z["residuals"], float(z["threshold"])
+    res_px, nc = residuals(U.labeled_poses(unit, step), U.pose_matrix(d))
+    res = res_px / float(z["eye_width_px"])
+    score = np.sqrt(np.mean(res ** 2, axis=1))
+    thr_pca = float(z["multiple"]) * float(np.nanmedian(score))
+    flagged = (np.nanmax(dev, axis=1) > thr) | (score > thr_pca)
+    C = pd.DataFrame({"frame": np.arange(len(d)), "status": np.where(flagged, "flagged", "ok"), "points": ""})
+    for b in BPS:
+        C[f"{b}_x"], C[f"{b}_y"] = xy[b][:, 0], xy[b][:, 1]
+    lik = {b: d[b]["likelihood"].to_numpy(float) for b in BPS}
+    log(f"video {v}: round {rnd + 1} pseudo labels from {Path(h5).name}: {int(flagged.sum())} of {len(d)} frames flagged "
+        f"(fitting thr {thr:.3f}, own PCA thr {thr_pca:.4f} eye widths)")
+    return C, d, lik, dev, res, Wm, thr, thr_pca, truth, Path(h5).name
+
+
+def pseudo(v, every, rnd=1):
+    unit = unit_of(v)
+    out = mkdir(OUT / f"video{v:02d}" / pseudo_dirname(every, rnd))
+    loc = mkdir(LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd))
+    if rnd == 1:
+        rep = OUT / f"video{v:02d}" / "repair"
+        if not (rep / "coords_after.csv.gz").exists():
+            log(f"video {v}: re-running the final pipeline into {rep}")
+            subprocess.run([sys.executable, str(HERE / "scripts" / "flag_and_repair.py"), "--video", str(v), *PIPE, "--out", str(rep), "--save-coords"],
+                           check=True, cwd=str(HERE / "scripts"), stdout=subprocess.DEVNULL)
+        for f in ("summary.csv", "whole_video.csv"):
+            a, b = pd.read_csv(rep / f), pd.read_csv(RES / "flag_and_repair" / FINAL.format(v=v) / f)
+            pd.testing.assert_frame_equal(a, b)
+        log(f"video {v}: re-run summary and whole_video identical to the committed run")
+        C = pd.read_csv(rep / "coords_after.csv.gz")
+        W = pd.read_csv(rep / "whole_video.csv").iloc[0]
+        Wm, thr = float(W.eye_width_px), float(W.thr_eye_widths)
+        rr, d, P, H, truth, fwd, sig = load(v)
+        n = len(C)
+        assert n == len(d) == len(fwd["200"])
+        lik = {b: d[b]["likelihood"].to_numpy(float) for b in BPS}
+        dev = fwd["200"] / Wm
+        z = np.load(RES / "finder_comparison" / "pca_cache" / f"video{v:02d}_pca.npz")
+        res, thr_pca = z["residuals"], float(z["threshold"])
+        source = Path(teacher_h5(v)).name
+    else:
+        C, d, lik, dev, res, Wm, thr, thr_pca, truth, source = student_source(v, every, rnd - 1)
+        n = len(C)
     assert res.shape == (n, len(BPS))
     tf = truth.index.to_numpy()
     near = np.zeros(n, bool)
@@ -173,7 +216,7 @@ def pseudo(v, every):
     F = pd.DataFrame(rows)
     F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
     K = F[F.kept]
-    S = {"video": v, "unit": unit, "every": every, "frames": n, "usable_frames": int(usable.sum()), "near_truth_excluded": int((usable & (C.frame.to_numpy() % every == 0) & near).sum()),
+    S = {"video": v, "unit": unit, "every": every, "round": rnd, "source": source, "frames": n, "usable_frames": int(usable.sum()), "near_truth_excluded": int((usable & (C.frame.to_numpy() % every == 0) & near).sum()),
          "candidates": int(cand.sum()), "kept_frames": len(K), "dropped_frames": int((~F.kept).sum()),
          "kept_ok": int((K.status == "ok").sum()), "kept_repaired": int((K.status == "repaired").sum()),
          "points_total": int(cand.sum()) * len(BPS), **{f"points_dropped_{w}": drop_count.get(w, 0) for w in ("likelihood", "fitting", "pca")},
@@ -186,13 +229,18 @@ def pseudo(v, every):
     names = [f"img{f:06d}.png" for f in K.frame]
     cols = pd.MultiIndex.from_product([[SCORER], BPS, ["x", "y"]], names=["scorer", "bodyparts", "coords"])
     T = pd.DataFrame(K[[f"{b}_{c}" for b in BPS for c in "xy"]].to_numpy(float), columns=cols,
-                     index=pd.MultiIndex.from_tuples([("labeled-data", pseudo_unit(v, every), nm) for nm in names]))
+                     index=pd.MultiIndex.from_tuples([("labeled-data", pseudo_unit(v, every, rnd), nm) for nm in names]))
     T.to_hdf(loc / f"CollectedData_{SCORER}.h5", key="df_with_missing", mode="w")
     T.to_csv(loc / f"CollectedData_{SCORER}.csv")
     T.round(3).to_csv(out / "pseudo_labels.csv")
 
     # the PNGs, one sequential pass over the video (cv2.imwrite of the frame as read, as select_frames.py does)
     import cv2
+    if rnd > 1:   # the frames are the same video frames as round 1's: copy the PNGs that round already extracted
+        prev = LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd - 1)
+        for nm in names:
+            if not (loc / nm).exists() and (prev / nm).exists():
+                shutil.copy2(prev / nm, loc / nm)
     want = {int(f): nm for f, nm in zip(K.frame, names) if not (loc / nm).exists()}
     if want:
         cap = cv2.VideoCapture(str(HERE / unit / f"{unit}.mp4"))
@@ -247,11 +295,11 @@ def teacher_training_set(v):
 def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag=""):
     import deeplabcut
     from deeplabcut.generate_training_dataset.trainingsetmanipulation import merge_annotateddatasets
-    unit, pu = unit_of(v), pseudo_unit(v, every)
+    unit, pu = unit_of(v), pseudo_unit(v, every, rnd)
     shuffle = shuffle_override or student_shuffle(v, every, rnd)
     name = model_name(every, rnd) + (f"_{tag}" if tag else "")
     out = mkdir(OUT / f"video{v:02d}" / name)
-    loc = LOCAL / f"video{v:02d}" / f"pseudo_every{every}"
+    loc = LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd)
     assert (loc / f"CollectedData_{SCORER}.h5").exists(), "run pseudo first"
     mdir = PROJECT / "dlc-models-pytorch" / "iteration-0" / f"{TASK}{DATE}-trainset*shuffle{shuffle}"
     assert not glob.glob(str(mdir)), f"shuffle {shuffle} exists already"
@@ -474,7 +522,7 @@ def compare():
     vids = sorted(E.video.unique())
     panels = [("median_error_pct", "median truth-frame error, % of eye width"), ("wrong_frames", "wrong truth frames (over the line)"),
               ("flagged_either_pct", "frames flagged by either finder, % of the video")]
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.4), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(max(15, 0.9 * len(vids) * len(models)), 4.4), constrained_layout=True)
     bw = 0.8 / len(models)
     for ax, (c, lab) in zip(axes, panels):
         for j, m in enumerate(models):
@@ -514,7 +562,7 @@ def main():
     ap.add_argument("--model-name", default=None, help="evaluate: folder name under results/self_training/videoNN/ for --h5")
     a = ap.parse_args()
     if a.cmd == "pseudo":
-        pseudo(a.video, a.every)
+        pseudo(a.video, a.every, a.round)
     elif a.cmd == "train":
         train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag)
     elif a.cmd == "predict":
