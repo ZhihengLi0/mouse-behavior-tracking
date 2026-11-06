@@ -1,0 +1,2 @@
+video,unit,every,round,source,frames,usable_frames,near_truth_excluded,candidates,kept_frames,dropped_frames,kept_ok,kept_repaired,points_total,points_dropped_likelihood,points_dropped_fitting,points_dropped_pca,labeled_points_in_kept_frames,frames_with_8_points,eye_width_px,thr_eye_widths,thr_pca_eye_widths,guard_frames
+12,12_20251016_Terra_spont_2,30,1,12_20251016_Terra_spont_2DLC_Resnet50_EyePupilEllipseSep20shuffle1311_snapshot_120.h5,71748,69512,277,2045,1953,92,1953,0,16360,0,8,308,15565,1899,438.0,0.14,0.027241947518830533,60
