@@ -41,8 +41,16 @@ multiple x the model's own median, the finder's rule; and > the teacher's absolu
 results/self_training/videoNN/<model>/eval.csv and truth_errors.csv; compare gathers every eval.csv into
 results/self_training/comparison.csv and comparison.png.
 
-Round 2 (student as teacher) only if round 1 lowers the median truth error and the wrong-frame count; it needs the
-student's heatmap peaks and is not implemented here. Nothing existing is modified."""
+Round 2 (--round 2): pseudo labels from the round-1 student's whole-video prediction (student_source), its own PCA
+threshold; shuffle 4000 + 10 * video + 2 + variant.
+
+Repaired source (--source repaired, 2026-11-05): the every-30 sets contained almost no repaired frames (the per-point
+filter judges a repaired frame by the teacher's pre-repair residuals), so the "correction feedback" question was not
+tested. This source takes ONLY the frames the final pipeline repaired, all eight points as accepted (a non-replaced
+point is dropped only below the likelihood bound), excluding the truth band, 60 frames around every drawn blind-test
+frame, and four of twenty equal time blocks (held out for a supplementary blind draw), then evenly spaced down to the
+every-30 student's pseudo count so that both students share the schedule. Model round1_repaired, shuffle
+4000 + 10 * video + 5, unit <unit>_pseudorep, folder pseudo_repaired. Existing outputs are unchanged."""
 import argparse
 import glob
 import math
@@ -75,6 +83,9 @@ MIN_POINTS = 6
 PIPE = ["--finder", "either", "--accept", "labelregion", "--points", "all", "--replace", "smallest"]
 FINAL = "video{v:02d}_either_labelregion_all_smallest"
 VARIANT = {30: 1, 100: 2}
+SOURCES = ("pipeline", "repaired")
+REPAIRED_VARIANT = 5                                  # shuffle 4000 + 10 * video + 5: the repaired-frames student
+HOLDOUT_BLOCKS, HELD_OUT = 20, (4, 9, 14, 19)         # repaired source: the time line in 20 equal blocks, these never trained on
 LINE = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
 
 
@@ -94,20 +105,38 @@ def teacher_shuffle(v):
     return int(re.search(r"shuffle(\d+)_", Path(teacher_h5(v)).name).group(1))
 
 
-def student_shuffle(v, every, rnd):
+def student_shuffle(v, every, rnd, source="pipeline"):
+    if source == "repaired":
+        return 4000 + 10 * v + 2 * (rnd - 1) + REPAIRED_VARIANT
     return 4000 + 10 * v + 2 * (rnd - 1) + VARIANT[every]
 
 
-def model_name(every=None, rnd=None, teacher=False):
-    return "teacher" if teacher else f"round{rnd}_every{every}"
+def model_name(every=None, rnd=None, teacher=False, source="pipeline"):
+    if teacher:
+        return "teacher"
+    return f"round{rnd}_repaired" if source == "repaired" else f"round{rnd}_every{every}"
 
 
-def pseudo_unit(v, every, rnd=1):
-    return f"{unit_of(v)}_pseudo{every}" + (f"r{rnd}" if rnd > 1 else "")
+def pseudo_unit(v, every, rnd=1, source="pipeline"):
+    tag = "pseudorep" if source == "repaired" else f"pseudo{every}"
+    return f"{unit_of(v)}_{tag}" + (f"r{rnd}" if rnd > 1 else "")
 
 
-def pseudo_dirname(every, rnd=1):
-    return f"pseudo_every{every}" + (f"_round{rnd}" if rnd > 1 else "")
+def pseudo_dirname(every, rnd=1, source="pipeline"):
+    base = "pseudo_repaired" if source == "repaired" else f"pseudo_every{every}"
+    return base + (f"_round{rnd}" if rnd > 1 else "")
+
+
+def holdout_mask(n):
+    """True on the frames of the held-out time blocks (repaired source): never trained on, the supplement is drawn there."""
+    block = np.arange(n) * HOLDOUT_BLOCKS // n
+    return np.isin(block, HELD_OUT), block
+
+
+def blind_frames(v):
+    """Every frame drawn for the blind test set of the video (all 50, labeled or not), or an empty list."""
+    f = RES / "blind_test" / f"video{v:02d}" / "selection_key.csv"
+    return pd.read_csv(f).frame.astype(int).tolist() if f.exists() else []
 
 
 def teacher_eye_width(d):
@@ -154,10 +183,65 @@ def student_source(v, every, rnd):
     return C, d, lik, dev, res, Wm, thr, thr_pca, truth, Path(h5).name
 
 
-def pseudo(v, every, rnd=1):
+def repaired_candidates(v, C, lik, near, n, every, source_name):
+    """Repaired source: every frame the final pipeline repaired, all eight points as accepted (a non-replaced point
+    is dropped only below the likelihood bound); excluded: the truth band, the blind-set band, the held-out time
+    blocks; then evenly spaced down to the every-30 student's pseudo count, so both students train on the same
+    number of pseudo frames with the same schedule. Returns (F, S) in the layout of the pipeline source; F.kept
+    marks the frames that train."""
+    held, block = holdout_mask(n)
+    bl = blind_frames(v)
+    near_blind = np.zeros(n, bool)
+    for f in bl:
+        near_blind[max(0, f - GUARD):f + GUARD + 1] = True
+    rep = (C.status == "repaired").to_numpy()
+    cand = rep & ~near & ~near_blind & ~held
+    rows, drop_count = [], Counter()
+    for i in np.flatnonzero(rep):
+        replaced = set(str(C.points[i]).split("+")) if isinstance(C.points[i], str) and C.points[i] else set()
+        kept, reasons = {}, {}
+        for b in BPS:
+            if b not in replaced and lik[b][i] < FIT_PBOUND:
+                reasons[b] = "likelihood"
+                if cand[i]:
+                    drop_count["likelihood"] += 1
+            else:
+                kept[b] = (float(C[f"{b}_x"][i]), float(C[f"{b}_y"][i]))
+        passes = all(b in kept for b in P4) and len(kept) >= MIN_POINTS
+        r = {"frame": int(C.frame[i]), "status": C.status[i], "replaced": "+".join(sorted(replaced)), "points_kept": len(kept),
+             "points_dropped": "+".join(f"{b}:{w}" for b, w in reasons.items()), "block": int(block[i]), "held_out": bool(held[i]),
+             "near_truth": bool(near[i]), "near_blind": bool(near_blind[i]), "in_band": bool(cand[i]), "passes_points": passes, "kept": False}
+        for b in BPS:
+            r[f"{b}_x"], r[f"{b}_y"] = kept.get(b, (np.nan, np.nan))
+        rows.append(r)
+    F = pd.DataFrame(rows)
+    elig = F.index[(F.passes_points & F.in_band)].to_numpy()
+    cap = int(pd.read_csv(OUT / f"video{v:02d}" / pseudo_dirname(every) / "pseudo_summary.csv").iloc[0].kept_frames)
+    if len(elig) > cap:
+        elig = elig[np.unique(np.round(np.linspace(0, len(elig) - 1, cap)).astype(int))]
+    F.loc[elig, "kept"] = True
+    K = F[F.kept]
+    assert not (K.held_out | K.near_truth | K.near_blind).any() and len(K) <= cap
+    S = {"video": v, "unit": unit_of(v), "every": np.nan, "round": 1, "source": source_name, "frames": n, "candidates_repaired": int(rep.sum()),
+         "held_out_frames": int((rep & held).sum()), "near_truth_excluded": int((rep & ~held & near).sum()), "blind_excluded": int((rep & ~held & ~near & near_blind).sum()),
+         "candidates": int(cand.sum()), "dropped_frames": int((F.in_band & ~F.passes_points).sum()),
+         "cap": cap, "kept_frames": len(K), "kept_ok": 0, "kept_repaired": len(K),
+         "points_total": int(cand.sum()) * len(BPS), **{f"points_dropped_{w}": drop_count.get(w, 0) for w in ("likelihood", "fitting", "pca")},
+         "labeled_points_in_kept_frames": int(K[[f"{b}_x" for b in BPS]].notna().sum().sum()),
+         "frames_with_8_points": int((K.points_kept == 8).sum()),
+         "replaced_points": " ".join(f"{b}:{c}" for b, c in Counter(p for s in K.replaced for p in s.split("+") if p).most_common()),
+         "eye_width_px": np.nan, "thr_eye_widths": np.nan, "thr_pca_eye_widths": np.nan, "guard_frames": GUARD, "holdout_blocks": HOLDOUT_BLOCKS,
+         "held_out_block_ids": "+".join(map(str, HELD_OUT))}
+    return F, S
+
+
+def pseudo(v, every, rnd=1, source="pipeline"):
     unit = unit_of(v)
-    out = mkdir(OUT / f"video{v:02d}" / pseudo_dirname(every, rnd))
-    loc = mkdir(LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd))
+    out = mkdir(OUT / f"video{v:02d}" / pseudo_dirname(every, rnd, source))
+    loc = mkdir(LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd, source))
+    if source == "repaired":
+        assert rnd == 1, "the repaired source is round 1 only"
+        every = 30                                            # the count cap and the file names refer to the every-30 student
     if rnd == 1:
         rep = OUT / f"video{v:02d}" / "repair"
         if not (rep / "coords_after.csv.gz").exists():
@@ -178,15 +262,23 @@ def pseudo(v, every, rnd=1):
         dev = fwd["200"] / Wm
         z = np.load(RES / "finder_comparison" / "pca_cache" / f"video{v:02d}_pca.npz")
         res, thr_pca = z["residuals"], float(z["threshold"])
-        source = Path(teacher_h5(v)).name
+        source_name = Path(teacher_h5(v)).name
     else:
-        C, d, lik, dev, res, Wm, thr, thr_pca, truth, source = student_source(v, every, rnd - 1)
+        C, d, lik, dev, res, Wm, thr, thr_pca, truth, source_name = student_source(v, every, rnd - 1)
         n = len(C)
     assert res.shape == (n, len(BPS))
     tf = truth.index.to_numpy()
     near = np.zeros(n, bool)
     for f in tf:
         near[max(0, f - GUARD):f + GUARD + 1] = True
+    if source == "repaired":
+        F, S = repaired_candidates(v, C, lik, near, n, every, source_name)
+        F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
+        K = F[F.kept]
+        pd.DataFrame([S]).to_csv(out / "pseudo_summary.csv", index=False)
+        print(pd.Series(S).to_string())
+        write_pseudo_set(v, every, rnd, source, K, S, out, loc, unit)
+        return
     usable = C.status.isin(["ok", "repaired"]).to_numpy()
     cand = usable & (C.frame.to_numpy() % every == 0) & ~near
     rows, drop_count = [], Counter()
@@ -216,7 +308,7 @@ def pseudo(v, every, rnd=1):
     F = pd.DataFrame(rows)
     F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
     K = F[F.kept]
-    S = {"video": v, "unit": unit, "every": every, "round": rnd, "source": source, "frames": n, "usable_frames": int(usable.sum()), "near_truth_excluded": int((usable & (C.frame.to_numpy() % every == 0) & near).sum()),
+    S = {"video": v, "unit": unit, "every": every, "round": rnd, "source": source_name, "frames": n, "usable_frames": int(usable.sum()), "near_truth_excluded": int((usable & (C.frame.to_numpy() % every == 0) & near).sum()),
          "candidates": int(cand.sum()), "kept_frames": len(K), "dropped_frames": int((~F.kept).sum()),
          "kept_ok": int((K.status == "ok").sum()), "kept_repaired": int((K.status == "repaired").sum()),
          "points_total": int(cand.sum()) * len(BPS), **{f"points_dropped_{w}": drop_count.get(w, 0) for w in ("likelihood", "fitting", "pca")},
@@ -224,12 +316,15 @@ def pseudo(v, every, rnd=1):
          "frames_with_8_points": int((K.points_kept == 8).sum()), "eye_width_px": Wm, "thr_eye_widths": thr, "thr_pca_eye_widths": thr_pca, "guard_frames": GUARD}
     pd.DataFrame([S]).to_csv(out / "pseudo_summary.csv", index=False)
     print(pd.Series(S).to_string())
+    write_pseudo_set(v, every, rnd, source, K, S, out, loc, unit)
 
+
+def write_pseudo_set(v, every, rnd, source, K, S, out, loc, unit):
     # the DeepLabCut label table, as CollectedData_<scorer>.h5 of a labeled-data folder
     names = [f"img{f:06d}.png" for f in K.frame]
     cols = pd.MultiIndex.from_product([[SCORER], BPS, ["x", "y"]], names=["scorer", "bodyparts", "coords"])
     T = pd.DataFrame(K[[f"{b}_{c}" for b in BPS for c in "xy"]].to_numpy(float), columns=cols,
-                     index=pd.MultiIndex.from_tuples([("labeled-data", pseudo_unit(v, every, rnd), nm) for nm in names]))
+                     index=pd.MultiIndex.from_tuples([("labeled-data", pseudo_unit(v, every, rnd, source), nm) for nm in names]))
     T.to_hdf(loc / f"CollectedData_{SCORER}.h5", key="df_with_missing", mode="w")
     T.to_csv(loc / f"CollectedData_{SCORER}.csv")
     T.round(3).to_csv(out / "pseudo_labels.csv")
@@ -237,7 +332,7 @@ def pseudo(v, every, rnd=1):
     # the PNGs, one sequential pass over the video (cv2.imwrite of the frame as read, as select_frames.py does)
     import cv2
     if rnd > 1:   # the frames are the same video frames as round 1's: copy the PNGs that round already extracted
-        prev = LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd - 1)
+        prev = LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd - 1, source)
         for nm in names:
             if not (loc / nm).exists() and (prev / nm).exists():
                 shutil.copy2(prev / nm, loc / nm)
@@ -260,7 +355,7 @@ def pseudo(v, every, rnd=1):
         log(f"video {v}: {written} PNGs written to {loc} in {(time.time() - t0) / 60:.1f} min")
     missing = [nm for nm in names if not (loc / nm).exists()]
     assert not missing, f"{len(missing)} PNGs missing"
-    log(f"video {v}: pseudo set every {every}: {len(K)} frames, {S['labeled_points_in_kept_frames']} labeled points")
+    log(f"video {v}: pseudo set {pseudo_dirname(every, rnd, source)}: {len(K)} frames, {S['labeled_points_in_kept_frames']} labeled points")
 
 
 # ------------------------------------------------------------------------------------------------------------ training
@@ -292,19 +387,29 @@ def teacher_training_set(v):
     return sh, prior, own, len(tr), len(te)
 
 
-def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag=""):
-    import deeplabcut
-    from deeplabcut.generate_training_dataset.trainingsetmanipulation import merge_annotateddatasets
-    unit, pu = unit_of(v), pseudo_unit(v, every, rnd)
-    shuffle = shuffle_override or student_shuffle(v, every, rnd)
-    name = model_name(every, rnd) + (f"_{tag}" if tag else "")
-    out = mkdir(OUT / f"video{v:02d}" / name)
-    loc = LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd)
+def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag="", source="pipeline", dry_run=False):
+    unit, pu = unit_of(v), pseudo_unit(v, every, rnd, source)
+    shuffle = shuffle_override or student_shuffle(v, every, rnd, source)
+    name = model_name(every, rnd, source=source) + (f"_{tag}" if tag else "")
+    loc = LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd, source)
     assert (loc / f"CollectedData_{SCORER}.h5").exists(), "run pseudo first"
     mdir = PROJECT / "dlc-models-pytorch" / "iteration-0" / f"{TASK}{DATE}-trainset*shuffle{shuffle}"
     assert not glob.glob(str(mdir)), f"shuffle {shuffle} exists already"
     tsh, prior, own, Nt, Nv = teacher_training_set(v)
     log(f"video {v}: teacher shuffle {tsh}: {Nt} train ({own} of this video, prior {dict(prior)}), {Nv} val")
+    if dry_run:   # the schedule only, nothing staged into the project (safe while another model trains)
+        Np = len(pd.read_hdf(loc / f"CollectedData_{SCORER}.h5"))
+        Ns = Nt + Np
+        it_teacher = EPOCHS * math.ceil(Nt / BATCH)
+        E = epochs_override or max(1, round(it_teacher / math.ceil(Ns / BATCH)))
+        s = max(1, E // 12)
+        E = max(s, round(E / s) * s)
+        log(f"DRY RUN student {name} shuffle {shuffle}: {Ns} train = {Nt} human + {Np} pseudo, {Nv} val; teacher {it_teacher} iterations -> "
+            f"{E} epochs x {math.ceil(Ns / BATCH)} = {E * math.ceil(Ns / BATCH)} iterations, snapshot every {s}")
+        return
+    import deeplabcut
+    from deeplabcut.generate_training_dataset.trainingsetmanipulation import merge_annotateddatasets
+    out = mkdir(OUT / f"video{v:02d}" / name)
     ensure_project([u for u, _ in prior] + [unit, pu])
     train_names = {}
     for u, last in prior:
@@ -417,9 +522,9 @@ def predict_video(v, shuffle, out, limit=0, batch=32, device="mps"):
 
 
 # ---------------------------------------------------------------------------------------------------------- evaluation
-def evaluate(v, every=None, rnd=None, teacher=False, tag="", save_flags=False, h5_override=None, name_override=None):
+def evaluate(v, every=None, rnd=None, teacher=False, tag="", save_flags=False, h5_override=None, name_override=None, source="pipeline"):
     unit, step = unit_of(v), step_of(v)
-    name = name_override or (model_name(every, rnd, teacher) + (f"_{tag}" if tag else ""))
+    name = name_override or (model_name(every, rnd, teacher, source) + (f"_{tag}" if tag else ""))
     out = mkdir(OUT / f"video{v:02d}" / name)
     rr, dt, P, H, truth, fwd, sig = load(v)
     Wm = teacher_eye_width(dt)
@@ -432,7 +537,7 @@ def evaluate(v, every=None, rnd=None, teacher=False, tag="", save_flags=False, h
         d = pt.load(str(h5))
     else:
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))[-1]
-        shuffle = student_shuffle(v, every, rnd)
+        shuffle = student_shuffle(v, every, rnd, source)
         d = pt.load(str(h5))
     n = len(d)
     assert n == len(dt)
@@ -504,7 +609,10 @@ def compare():
                     "flagged_not_repaired_pct": W.flagged_not_repaired_pct})
     E = pd.concat([E, pd.DataFrame(ref)], ignore_index=True)
     order = {"teacher": 0, "teacher + repair": 1, "human40": 90}
-    E["o"] = E.model.map(lambda m: 2 + int(re.search(r"round(\d+)", m).group(1)) * 10 + VARIANT.get(int(re.search(r"every(\d+)", m).group(1)), 9) if "round" in m else order.get(m, 95))
+    def variant(m):
+        e = re.search(r"every(\d+)", m)
+        return VARIANT.get(int(e.group(1)), 9) if e else REPAIRED_VARIANT
+    E["o"] = E.model.map(lambda m: 2 + int(re.search(r"round(\d+)", m).group(1)) * 10 + variant(m) if "round" in m else order.get(m, 95))
     E = E.sort_values(["video", "o"]).drop(columns="o")
     E.to_csv(OUT / "comparison.csv", index=False)
     show = ["video", "model", "median_error_pct", "p90_error_pct", "wrong_frames", "test50_median_px", "flagged_fit_pct", "flagged_pca_pct", "flagged_either_pct"]
@@ -560,11 +668,14 @@ def main():
     ap.add_argument("--save-flags", action="store_true", help="evaluate: also write flags.csv.gz (per-frame finder state); default outputs unchanged")
     ap.add_argument("--h5", default=None, help="evaluate: whole-video prediction of another model of the video (with --model-name)")
     ap.add_argument("--model-name", default=None, help="evaluate: folder name under results/self_training/videoNN/ for --h5")
+    ap.add_argument("--source", choices=SOURCES, default="pipeline",
+                    help="pseudo/train/evaluate: 'pipeline' (every N-th passed frame, default) or 'repaired' (the repaired frames only, --every ignored)")
+    ap.add_argument("--dry-run", action="store_true", help="train: print the schedule and stop before staging anything")
     a = ap.parse_args()
     if a.cmd == "pseudo":
-        pseudo(a.video, a.every, a.round)
+        pseudo(a.video, a.every, a.round, a.source)
     elif a.cmd == "train":
-        train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag)
+        train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag, a.source, a.dry_run)
     elif a.cmd == "predict":
         t1 = time.time()
         predict_video(a.video, a.shuffle, Path(a.out), a.limit)
@@ -576,7 +687,7 @@ def main():
             T["prediction_h5"] = h5.name
             T.to_csv(a.info, index=False)
     elif a.cmd == "evaluate":
-        evaluate(a.video, a.every, a.round, a.teacher, a.tag, a.save_flags, a.h5, a.model_name)
+        evaluate(a.video, a.every, a.round, a.teacher, a.tag, a.save_flags, a.h5, a.model_name, a.source)
     else:
         compare()
 

@@ -46,18 +46,23 @@ import pupil_trace as pt  # noqa: E402
 import unreliable_frames_sweep as U  # noqa: E402
 from scale_step import SCORER  # noqa: E402
 from second_peak_repair import BPS, RES, frame_rmse, load  # noqa: E402
-from self_training import FINAL, LINE, LOCAL, mkdir, teacher_eye_width, teacher_h5, unit_of  # noqa: E402
+from self_training import FINAL, LINE, LOCAL, holdout_mask, mkdir, teacher_eye_width, teacher_h5, unit_of  # noqa: E402
 
 HERE = RES.parent
 OUT = RES / "blind_test"
 STRATA = {"A": "teacher flagged, student not", "B": "both flagged", "C": "neither flagged", "D": "student flagged, teacher not"}
 GUARD_TRUTH, GUARD_LABEL, GUARD_PSEUDO = 60, 5, 5
 STUDENT = "round1_every30"
+NEW_STUDENT = "round1_repaired"
+# supplement cells: frames where the repaired-frames student's flag differs from the every-30 student's, by the teacher's flag
+CELLS = {"E_t": "teacher and every30 flagged, repaired not", "E_n": "every30 flagged only, repaired not",
+         "F_t": "teacher and repaired flagged, every30 not", "F_n": "repaired flagged only, every30 not"}
 PUPIL = BPS[:4]
+SUP = False                                                    # --supplement: work in videoNN/supplement/ (its own key, labels, scores)
 
 
 def folder(v):
-    return OUT / f"video{v:02d}"
+    return OUT / f"video{v:02d}" / ("supplement" if SUP else "")
 
 
 def label_dir(v):
@@ -94,10 +99,111 @@ def label_frames(v):
 
 def pseudo_frames(v):
     fr = []
-    for f in (RES / "self_training" / f"video{v:02d}").glob("pseudo_every*/pseudo_frames.csv"):
+    for f in (RES / "self_training" / f"video{v:02d}").glob("pseudo_*/pseudo_frames.csv"):
         K = pd.read_csv(f)
         fr += K[K.kept].frame.astype(int).tolist()
     return sorted(set(fr))
+
+
+def draw(pool, k, XY, Wm, seed, rng):
+    """k frames spread over the pose space of a pool (k-means on the eight points / eye width, one frame per cluster);
+    the whole pool when it is not larger than k. Returns (frames, cluster ids)."""
+    from sklearn.cluster import KMeans
+    if len(pool) <= k:
+        return pool, np.arange(len(pool))
+    feat = (XY[pool] / Wm).reshape(len(pool), -1)
+    lab = KMeans(n_clusters=k, random_state=seed, n_init=4).fit_predict(feat)
+    return np.array([rng.choice(pool[lab == c]) for c in range(k)]), np.arange(k)
+
+
+def write_pngs(v, want, ld):
+    """PNGs: one sequential pass, frames written exactly as read (as select_frames.py and self_training.py pseudo do)."""
+    import cv2
+    cap = cv2.VideoCapture(str(HERE / unit_of(v) / f"{unit_of(v)}.mp4"))
+    i, last = 0, max(want)
+    while i <= last:
+        if not cap.grab():
+            break
+        if i in want:
+            ok, im = cap.retrieve()
+            assert ok
+            cv2.imwrite(str(ld / want[i]), im)
+        i += 1
+    cap.release()
+    missing = [nm for nm in want.values() if not (ld / nm).exists()]
+    assert not missing, missing
+
+
+def supplement(v, n_total, seed):
+    """Supplementary blind draw for the repaired-frames student (--source repaired of self_training.py): frames in the
+    held-out time blocks of that student's pseudo set where its flag differs from the every-30 student's, by cell
+    (CELLS), spread over the pose space as in select; the existing rules exclude the truth band, labels, every pseudo
+    frame of any student and the first blind draw. Weights = cell share of the eligible disagreement frames / drawn.
+    Writes videoNN/supplement/selection_key.csv, selection_summary.csv and the PNGs (img101.png onwards)."""
+    assert SUP, "run with --supplement"
+    rr, dt, P, H, truth, fwd, sig = load(v)
+    n = len(dt)
+    Wm = teacher_eye_width(dt)
+    XY = U.pose_matrix(dt)
+    tflag, sflag = flags_of(v)
+    R = pd.read_csv(RES / "self_training" / f"video{v:02d}" / NEW_STUDENT / "flags.csv.gz")
+    assert len(R) == n
+    rflag = (R.fit_flag | R.pca_flag).to_numpy(bool)
+    held, block = holdout_mask(n)
+    first = pd.read_csv(OUT / f"video{v:02d}" / "selection_key.csv").frame.astype(int).tolist()
+    excl = band(n, truth.index.astype(int), GUARD_TRUTH) | band(n, label_frames(v), GUARD_LABEL) | band(n, pseudo_frames(v), GUARD_PSEUDO) | band(n, first, GUARD_LABEL)
+    excl |= ~np.isfinite(XY).all(axis=(1, 2))
+    elig = ~excl & held
+    cell = np.where(sflag & ~rflag, np.where(tflag, "E_t", "E_n"), np.where(~sflag & rflag, np.where(tflag, "F_t", "F_n"), ""))
+    whole = {c: int((cell == c).sum()) for c in CELLS}
+    avail = {c: int(((cell == c) & elig).sum()) for c in CELLS}
+    tot = sum(avail.values())
+    print(f"video {v}: the two students disagree on {sum(whole.values())} frames of {n} ({', '.join(f'{c} {k}' for c, k in whole.items())}); "
+          f"eligible in the held-out blocks {tot} ({', '.join(f'{c} {k}' for c, k in avail.items())})")
+    if tot < 20:
+        print("fewer than 20 eligible disagreement frames: no supplement drawn")
+        return
+    # quota: proportional to the eligible cell sizes, at least one per non-empty cell, largest remainders
+    quota = {c: (1 if avail[c] else 0) for c in CELLS}
+    rest = n_total - sum(quota.values())
+    exact = {c: rest * avail[c] / tot for c in CELLS}
+    for c in CELLS:
+        quota[c] += int(exact[c])
+    for c in sorted(CELLS, key=lambda c: exact[c] - int(exact[c]), reverse=True)[:n_total - sum(quota.values())]:
+        quota[c] += 1
+    quota = {c: min(q, avail[c]) for c, q in quota.items()}
+    rng = np.random.default_rng(seed)
+    rows = []
+    for c in CELLS:
+        pool = np.flatnonzero((cell == c) & elig)
+        chosen, lab = draw(pool, quota[c], XY, Wm, seed, rng)
+        for f, k in zip(chosen, lab):
+            rows.append({"frame": int(f), "stratum": c, "cluster": int(k)})
+    sel = pd.DataFrame(rows)
+    assert not excl[sel.frame].any() and held[sel.frame].all()
+    for c in CELLS:
+        cnt = int((sel.stratum == c).sum())
+        sel.loc[sel.stratum == c, "stratum_frames"] = avail[c]
+        sel.loc[sel.stratum == c, "stratum_share"] = avail[c] / tot
+        sel.loc[sel.stratum == c, "weight"] = (avail[c] / tot) / cnt if cnt else np.nan
+    sel["teacher_flag"], sel["student_flag"], sel["repaired_flag"] = tflag[sel.frame], sflag[sel.frame], rflag[sel.frame]
+    sel["block"] = block[sel.frame]
+    sel = sel.sample(frac=1, random_state=int(rng.integers(1 << 31))).reset_index(drop=True)
+    sel.insert(0, "blind_name", [f"img{i + 101:03d}.png" for i in range(len(sel))])
+    sel["video"] = v
+    ld = label_dir(v)
+    if ld.exists():
+        raise SystemExit(f"{ld} exists; remove it by hand for a fresh set")
+    ld.mkdir(parents=True)
+    out = mkdir(folder(v))
+    sel.to_csv(out / "selection_key.csv", index=False)
+    pd.DataFrame([{"video": v, "unit": unit_of(v), "frames": n, "held_out_frames": int(held.sum()), "eligible_held_out": int(elig.sum()),
+                   "disagree_whole_video": sum(whole.values()), **{f"whole_{c}": whole[c] for c in CELLS},
+                   "disagree_eligible": tot, **{f"eligible_{c}": avail[c] for c in CELLS}, **{f"drawn_{c}": int((sel.stratum == c).sum()) for c in CELLS},
+                   "eye_width_px": round(Wm, 1), "seed": seed}]).to_csv(out / "selection_summary.csv", index=False)
+    write_pngs(v, dict(zip(sel.frame.astype(int), sel.blind_name)), ld)
+    print(f"video {v}: {len(sel)} supplement frames drawn; cells " + ", ".join(f"{c} {int((sel.stratum == c).sum())} of {avail[c]}" for c in CELLS))
+    print(f"PNGs in {ld}; key in {out / 'selection_key.csv'} (do not open it before labeling)")
 
 
 def select(v, n_total, seed):
@@ -119,15 +225,8 @@ def select(v, n_total, seed):
     for s in ["A", "B", "D", "C"]:                               # C last, it absorbs the shortfall of the others
         pool = np.flatnonzero((strat == s) & elig)
         k = quota[s] + (short if s == "C" else 0)
-        if len(pool) <= k:
-            chosen = pool
-            short += k - len(pool)
-            lab = np.arange(len(pool))
-        else:
-            feat = (XY[pool] / Wm).reshape(len(pool), -1)
-            lab = KMeans(n_clusters=k, random_state=seed, n_init=4).fit_predict(feat)
-            chosen = np.array([rng.choice(pool[lab == c]) for c in range(k)])
-            lab = np.arange(k)
+        chosen, lab = draw(pool, k, XY, Wm, seed, rng)
+        short += max(0, k - len(pool))
         for f, c in zip(chosen, lab):
             rows.append({"frame": int(f), "stratum": s, "cluster": int(c)})
     sel = pd.DataFrame(rows)
@@ -153,22 +252,7 @@ def select(v, n_total, seed):
                    "excluded_label_band": int(band(n, label_frames(v), GUARD_LABEL).sum()), "excluded_pseudo_band": int(band(n, pseudo_frames(v), GUARD_PSEUDO).sum()),
                    **{f"share_{s}": round(share[s], 5) for s in STRATA}, **{f"drawn_{s}": int((sel.stratum == s).sum()) for s in STRATA},
                    "eye_width_px": round(Wm, 1), "seed": seed}]).to_csv(out / "selection_summary.csv", index=False)
-    # PNGs: one sequential pass, frames written exactly as read (as select_frames.py and self_training.py pseudo do)
-    import cv2
-    want = dict(zip(sel.frame.astype(int), sel.blind_name))
-    cap = cv2.VideoCapture(str(HERE / unit_of(v) / f"{unit_of(v)}.mp4"))
-    i, last = 0, max(want)
-    while i <= last:
-        if not cap.grab():
-            break
-        if i in want:
-            ok, im = cap.retrieve()
-            assert ok
-            cv2.imwrite(str(ld / want[i]), im)
-        i += 1
-    cap.release()
-    missing = [nm for nm in sel.blind_name if not (ld / nm).exists()]
-    assert not missing, missing
+    write_pngs(v, dict(zip(sel.frame.astype(int), sel.blind_name)), ld)
     print(f"video {v}: {len(sel)} frames drawn from {int(elig.sum())} eligible; strata " + ", ".join(f"{s} {int((sel.stratum == s).sum())} (share {100 * share[s]:.1f} %)" for s in STRATA))
     print(f"PNGs in {ld}; key in {out / 'selection_key.csv'} (do not open it before labeling)")
 
@@ -277,7 +361,7 @@ def coords_of(path):
 def models_of(v, extra):
     unit = unit_of(v)
     m = {"teacher": teacher_h5(v), "teacher + repair": RES / "self_training" / f"video{v:02d}" / "repair" / "coords_after.csv.gz"}
-    for name in ("round1_every30", "round1_every100", "round2_every30", "human40"):
+    for name in ("round1_every30", "round1_every100", "round2_every30", NEW_STUDENT, "human40"):
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))
         if h5:
             m[name] = h5[-1]
@@ -350,27 +434,29 @@ def paired(E, ref="teacher"):
     return pd.DataFrame(rows)
 
 
-def figure(E, v, out):
+def figure(E, v, out, strata=None):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    strata = strata or STRATA
     students = [m for m in E.model.unique() if m not in ("teacher",)]
     R = E[E.model == "teacher"].set_index("frame").error * 100
-    fig, axes = plt.subplots(1, 4, figsize=(17, 4.4), sharex=True, sharey=True)
-    colors = {"teacher + repair": "#9e9e9e", "round1_every30": "#e69f00", "round1_every100": "#0072b2", "round2_every30": "#cc79a7", "human40": "#009e73"}
+    fig, axes = plt.subplots(1, len(strata), figsize=(17, 4.4), sharex=True, sharey=True)
+    colors = {"teacher + repair": "#9e9e9e", "round1_every30": "#e69f00", "round1_every100": "#0072b2", "round2_every30": "#cc79a7", "human40": "#009e73",
+              NEW_STUDENT: "#d55e00"}
     lim = max(float(np.nanmax(E.error)) * 100, LINE * 100) * 1.05
-    for ax, s in zip(axes, STRATA):
+    for ax, s in zip(axes, strata):
         for m in students:
             g = E[(E.model == m) & (E.stratum == s)].set_index("frame").error * 100
             ax.scatter(R.loc[g.index], g, s=22, color=colors.get(m, "k"), label=m, alpha=0.85, edgecolor="white", linewidth=0.4)
         ax.plot([0, lim], [0, lim], color="0.75", lw=0.8, zorder=0)
         ax.axhline(LINE * 100, color="0.6", lw=0.8, ls="--"); ax.axvline(LINE * 100, color="0.6", lw=0.8, ls="--")
-        ax.set_title(f"{s}: {STRATA[s]}", fontsize=10)
+        ax.set_title(f"{s}: {strata[s]}", fontsize=10)
         ax.set_xlabel("teacher error, % of eye width")
         ax.set_xlim(0, lim); ax.set_ylim(0, lim)
     axes[0].set_ylabel("model error, % of eye width")
     axes[0].legend(frameon=False, fontsize=8)
-    fig.suptitle(f"Video {v}, blind test set: each point is one frame, below the diagonal = better than the teacher", fontsize=11)
+    fig.suptitle(f"Video {v}, blind {'supplement' if SUP else 'test set'}: each point is one frame, below the diagonal = better than the teacher", fontsize=11)
     fig.tight_layout()
     fig.savefig(out, dpi=150)
 
@@ -384,11 +470,13 @@ def score(v, extra):
     S = summarise(E)
     S.to_csv(out / "scores.csv", index=False)
     Pd = paired(E)
+    if STUDENT in models and NEW_STUDENT in models:
+        Pd = pd.concat([Pd, paired(E[E.model.isin([STUDENT, NEW_STUDENT])], ref=STUDENT)], ignore_index=True)
     Pd.to_csv(out / "paired.csv", index=False)
-    figure(E, v, out / "paired.png")
+    figure(E, v, out / "paired.png", CELLS if SUP else None)
     print(f"video {v}: {len(L)} labeled frames ({int((L.labeled_points == 0).sum())} with no point), eye width {Wm:.1f} px, models: {', '.join(models)}")
     print(S[S.stratum.str.startswith("all")][["model", "frames", "median_error_pct", "p90_error_pct", "wrong_frames", "wrong_pct"]].to_string(index=False))
-    print(Pd[Pd.stratum == "all"][["model", "frames", "better", "worse", "same_within_1pct", "median_diff_pct", "p_sign", "p_wilcoxon"]].to_string(index=False))
+    print(Pd[Pd.stratum == "all"][["model", "against", "frames", "better", "worse", "same_within_1pct", "median_diff_pct", "p_sign", "p_wilcoxon"]].to_string(index=False))
 
 
 def check(v):
@@ -409,16 +497,21 @@ def check(v):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["select", "subset", "prelabel", "score", "check"])
+    ap.add_argument("cmd", choices=["select", "subset", "prelabel", "score", "check", "supplement"])
     ap.add_argument("--video", type=int, required=True)
-    ap.add_argument("--n", type=int, default=50)
+    ap.add_argument("--n", type=int, default=None, help="select: frames to draw (default 50); supplement: default 10")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--points", default=None, help="prelabel: csv (blind_name, bodypart, x, y)")
     ap.add_argument("--counts", default="A=10,B=3,C=8,D=3", help="subset: frames to keep per stratum")
     ap.add_argument("--extra", action="append", help="score: extra model as name=path (h5 or coords_after.csv.gz)")
+    ap.add_argument("--supplement", action="store_true", help="prelabel/score: the supplement set (videoNN/supplement/); implied by the supplement command")
     a = ap.parse_args()
-    if a.cmd == "select":
-        select(a.video, a.n, a.seed)
+    global SUP
+    SUP = a.supplement or a.cmd == "supplement"
+    if a.cmd == "supplement":
+        supplement(a.video, a.n or 10, a.seed)
+    elif a.cmd == "select":
+        select(a.video, a.n or 50, a.seed)
     elif a.cmd == "subset":
         subset(a.video, {kv.split("=")[0]: int(kv.split("=")[1]) for kv in a.counts.split(",")})
     elif a.cmd == "prelabel":
