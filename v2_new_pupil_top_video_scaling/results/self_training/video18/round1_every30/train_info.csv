@@ -1,0 +1,2 @@
+video,model,shuffle,teacher_shuffle,train_human,train_pseudo,val,teacher_iterations,epochs,iterations,milestones,snapshot_every,final_snapshot,train_minutes,predict_minutes,prediction_h5
+18,round1_every30,4181,1912,820,1490,20,49200,42,48510,34/40,3,snapshot-042.pt,144.9,,
