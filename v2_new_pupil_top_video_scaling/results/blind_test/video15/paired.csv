@@ -1,0 +1,16 @@
+model,against,stratum,frames,better,worse,same_within_1pct,median_diff_pct,p_sign,p_wilcoxon
+teacher + repair,teacher,A,10,4,0,6,-0.0,0.125,0.2324
+teacher + repair,teacher,B,3,0,0,3,0.0,,0.25
+teacher + repair,teacher,C,8,0,0,8,0.0,,1.0
+teacher + repair,teacher,D,3,0,0,3,0.0,,1.0
+teacher + repair,teacher,all,24,4,0,20,0.0,0.125,0.5646
+round1_every30,teacher,A,10,6,0,4,-22.1,0.0312,0.0137
+round1_every30,teacher,B,3,2,0,1,-13.6,0.5,0.5
+round1_every30,teacher,C,8,0,1,7,0.11,1.0,0.5469
+round1_every30,teacher,D,3,0,2,1,3.86,0.5,0.5
+round1_every30,teacher,all,24,8,3,13,-0.2,0.2266,0.0564
+human40,teacher,A,10,0,0,10,0.0,,
+human40,teacher,B,3,0,0,3,0.0,,
+human40,teacher,C,8,0,0,8,0.0,,
+human40,teacher,D,3,0,0,3,0.0,,
+human40,teacher,all,24,0,0,24,0.0,,

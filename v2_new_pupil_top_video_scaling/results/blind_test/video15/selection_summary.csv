@@ -1,0 +1,2 @@
+video,unit,frames,eligible,excluded_truth_band,excluded_label_band,excluded_pseudo_band,share_A,share_B,share_C,share_D,drawn_A,drawn_B,drawn_C,drawn_D,eye_width_px,seed,kept_A,kept_B,kept_C,kept_D
+15,15_20251013_Terra_spont_1,71748,43194,8410,880,19536,0.0792,0.03065,0.88144,0.0087,13,12,13,12,428.8,42,10,3,8,3
