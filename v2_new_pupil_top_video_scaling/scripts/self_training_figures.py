@@ -23,9 +23,13 @@ import blind_test_set as B  # noqa: E402
 VIDEOS = (1, 8, 15, 6)
 ALL = (0, 1, 2, 4, 6, 7, 8, 12, 15, 18)
 MODELS = {"teacher": "starting model", "teacher + repair": "starting model + repair", "round1_every30": "experiment 1",
-          "round1_repaired": "experiment 2", "round2_every30": "experiment 1, second turn"}
+          "round1_repaired": "experiment 2", "round2_every30": "experiment 1, second turn",
+          "round1_both": "experiment 3, first turn", "round2_both": "experiment 3, second turn",
+          "round3_both": "experiment 3, third turn"}
 COL = {"teacher": "#6f6f6f", "teacher + repair": "#b9b9b9", "round1_every30": "#e69f00", "round1_repaired": "#d55e00",
-       "round2_every30": "#cc79a7"}
+       "round2_every30": "#cc79a7", "round1_both": "#56b4e9", "round2_both": "#1f78b4", "round3_both": "#0b3d91"}
+LOOP = ("round1_every30", "round1_repaired", "round1_both")       # the three first-turn loop models shown side by side
+BARS = [m for m in MODELS if m not in ("round2_both", "round3_both")]   # later turns of experiment 3: figure loop_turns
 LINE = 14.0
 plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False, "axes.edgecolor": "#888",
                      "axes.labelcolor": "#222", "xtick.color": "#444", "ytick.color": "#444", "axes.titlesize": 11})
@@ -60,7 +64,7 @@ def bars(ax, C, col, models, ylabel, fmt, vids):
 
 def fig_truth():
     C = comparison()
-    models = list(MODELS)
+    models = BARS
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 3.9))
     bars(axes[0], C, "median_error_pct", models, "median error, 70 truth frames, % of eye width", lambda y: f"{y:.1f}", VIDEOS)
     bars(axes[1], C, "wrong_frames", models, "wrong truth frames (error over 14 %), of 70", lambda y: f"{y:.0f}", VIDEOS)
@@ -70,7 +74,7 @@ def fig_truth():
     axes[0].set_ylim(0, 6.2)
     axes[2].set_ylim(0, 17.5)
     h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.legend(h, l, loc="upper center", ncol=6, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     fig.savefig(OUT / "loop_truth.png", dpi=170)
     plt.close(fig)
@@ -96,7 +100,7 @@ def fig_blind():
     for ax, v in zip(axes, VIDEOS):
         P = pd.read_csv(RES / "blind_test" / f"video{v:02d}" / "per_frame.csv")
         T = P[P.model == "teacher"].set_index("frame").error * 100
-        for m in ("round1_every30", "round1_repaired"):
+        for m in LOOP:
             M = P[P.model == m].set_index("frame")
             for s, marker in mk.items():
                 idx = M.index[M.stratum == s]
@@ -115,9 +119,9 @@ def fig_blind():
         ax.set_axisbelow(True)
     axes[0].set_ylabel("loop model error, % of eye width")
     from matplotlib.lines import Line2D
-    hs = [Line2D([], [], color=COL[m], marker="o", linestyle="", label=MODELS[m]) for m in ("round1_every30", "round1_repaired")]
+    hs = [Line2D([], [], color=COL[m], marker="o", linestyle="", label=MODELS[m]) for m in LOOP]
     hs += [Line2D([], [], color="#555", marker=mk[s], linestyle="", label=f"stratum {s}") for s in mk]
-    fig.legend(handles=hs, loc="upper center", ncol=6, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.legend(handles=hs, loc="upper center", ncol=7, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     fig.savefig(OUT / "loop_blind.png", dpi=170)
     plt.close(fig)
@@ -140,7 +144,7 @@ def fig_examples():
         human = {b: (row[(sc, b, "x")], row[(sc, b, "y")]) for b in B.BPS}
         models = B.models_of(v, None)
         pts = {}
-        for m in ("teacher", "round1_every30", "round1_repaired"):
+        for m in ("teacher",) + LOOP:
             xy = B.coords_of(models[m])
             pts[m] = {b: xy[b][f] for b in B.BPS}
         panels.append((v, f, img, human, pts))
@@ -163,14 +167,68 @@ def fig_examples():
             s.set_visible(False)
     from matplotlib.lines import Line2D
     hs = [Line2D([], [], color=COL[m], marker="o", markeredgecolor="black", markeredgewidth=0.4, linestyle="", label=MODELS[m])
-          for m in ("teacher", "round1_every30", "round1_repaired")]
+          for m in ("teacher",) + LOOP]
     hs.append(Line2D([], [], marker="o", markerfacecolor="none", markeredgecolor="#333", markeredgewidth=1.4, markersize=9,
                      linestyle="", label="human label (white ring in the image)"))
-    fig.legend(handles=hs, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.legend(handles=hs, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     fig.savefig(OUT / "loop_examples.jpg", dpi=150, pil_kwargs={"quality": 88})
     plt.close(fig)
     return picks
+
+
+def blind_wrong(v, model):
+    """Wrong frames of a model on the 24 blind frames plus the 10 supplementary frames (error over the 14 % line)."""
+    n = 0
+    for f in ("per_frame.csv", "supplement/per_frame.csv"):
+        P = pd.read_csv(RES / "blind_test" / f"video{v:02d}" / f)
+        n += int((P[P.model == model].error > LINE / 100).sum())
+    return n
+
+
+def fig_turns():
+    """Experiment 3 turn by turn: flagged share of the video, wrong blind frames (of 34) and wrong truth frames (of 70),
+    turn 0 = the starting model; a dotted line marks the turn at which the stop rule stopped the loop."""
+    C = comparison()
+    series = [("flagged_either_pct", "frames flagged by either finder, % of the video", "o", "#0072b2", (0, 5), "center"),
+              ("blind_wrong_pct", "wrong blind frames, % of 34", "s", "#d55e00", (0, 5), "center"),
+              ("truth_wrong_pct", "wrong truth frames, % of 70", "^", "#009e73", (7, -3), "left")]
+    fig, axes = plt.subplots(1, 4, figsize=(13.5, 3.6), sharey=True)
+    for ax, v in zip(axes, VIDEOS):
+        rows = []
+        for r in range(4):
+            m = "teacher" if r == 0 else f"round{r}_both"
+            c = C[(C.video == v) & (C.model == m)]
+            if not len(c):
+                break
+            rows.append({"turn": r, "flagged_either_pct": float(c.iloc[0].flagged_either_pct),
+                         "blind_wrong_pct": 100 * blind_wrong(v, m) / 34, "truth_wrong_pct": 100 * float(c.iloc[0].wrong_frames) / 70})
+        T = pd.DataFrame(rows)
+        for col, label, marker, colour, off, ha in series:
+            ax.plot(T.turn, T[col], marker=marker, color=colour, linewidth=1.6, markersize=5.5, label=label)
+            for x, y in zip(T.turn, T[col]):
+                ax.annotate(f"{y:.1f}", (x, y), textcoords="offset points", xytext=off, ha=ha, fontsize=6.5, color="#333")
+        status = RES / "self_training" / f"video{v:02d}" / "loop_status.csv"
+        if status.exists():
+            S = pd.read_csv(status)
+            stop = S[S.stop.astype(str) == "True"]
+            if len(stop):
+                ax.axvline(int(stop.iloc[0]["round"]), color="#999", linestyle=":", linewidth=0.9)
+                ax.text(int(stop.iloc[0]["round"]) + 0.05, ax.get_ylim()[1] * 0.97 if ax.get_ylim()[1] > 0 else 1, "stopped",
+                        fontsize=7, color="#666", va="top")
+        ax.set_title(f"video {v}")
+        ax.set_xticks(range(4))
+        ax.set_xticklabels(["start", "turn 1", "turn 2", "turn 3"], fontsize=8)
+        ax.set_xlim(-0.4, 3.4)
+        ax.grid(color="#eee", linewidth=0.5)
+        ax.set_axisbelow(True)
+    axes[0].set_ylabel("percent")
+    axes[0].set_ylim(0, 62)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.9))
+    fig.savefig(OUT / "loop_turns.png", dpi=170)
+    plt.close(fig)
 
 
 if __name__ == "__main__":
@@ -178,5 +236,6 @@ if __name__ == "__main__":
     fig_truth()
     fig_all_videos()
     fig_blind()
+    fig_turns()
     print("examples:", fig_examples())
     print("written to", OUT)
