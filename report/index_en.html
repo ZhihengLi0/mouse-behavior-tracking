@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 16:03 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 16:12 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1109,7 +1109,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Result.</b> Truth frames: the whole replacement repairs as many as the pupil-only run (12), differing on 8 frames: 6 right frames flagged because of a corner are now judged plausible as they are and left alone, one wrong eyelid frame of video 2 is repaired, and one frame of video 4 (62186, lower eyelid worst) is sent back instead, because the eyelid's second peak fails the outline range and the whole replacement is reverted. With the smallest subset 15 are repaired: the 3 gained are eyelid frames (video 2: 68086, 68379; video 4: 70429), still flagged falls from 7 to 4, made worse stays 1. Whole videos: the still-flagged share falls from 1.18% to 0.51%, most of it becoming "plausible as it is" (1.74% to 2.11%), the rest repaired (0.80% to 1.10%); the smallest subset repairs 1878 frames the whole replacement sent back and loses none; of the 12,517 frames both repair, 805 keep a pupil point the whole replacement would have moved. By eye (Table 9-3-3): 39 of the 41 judged eyelid points are right, 31 of 35 corners, though a third of the corners could not be judged from the crop; of the pupil points moved in the same frames, 10 of 32 judged were right before and moved for nothing, which is why the smallest subset was adopted. The check by eye has not been repeated on the smallest-subset version.</p>
+    <p><b>Conclusion: eyelids and corners are repaired too, frames that are plausible as they are no longer wait for a person, and nothing more is made worse.</b></p>
+    <ul>
+      <li>Truth frames: wrong frames repaired from 12 to 15, the 3 gained all eyelid errors; still flagged from 7 down to 4; made worse still 1.</li>
+      <li>Whole videos: the frames flagged and not repaired halve (1.18% to 0.51%), most of them re-judged as plausible as they are, the rest repaired.</li>
+      <li>Why the smallest subset rather than the whole replacement: the whole replacement repairs as many as pupil points only, and the check by eye found that about a third of the pupil points moved along in the same frames were right before and moved for nothing; the smallest subset keeps those points and repairs more frames, never fewer.</li>
+      <li>By eye: more than nine in ten of the eyelid and corner points put in are right (a third of the corners could not be judged from the crop). The check has not been repeated on the smallest-subset run.</li>
+    </ul>
   </div>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on the extension:</span>with eyelids and corners repaired too and the smallest subset replaced, 15 of the 23 wrong frames are repaired (12 with pupil points only), the rest stay flagged, nothing is deleted; on the whole videos 1.1% of the frames are repaired and 0.5% stay flagged.
