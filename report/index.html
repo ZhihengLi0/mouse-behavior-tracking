@@ -80,7 +80,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:25 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:26 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1442,9 +1442,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
 
   <p class="text"><b><span lang="zh">结果</span><span lang="en">Results</span></b></p>
-  <p class="text"><b><span lang="zh">表 9-4-1：四个视频上每个模型的五个数（真值帧 70 帧，盲测帧 24 + 10 帧）</span><span lang="en">Table 9-4-1: five numbers per model on the four videos (70 truth frames, 24 + 10 blind frames)</span></b></p>
+  <p class="text"><b><span lang="zh">表 9-4-1：四个视频上每个模型的五个数。"预测错的" = 该模型在同一批帧上误差超过眼宽 14% 的帧数</span><span lang="en">Table 9-4-1: five numbers per model on the four videos. "Wrong predictions" = frames of the same set on which that model's error exceeds 14% of the eye width</span></b></p>
   <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">模型</span><span lang="en">Model</span></th><th><span lang="zh">真值错帧（/70）</span><span lang="en">Wrong truth frames (of 70)</span></th><th><span lang="zh">真值中位误差（% 眼宽）</span><span lang="en">Median truth error (% eye width)</span></th><th><span lang="zh">整段标出率（%）</span><span lang="en">Flagged share (%)</span></th><th><span lang="zh">盲测错帧（/24）</span><span lang="en">Wrong blind frames (of 24)</span></th><th><span lang="zh">补充盲测错帧（/10）</span><span lang="en">Wrong supplementary frames (of 10)</span></th></tr></thead>
+    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">模型</span><span lang="en">Model</span></th><th><span lang="zh">70 帧真值帧里预测错的</span><span lang="en">Wrong predictions among the 70 truth frames</span></th><th><span lang="zh">真值中位误差（% 眼宽）</span><span lang="en">Median truth error (% eye width)</span></th><th><span lang="zh">整段标出率（%）</span><span lang="en">Flagged share (%)</span></th><th><span lang="zh">24 帧盲测帧里预测错的</span><span lang="en">Wrong predictions among the 24 blind frames</span></th><th><span lang="zh">10 帧补充盲测帧里预测错的</span><span lang="en">Wrong predictions among the 10 supplementary frames</span></th></tr></thead>
     <tbody>
       <tr><td rowspan="4">1</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>8</td><td>2.94</td><td>15.3</td><td>11</td><td>6</td></tr>
       <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>2</td><td>2.67</td><td>1.3</td><td>4</td><td>3</td></tr>
