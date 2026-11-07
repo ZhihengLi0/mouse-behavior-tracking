@@ -11,7 +11,11 @@ from PIL import Image, ImageDraw, ImageFont
 from second_peak_repair import BPS, P4, RES, Geometry, load, peak2_pixels, pooled_bands
 
 FAR = RES / "flag_and_repair"
+import sys  # noqa: E402
+
 TEST, N_EACH, TW, TH = "labelregion", 5, 320, 240
+if len(sys.argv) > 1:      # optional: another run's folder suffix, e.g. either_labelregion_all_smallest (output name carries it)
+    TEST = sys.argv[1]
 FONT = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 14)
 FONT_B = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 17)
 
@@ -75,6 +79,6 @@ for r in sel.itertuples():
     S.paste(crop, (col * TW, 30 + r.row * (TH + 30)))
 for v in cache:
     cache[v][3].release()
-out = FAR / "all_videos" / "repair_examples.jpg"
+out = FAR / "all_videos" / ("repair_examples.jpg" if TEST == "labelregion" else f"repair_examples_{TEST}.jpg")
 S.save(out, quality=90)
 print("saved", out, len(rep), "repaired,", len(left), "still flagged")

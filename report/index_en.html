@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 14:23 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 14:27 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -961,10 +961,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Three repaired frames. Left to right: before (red = the model's points, the thrown point outside the view); the point's heatmap over the whole frame, red ring = peak 1, blue ring = peak 2, dashed box = the area the third panel enlarges; the box enlarged, peak 2 on the pupil edge; after (blue = the point moved to peak 2).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-7:</span>[pupil-points-only run, method selection] Three repaired frames. Left to right: before (red = the model's points, the thrown point outside the view); the point's heatmap over the whole frame, red ring = peak 1, blue ring = peak 2, dashed box = the area the third panel enlarges; the box enlarged, peak 2 on the pupil edge; after (blue = the point moved to peak 2).</figcaption>
   </figure>
 
-  <p class="text"><b><span lang="en">Result one: truth frames</span></b></p>
+  <p class="text"><b><span lang="en">Result one: truth frames (final pipeline)</span></b></p>
   
   <div class="text" lang="en">
     <p>All 23 wrong frames are flagged: 15 repaired (error back under the line), 4 still flagged, 4 left alone as closed-eye. By the worst point: of the 16 frames whose worst point is a pupil point 11 are repaired, of the 4 with an eyelid worst 3, of the 3 with a corner worst 1. The 4 still flagged are frames in which several points were thrown at once and the second peak is not where the point belongs either: video 1 frames 61431 and 62186, video 2 frame 67793, video 14 frame 64865; the 4 closed-eye frames are in videos 10 and 11, in two of which the model's eyelid points are themselves wrong. Of the 40 flagged right frames 38 pass the check as they are and are left alone, 2 are repaired, one of them pushed over the line (made worse). Figure 9-10 shows repaired frames and frames that stay flagged.</p>
@@ -972,11 +972,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-10:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-10:</span>[final pipeline] Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
 
-  <p class="text"><b><span lang="en">Result two: whole videos</span></b></p>
-  <p class="text"><b><span lang="en">Table 9-3-1: frame statuses over the whole of the 19 videos (% of frames)</span></b></p>
+  <p class="text"><b><span lang="en">Result two: whole videos (final pipeline)</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-1: [final pipeline] frame statuses over the whole of the 19 videos (% of frames)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Frames</span></th><th><span lang="en">Flagged</span></th><th><span lang="en">Repaired</span></th><th><span lang="en">Flagged, not repaired</span></th><th><span lang="en">Plausible as it is</span></th><th><span lang="en">Closed</span></th></tr></thead>
     <tbody>
@@ -1007,7 +1007,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p>4.2% of all frames are flagged by either finder: 1.10% repaired, 0.51% flagged and not repaired, 2.11% plausible as they are, 0.59% closed. Videos 1 and 8 have the most (flagged 15.3% and 8.9%, repaired 6.8% and 2.0%). Points put in: 15,159 in all, 11,571 pupil points, 1295 eyelid, 2293 corner; among the pupil points mostly pupil_left. Of the frames flagged and not repaired about two in five are false alarms (check by eye, below).</p>
   </div>
 
-  <p class="text"><b><span lang="en">How the check, the finder and the way of replacing were chosen</span></b></p>
+  <p class="text"><b><span lang="en">How the check, the finder and the way of replacing were chosen (comparisons made while settling the method, not results of the final pipeline)</span></b></p>
   
   <div class="text" lang="en">
     <p>The three comparisons below were made while the method was being settled; the first two were run with pupil points only replaced and the pupil range alone as check (the outline range and the smallest subset came later), so the figures show 12 frames repaired rather than 15; the conclusions of the comparisons are unaffected.</p>
@@ -1027,9 +1027,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-8:</span>The acceptance tests (pupil points only replaced), (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired (blue, of which made worse in red), still flagged (orange), judged plausible as they are and left alone (grey); the three add up to the flagged right frames.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>[pupil-points-only run, method selection] The acceptance tests, (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired (blue, of which made worse in red), still flagged (orange), judged plausible as they are and left alone (grey); the three add up to the flagged right frames.</figcaption>
   </figure>
-  <p class="text"><b><span lang="en">Table 9-3-2: the seven checks on the truth frames (pupil points only replaced)</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-2: [pupil-points-only run, method selection] the seven checks on the truth frames</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Check</span></th><th><span lang="en">23 wrong frames flagged by fitting: repaired / still flagged / closed</span></th><th><span lang="en">28 right frames flagged by fitting: repaired (made worse) / still flagged</span></th><th><span lang="en">23 wrong frames flagged by the PCA: repaired</span></th><th><span lang="en">14 right frames flagged by the PCA: repaired (made worse)</span></th></tr></thead>
     <tbody>
@@ -1045,9 +1045,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-9:</span>The repair with each finder (pupil points only replaced), acceptance = the human-label range. Left: of the 23 wrong frames, flagged, repaired, still wrong; right: on whole videos, repaired, flagged and not repaired, flagged but plausible.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-9:</span>[pupil-points-only run, method selection] The repair with each finder, acceptance = the human-label range. Left: of the 23 wrong frames, flagged, repaired, still wrong; right: on whole videos, repaired, flagged and not repaired, flagged but plausible.</figcaption>
   </figure>
-  <p class="text"><b><span lang="en">Table 9-3-3: the three replacement scopes compared</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-3: [the three runs compared] the three replacement scopes compared</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th></th><th><span lang="en">Pupil points only</span></th><th><span lang="en">All 8, whole replacement</span></th><th><span lang="en">All 8, smallest subset (used)</span></th></tr></thead>
     <tbody>
@@ -1063,7 +1063,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <div class="figbox wide"><img src="assets/fig_repair_scope.png" alt="Pupil points only against all eight points: truth frames, and per video the frames repaired and the frames flagged and not repaired"></div>
     
     <figcaption lang="en">
-<span class="tag">Figure 9-9b:</span>Pupil points only (grey) against all eight points with the smallest subset (blue). Left: truth frames, of the 23 wrong frames the repaired and the still flagged, of the 40 flagged right frames the made worse and the left alone as plausible. Middle: frames repaired per video, % of the video. Right: frames flagged and not repaired per video. With all eight points every video repairs more and leaves fewer unrepaired; on video 1 the still-flagged share falls from 4.7% to 1.9%.</figcaption>
+<span class="tag">Figure 9-9b:</span>[pupil points only vs the final pipeline] Pupil points only (grey) against all eight points with the smallest subset (blue). Left: truth frames, of the 23 wrong frames the repaired and the still flagged, of the 40 flagged right frames the made worse and the left alone as plausible. Middle: frames repaired per video, % of the video. Right: frames flagged and not repaired per video. With all eight points every video repairs more and leaves fewer unrepaired; on video 1 the still-flagged share falls from 4.7% to 1.9%.</figcaption>
   </figure>
 
   <p class="text"><b><span lang="en">Result three: check by eye, is the repair right on the whole videos</span></b></p>
@@ -1080,7 +1080,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-11:</span>Verdicts of check one. Left: repaired frames; right: still-flagged frames.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-11:</span>[pupil-points-only run, method selection] Verdicts of check one. Left: repaired frames; right: still-flagged frames.</figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -1089,9 +1089,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-12:</span>Repaired frames from check one, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-12:</span>[pupil-points-only run, method selection] Repaired frames from check one, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
   </figure>
-  <p class="text"><b><span lang="en">Table 9-3-4: check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-4: [all-8-points whole-replacement run, method selection] check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Point put in</span></th><th><span lang="en">Right</span></th><th><span lang="en">Closer, not right</span></th><th><span lang="en">Was right, moved for nothing</span></th><th><span lang="en">Cannot tell</span></th><th><span lang="en">Total</span></th></tr></thead>
     <tbody>
@@ -1103,7 +1103,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_outline_examples.jpg" alt="Four repaired frames in which an eyelid or corner point was replaced, before and after side by side"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-12b:</span>Four frames of check two judged right, before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-12b:</span>[all-8-points whole-replacement run, method selection] Four frames of check two judged right, before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
   </figure>
   
   <div class="text" lang="en">
