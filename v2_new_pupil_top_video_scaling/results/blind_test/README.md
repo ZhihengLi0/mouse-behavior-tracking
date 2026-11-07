@@ -125,9 +125,44 @@ student on 0 of 20; the student is never worse than the teacher on any of the 16
 repair pipeline recovers 5 of the 15 (all on video 8); the 40-label model 11 of the 15 (4 left on video 1). The
 pseudo-label density does not matter. Frames both finders flag are wrong for every model (5 of 6).
 
+## Videos 15 and 6 (24 frames each, labeled 2026-11-06) and the loop models
+
+Same procedure (strata from the teacher's and the every30 student's flags, 50 drawn, 24 labeled after AI
+pre-labels). Models scored on all four videos since then: `round1_repaired` (experiment 2 of the page),
+`round2_every30` (videos 1, 8), `round1_both` and later `round{r}_both` (experiment 3, every turn). Wrong frames
+per stratum A / B / C / D and the paired comparison against the teacher (`scores.csv`, `paired.csv`):
+
+| video | teacher | teacher + repair | round1_every30 | round1_repaired | round1_both |
+|---|---|---|---|---|---|
+| 1 | 8/3/0/0 | 7/3/0/0 | 0/3/0/1 (14 better, 1 worse) | 1/1/0/2 (13, 2) | 0/1/0/1 (13, 1) |
+| 8 | 7/2/0/0 | 2/2/0/0 | 0/2/0/0 (9, 2) | 0/2/0/0 (9, 4) | 0/2/0/0 (9, 2) |
+| 15 | 5/2/0/0 | 2/2/0/0 | 0/2/0/0 (8, 3) | 1/2/0/0 (8, 6) | 0/2/0/0 (8, 3) |
+| 6 | 7/1/0/0 | 4/1/0/0 | 0/2/0/1 (11, 2) | 1/1/0/0 (12, 1) | |
+
+Over the 40 stratum-A frames: teacher wrong 27, teacher + repair 15, round1_every30 0, round1_repaired 3,
+round1_both 0 of 30 (video 6 pending). Experiment 2 against experiment 1 paired on the 24 frames: 2/7, 4/2, 3/5,
+3/5 better/worse on videos 1, 8, 15, 6, none significant.
+
+## Supplementary set (`videoNN/supplement/`, 10 frames per video, labeled 2026-11-07)
+
+`blind_test_set.py supplement`: frames on which the every30 and the repaired students disagree (either flags the
+frame and the other does not, or their predictions differ by more than 0.14 eye widths), drawn only inside the
+held-out blocks 4, 9, 14, 19 of 20 that experiment 2 never trained on, more than 60 frames from truth and drawn blind
+frames; cells E_t / E_n (every30 flags, repaired not; t = teacher also flagged, n = not) and F_t / F_n (the reverse);
+k-means per cell, 10 frames, AI pre-labels from the images only, the user reviewed every point. Scored with
+`score --video V --supplement` into `supplement/{scores,paired,per_frame}.csv`, `paired.png`.
+
+Wrong of 10 per video (1 / 8 / 15 / 6): teacher 6 / 3 / 3 / 1, teacher + repair 4 / 1 / 2 / 0, round1_every30
+3 / 1 / 1 / 1, round1_repaired 0 / 0 / 1 / 3, round1_both 2 / 1 / 2 / (pending). The direction between the two
+first experiments changes with the video (video 1 favours repaired frames, video 6 checked frames: its three
+repaired-student errors are pupil_left throws on frames it flags itself).
+
 ## Files
 
 - `videoNN/selection_key.csv`: blind name, frame, stratum, cluster, stratum share, weight, flags, `subset`
+- `videoNN/supplement/`: the same files for the supplementary set (`selection_key.csv`, `selection_summary.csv`,
+  `prelabels_ai.csv`, `prelabels_ai_notes.md`, `labeling/blind/CollectedData_Zhiheng.csv`, `scores.csv`,
+  `paired.csv`, `per_frame.csv`, `paired.png`)
 - `videoNN/selection_summary.csv`: universe, exclusions, strata shares, frames drawn and kept
 - `videoNN/prelabels_ai.csv`, `prelabels_ai_notes.md`: the AI pre-labels and how they were placed
 - `videoNN/labeling/blind/CollectedData_Zhiheng.csv`: the reviewed human labels (the `.h5` and the PNGs are local)

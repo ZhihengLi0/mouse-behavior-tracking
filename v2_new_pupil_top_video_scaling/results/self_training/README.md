@@ -1,3 +1,8 @@
+# Self-training (the loop of page step 9.4)
+
+The first section below is the round-1 pilot as written on 2026-11-04; the later runs (experiment 1 on more videos,
+the second turn, experiment 2 with repaired frames, experiment 3 with both kinds repeated) are in "Later runs".
+
 # Self-training, round 1 (pilot and all-videos pass)
 
 Direction 3 of the 2026-10-31 meeting: retrain the plateau model of a video on its own human labels plus
@@ -155,15 +160,77 @@ Per truth frame: `videoNN/<model>/truth_errors.csv`.
 - Video 7's teacher is shuffle 811, which has 20 labels of video 7, although the plateau table lists video 7 with
   zero labels; all step-9 numbers of video 7 were computed on 811, so the pilot kept it.
 
-## Status
+## Later runs (2026-11-05 to 2026-11-07)
 
-Round 1 is complete on videos 1, 7 and 8 with two variants and on videos 0, 2, 4, 6 and 15 with every30: eight
-of the 19 videos have an every30 student. Eleven remain (18, 12, 11, 14, 10, 3, 5, 9, 13, 17, 16, in the order
-the driver takes them); the driver resumes where it stopped and runs only what can finish before 07:30. The blind
-test set on videos 1 and 8 (`results/blind_test/README.md`) showed that the students' lower flagged share is real
-accuracy: in the stratum the teacher flagged and the student did not, the teacher is wrong on 15 of 20 frames and
-the every30 student on none. Round 2 (pseudo labels from the round-1 student's own prediction, student shuffle
-4000 + 10 x video + 3) is planned next on videos 1 and 8, to be scored on the same blind sets.
+On the summary page (step 9.4) the names are: starting model = teacher, experiment 1 = `round1_every30`,
+experiment 2 = `round1_repaired`, experiment 3 = `round{r}_both`, second turn of experiment 1 = `round2_every30`.
+
+### Experiment 1 on videos 12 and 18 (every30)
+
+| video | human | pseudo (candidates / kept / points dropped fitting, PCA) | epochs | iterations | teacher iterations | median % | wrong of 70 | flagged either % |
+|---|---|---|---|---|---|---|---|---|
+| 12 | 600 | 2045 / 1953 / 8, 308 | 28 | 35756 | 36000 | 1.37 → 1.48 | 0 → 0 | 4.10 → 1.77 |
+| 18 | 820 | 1982 / 1490 / 4, 875 | 42 | 48510 | 49200 | 2.57 → 2.67 | 0 → 0 | 6.60 → 5.03 |
+
+Ten videos have an experiment-1 student (0 1 2 4 6 7 8 12 15 18); nine do not (11 14 10 3 5 9 13 17 16).
+
+### Second turn of experiment 1 (`round2_every30`, shuffle 4000 + 10 x video + 3)
+
+Pseudo labels from the round-1 student's own whole-video prediction (finders recomputed on it, PCA median its own),
+every 30th unflagged frame, same per-point filter, same iteration matching. Videos 1 and 8.
+
+| video | pseudo (candidates / kept) | epochs | iterations | median % | wrong of 70 | flagged either % |
+|---|---|---|---|---|---|---|
+| 1 | 2088 / 2064 | 7 | 7644 | 2.82 | 1 | 0.98 |
+| 8 | 2040 / 1994 | 21 | 25347 | 5.06 | 0 | 2.13 |
+
+Against the first turn: video 1 wrong 2 → 1, video 8 0 → 0; flagged share 1.34 → 0.98 and 3.22 → 2.13 percent; the
+blind frames unchanged (`../blind_test/`). A second turn without repair brings back only self-prediction and
+saturates.
+
+### Experiment 2: repaired frames only (`round1_repaired`, shuffle 4000 + 10 x video + 5)
+
+`self_training.py pseudo --source repaired`: every frame the final pipeline repaired, all 8 points at the repaired
+coordinates (a point not replaced is blank only when its likelihood is under 0.01), minus frames within 60 of a
+truth frame, within 60 of a drawn blind frame, or inside the held-out blocks (blocks 4, 9, 14, 19 of 20, where the
+supplementary blind frames were later drawn); count capped at experiment 1's count on the video (evenly spread
+indices). Videos 1, 8, 15, 6 (2026-11-05/06).
+
+| video | repaired frames | removed: held out / near truth / near blind | kept | cap | epochs | iterations | median % | wrong of 70 | flagged either % |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 4885 | 559 / 515 / 571 | 1784 | 1784 | 8 | 7616 | 2.73 | 2 | 1.51 |
+| 8 | 1433 | 511 / 181 / 125 | 616 | 1829 | 48 | 24864 | 5.08 | 0 | 3.35 |
+| 15 | 826 | 71 / 16 / 191 | 548 | 1776 | 65 | 40560 | 2.75 | 0 | 3.37 |
+| 6 | 1460 | 100 / 4 / 226 | 1130 | 1859 | 32 | 24480 | 1.52 | 0 | 3.39 |
+
+Same wrong counts as experiment 1 on the truth frames; medians within 0.33 percent; flagged share a little higher
+than experiment 1 on every video. On the blind frames the two experiments cannot be told apart (`../blind_test/`).
+
+### Experiment 3: both kinds of frames, repeated (`round{r}_both`, shuffle 5000 + 10 x video + r)
+
+`self_training.py pseudo --source both --round r`, `train`, `evaluate --save-flags`, `loop-status`; driver
+`self_training_loop.sh`, log `loop.log`. Frames fed back = (experiment 1's rule: every 30th checked or repaired
+frame, per-point filter) ∪ (every repaired frame, all points), no cap, no held-out blocks, minus frames within 60 of
+a truth frame or of any of the 60 blind frames (50 drawn + 10 supplementary). Epochs = experiment 1's epochs on the
+video (8 / 22 / 34 / 21), so the iterations grow with the set; every turn trains afresh from ImageNet weights.
+From round 2 the previous loop model's prediction is flagged with its own PCA median and repaired with its own second
+peaks (`student_repair`: `heatmap_signals.peaks_for_frames` on the flagged frames and the frames within 0.9 of either
+threshold, then `flag_and_repair.py --pred-h5 --peaks-csv --dev-npy --pca-own`, output `videoNN/round{r-1}_both/repair/`,
+local only). Stop rule (`videoNN/loop_status.csv`): flagged frames not below 90 percent of the previous round's, or
+wrong blind frames (24 + 10) not lower, or round 3.
+
+| video | round | fed back (grid-only + repaired) | epochs | iterations | median % | wrong of 70 | flagged either % | flagged frames (prev → now) | blind wrong 34 (prev → now) | decision |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | 5347 (1668 + 3679) | 8 | 21872 | 2.56 | 1 | 0.83 | 10987 → 598 | 17 → 4 | continue |
+| 8 | 1 | 2508 (1704 + 804) | 22 | 32208 | 4.85 | 0 | 3.30 | 6383 → 2365 | 12 → 3 | continue |
+| 15 | 1 | 2254 (1688 + 566) | 34 | 50218 | 2.50 | 0 | 2.77 | 5500 → 1988 | 10 → 4 | continue |
+| 6 | 1 | 2921 (1725 + 1196) | 21 | | | | | 3883 → | 9 → | |
+
+Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
+(`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
+`train_v*_both_r*.log`, `eval_v*_both_r*.log`, `score_v*_both_r*.log`, `status_v*_r*.log` (local).
+
+Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
 ## Files
 
