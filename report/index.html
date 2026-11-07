@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 14:27 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:04 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1265,15 +1265,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
   <p class="text"><b><span lang="zh">结果一：真值帧（最终流程）</span><span lang="en">Result one: truth frames (final pipeline)</span></b></p>
   <div class="text" lang="zh">
-    <p>23 帧错帧全部被标出：修好 15 帧（修后误差回到线下），4 帧仍标出，4 帧判为闭眼未动。按最差的点分：最差点是瞳孔点的 16 帧修好 11 帧，是眼睑的 4 帧修好 3 帧，是眼角的 3 帧修好 1 帧。仍标出的 4 帧是多个点同时甩出、第二峰也不在该在的位置的帧：视频 1 的 61431 和 62186、视频 2 的 67793、视频 14 的 64865；闭眼的 4 帧在视频 10 和 11，其中两帧是模型的眼睑点本身错了。被标出的 40 帧对帧：38 帧按原样通过验收、判为本来合理不动，2 帧被修，其中 1 帧修过了线（变差）。图 9-10 是修好和没修好的例子。</p>
+    <p>23 帧错帧全部被标出：修好 15 帧（修后误差回到线下），4 帧仍标出，4 帧判为闭眼未动。按最差的点分：最差点是瞳孔点的 16 帧修好 11 帧，是眼睑的 4 帧修好 3 帧，是眼角的 3 帧修好 1 帧。仍标出的 4 帧是多个点同时甩出、第二峰也不在该在的位置的帧：视频 1 的 61431 和 62186、视频 2 的 67793、视频 14 的 64865；闭眼的 4 帧在视频 10 和 11，其中两帧是模型的眼睑点本身错了。被标出的 40 帧对帧：38 帧按原样通过验收、判为本来合理不动，2 帧被修，其中 1 帧修过了线（变差）。图 9-8 是修好和没修好的例子。</p>
   </div>
   <div class="text" lang="en">
-    <p>All 23 wrong frames are flagged: 15 repaired (error back under the line), 4 still flagged, 4 left alone as closed-eye. By the worst point: of the 16 frames whose worst point is a pupil point 11 are repaired, of the 4 with an eyelid worst 3, of the 3 with a corner worst 1. The 4 still flagged are frames in which several points were thrown at once and the second peak is not where the point belongs either: video 1 frames 61431 and 62186, video 2 frame 67793, video 14 frame 64865; the 4 closed-eye frames are in videos 10 and 11, in two of which the model's eyelid points are themselves wrong. Of the 40 flagged right frames 38 pass the check as they are and are left alone, 2 are repaired, one of them pushed over the line (made worse). Figure 9-10 shows repaired frames and frames that stay flagged.</p>
+    <p>All 23 wrong frames are flagged: 15 repaired (error back under the line), 4 still flagged, 4 left alone as closed-eye. By the worst point: of the 16 frames whose worst point is a pupil point 11 are repaired, of the 4 with an eyelid worst 3, of the 3 with a corner worst 1. The 4 still flagged are frames in which several points were thrown at once and the second peak is not where the point belongs either: video 1 frames 61431 and 62186, video 2 frame 67793, video 14 frame 64865; the 4 closed-eye frames are in videos 10 and 11, in two of which the model's eyelid points are themselves wrong. Of the 40 flagged right frames 38 pass the check as they are and are left alone, 2 are repaired, one of them pushed over the line (made worse). Figure 9-8 shows repaired frames and frames that stay flagged.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
-    <figcaption lang="zh"><span class="tag">图 9-10：</span>【最终流程】上排：修好的错帧，红 = 模型，蓝 = 接受的第二峰，绿圈 = 人工标注。下排：没修好、仍标出的错帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-10:</span>[final pipeline] Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-8：</span>【最终流程】上排：修好的错帧，红 = 模型，蓝 = 接受的第二峰，绿圈 = 人工标注。下排：没修好、仍标出的错帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>[final pipeline] Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
   </figure>
 
   <p class="text"><b><span lang="zh">结果二：整段视频（最终流程）</span><span lang="en">Result two: whole videos (final pipeline)</span></b></p>
@@ -1310,80 +1310,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <p>4.2% of all frames are flagged by either finder: 1.10% repaired, 0.51% flagged and not repaired, 2.11% plausible as they are, 0.59% closed. Videos 1 and 8 have the most (flagged 15.3% and 8.9%, repaired 6.8% and 2.0%). Points put in: 15,159 in all, 11,571 pupil points, 1295 eyelid, 2293 corner; among the pupil points mostly pupil_left. Of the frames flagged and not repaired about two in five are false alarms (check by eye, below).</p>
   </div>
 
-  <p class="text"><b><span lang="zh">验收标准、找法和替换方式是怎么选的（定方案时的比较，不是最终流程的结果）</span><span lang="en">How the check, the finder and the way of replacing were chosen (comparisons made while settling the method, not results of the final pipeline)</span></b></p>
-  <div class="text" lang="zh">
-    <p>下面三个比较是定方案时做的，前两个在只换瞳孔点、只用瞳孔范围验收的设定下比较（当时还没有轮廓范围和最小子集），所以图里修好的数是 12 帧而不是 15 帧；比较的结论不受影响。</p>
-    <p><b>验收标准。</b>同一种修法配七种验收，fitting 找出的帧和 PCA 找出的帧各走一遍（图 9-8）：</p>
-    <ul>
-      <li>（a）<b>人工标注范围</b>：上面"怎么做"里的瞳孔部分。</li>
-      <li>（b）<b>几何规则</b>：同样的量，但范围手定：该视频中位数 ± 5 个 MAD，点在眼角之内、眼睑带之内，左右上下顺序正确。</li>
-      <li>（c）<b>同一个 fitting 量</b>：换上去的点和预报位置的距离降到线以下（只对 fitting 找出的帧有定义）。</li>
-      <li>（d）<b>第二峰的置信度</b>不低于 0.238。</li>
-      <li>（e）<b>跳变</b>：换上去的点相对前后帧的位移不超过眼宽的 0.485。</li>
-      <li>（f）标注范围不放宽、不先验原样；（g）标注范围不放宽、先验原样。</li>
-    </ul>
-    <p>(d)、(e) 的数是在 37 个候选修复上选的，使"该修的被接受"减"不该修的被接受"最大。结果见表 9-3-2：标注范围和几何规则并列最好，标注范围不含手定的数、修坏的更少，所以采用它。fitting 不能兼做验收：连续错一段时预报跟着错，正确的第二峰被拒；对的帧因眼睛快动被标出时预报滞后，靠近预报的错误第二峰被接受。找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的证据。</p>
-    <p><b>找法。</b>fitting、PCA、两者任一，三种找法各在 19 个视频上跑一遍，验收都是标注范围（图 9-9）。真值帧上三者几乎一样：23 帧错帧都找全，分别修好 12、11、12 帧，对的帧变差 1、0、1 帧。整段视频上 PCA 标出 2.4% 的帧、修好 0.72%，fitting 标出 3.8%、修好 0.78%，并集标出 4.2%、修好 0.80%。并集多标出的帧几乎都修不了：PCA 单独找到的错帧第二峰过不了验收，留在"标出未修"里。采用并集：多找出的错帧虽然修不了，但被标出了。</p>
-    <p><b>替换方式。</b>可换的点扩到 8 个之后先试整组换（候选点一起换，通过就收，不通过整帧退回）：真值帧修好的数不变（12 帧），6 帧因眼角触发而标出的对帧改判为本来合理，视频 2 的一帧眼睑错帧修好，视频 4 的一帧反而退回（眼睑的第二峰过不了轮廓范围、整组一起退回）；人眼核对（表 9-3-4）发现同一帧里跟着换的瞳孔点有三分之一本来就对、是白动的。改成最小子集后修好 15 帧、仍标出 4 帧，整段仍标出的帧 0.66% 降到 0.51%，比整组换多修好 1878 帧、没有少修的，两者都修的 12,517 帧里 805 帧保住了一个整组换会动的瞳孔点（表 9-3-3）。和只换瞳孔点比（图 9-9b），好在三处：眼睑、眼角错的帧能修了（真值帧 12 到 15，整段每个视频修好的都更多）；因轮廓点触发而标出、但本来合理的帧不再留在"标出未修"里（整段 1.18% 到 0.51%，视频 1 从 4.7% 到 1.9%）；修坏的没有增加（真值帧仍是 1 帧）。</p>
-  </div>
-  <div class="text" lang="en">
-    <p>The three comparisons below were made while the method was being settled; the first two were run with pupil points only replaced and the pupil range alone as check (the outline range and the smallest subset came later), so the figures show 12 frames repaired rather than 15; the conclusions of the comparisons are unaffected.</p>
-    <p><b>The check.</b> One repair, seven checks, run on the frames fitting flags and on the frames the PCA flags (Figure 9-8):</p>
-    <ul>
-      <li>(a) <b>human-label range</b>: the pupil part of "how it is done" above.</li>
-      <li>(b) <b>geometry rule</b>: the same quantities with hand-set bands: video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order.</li>
-      <li>(c) <b>the same fitting score</b>: the replaced point's distance to the prediction falls below the line (defined only for the frames fitting flags).</li>
-      <li>(d) <b>second-peak confidence</b> at least 0.238.</li>
-      <li>(e) <b>jump</b>: displacement of the replaced point to the previous and next frame at most 0.485 eye widths.</li>
-      <li>(f) the label range without margin and without checking the frame as it is first; (g) without margin, with that check.</li>
-    </ul>
-    <p>The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise right repairs accepted minus wrong repairs accepted. Results in Table 9-3-2: the label range and the geometry rule are jointly best; the label range has no hand-set number and makes fewer frames worse, so it is the one used. Fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</p>
-    <p><b>The finder.</b> Fitting, the PCA and either of the two were each run on the 19 videos with the label range as check (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: for the errors the PCA alone finds the second peak fails the check, so they stay flagged and unrepaired. The union is used: the extra errors cannot be repaired but they are flagged.</p>
-    <p><b>The way of replacing.</b> With all 8 points allowed, the whole replacement was tried first (all candidates at once, accepted or the whole frame reverted): the same number of truth frames repaired (12), 6 right frames flagged because of a corner now judged plausible, one wrong eyelid frame of video 2 repaired, one frame of video 4 sent back instead (the eyelid's second peak fails the outline range and everything is reverted); the check by eye (Table 9-3-4) found that a third of the pupil points moved along in the same frames were right before and moved for nothing. With the smallest subset 15 frames are repaired and 4 stay flagged, the still-flagged share of the whole videos falls from 0.66% to 0.51%, 1878 more frames are repaired than with the whole replacement and none fewer, and of the 12,517 frames both repair, 805 keep a pupil point the whole replacement would have moved (Table 9-3-3). Against pupil points only (Figure 9-9b) the gain is in three places: frames with a wrong eyelid or corner are repaired (truth frames 12 to 15, more repaired on every video); frames flagged because of an outline point that are plausible as they are no longer stay in "flagged, not repaired" (whole videos 1.18% to 0.51%, video 1 from 4.7% to 1.9%); nothing more is made worse (still 1 truth frame).</p>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
-    <figcaption lang="zh"><span class="tag">图 9-8：</span>【只换瞳孔点的运行，定方案时】验收标准的比较，(a)–(g) 对应上文；上排 fitting 找出的帧，下排 PCA 找出的帧。左：23 帧错帧里修好的（蓝）、仍标出的（橙）、判为闭眼未动的（灰）。右：被标出的对帧里被修的（蓝，其中修坏的为红）、仍标出的（橙）、判为本来合理而不动的（灰），三类加起来等于被标出的对帧数。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-8:</span>[pupil-points-only run, method selection] The acceptance tests, (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired (blue, of which made worse in red), still flagged (orange), judged plausible as they are and left alone (grey); the three add up to the flagged right frames.</figcaption>
-  </figure>
-  <p class="text"><b><span lang="zh">表 9-3-2：【只换瞳孔点的运行，定方案时】七种验收在真值帧上的结果</span><span lang="en">Table 9-3-2: [pupil-points-only run, method selection] the seven checks on the truth frames</span></b></p>
-  <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">验收</span><span lang="en">Check</span></th><th><span lang="zh">fitting 找出的 23 帧错帧：修好 / 仍标出 / 闭眼</span><span lang="en">23 wrong frames flagged by fitting: repaired / still flagged / closed</span></th><th><span lang="zh">fitting 找出的 28 帧对帧：修了（其中变差）/ 仍标出</span><span lang="en">28 right frames flagged by fitting: repaired (made worse) / still flagged</span></th><th><span lang="zh">PCA 找出的 23 帧错帧：修好</span><span lang="en">23 wrong frames flagged by the PCA: repaired</span></th><th><span lang="zh">PCA 找出的 14 帧对帧：修了（其中变差）</span><span lang="en">14 right frames flagged by the PCA: repaired (made worse)</span></th></tr></thead>
-    <tbody>
-      <tr><td><span lang="zh">（a）人工标注范围</span><span lang="en">(a) human-label range</span></td><td>12 / 7 / 4</td><td>1 (1) / 6</td><td>11</td><td>1 (0)</td></tr>
-      <tr><td><span lang="zh">（b）几何规则</span><span lang="en">(b) geometry rule</span></td><td>12 / 7 / 4</td><td>4 (0) / 7</td><td>12</td><td>5 (2)</td></tr>
-      <tr><td><span lang="zh">（c）同一个 fitting 量</span><span lang="en">(c) the same fitting score</span></td><td>5 / 14 / 4</td><td>10 (2) / 18</td><td></td><td></td></tr>
-      <tr><td><span lang="zh">（d）第二峰置信度</span><span lang="en">(d) second-peak confidence</span></td><td>10 / 9 / 4</td><td></td><td>9</td><td>11 (3)</td></tr>
-      <tr><td><span lang="zh">（e）跳变</span><span lang="en">(e) jump</span></td><td>5 / 14 / 4</td><td></td><td>4</td><td>13 (4)</td></tr>
-    </tbody>
-  </table></div>
-  <p class="text" lang="zh">(f)、(g) 和对帧的其余格子见图 9-8。没有一种验收把对的帧修到线以上。</p>
-  <p class="text" lang="en">(f), (g) and the remaining cells for the right frames are in Figure 9-8. No check pushes a right frame over the line.</p>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
-    <figcaption lang="zh"><span class="tag">图 9-9：</span>【只换瞳孔点的运行，定方案时】三种找法下的修复，验收都是人工标注范围。左：23 帧错帧里被标出、修好、修后仍错的；右：整段视频上修好、标出未修、标出但本来合理的比例。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-9:</span>[pupil-points-only run, method selection] The repair with each finder, acceptance = the human-label range. Left: of the 23 wrong frames, flagged, repaired, still wrong; right: on whole videos, repaired, flagged and not repaired, flagged but plausible.</figcaption>
-  </figure>
-  <p class="text"><b><span lang="zh">表 9-3-3：【三种运行的对比】三种替换范围的比较</span><span lang="en">Table 9-3-3: [the three runs compared] the three replacement scopes compared</span></b></p>
-  <div class="tablebox"><table>
-    <thead><tr><th></th><th><span lang="zh">只换瞳孔点</span><span lang="en">Pupil points only</span></th><th><span lang="zh">8 个点，整组换</span><span lang="en">All 8, whole replacement</span></th><th><span lang="zh">8 个点，最小子集（采用）</span><span lang="en">All 8, smallest subset (used)</span></th></tr></thead>
-    <tbody>
-      <tr><td><span lang="zh">23 帧错帧：修好 / 仍标出 / 闭眼</span><span lang="en">23 wrong truth frames: repaired / still flagged / closed</span></td><td>12 / 7 / 4</td><td>12 / 7 / 4</td><td>15 / 4 / 4</td></tr>
-      <tr><td><span lang="zh">其中最差点是眼睑的 4 帧：修好</span><span lang="en">of them the 4 whose worst point is an eyelid: repaired</span></td><td>1</td><td>1</td><td>3</td></tr>
-      <tr><td><span lang="zh">其中最差点是眼角的 3 帧：修好</span><span lang="en">of them the 3 whose worst point is a corner: repaired</span></td><td>0</td><td>0</td><td>1</td></tr>
-      <tr><td><span lang="zh">被标出的 40 帧对帧：修了 / 修坏 / 本来合理不动</span><span lang="en">40 flagged right frames: repaired / made worse / plausible as they are</span></td><td>2 / 1 / 32</td><td>2 / 1 / 38</td><td>2 / 1 / 38</td></tr>
-      <tr><td><span lang="zh">整段视频（% 帧）：修复 / 标出未修 / 本来合理</span><span lang="en">Whole videos (% of frames): repaired / flagged, not repaired / plausible</span></td><td>0.80 / 1.18 / 1.74</td><td>0.96 / 0.66 / 2.11</td><td>1.10 / 0.51 / 2.11</td></tr>
-      <tr><td><span lang="zh">换上去的点：瞳孔 / 眼睑 / 眼角</span><span lang="en">Points put in: pupil / eyelid / corner</span></td><td>11072 / 0 / 0</td><td>11140 / 959 / 1916</td><td>11571 / 1295 / 2293</td></tr>
-    </tbody>
-  </table></div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_repair_scope.png" alt="Pupil points only against all eight points: truth frames, and per video the frames repaired and the frames flagged and not repaired"></div>
-    <figcaption lang="zh"><span class="tag">图 9-9b：</span>【只换瞳孔点 vs 最终流程】只换瞳孔点（灰）和换全部 8 个点、最小子集（蓝）的对比。左：真值帧，23 帧错帧里修好的和仍标出的，被标出的 40 帧对帧里修坏的和判为本来合理不动的。中：19 个视频各自修复的帧占比。右：各自标出未修的帧占比。换全部 8 个点后每个视频修好的更多、留下未修的更少，视频 1 标出未修的帧从 4.7% 降到 1.9%。</figcaption>
-    <figcaption lang="en">
-<span class="tag">Figure 9-9b:</span>[pupil points only vs the final pipeline] Pupil points only (grey) against all eight points with the smallest subset (blue). Left: truth frames, of the 23 wrong frames the repaired and the still flagged, of the 40 flagged right frames the made worse and the left alone as plausible. Middle: frames repaired per video, % of the video. Right: frames flagged and not repaired per video. With all eight points every video repairs more and leaves fewer unrepaired; on video 1 the still-flagged share falls from 4.7% to 1.9%.</figcaption>
-  </figure>
-
-  <p class="text"><b><span lang="zh">结果三：人眼核对，修复在整段视频上对不对</span><span lang="en">Result three: check by eye, is the repair right on the whole videos</span></b></p>
+  <p class="text"><b><span lang="zh">结果三：人眼核对（整段视频没有标注，只能靠人眼看修得对不对）</span><span lang="en">Result three: check by eye (the whole videos have no labels, only the eye can tell whether a repair is right)</span></b></p>
   <div class="text" lang="zh">
     <p>真值帧只有 1330 帧，修复动到的帧绝大多数没有标注。被修的帧换上去的点是不是落在该在的位置，仍标出的帧是不是真的错了，只能靠人眼判断。做了两次：一次看换瞳孔点的修复帧和仍标出的帧，一次看换过眼睑或眼角的修复帧。</p>
   </div>
@@ -1398,21 +1325,21 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
-    <figcaption lang="zh"><span class="tag">图 9-11：</span>【只换瞳孔点的运行，定方案时】核对一的结果。左：修复帧；右：仍标出帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-11:</span>[pupil-points-only run, method selection] Verdicts of check one. Left: repaired frames; right: still-flagged frames.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-9：</span>【只换瞳孔点的运行，定方案时】核对一的结果。左：修复帧；右：仍标出帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-9:</span>[pupil-points-only run, method selection] Verdicts of check one. Left: repaired frames; right: still-flagged frames.</figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p><b>核对一：</b>174 帧修复帧里 149 帧换上去的点落在瞳孔该在的位置，19 帧近了但还不在瞳孔上（多在视频 14、17、18），4 帧没变好；184 帧仍标出帧里 101 帧确实有点错了，69 帧是误报，14 帧看不清。这些帧都没参与定线、定阈值、定范围。图 9-12 是其中的例子。</p>
+    <p><b>核对一：</b>174 帧修复帧里 149 帧换上去的点落在瞳孔该在的位置，19 帧近了但还不在瞳孔上（多在视频 14、17、18），4 帧没变好；184 帧仍标出帧里 101 帧确实有点错了，69 帧是误报，14 帧看不清。这些帧都没参与定线、定阈值、定范围。图 9-10 是其中的例子。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>Check one:</b> of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the ranges. Figure 9-12 shows examples.</p>
+    <p><b>Check one:</b> of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the ranges. Figure 9-10 shows examples.</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
-    <figcaption lang="zh"><span class="tag">图 9-12：</span>【只换瞳孔点的运行，定方案时】核对一里的修复帧，修复前（红 = 模型）和修复后（蓝 = 换上去的点）并排。上面八帧判为换上去的点在瞳孔该在的位置，每个视频一帧；下面两帧判为近了但还不对，第二峰也不在瞳孔边缘上。被甩到视野外的点在边上用红色实心点标出。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-12:</span>[pupil-points-only run, method selection] Repaired frames from check one, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-10：</span>【只换瞳孔点的运行，定方案时】核对一里的修复帧，修复前（红 = 模型）和修复后（蓝 = 换上去的点）并排。上面八帧判为换上去的点在瞳孔该在的位置，每个视频一帧；下面两帧判为近了但还不对，第二峰也不在瞳孔边缘上。被甩到视野外的点在边上用红色实心点标出。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-10:</span>[pupil-points-only run, method selection] Repaired frames from check one, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
   </figure>
-  <p class="text"><b><span lang="zh">表 9-3-4：【8 点整组换的运行，定方案时】核对二，换过眼睑或眼角的修复帧（139 个换上去的点）</span><span lang="en">Table 9-3-4: [all-8-points whole-replacement run, method selection] check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
+  <p class="text"><b><span lang="zh">表 9-3-2：【8 点整组换的运行，定方案时】核对二，换过眼睑或眼角的修复帧（139 个换上去的点）</span><span lang="en">Table 9-3-2: [all-8-points whole-replacement run, method selection] check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="zh">换上去的点</span><span lang="en">Point put in</span></th><th><span lang="zh">对</span><span lang="en">Right</span></th><th><span lang="zh">近了但还不对</span><span lang="en">Closer, not right</span></th><th><span lang="zh">本来就对，不该动</span><span lang="en">Was right, moved for nothing</span></th><th><span lang="zh">看不清</span><span lang="en">Cannot tell</span></th><th><span lang="zh">合计</span><span lang="en">Total</span></th></tr></thead>
     <tbody>
@@ -1423,8 +1350,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_outline_examples.jpg" alt="Four repaired frames in which an eyelid or corner point was replaced, before and after side by side"></div>
-    <figcaption lang="zh"><span class="tag">图 9-12b：</span>【8 点整组换的运行，定方案时】核对二里判为对的四帧，修复前（红 = 模型，方 = 眼睑或眼角点，圆 = 瞳孔点）和修复后（蓝 = 换上去的点，细线从原位置指向新位置）并排：颞侧眼角甩到毛发上、鼻侧眼角甩出视野、上眼睑甩出视野、下眼睑甩出视野。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-12b:</span>[all-8-points whole-replacement run, method selection] Four frames of check two judged right, before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
+    <figcaption lang="zh"><span class="tag">图 9-11：</span>【8 点整组换的运行，定方案时】核对二里判为对的四帧，修复前（红 = 模型，方 = 眼睑或眼角点，圆 = 瞳孔点）和修复后（蓝 = 换上去的点，细线从原位置指向新位置）并排：颞侧眼角甩到毛发上、鼻侧眼角甩出视野、上眼睑甩出视野、下眼睑甩出视野。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-11:</span>[all-8-points whole-replacement run, method selection] Four frames of check two judged right, before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
   </figure>
   <div class="text" lang="zh">
     <p><b>核对二：</b>换上去的眼睑点 41 个判得清的里 39 个对，眼角 35 个里 31 个对，但眼角有三分之一从裁剪图上看不清；同一帧里跟着换的瞳孔点 32 个判得清的里 10 个本来就对、是白动的，这是改成最小子集替换的原因。最小子集版本的人眼核对还没有重做。</p>
@@ -1432,6 +1359,29 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="en">
     <p><b>Check two:</b> 39 of the 41 judged eyelid points are right, 31 of 35 corners, though a third of the corners could not be judged from the crop; of the pupil points moved in the same frames, 10 of 32 judged were right before and moved for nothing, which is why the smallest subset replaced the whole replacement. The check by eye has not been repeated on the smallest-subset run.</p>
   </div>
+
+  <p class="text"><b><span lang="zh">验收标准、找法和替换方式是怎么选的（定方案时的比较，一张图）</span><span lang="en">How the check, the finder and the points to replace were chosen (comparisons made while settling the method, one figure)</span></b></p>
+  <div class="text" lang="zh">
+    <p>三个选择各做了一次对比，每次只换一样、其余不变，结果都在图 9-12：上排是真值帧（23 帧错帧修好几帧、对帧修坏几帧），下排是整段视频（修复和标出未修的帧占比），绿底的是采用的那个。</p>
+    <ul>
+      <li><b>验收标准</b>（图 9-12 左，只换瞳孔点、fitting 找帧）：七种里人工标注范围 (a) 和手定几何规则 (b) 并列最好（各修好 12 帧），(a) 不含手定的数、修坏的更少，采用 (a)。用找帧的量 (c)、第二峰置信度 (d)、跳变 (e) 做验收都差得多：找帧问的是"这帧和过去一不一致"，验收需要这一帧自己的几何证据。(f)、(g) 是 (a) 去掉余量的变体，各少修 2 帧，说明余量要留。</li>
+      <li><b>找法</b>（图 9-12 中）：fitting、PCA、两者任一，真值帧上几乎一样（修好 12、11、12 帧）；并集标出的帧最多（4.2%），多出来的错帧第二峰修不了，但被标出了，所以采用并集。</li>
+      <li><b>换哪些点</b>（图 9-12 右）：只换瞳孔点修好 12 帧；8 个点整组换修好的不变，但同帧本来对的瞳孔点有三分之一被白动（表 9-3-2）；8 个点按最小子集换修好 15 帧、仍标出 4 帧，整段标出未修的帧从 1.18% 降到 0.51%，采用最小子集。</li>
+    </ul>
+  </div>
+  <div class="text" lang="en">
+    <p>Each of the three choices was compared once, changing one thing at a time; the results are in Figure 9-12: top row the truth frames (wrong frames repaired, right frames made worse), bottom row the whole videos (frames repaired, frames flagged and not repaired), the option used on a green background.</p>
+    <ul>
+      <li><b>The check</b> (Figure 9-12 left, pupil points only, finder = fitting): of seven, the human-label range (a) and the hand-made geometry rule (b) are jointly best (12 frames repaired each); (a) has no hand-set number and makes fewer frames worse, so (a) is used. The finder's own score (c), the second-peak confidence (d) and the jump (e) are much worse as checks: finding asks whether the frame disagrees with the past, the check needs geometric evidence from the frame itself. (f) and (g) are (a) without its margin and repair 2 frames fewer each, so the margin stays.</li>
+      <li><b>The finder</b> (Figure 9-12 middle): fitting, the PCA and either are nearly the same on the truth frames (12, 11, 12 repaired); the union flags the most frames (4.2%), and the extra errors cannot be repaired by the second peak but are flagged, so the union is used.</li>
+      <li><b>Which points</b> (Figure 9-12 right): pupil points only repairs 12; all 8 points with the whole replacement repairs the same number but moves a third of the right pupil points in the same frames for nothing (Table 9-3-2); all 8 points by the smallest subset repairs 15, leaves 4 flagged and brings the still-flagged share of the whole videos from 1.18% to 0.51%, so the smallest subset is used.</li>
+    </ul>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_method_selection.png" alt="Three comparisons made while settling the repair: seven checks, three finders, three replacement scopes; truth frames above, whole videos below"></div>
+    <figcaption lang="zh"><span class="tag">图 9-12：</span>定方案时的三个对比。左：七种验收（只换瞳孔点，fitting 找帧）；中：三种找法（验收 = 标注范围，只换瞳孔点）；右：换哪些点（找帧 = 并集，验收 = 标注范围）。上排：23 帧错帧里修好的（蓝）和被标出的对帧里修坏的（红）；下排：整段视频修复的（蓝）和标出未修的（橙）帧占比。绿底 = 采用的。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-12:</span>The three comparisons made while settling the method. Left: seven checks (pupil points only, finder = fitting); middle: three finders (check = label range, pupil points only); right: which points to replace (finder = either, check = label range). Top: of the 23 wrong truth frames the repaired (blue) and of the flagged right frames the made worse (red); bottom: share of all frames repaired (blue) and flagged and not repaired (orange). Green background = the option used.</figcaption>
+  </figure>
 
   <div class="concl" lang="zh"><span class="tag">修和验的结论：</span>热图第二峰加两部分人工标注范围验收，23 帧错帧修好 15 帧，其余仍标出，不删帧；整段视频修复 1.1% 的帧、标出未修 0.5%。
     <ol>
