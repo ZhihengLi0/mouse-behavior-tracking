@@ -262,15 +262,20 @@ def fig_experiment(model):
     label, colour, nblind = EXPS[model]
     C = pd.read_csv(RES / "self_training" / "comparison.csv")
     vids = [int(v) for v in sorted(C[C.model == model].video.unique())]
+    series = [("teacher", COL["teacher"], "starting model"), (model, colour, label)]
+    if model == "round1_every30" and "round2_every30" in set(C.model):
+        series.append(("round2_every30", COL["round2_every30"], "experiment 1, second turn (videos 1, 8)"))
     fig, axes = plt.subplots(2, 2, figsize=(13.5, 7.2))
     axes = axes.ravel()
     cols = [("wrong_frames", "wrong truth frames (of 70)", "{:.0f}"), ("median_error_pct", "median truth error, % of eye width", "{:.1f}"),
             ("flagged_either_pct", "frames flagged, % of the video", "{:.1f}")]
-    w = 0.38
+    k = len(series)
+    w = 0.8 / k
     for ax, (col, ylabel, fmt) in zip(axes[:3], cols):
-        for j, (m, c, lab) in enumerate((("teacher", COL["teacher"], "starting model"), (model, colour, label))):
-            ys = [float(C[(C.video == v) & (C.model == m)].iloc[0][col]) for v in vids]
-            xs = np.arange(len(vids)) + (j - 0.5) * w
+        for j, (m, c, lab) in enumerate(series):
+            pts = [(i, float(C[(C.video == v) & (C.model == m)].iloc[0][col])) for i, v in enumerate(vids) if len(C[(C.video == v) & (C.model == m)])]
+            xs = [i + (j - (k - 1) / 2) * w for i, _ in pts]
+            ys = [y for _, y in pts]
             ax.bar(xs, ys, w * 0.92, color=c, label=lab, edgecolor="white", linewidth=0.5)
             for x, y in zip(xs, ys):
                 ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=8, color="#222")
@@ -283,13 +288,14 @@ def fig_experiment(model):
         ax.set_ylim(0, ax.get_ylim()[1] * 1.18)
     bv = [v for v in vids if (RES / "blind_test" / f"video{v:02d}" / "per_frame.csv").exists()]
     ax = axes[3]
-    for j, (m, c, lab) in enumerate((("teacher", COL["teacher"], "starting model"), (model, colour, label))):
-        ys = [blind_wrong_n(v, m, nblind) for v in bv]
-        xs = np.arange(len(bv)) + (j - 0.5) * w
+    for j, (m, c, lab) in enumerate(series):
+        pts = [(i, blind_wrong_n(v, m, nblind)) for i, v in enumerate(bv)]
+        pts = [(i, y) for i, y in pts if np.isfinite(y)]
+        xs = [i + (j - (k - 1) / 2) * w for i, _ in pts]
+        ys = [y for _, y in pts]
         ax.bar(xs, ys, w * 0.92, color=c, edgecolor="white", linewidth=0.5)
         for x, y in zip(xs, ys):
-            if np.isfinite(y):
-                ax.text(x, y, f"{y:.0f}", ha="center", va="bottom", fontsize=8, color="#222")
+            ax.text(x, y, f"{y:.0f}", ha="center", va="bottom", fontsize=8, color="#222")
     ax.set_xticks(range(len(bv)))
     ax.set_xticklabels([str(v) for v in bv])
     ax.set_xlabel("video")
@@ -298,7 +304,7 @@ def fig_experiment(model):
     ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
     ax.set_axisbelow(True)
     h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0))
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     name = {"round1_every30": "loop_exp1", "round1_repaired": "loop_exp2", "round1_both": "loop_exp3"}[model]
     fig.savefig(OUT / f"{name}.png", dpi=170)
