@@ -1448,10 +1448,24 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <div class="text" lang="zh">
-    <p>九个视频上错帧不增、标出率下降：有错帧的四个视频错帧从 8 / 4 / 2 / 1 降到 2 / 1 / 0 / 0，中位误差相差 0.3% 以内；盲测帧上四个视频的错帧都降到三分之一左右。视频 0 变差：起点模型只有 60 帧人工标注、进入训练集的帧只有 368 帧，loop 的起点必须是平台点的模型。第二圈（视频 1、8）没有再明显变好。</p>
+    <p><b>结论：十个视频里九个好于起点模型，视频 0 变差。</b></p>
+    <ul>
+      <li>真值帧：有错帧的四个视频从 8 / 4 / 2 / 1 降到 2 / 1 / 0 / 0，其余视频本来就是 0；中位误差不变（相差 0.3% 以内）。</li>
+      <li>整段标出率：九个视频都下降，多数降到三分之一以下。</li>
+      <li>盲测帧：四个视频的错帧都降到三分之一左右。</li>
+      <li>视频 0：错帧 0 → 5。它的起点模型只有 60 帧人工标注，还没到平台点；loop 的起点必须是平台点的模型。</li>
+      <li>第二圈 = 把实验一的模型当作新的起点，再做一遍实验一（视频 1、8）：没有再明显变好。</li>
+    </ul>
   </div>
   <div class="text" lang="en">
-    <p>On nine videos the wrong frames do not increase and the flagged share falls: on the four videos with wrong frames they go from 8 / 4 / 2 / 1 to 2 / 1 / 0 / 0, with the median within 0.3%; on the blind frames the wrong count falls to about a third on all four videos. Video 0 gets worse: its starting model has only 60 human frames and only 368 frames enter the training set, so the loop needs the plateau model as its start. The second turn (videos 1, 8) does not clearly improve further.</p>
+    <p><b>Conclusion: nine of the ten videos beat the starting model, video 0 gets worse.</b></p>
+    <ul>
+      <li>Truth frames: on the four videos with wrong frames they go from 8 / 4 / 2 / 1 to 2 / 1 / 0 / 0, the other videos were at 0 already; the median error is unchanged (within 0.3%).</li>
+      <li>Flagged share: falls on nine videos, mostly below a third.</li>
+      <li>Blind frames: the wrong count falls to about a third on all four videos.</li>
+      <li>Video 0: wrong frames 0 → 5. Its starting model has only 60 human frames and is not at its plateau; the loop has to start from the plateau model.</li>
+      <li>Second turn = experiment 1 once more with experiment 1's model as the new starting point (videos 1, 8): no clear further gain.</li>
+    </ul>
   </div>
   <h4><span lang="zh">实验二：只有修复过的帧进入训练集</span><span lang="en">Experiment 2: only the repaired frames enter the training set</span></h4>
   <div class="tablebox"><table class="info"><tbody>
@@ -1474,10 +1488,20 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <div class="text" lang="zh">
-    <p>四个视频都好于起点模型：真值错帧 8 → 2、1 → 0，标出率降到三分之一左右，盲测错帧降到三分之一左右，中位误差相差 0.3% 以内。只让修复帧进入训练集的局限是帧的类型单一（几乎都是换 pupil_left 的帧），修复本身的小偏差会被学进去，视频 6 的补充盲测帧上有 3 帧 pupil_left 放错；这是实验三把没被标出的帧也放进去的理由。</p>
+    <p><b>结论：四个视频都好于起点模型。</b></p>
+    <ul>
+      <li>真值帧：错帧 8 → 2（视频 1）、1 → 0（视频 8），其余本来就是 0；中位误差不变（相差 0.3% 以内）。</li>
+      <li>整段标出率和盲测错帧：都降到三分之一左右。</li>
+      <li>局限：修复帧的类型单一（几乎都是换 pupil_left 的帧），修复本身的小偏差会被学进去，视频 6 的补充盲测帧上有 3 帧 pupil_left 放错。这是实验三把没被标出的帧也放进训练集的理由。</li>
+    </ul>
   </div>
   <div class="text" lang="en">
-    <p>All four videos beat the starting model: wrong truth frames 8 → 2 and 1 → 0, the flagged share to about a third, the wrong blind frames to about a third, the median within 0.3%. The limit of adding only repaired frames to the training set only is that they are of one kind (almost all pupil_left replacements), so the repair's own small bias is learned: on video 6 three supplementary blind frames have pupil_left misplaced. That is why experiment 3 adds the unflagged frames.</p>
+    <p><b>Conclusion: all four videos beat the starting model.</b></p>
+    <ul>
+      <li>Truth frames: wrong frames 8 → 2 (video 1) and 1 → 0 (video 8), the others were at 0 already; the median error is unchanged (within 0.3%).</li>
+      <li>Flagged share and wrong blind frames: both to about a third.</li>
+      <li>Limit: the repaired frames are of one kind (almost all pupil_left replacements), so the repair's own small bias is learned: on video 6 three supplementary blind frames have pupil_left misplaced. That is why experiment 3 adds the unflagged frames to the training set.</li>
+    </ul>
   </div>
   <h4><span lang="zh">实验三：两种帧一起进入训练集，转到饱和</span><span lang="en">Experiment 3: both kinds enter the training set, turn after turn until saturation</span></h4>
   <div class="tablebox"><table class="info"><tbody>
@@ -1511,10 +1535,22 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 9-18:</span>Experiment 3 turn by turn on the four videos: share of the whole video flagged by either finder (blue circles), wrong share of the 34 blind frames (orange squares), wrong share of the 70 truth frames (green triangles); turn 0 is the starting model. A dotted vertical line marks the turn at which the loop stopped.</figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p>第一圈后三个视频都好于起点模型：真值错帧 8 → 1、1 → 0、0 → 0，中位误差相差 0.3% 以内，标出的帧降到起点模型的 5% 到 37%，34 帧盲测帧里预测错的从 17 / 12 / 10 降到 4 / 3 / 4。三个视频都还没有饱和，后面的圈还没跑。</p>
+    <p><b>结论：第一圈后三个视频都好于起点模型，都还没饱和。</b></p>
+    <ul>
+      <li>真值帧：错帧 8 → 1、1 → 0、0 → 0；中位误差不变（相差 0.3% 以内）。</li>
+      <li>整段标出率：降到起点模型的 5% 到 37%。</li>
+      <li>盲测帧（34 帧）：预测错的从 17 / 12 / 10 降到 4 / 3 / 4。</li>
+      <li>三个视频都满足再转一圈的条件；第二圈起还没跑。</li>
+    </ul>
   </div>
   <div class="text" lang="en">
-    <p>After turn 1 all three videos beat the starting model: wrong truth frames 8 → 1, 1 → 0, 0 → 0, the median within 0.3%, the flagged frames down to 5% to 37% of the starting model's, wrong predictions among the 34 blind frames from 17 / 12 / 10 down to 4 / 3 / 4. None of the three videos is saturated yet; the later turns have not been run.</p>
+    <p><b>Conclusion: after turn 1 all three videos beat the starting model, and none is saturated yet.</b></p>
+    <ul>
+      <li>Truth frames: wrong frames 8 → 1, 1 → 0, 0 → 0; the median error is unchanged (within 0.3%).</li>
+      <li>Flagged share: down to 5% to 37% of the starting model's.</li>
+      <li>Blind frames (34): wrong predictions from 17 / 12 / 10 down to 4 / 3 / 4.</li>
+      <li>All three videos meet the condition for another turn; turn 2 onward has not been run.</li>
+    </ul>
   </div>
   <div class="concl" lang="zh"><span class="tag">loop 的结论：</span>把找帧、修复、验收做成循环，再训练出来的模型在四个视频上都比起点模型错帧更少。
     <ol>
