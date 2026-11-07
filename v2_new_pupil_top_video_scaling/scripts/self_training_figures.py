@@ -262,7 +262,8 @@ def fig_experiment(model):
     label, colour, nblind = EXPS[model]
     C = pd.read_csv(RES / "self_training" / "comparison.csv")
     vids = [int(v) for v in sorted(C[C.model == model].video.unique())]
-    fig, axes = plt.subplots(1, 4, figsize=(13.5, 3.6), gridspec_kw={"width_ratios": [len(vids), len(vids), len(vids), max(3, len(vids) // 2)]})
+    fig, axes = plt.subplots(2, 2, figsize=(13.5, 7.2))
+    axes = axes.ravel()
     cols = [("wrong_frames", "wrong truth frames (of 70)", "{:.0f}"), ("median_error_pct", "median truth error, % of eye width", "{:.1f}"),
             ("flagged_either_pct", "frames flagged, % of the video", "{:.1f}")]
     w = 0.38
@@ -272,8 +273,7 @@ def fig_experiment(model):
             xs = np.arange(len(vids)) + (j - 0.5) * w
             ax.bar(xs, ys, w * 0.92, color=c, label=lab, edgecolor="white", linewidth=0.5)
             for x, y in zip(xs, ys):
-                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=6.5 if len(vids) > 4 else 8, color="#222",
-                        rotation=90 if len(vids) > 4 else 0)
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=8, color="#222")
         ax.set_xticks(range(len(vids)))
         ax.set_xticklabels([str(v) for v in vids])
         ax.set_xlabel("video")
@@ -299,7 +299,7 @@ def fig_experiment(model):
     ax.set_axisbelow(True)
     h, l = axes[0].get_legend_handles_labels()
     fig.legend(h, l, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.0))
-    fig.tight_layout(rect=(0, 0, 1, 0.9))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     name = {"round1_every30": "loop_exp1", "round1_repaired": "loop_exp2", "round1_both": "loop_exp3"}[model]
     fig.savefig(OUT / f"{name}.png", dpi=170)
     plt.close(fig)
