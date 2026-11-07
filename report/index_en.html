@@ -77,7 +77,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:18 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1303,8 +1303,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   
   <div class="text" lang="en">
-    <p>The median error does not change on any of the four videos: both experiments' models are within 0.3% of eye width of the starting model (the largest difference is experiment 2 on video 15, +0.33%). Wrong truth frames exist only for the starting models of videos 1 and 8; both experiments bring video 1 from 8 to 2 (the second turn to 1) and video 8 from 1 to 0; the two frames left on video 1 (61431, 62186) are the same two the repair pipeline cannot fix. The flagged share of the whole video falls below a third of the starting model's on every video, more so in experiment 1 (video 6: 5.4% to 0.4%, experiment 2 to 3.4%). A low flagged share is not accuracy: a model trained on its own predictions agrees more easily with its own shape model. Hence the blind frames.</p>
-    <p>Experiment 3, first turn: the median error is 2.56% on video 1 and 4.85% on video 8, the lowest of all models on each video; on video 15 it is 2.50%, within 0.1% of the starting model. Wrong truth frames: one left on video 1 (62186, pupil_bottom a whole eye width off, the frame the repair of 9.3 cannot fix either), none on videos 8 and 15. Flagged share 0.8% / 3.3% / 2.8%, close to experiment 1.</p>
+    <p>On the truth frames the median error of all three experiments is almost the starting model's; the difference is in the gross errors: most of the starting model's wrong frames are gone, and the one or two left are the frames the repair pipeline cannot fix either. The flagged share of the whole videos falls below a third of the starting model's on every video. A low flagged share is not accuracy, since a model trained on its own predictions agrees more easily with its own shape model, hence the blind frames.</p>
   </div>
 
   <p class="text"><b><span lang="en">Blind frames by stratum</span></b></p>

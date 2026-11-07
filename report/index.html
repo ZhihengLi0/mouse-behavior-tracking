@@ -80,7 +80,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:18 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1699,12 +1699,10 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <div class="text" lang="zh">
-    <p>中位误差在四个视频上都没有变：两个实验的模型和起点模型相差不到眼宽的 0.3%（视频 15 的实验二 +0.33%，最大）。错帧只有视频 1 和 8 的起点模型有，两个实验都把视频 1 的 8 帧降到 2 帧（第二圈 1 帧）、视频 8 的 1 帧降到 0；视频 1 剩下的 2 帧（61431、62186）和修复流水线修不好的是同样两帧。整段视频的标出率在每个视频都降到起点模型的三分之一以下，实验一降得更多（视频 6：5.4% 到 0.4%，实验二到 3.4%）。标出率低不等于准：模型是用自己的预测训练的，更容易和自己的形状模型一致。所以要看盲测帧。</p>
-    <p>实验三第一圈：视频 1 的中位误差 2.56%、视频 8 的 4.85%，是各自视频上所有模型里最低的；视频 15 的 2.50% 和起点模型相差 0.1%。错帧视频 1 剩 1 帧（62186，pupil_bottom 偏了一个眼宽，9.3 的修复也修不好的那帧），视频 8、15 为 0。标出率 0.8% / 3.3% / 2.8%，和实验一相近。</p>
+    <p>真值帧上，三个实验的中位误差都和起点模型几乎一样，差别在大错帧：起点模型的错帧大多被修掉，剩下的那一两帧是修复流水线也修不好的帧。整段视频的标出率每个视频都降到起点模型的三分之一以下。标出率低不等于准，模型是用自己的预测训练的，更容易和自己的形状模型一致，所以还要看盲测帧。</p>
   </div>
   <div class="text" lang="en">
-    <p>The median error does not change on any of the four videos: both experiments' models are within 0.3% of eye width of the starting model (the largest difference is experiment 2 on video 15, +0.33%). Wrong truth frames exist only for the starting models of videos 1 and 8; both experiments bring video 1 from 8 to 2 (the second turn to 1) and video 8 from 1 to 0; the two frames left on video 1 (61431, 62186) are the same two the repair pipeline cannot fix. The flagged share of the whole video falls below a third of the starting model's on every video, more so in experiment 1 (video 6: 5.4% to 0.4%, experiment 2 to 3.4%). A low flagged share is not accuracy: a model trained on its own predictions agrees more easily with its own shape model. Hence the blind frames.</p>
-    <p>Experiment 3, first turn: the median error is 2.56% on video 1 and 4.85% on video 8, the lowest of all models on each video; on video 15 it is 2.50%, within 0.1% of the starting model. Wrong truth frames: one left on video 1 (62186, pupil_bottom a whole eye width off, the frame the repair of 9.3 cannot fix either), none on videos 8 and 15. Flagged share 0.8% / 3.3% / 2.8%, close to experiment 1.</p>
+    <p>On the truth frames the median error of all three experiments is almost the starting model's; the difference is in the gross errors: most of the starting model's wrong frames are gone, and the one or two left are the frames the repair pipeline cannot fix either. The flagged share of the whole videos falls below a third of the starting model's on every video. A low flagged share is not accuracy, since a model trained on its own predictions agrees more easily with its own shape model, hence the blind frames.</p>
   </div>
 
   <p class="text"><b><span lang="zh">盲测帧，按层</span><span lang="en">Blind frames by stratum</span></b></p>
