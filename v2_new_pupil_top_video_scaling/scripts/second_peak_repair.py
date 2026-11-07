@@ -49,16 +49,24 @@ P4 = BPS[:4]
 ALONG_MAX, LID_MARGIN = 0.6, 0.1
 
 
-def load(video):
+def load(video, h5=None, peaks=None):
+    """Plateau prediction, heatmap peaks and stats, truth frames, cached deviations of a video. h5 / peaks (added
+    2026-11-07 for the self-training loop) replace the plateau prediction and the peaks file by another model's;
+    a peaks file given this way carries the stats columns too (one file). Defaults unchanged."""
     rr = PL[PL.video == video].iloc[0]
     step = max(1, int(rr.labels_at_plateau) // 20)
-    h5 = sorted(glob.glob(str(HERE / rr.unit / "training-data" / f"predictions_step{step:02d}" / "*snapshot*120*.h5")))[-1]
-    d = pt.load(h5)
-    pk = sorted(glob.glob(str(RES / "heatmap_signals" / f"video{video:02d}_shuffle*_peaks.csv")))
-    if not pk:
-        raise SystemExit(f"no peaks file for video {video}: run heatmap_signals.py --peaks first")
-    P = pd.read_csv(pk[-1]).set_index("frame").sort_index()
-    H = pd.read_csv(pk[-1].replace("_peaks.csv", ".csv")).set_index("frame").sort_index()
+    if h5 is None:
+        h5 = sorted(glob.glob(str(HERE / rr.unit / "training-data" / f"predictions_step{step:02d}" / "*snapshot*120*.h5")))[-1]
+    d = pt.load(str(h5))
+    if peaks is None:
+        pk = sorted(glob.glob(str(RES / "heatmap_signals" / f"video{video:02d}_shuffle*_peaks.csv")))
+        if not pk:
+            raise SystemExit(f"no peaks file for video {video}: run heatmap_signals.py --peaks first")
+        P = pd.read_csv(pk[-1]).set_index("frame").sort_index()
+        H = pd.read_csv(pk[-1].replace("_peaks.csv", ".csv")).set_index("frame").sort_index()
+    else:
+        P = pd.read_csv(peaks).set_index("frame").sort_index()
+        H = P
     assert len(d) == len(P) == len(H), (len(d), len(P), len(H))
     truth = pd.read_csv(RES / "error_detector" / "scores_lovo.csv")
     truth = truth[truth.plateau & (truth.video == video)].drop_duplicates("frame").set_index("frame").sort_index()

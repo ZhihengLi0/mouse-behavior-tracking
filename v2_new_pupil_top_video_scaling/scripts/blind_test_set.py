@@ -365,6 +365,10 @@ def models_of(v, extra):
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))
         if h5:
             m[name] = h5[-1]
+    for d in sorted((LOCAL / f"video{v:02d}").glob("round*_both")):   # the loop models (experiment 3), when predicted
+        h5 = sorted((d / "predictions").glob("*.h5"))
+        if h5:
+            m[d.name] = h5[-1]
     if "human40" not in m:                                         # the 40-label model of the scaling curve, when its prediction is on disk
         h5 = sorted((HERE / unit / "training-data" / "predictions_step02").glob("*snapshot_120.h5"))
         if h5:
@@ -443,6 +447,7 @@ def figure(E, v, out, strata=None):
     R = E[E.model == "teacher"].set_index("frame").error * 100
     fig, axes = plt.subplots(1, len(strata), figsize=(17, 4.4), sharex=True, sharey=True)
     colors = {"teacher + repair": "#9e9e9e", "round1_every30": "#e69f00", "round1_every100": "#0072b2", "round2_every30": "#cc79a7", "human40": "#009e73",
+              "round1_both": "#56b4e9", "round2_both": "#1f78b4", "round3_both": "#0b3d91",
               NEW_STUDENT: "#d55e00"}
     lim = max(float(np.nanmax(E.error)) * 100, LINE * 100) * 1.05
     for ax, s in zip(axes, strata):

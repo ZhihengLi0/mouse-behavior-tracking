@@ -235,6 +235,11 @@ def main():
     ap.add_argument("--replace", choices=["whole", "smallest"], default="whole", help="--points all only: replace every candidate at once (default) or the smallest subset that passes")
     ap.add_argument("--out", default=None, help="output folder override (verification only)")
     ap.add_argument("--save-coords", action="store_true", help="also write coords_after.csv.gz (x, y of the 8 points after repair, every frame); default outputs unchanged")
+    # another model's prediction instead of the plateau model's (self-training loop, 2026-11-07); defaults unchanged
+    ap.add_argument("--pred-h5", default=None, help="whole-video prediction to flag and repair (default: the plateau model's)")
+    ap.add_argument("--peaks-csv", default=None, help="heatmap peaks (+ stats) of that prediction, one row per frame (default: results/heatmap_signals)")
+    ap.add_argument("--dev-npy", default=None, help="one-step fitting deviations in px of that prediction, shape (frames, 8) (default: the sweep's cache)")
+    ap.add_argument("--pca-own", action="store_true", help="PCA finder: residuals of that prediction against the video's labeled-pose PCA, threshold = multiple x its own median score")
     a = ap.parse_args()
     assert a.replace == "whole" or a.points == "all", "--replace smallest is only defined with --points all"
     assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
@@ -244,13 +249,13 @@ def main():
     tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
     out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else "") + ("_smallest" if a.replace == "smallest" else ""))
     out.mkdir(parents=True, exist_ok=True)
-    rr, d, P, H, truth, fwd, sig = load(a.video)
+    rr, d, P, H, truth, fwd, sig = load(a.video, a.pred_h5, a.peaks_csv)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
     p2, off = peak2_pixels(d, P)
     B, scale = pooled_bands(RES / "second_peak_repair")
     G = Geometry(xy, scale)
     n = len(d)
-    dev_px = fwd["200"]
+    dev_px = np.load(a.dev_npy) if a.dev_npy else fwd["200"]
     assert dev_px.shape == (n, len(BPS))
     dev = dev_px / G.Wm
     fit = np.nanmax(dev, axis=1)
@@ -260,8 +265,19 @@ def main():
         flag, pca_rel, flag_pca, thr_pca = flag_fit, None, None, np.nan
     else:
         z = np.load(RES / "finder_comparison" / "pca_cache" / f"video{a.video:02d}_pca.npz")
-        pca_res, pca_rel, thr_pca = z["residuals"], z["score"], float(z["threshold"])
-        assert pca_res.shape == (n, len(BPS)) and abs(float(z["eye_width_px"]) - G.Wm) < 0.5
+        if a.pca_own:
+            import unreliable_frames_sweep as U
+            from pca_threshold import residuals
+            step = max(1, int(rr.labels_at_plateau) // 20)
+            res_px, _ = residuals(U.labeled_poses(rr.unit, step), U.pose_matrix(d))
+            pca_res = res_px / float(z["eye_width_px"])
+            pca_rel = np.sqrt(np.mean(pca_res ** 2, axis=1))
+            thr_pca = float(z["multiple"]) * float(np.nanmedian(pca_rel))
+            print(f"PCA finder on the given prediction: own median {np.nanmedian(pca_rel):.5f}, threshold {thr_pca:.5f} eye widths")
+        else:
+            pca_res, pca_rel, thr_pca = z["residuals"], z["score"], float(z["threshold"])
+            assert abs(float(z["eye_width_px"]) - G.Wm) < 0.5
+        assert pca_res.shape == (n, len(BPS))
         flag_pca = pca_rel > thr_pca
         if a.finder == "pca":
             flag, cdev = flag_pca, pca_res
@@ -350,7 +366,8 @@ def main():
             r[f"{b}_after"] = np.hypot(after[b][0] - hx, after[b][1] - hy) / G.Wm
         rows.append(r)
     T = pd.DataFrame(rows)
-    assert np.allclose(T.error_before_px, T.rmse_file, atol=0.05), "frame RMSE formula differs from scores_lovo.csv"
+    if a.pred_h5 is None:   # scores_lovo.csv holds the plateau model's errors; another prediction has its own
+        assert np.allclose(T.error_before_px, T.rmse_file, atol=0.05), "frame RMSE formula differs from scores_lovo.csv"
     T.round(4).to_csv(out / "truth_frames.csv", index=False)
     wrong, good, rep = T.error_before > line, T.error_before <= line, T.status == "repaired"
     nr = T.status == "flagged_not_repaired"

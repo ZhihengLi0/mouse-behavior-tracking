@@ -92,11 +92,16 @@ def heatmap_stats(H, stride, peaks=False):
 
 
 def build_runner(shuffle, batch, device, store, peaks=False):
-    from deeplabcut.pose_estimation_pytorch.apis.utils import get_pose_inference_runner
     folder = next(MODELS.glob(f"*shuffle{shuffle}"))
     snap = folder / "train" / "snapshot-120.pt"
     if not snap.exists():
         snap = next((folder / "train").glob("snapshot-best-120.pt"))
+    return build_runner_at(folder, snap, batch, device, store, peaks)
+
+
+def build_runner_at(folder, snap, batch, device, store, peaks=False):
+    """The inference runner of one model folder + snapshot, with the heatmap hook (factored out 2026-11-07)."""
+    from deeplabcut.pose_estimation_pytorch.apis.utils import get_pose_inference_runner
     runner = get_pose_inference_runner(model_config=folder / "train" / "pytorch_config.yaml", snapshot_path=snap,
                                        batch_size=batch, device=device,
                                        inference_cfg={"multithreading": {"enabled": False}})
@@ -118,6 +123,59 @@ def build_runner(shuffle, batch, device, store, peaks=False):
 
     pred.forward = forward
     return runner, snap
+
+
+def peaks_for_frames(video, folder, snap, h5, wanted, out_csv, batch=32, device="mps"):
+    """Heatmap stats and peak cells of one model (folder / snapshot) on a subset of frames of the video, written as
+    ONE file with one row per video frame: x, y from the model's whole-video h5 on every frame (so that
+    second_peak_repair.peak2_pixels' consistency check holds), stats and peaks NaN on frames not computed. For the
+    self-training loop (2026-11-07): the repair needs peaks on the flagged frames only. Returns the DataFrame."""
+    import cv2
+    import pupil_trace as pt
+    unit = unit_of(video)
+    video_path = HERE / unit / f"{unit}.mp4"
+    want = sorted({int(f) for f in wanted})
+    store = []
+    runner, snap = build_runner_at(Path(folder), Path(snap), batch, device, store, peaks=True)
+    print("model", snap, "frames", len(want))
+    t0 = time.time()
+
+    def gen():
+        cap = cv2.VideoCapture(str(video_path))
+        ws, i, last = set(want), 0, want[-1]
+        while i <= last:
+            if not cap.grab():
+                break
+            if i in ws:
+                ok, im = cap.retrieve()
+                assert ok
+                yield im[..., ::-1].copy()   # RGB, as self_training.predict_video feeds the runner
+            i += 1
+        cap.release()
+
+    preds = [np.asarray(p["bodyparts"])[0, :, :3] for p in runner.inference(images=gen())]
+    poses = np.stack(preds)
+    S = np.concatenate(store)[: len(poses)]
+    assert len(S) == len(poses) == len(want), (len(S), len(poses), len(want))
+    d = pt.load(str(h5))
+    n = len(d)
+    cols = {"frame": np.arange(n)}
+    worst = 0.0
+    for k, bp in enumerate(BPS):
+        x, y = d[bp]["x"].to_numpy(float), d[bp]["y"].to_numpy(float)
+        cols[f"{bp}_x"], cols[f"{bp}_y"] = x, y
+        worst = max(worst, float(np.nanmax(np.hypot(poses[:, k, 0] - x[want], poses[:, k, 1] - y[want]))))
+        for j, st in enumerate(STATS + PEAKS):
+            col = np.full(n, np.nan)
+            col[want] = S[:, k, j]
+            cols[f"{bp}_{st}"] = col
+    D = pd.DataFrame(cols)
+    Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
+    D.to_csv(out_csv, index=False, float_format="%.3f")
+    print(f"written {out_csv}: {len(want)} of {n} frames computed in {(time.time() - t0) / 60:.1f} min; "
+          f"largest x, y difference to the h5 on the computed frames {worst:.2f} px")
+    assert worst < 1.0, f"the runner's points differ from the h5 by {worst:.2f} px: wrong model or snapshot"
+    return D
 
 
 def frames(video_path, limit):
