@@ -94,7 +94,7 @@ PIPE = ["--finder", "either", "--accept", "labelregion", "--points", "all", "--r
 FINAL = "video{v:02d}_either_labelregion_all_smallest"
 VARIANT = {30: 1, 100: 2}
 SOURCES = ("pipeline", "repaired", "both")
-BOTH_BASE, MAX_ROUND = 5000, 3                      # the loop: shuffle 5000 + 10 * video + round; at most three rounds
+BOTH_BASE, MAX_ROUND = 5000, 3                      # the loop: shuffle 5000 + 10 * video + round; MAX_ROUND = the driver's run budget per launch, NOT part of the stop rule (user 2026-11-07)
 REPAIRED_VARIANT = 5                                  # shuffle 4000 + 10 * video + 5: the repaired-frames student
 HOLDOUT_BLOCKS, HELD_OUT = 20, (4, 9, 14, 19)         # repaired source: the time line in 20 equal blocks, these never trained on
 LINE = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
@@ -812,7 +812,8 @@ def compare():
 def loop_status(v, rnd):
     """Stop rule of the loop after round rnd: stop when the round's flagged frames are not below 90 % of the previous
     round's (round 0 = the pipeline run of the starting model), or the blind wrong count (24 + 10 frames) did not
-    decrease, or rnd reached MAX_ROUND. Appends a row to videoNN/loop_status.csv and prints LOOP_STOP / LOOP_CONTINUE."""
+    decrease (saturation). The number of rounds is not a criterion (user 2026-11-07); the driver's MAX_ROUND only limits one
+    launch. Appends a row to videoNN/loop_status.csv and prints LOOP_STOP / LOOP_CONTINUE."""
     def flagged_count(r):
         if r == 0:
             F = pd.read_csv(RES / "flag_and_repair" / FINAL.format(v=v) / "frames_all.csv.gz")
@@ -839,8 +840,6 @@ def loop_status(v, rnd):
         reasons.append(f"flagged {fl} not below 90 % of {fl0}")
     if wr >= wr0:
         reasons.append(f"blind wrong {wr} not below {wr0}")
-    if rnd >= MAX_ROUND:
-        reasons.append(f"round {rnd} = max")
     stop = bool(reasons)
     row = {"video": v, "round": rnd, "flagged_prev": fl0, "flagged": fl, "blind_frames": nb, "blind_wrong_prev": wr0, "blind_wrong": wr,
            "stop": stop, "reason": "; ".join(reasons)}

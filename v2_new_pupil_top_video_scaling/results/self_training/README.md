@@ -217,7 +217,7 @@ From round 2 the previous loop model's prediction is flagged with its own PCA me
 peaks (`student_repair`: `heatmap_signals.peaks_for_frames` on the flagged frames and the frames within 0.9 of either
 threshold, then `flag_and_repair.py --pred-h5 --peaks-csv --dev-npy --pca-own`, output `videoNN/round{r-1}_both/repair/`,
 local only). Stop rule (`videoNN/loop_status.csv`): flagged frames not below 90 percent of the previous round's, or
-wrong blind frames (24 + 10) not lower, or round 3.
+wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion; the driver's MAXR only limits one launch).
 
 | video | round | fed back (grid-only + repaired) | epochs | iterations | median % | wrong of 70 | flagged either % | flagged frames (prev → now) | blind wrong 34 (prev → now) | decision |
 |---|---|---|---|---|---|---|---|---|---|---|
