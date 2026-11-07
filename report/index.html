@@ -80,7 +80,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:26 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1442,25 +1442,25 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
 
   <p class="text"><b><span lang="zh">结果</span><span lang="en">Results</span></b></p>
-  <p class="text"><b><span lang="zh">表 9-4-1：四个视频上每个模型的五个数。"预测错的" = 该模型在同一批帧上误差超过眼宽 14% 的帧数</span><span lang="en">Table 9-4-1: five numbers per model on the four videos. "Wrong predictions" = frames of the same set on which that model's error exceeds 14% of the eye width</span></b></p>
+  <p class="text"><b><span lang="zh">表 9-4-1：四个视频上每个模型的五个数。"预测错的" = 该模型在同一批帧上误差超过眼宽 14% 的帧数。实验一、二只用按分层抽的 24 帧评；实验三用全部 34 帧（24 帧加 10 帧补充帧）评</span><span lang="en">Table 9-4-1: five numbers per model on the four videos. "Wrong predictions" = frames of the same set on which that model's error exceeds 14% of the eye width. Experiments 1 and 2 are judged on the 24 stratified frames only; experiment 3 on all 34 (24 plus the 10 supplementary)</span></b></p>
   <div class="tablebox"><table>
-    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">模型</span><span lang="en">Model</span></th><th><span lang="zh">70 帧真值帧里预测错的</span><span lang="en">Wrong predictions among the 70 truth frames</span></th><th><span lang="zh">真值中位误差（% 眼宽）</span><span lang="en">Median truth error (% eye width)</span></th><th><span lang="zh">整段标出率（%）</span><span lang="en">Flagged share (%)</span></th><th><span lang="zh">24 帧盲测帧里预测错的</span><span lang="en">Wrong predictions among the 24 blind frames</span></th><th><span lang="zh">10 帧补充盲测帧里预测错的</span><span lang="en">Wrong predictions among the 10 supplementary frames</span></th></tr></thead>
+    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">模型</span><span lang="en">Model</span></th><th><span lang="zh">70 帧真值帧里预测错的</span><span lang="en">Wrong predictions among the 70 truth frames</span></th><th><span lang="zh">真值中位误差（% 眼宽）</span><span lang="en">Median truth error (% eye width)</span></th><th><span lang="zh">整段标出率（%）</span><span lang="en">Flagged share (%)</span></th><th><span lang="zh">24 帧分层盲测帧里预测错的（起点模型、实验一、实验二）</span><span lang="en">Wrong predictions among the 24 stratified blind frames (starting model, experiments 1 and 2)</span></th><th><span lang="zh">34 帧盲测帧里预测错的（24 + 10，起点模型、实验三）</span><span lang="en">Wrong predictions among all 34 blind frames (24 + 10; starting model, experiment 3)</span></th></tr></thead>
     <tbody>
-      <tr><td rowspan="4">1</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>8</td><td>2.94</td><td>15.3</td><td>11</td><td>6</td></tr>
-      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>2</td><td>2.67</td><td>1.3</td><td>4</td><td>3</td></tr>
-      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>2</td><td>2.73</td><td>1.5</td><td>4</td><td>0</td></tr>
-      <tr><td><span lang="zh">实验三第一圈</span><span lang="en">experiment 3, turn 1</span></td><td>1</td><td>2.56</td><td>0.8</td><td>2</td><td>2</td></tr>
-      <tr><td rowspan="4">8</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>1</td><td>5.02</td><td>8.9</td><td>9</td><td>3</td></tr>
-      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>0</td><td>5.26</td><td>3.2</td><td>2</td><td>1</td></tr>
-      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>0</td><td>5.08</td><td>3.4</td><td>2</td><td>0</td></tr>
-      <tr><td><span lang="zh">实验三第一圈</span><span lang="en">experiment 3, turn 1</span></td><td>0</td><td>4.85</td><td>3.3</td><td>2</td><td>1</td></tr>
-      <tr><td rowspan="4">15</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>0</td><td>2.42</td><td>7.7</td><td>7</td><td>3</td></tr>
-      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>0</td><td>2.39</td><td>2.7</td><td>2</td><td>1</td></tr>
-      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>0</td><td>2.75</td><td>3.4</td><td>3</td><td>1</td></tr>
-      <tr><td><span lang="zh">实验三第一圈</span><span lang="en">experiment 3, turn 1</span></td><td>0</td><td>2.50</td><td>2.8</td><td>2</td><td>2</td></tr>
-      <tr><td rowspan="3">6</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>0</td><td>1.49</td><td>5.4</td><td>8</td><td>1</td></tr>
-      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>0</td><td>1.44</td><td>0.4</td><td>3</td><td>1</td></tr>
-      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>0</td><td>1.52</td><td>3.4</td><td>2</td><td>3</td></tr>
+      <tr><td rowspan="4">1</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>8</td><td>2.94</td><td>15.3</td><td>11</td><td>17</td></tr>
+      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>2</td><td>2.67</td><td>1.3</td><td>4</td><td></td></tr>
+      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>2</td><td>2.73</td><td>1.5</td><td>4</td><td></td></tr>
+      <tr><td><span lang="zh">实验三第一圈</span><span lang="en">experiment 3, turn 1</span></td><td>1</td><td>2.56</td><td>0.8</td><td></td><td>4</td></tr>
+      <tr><td rowspan="4">8</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>1</td><td>5.02</td><td>8.9</td><td>9</td><td>12</td></tr>
+      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>0</td><td>5.26</td><td>3.2</td><td>2</td><td></td></tr>
+      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>0</td><td>5.08</td><td>3.4</td><td>2</td><td></td></tr>
+      <tr><td><span lang="zh">实验三第一圈</span><span lang="en">experiment 3, turn 1</span></td><td>0</td><td>4.85</td><td>3.3</td><td></td><td>3</td></tr>
+      <tr><td rowspan="4">15</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>0</td><td>2.42</td><td>7.7</td><td>7</td><td>10</td></tr>
+      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>0</td><td>2.39</td><td>2.7</td><td>2</td><td></td></tr>
+      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>0</td><td>2.75</td><td>3.4</td><td>3</td><td></td></tr>
+      <tr><td><span lang="zh">实验三第一圈</span><span lang="en">experiment 3, turn 1</span></td><td>0</td><td>2.50</td><td>2.8</td><td></td><td>4</td></tr>
+      <tr><td rowspan="3">6</td><td><span lang="zh">起点模型</span><span lang="en">starting model</span></td><td>0</td><td>1.49</td><td>5.4</td><td>8</td><td>9</td></tr>
+      <tr><td><span lang="zh">实验一</span><span lang="en">experiment 1</span></td><td>0</td><td>1.44</td><td>0.4</td><td>3</td><td></td></tr>
+      <tr><td><span lang="zh">实验二</span><span lang="en">experiment 2</span></td><td>0</td><td>1.52</td><td>3.4</td><td>2</td><td></td></tr>
     </tbody>
   </table></div>
   <figure>
@@ -1479,11 +1479,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 9-15:</span>Experiment 3 turn by turn on the four videos: share of the whole video flagged by either finder (blue circles), wrong share of the 34 blind frames (orange squares), wrong share of the 70 truth frames (green triangles); turn 0 is the starting model. A dotted vertical line marks the turn at which the loop stopped.</figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p><b>看什么：</b>三个实验的模型在每个视频上都比起点模型错得少：真值错帧 8 → 1 到 2（视频 1）、1 → 0（视频 8）；24 帧盲测错帧从 7 到 11 降到 2 到 4；整段标出率降到起点模型的三分之一以下；普通帧的中位误差不变（相差 0.3% 以内）。loop 修掉的是大错帧，不是把每帧都变准。</p>
+    <p><b>看什么：</b>三个实验的模型在每个视频上都比起点模型错得少：真值错帧 8 → 1 到 2（视频 1）、1 → 0（视频 8）；24 帧盲测帧里预测错的从 7 到 11 降到 2 到 4（实验三在 34 帧上从 10 到 17 降到 3 到 4）；整段标出率降到起点模型的三分之一以下；普通帧的中位误差不变（相差 0.3% 以内）。loop 修掉的是大错帧，不是把每帧都变准。</p>
     <p>三个实验之间分不出高下：盲测帧上互相差一两帧，方向随视频变（视频 1 实验二和三更好，视频 6 实验二更差）。剩下的错帧几乎都是起点模型和 loop 模型都标出的眯眼帧，三个实验都修不了。实验三第一圈后三个视频都还满足"再转一圈"的条件（图 9-16），视频 6 的第一圈训练完、尚未预测。</p>
   </div>
   <div class="text" lang="en">
-    <p><b>What it says:</b> on every video the three experiments' models are wrong less often than the starting model: wrong truth frames 8 → 1 to 2 (video 1), 1 → 0 (video 8); wrong blind frames of 24 from 7 to 11 down to 2 to 4; the flagged share below a third of the starting model's; the median error of ordinary frames unchanged (within 0.3%). The loop removes the gross errors, it does not make every frame more precise.</p>
+    <p><b>What it says:</b> on every video the three experiments' models are wrong less often than the starting model: wrong truth frames 8 → 1 to 2 (video 1), 1 → 0 (video 8); wrong predictions among the 24 blind frames from 7 to 11 down to 2 to 4 (experiment 3 on the 34 frames from 10 to 17 down to 3 to 4); the flagged share below a third of the starting model's; the median error of ordinary frames unchanged (within 0.3%). The loop removes the gross errors, it does not make every frame more precise.</p>
     <p>The three experiments cannot be told apart: on the blind frames they differ by one or two frames, in a direction that changes with the video (experiments 2 and 3 better on video 1, experiment 2 worse on video 6). The remaining wrong frames are almost all squinting frames both the starting and the loop model flag, which no experiment repairs. After turn 1 of experiment 3 all three videos still meet the condition for another turn (Figure 9-16); video 6's first turn is trained and not yet predicted.</p>
   </div>
 
