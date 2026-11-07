@@ -1,0 +1,26 @@
+model,against,stratum,frames,better,worse,same_within_1pct,median_diff_pct,p_sign,p_wilcoxon
+teacher + repair,teacher,E_n,2,0,0,2,0.0,,0.5
+teacher + repair,teacher,E_t,2,1,0,1,-16.88,1.0,0.5
+teacher + repair,teacher,F_n,3,0,0,3,0.0,,0.75
+teacher + repair,teacher,F_t,3,0,0,3,-0.0,,1.0
+teacher + repair,teacher,all,10,1,0,9,-0.0,1.0,1.0
+round1_every30,teacher,E_n,2,0,1,1,1.64,1.0,0.5
+round1_every30,teacher,E_t,2,1,0,1,-16.62,1.0,1.0
+round1_every30,teacher,F_n,3,0,1,2,0.01,1.0,0.75
+round1_every30,teacher,F_t,3,1,1,1,0.08,1.0,1.0
+round1_every30,teacher,all,10,2,3,5,0.09,1.0,0.7695
+round1_repaired,teacher,E_n,2,0,1,1,2.17,1.0,0.5
+round1_repaired,teacher,E_t,2,1,1,0,-15.03,1.0,1.0
+round1_repaired,teacher,F_n,3,1,1,1,-0.68,1.0,0.75
+round1_repaired,teacher,F_t,3,1,0,2,-0.33,1.0,0.25
+round1_repaired,teacher,all,10,3,3,4,-0.17,1.0,0.625
+human40,teacher,E_n,2,0,0,2,0.0,,
+human40,teacher,E_t,2,0,0,2,0.0,,
+human40,teacher,F_n,3,0,0,3,0.0,,
+human40,teacher,F_t,3,0,0,3,0.0,,
+human40,teacher,all,10,0,0,10,0.0,,
+round1_repaired,round1_every30,E_n,2,1,1,0,0.54,1.0,1.0
+round1_repaired,round1_every30,E_t,2,0,1,1,1.59,1.0,1.0
+round1_repaired,round1_every30,F_n,3,2,1,0,-2.21,1.0,0.5
+round1_repaired,round1_every30,F_t,3,2,0,1,-1.41,0.5,0.25
+round1_repaired,round1_every30,all,10,5,3,2,-0.91,0.7266,0.625
