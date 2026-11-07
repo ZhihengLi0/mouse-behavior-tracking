@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:42 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:48 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -115,7 +115,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>20 labels already come close to saturation; could the first batch be cut to 5 or 10?</b> They cannot replace 20: 5 labels are enough on only 5 of the 19 videos and 10 labels on 7, one cannot tell in advance which, and the result depends on which frames happen to be taken. What is compared is the size of the first batch (5 or 10 taken out of the 20 already labeled), not a procedure of 5 labels per step (step 6).</li>
       <li><b>Do new videos make old ones worse?</b> No (step 7).</li>
       <li><b>Which points are accurate, and can the confidence be trusted?</b> Pupil top is the least accurate (median error 10.2 px; the other 7 points 3.5–6.0 px); for every point a lower confidence goes with a larger error, but pupil top has 8.3 px even at high confidence (step 8).</li>
-      <li><b>Which frames of a whole video cannot be trusted, and how to repair them?</b> A frame error above 14% of the eye width is a wrong frame, 23 of the 1330 truth frames; two finders, fitting for jumps in time with the same line as threshold and a PCA of the pose shape with a per-video threshold, find all 23; a thrown point is replaced by the second peak of its heatmap and accepted by the human-label range, 15 frames repaired, the rest stay flagged, nothing deleted; on the whole videos about six of seven repairs are right by eye Making finding, repair and check into a loop, with the checked or the repaired frames retraining the model next to the human labels, reduces the wrong frames on all four videos tried and brings the flagged share below a third; blind frames labeled afterwards confirm it; a third experiment that feeds both kinds back together and runs turn after turn also beats the starting model after its first turn on the three videos finished (step 9).</li>
+      <li><b>Which frames of a whole video cannot be trusted, and how to repair them?</b> A frame error above 14% of the eye width is a wrong frame, 23 of the 1330 truth frames; two finders, fitting for jumps in time with the same line as threshold and a PCA of the pose shape with a per-video threshold, find all 23; a thrown point is replaced by the second peak of its heatmap and accepted by the human-label range, 15 frames repaired, the rest stay flagged, nothing deleted; on the whole videos about six of seven repairs are right by eye Making finding, repair and check into a loop, with the unflagged or the repaired frames retraining the model next to the human labels, reduces the wrong frames on all four videos tried and brings the flagged share below a third; blind frames labeled afterwards confirm it; a third experiment that feeds both kinds back together and runs turn after turn also beats the starting model after its first turn on the three videos finished (step 9).</li>
       <li><b>How to compute the pupil area?</b> Under the definitions made explicit on 2026-09-20 all four pupil points are ellipse endpoints, and on the 940 test frames of 19 videos the four-point area has a median error of 5.4% against 8.4% for the three-point rule; on videos 4 and 8 the area is still not accurate (step 10).</li>
       <li><b>How to detect blinks?</b> Definition: not open = the eye is closed or the lid covers part of the pupil. The analysis here is static, frame by frame; blink dynamics are a separate analysis. Criterion: one pixel threshold per mouse, not open when the eyelid distance is below it, Pluto 147.5 px, Terra 150.5 px. The threshold is chosen on 327 judged frames (the labeler judged open / not open from the raw frame alone), 94% (Pluto) and 89% (Terra) accurate. The model's eyelid distance is within 2 px of the labels on 949 test frames. In 9 videos (3, 4, 8–12, 15, 18) 20–79% of the frames are below the threshold: a half-covered eye is the resting state of those recordings, and blinks are a subset (step 11).</li>
     </ol>
@@ -929,22 +929,105 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
 
   <h3><span lang="en">9.3 Repairing and checking wrong frames: the heatmap method performs well</span></h3>
+  <h4><span lang="en">Pupil-points-only version: repair, acceptance tests, finders, check by eye</span></h4>
   
   <div class="text" lang="en">
-    <p><b>The question:</b> can a thrown point in a frame flagged by 9.2 be put back automatically, and how do we know it landed right. There is one repair: the point is replaced by the second peak of its heatmap; a check decides, pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data.</p>
+    <ol>
+      <li><b>Repair:</b> in a flagged frame not judged closed, every pupil point whose deviation exceeds the line is replaced by the second peak of that point's heatmap (the peak's cell times the stride, plus the point's median offset between regressed coordinate and first-peak cell). The model outputs a heatmap for every point; the first peak is the position it reports, and when a point is thrown the second peak is often at the right place. In a frame flagged by the PCA the pupil point with the largest residual is replaced: the residual spreads over all 8 points, picking points over the threshold repairs nothing, and of four rules tried on four videos replacing the single largest repaired the most and did as well as fitting on the truth frames; in a frame flagged by either finder the union of both candidate sets is replaced.</li>
+      <li><b>Check:</b> after the replacement something has to judge whether the new position looks like a pupil point: pass = repaired, fail = nothing changed, the frame stays flagged. No frame is deleted; frames that cannot be repaired stay flagged, and leaving them out is a decision for whoever uses the data. There is only this one repair; the frames fitting flags and the frames the PCA flags each go through it and are counted separately, and what is compared is which check suits.</li>
+      <li><b>Acceptance tests compared (seven; (c) is defined only for the frames fitting flags):</b>
+        <ul>
+          <li>(a) <b>human-label range</b>: twelve scale-free quantities of the four pupil points in the frame's own eye frame (position along the corners, position inside the eyelid band, ratio to the other three points) must all lie in the range spanned by the 1330 human labels. The range is widened on each side by 42% of its width, the smallest margin at which the range of any 18 videos contains all labels of the 19th. The frame is first checked as it is and left alone if already plausible.</li>
+          <li>(b) <b>geometry rule</b>: the same quantities with hand-set bands: video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order.</li>
+          <li>(c) <b>the same fitting score</b>: the replaced point's distance to the same prediction falls below the line.</li>
+          <li>(d) <b>second-peak confidence</b> at least 0.238.</li>
+          <li>(e) <b>jump</b>: displacement of the replaced point to the previous and next frame at most 0.485 eye widths.</li>
+          <li>(f) label range without margin and without the plausibility check first.</li>
+          <li>(g) label range without margin, with the check first.</li>
+        </ul>
+        The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise "right repairs accepted" minus "wrong repairs accepted".
+      </li>
+    </ol>
+  </div>
+  
+  <div class="text" lang="en">
+    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus an offset inside the cell that the network outputs as well, so it is precise to the pixel rather than to 8 px, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the pupil edge usually still holds a local high cell: the second peak. How the second peak is taken is our rule: among the local maxima of the heatmap at least 3 cells away from the highest cell, the one with the highest score; the 3 cells are an exclusion radius we set, so that a cell on the slope of the highest peak is not taken as the second peak. The repair moves the thrown point to the second peak, and the check then decides whether that place looks like a pupil point. The second peak is known only as a cell, the network's offset holds only for the highest cell, so a repaired coordinate is precise to the cell, within half a cell, which does not matter for a right-or-wrong decision at the scale of tens of px. Figure 9-7 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-7:</span>Three repaired frames. Left to right: before (red = the model's points, the thrown point outside the view); the point's heatmap over the whole frame, red ring = peak 1, blue ring = peak 2, dashed box = the area the third panel enlarges; the box enlarged, peak 2 on the pupil edge; after (blue = the point moved to peak 2).</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-8:</span>(pupil points only) The acceptance tests, (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired (blue, of which made worse in red), still flagged (orange), judged plausible as they are by a two-step test and left alone (grey); the three add up to the flagged right frames.</figcaption>
+  </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Another finder, the same repair and check.</b> Fitting, the PCA and either of the two were each run on the 19 videos (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: for the errors the PCA alone finds the second peak fails the check, so they stay flagged and unrepaired. The gain in finding does not turn into a gain in repair; these frames need another repair.</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-9:</span>(pupil points only) The repair with each finder, acceptance = the human-label range. Left: of the 23 wrong frames, flagged, repaired, still wrong; right: on whole videos, repaired, flagged and not repaired, flagged but plausible.</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-10:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
+  </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Check by eye: is the repair right on the whole videos?</b> There are only 1330 truth frames; nearly all frames the repair touches have no labels. Whether the point put in sits where it belongs, and whether a still-flagged frame is really wrong, only the eye can say.</p>
+  </div>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Frames</span></th><td><span lang="en">Two groups: repaired frames, still-flagged frames; up to 10 per video and group, one per run of touched frames, 358 in all, 355 judged. Finder fitting, acceptance the human-label range.</span></td></tr>
+    <tr><th><span lang="en">How judged</span></th><td><span lang="en">Repaired frame, three panels: the frame, before (red = the model's 8 points), after (blue = the point put in); is the blue point where the pupil point belongs: yes / better but still not right / no / cannot tell. Still-flagged frame, two panels: the frame, the model's points; is a red point really wrong: yes / no / cannot tell.</span></td></tr>
+    <tr><th><span lang="en">What counts as right</span></th><td><span lang="en">The blue point counts as right only on the pupil edge where that point belongs; closer than before but not on the pupil is "better but still not right".</span></td></tr>
+    <tr><th><span lang="en">Script and results</span></th><td><code>spotcheck_review.py</code>, <code>spotcheck_review_eval.py</code>; <code>results/flag_and_repair/spotcheck_review/</code></td></tr>
+  </tbody></table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-11:</span>(pupil points only) Verdicts by eye on the repair over the whole videos. Left: repaired frames; right: still-flagged frames.</figcaption>
+  </figure>
+  
+  <div class="text" lang="en">
+    <p><b>Result:</b> of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the label range. Figure 9-12 shows examples.</p>
+  </div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-12:</span>(pupil points only) Repaired frames from the check by eye, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on repair and check (pupil points only):</span>the human-label range and the hand-made geometry rule are jointly best, 12 frames repaired each; the finder's own score is the worst check.
+    <ol>
+      <li>The 23 wrong frames, flagged by fitting: the human-label range repairs 12, leaves 7 flagged and 4 untouched as closed-eye; the geometry rule the same; confidence 10, jump 5, the same fitting score 5. Flagged by the PCA: label range 11, geometry rule 12, confidence 9, jump 4.</li>
+      <li>The flagged right frames, 28 by fitting: the human-label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4 (none worse), 7 flagged; the fitting score repairs 10 (2 worse), 18 flagged. 14 by the PCA: label range repairs 1 (none worse), geometry rule 5 (2 worse), confidence 11 (3 worse), jump 13 (4 worse). No test pushes a right frame over the line.</li>
+      <li>On both routes the human-label range and the hand-made geometry rule are jointly best; the label range has no hand-set number and makes fewer frames worse, so it is the one used; the geometry rule is kept as the comparison.</li>
+      <li>Why fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</li>
+      <li>The 7 frames still flagged are frames in which several points were thrown at once and the second peak is not on the pupil either (videos 1, 2, 14, and one frame of video 8); the 4 untouched frames are those the eyelid rule calls closed (videos 10, 11), in two of which the model's eyelid points are themselves wrong.</li>
+      <li>Whole videos: the human-label range repairs 0.8% and leaves 1.2% of the frames flagged, most in videos 1 and 8; by eye (Figure 9-11) about six of seven repairs are right and about three of five still-flagged frames are real errors.</li>
+      <li>With the PCA or the union as finder the number repaired does not change (Figure 9-9): the errors the PCA adds cannot be repaired by the second peak and are the next thing to repair.</li>
+    </ol>
+  </div>
+  <h4><span lang="en">Extension to all 8 points: eyelids and corners repaired too, the smallest subset replaced</span></h4>
+  
+  <div class="text" lang="en">
+    <p>The repair above replaces pupil points only: when the point over the line in a flagged frame is an eyelid or a corner, the frame stays flagged untouched, and most still-flagged frames are exactly those. So the repair was extended to all 8 points, the check was given a way to judge eyelids and corners, and after the check by eye the replacement was changed to the smallest subset of points. This version is the repair every later section uses and the starting point of the loop of 9.4.</p>
   </div>
   <p class="text"><b><span lang="en">Basic information</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Data</span></th><td><span lang="en">The whole-video predictions of the 19 videos and the 1330 truth frames (23 wrong), as in 9.1 and 9.2; finder = either fitting or the PCA (9.2).</span></td></tr>
-    <tr><th><span lang="en">Points that may be replaced</span></th><td><span lang="en">All 8. Candidate points = every point over the line (fitting), the point with the largest residual whichever it is (PCA), the union of the two.</span></td></tr>
-    <tr><th><span lang="en">Replaced by</span></th><td><span lang="en">The second peak of that point's heatmap (the highest local maximum at least 3 cells from the highest cell).</span></td></tr>
-    <tr><th><span lang="en">Check</span></th><td><span lang="en">Both parts must pass: the 12 scale-free quantities of the four pupil points inside the human-label range (margin 0.42), and 8 outline quantities of the eyelids and corners inside the human-label range (margin 0.23). Both ranges come from the 1330 human labels; no hand-set number.</span></td></tr>
-    <tr><th><span lang="en">How points are replaced</span></th><td><span lang="en">The smallest subset of candidates that makes the frame pass: outline points tried first, pupil points after, singles before pairs; if no subset passes the frame is reverted.</span></td></tr>
-    <tr><th><span lang="en">Closed eye</span></th><td><span lang="en">Frames whose eyelid opening is below half the video's median are called closed, left alone and counted apart.</span></td></tr>
-    <tr><th><span lang="en">Metrics</span></th><td><span lang="en">Truth frames: of the 23 wrong frames, repaired (error back under the line), still flagged, closed; of the 40 flagged right frames, repaired, made worse (pushed over the line), left alone as plausible. Whole videos: shares of frames repaired, flagged and not repaired, plausible as they are. By eye: whether the point put in sits where it belongs.</span></td></tr>
-    <tr><th><span lang="en">Scripts and results</span></th><td><code>flag_and_repair.py --finder either --accept labelregion --points all --replace smallest</code>, <code>second_peak_repair.py</code>, <code>acceptance_thresholds.py</code>, <code>outline_region.py</code>; <code>results/flag_and_repair/videoNN_either_labelregion_all_smallest/</code>, <code>all_videos/full_repair.csv</code>, <code>results/acceptance_thresholds/label_region_margin.csv</code>, <code>label_region_outline.csv</code></td></tr>
+    <tr><th><span lang="en">Data</span></th><td><span lang="en">19 videos, finder either fitting or PCA (9.2), the 1330 truth frames (23 wrong), as above.</span></td></tr>
+    <tr><th><span lang="en">Points that may be replaced</span></th><td><span lang="en">Before: pupil top, bottom, left, right; now: all 8. Candidate points = every point over the line (fitting), the point with the largest residual whichever it is (PCA), the union of the two.</span></td></tr>
+    <tr><th><span lang="en">Check</span></th><td><span lang="en">Both parts must pass: the 12 pupil quantities inside the human-label range (test (a) above, margin 0.42) and 8 outline quantities of the eyelids and corners inside their own human-label range (margin 0.23).</span></td></tr>
+    <tr><th><span lang="en">How points are replaced</span></th><td><span lang="en">First the whole replacement (all candidates at once, accepted or the whole frame reverted), then the smallest subset (the smallest subset of candidates that makes the frame pass; outline points tried first, pupil points after, singles before pairs).</span></td></tr>
+    <tr><th><span lang="en">Check by eye</span></th><td><span lang="en">Whole-replacement version: 5 repaired frames per video with an eyelid or corner replaced, 90 frames, 139 points put in, one verdict per point (right / closer but still not right / no / was right before and should not have moved / cannot tell). The smallest-subset version was not checked by eye again.</span></td></tr>
+    <tr><th><span lang="en">Scripts and results</span></th><td><code>flag_and_repair.py --finder either --accept labelregion --points all --replace smallest</code>, <code>outline_region.py</code>, <code>outline_review.py</code>; <code>results/flag_and_repair/videoNN_either_labelregion_all_smallest/</code>, <code>all_videos/full_repair.csv</code>, <code>outline_review/</code>, <code>results/acceptance_thresholds/label_region_outline.csv</code></td></tr>
   </tbody></table></div>
-  <p class="text"><b><span lang="en">How it is done (each step written so that it can be recomputed)</span></b></p>
+  <p class="text"><b><span lang="en">The extended algorithm (each step written so that it can be recomputed)</span></b></p>
   
   <div class="text" lang="en">
     <ol>
@@ -957,29 +1040,29 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>Each frame's status</b> is one of: not flagged, plausible as it is (flagged, check passed, untouched), repaired, flagged and not repaired, closed. Whole videos are counted in these five classes; on the truth frames the error before and after says repaired to good or made worse.</li>
     </ol>
   </div>
+  <p class="text"><b><span lang="en">Results: pupil points only against all 8 points</span></b></p>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_repair_scope.png" alt="Pupil points only against all eight points: truth frames, and per video the frames repaired and the frames flagged and not repaired"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-13:</span>Pupil points only (grey) against all eight points with the smallest subset (blue). Left: truth frames, of the 23 wrong frames the repaired and the still flagged, of the 40 flagged right frames the made worse and the left alone as plausible. Middle: frames repaired per video, % of the video. Right: frames flagged and not repaired per video. With all eight points every video repairs more and leaves fewer unrepaired; on video 1 the still-flagged share falls from 4.7% to 1.9%.</figcaption>
+  </figure>
+  <p class="text"><b><span lang="en">Table 9-3-1: pupil points only, all eight points with whole replacement, all eight points with the smallest subset</span></b></p>
+  <div class="tablebox"><table>
+    <thead><tr><th></th><th><span lang="en">Pupil points only</span></th><th><span lang="en">All 8, whole replacement</span></th><th><span lang="en">All 8, smallest subset (used)</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="en">23 wrong truth frames: repaired / still flagged / left as closed-eye</span></td><td>12 / 7 / 4</td><td>12 / 7 / 4</td><td>15 / 4 / 4</td></tr>
+      <tr><td><span lang="en">of them the 4 whose worst point is an eyelid: repaired</span></td><td>1</td><td>1</td><td>3</td></tr>
+      <tr><td><span lang="en">of them the 3 whose worst point is a corner: repaired</span></td><td>0</td><td>0</td><td>1</td></tr>
+      <tr><td><span lang="en">40 right truth frames flagged: repaired / made worse / left as plausible</span></td><td>2 / 1 / 32</td><td>2 / 1 / 38</td><td>2 / 1 / 38</td></tr>
+      <tr><td><span lang="en">Whole videos (% of frames): repaired / still flagged / left as plausible</span></td><td>0.80 / 1.18 / 1.74</td><td>0.96 / 0.66 / 2.11</td><td>1.10 / 0.51 / 2.11</td></tr>
+      <tr><td><span lang="en">Points put in: pupil / eyelid / corner</span></td><td>11072 / 0 / 0</td><td>11140 / 959 / 1916</td><td>11571 / 1295 / 2293</td></tr>
+    </tbody>
+  </table></div>
   
   <div class="text" lang="en">
-    <p><b>Why the second peak.</b> For each point the model outputs not a coordinate but a heatmap: the image in cells of 8 px, one score per cell for how likely the point is there; the reported coordinate is the highest cell plus an offset inside the cell that the network outputs as well, so it is precise to the pixel rather than to 8 px, and the reported confidence is that highest score. A thrown point is a frame in which the highest cell landed elsewhere, on a corner, the fur or the image border, while the place the point belongs usually still holds a local high cell: the second peak. The 3 cells are an exclusion radius we set, so that a cell on the slope of the highest peak is not taken as the second peak. The second peak is known only as a cell, the network's offset holds only for the highest cell, so a repaired coordinate is precise to the cell, within half a cell, which does not matter for a right-or-wrong decision at the scale of tens of px. Figure 9-7 shows three frames the check by eye judged repaired correctly: the two peaks score almost the same, 0.27 against 0.25, 0.21 against 0.21, 0.42 against 0.38, so the model cannot tell which one is right and the confidence cannot replace the check.</p>
+    <p>All 23 wrong frames are flagged: 15 repaired (error back under the line), 4 still flagged, 4 left alone as closed-eye. By the worst point: of the 16 frames whose worst point is a pupil point 11 are repaired, of the 4 with an eyelid worst 3, of the 3 with a corner worst 1. The 4 still flagged are frames in which several points were thrown at once and the second peak is not where the point belongs either: video 1 frames 61431 and 62186, video 2 frame 67793, video 14 frame 64865; the 4 closed-eye frames are in videos 10 and 11, in two of which the model's eyelid points are themselves wrong. Of the 40 flagged right frames 38 pass the check as they are and are left alone, 2 are repaired, one of them pushed over the line (made worse).</p>
   </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_heatmap_examples.jpg" alt="Three repaired frames: the model's points before, the heatmap of the thrown point with its two peaks, the points after"></div>
-    
-    <figcaption lang="en"><span class="tag">Figure 9-7:</span>(the pupil-points-only run) Three repaired frames. Left to right: before (red = the model's points, the thrown point outside the view); the point's heatmap over the whole frame, red ring = peak 1, blue ring = peak 2, dashed box = the area the third panel enlarges; the box enlarged, peak 2 on the pupil edge; after (blue = the point moved to peak 2).</figcaption>
-  </figure>
-
-  <p class="text"><b><span lang="en">Result one: truth frames</span></b></p>
-  
-  <div class="text" lang="en">
-    <p>All 23 wrong frames are flagged: 15 repaired (error back under the line), 4 still flagged, 4 left alone as closed-eye. By the worst point: of the 16 frames whose worst point is a pupil point 11 are repaired, of the 4 with an eyelid worst 3, of the 3 with a corner worst 1. The 4 still flagged are frames in which several points were thrown at once and the second peak is not where the point belongs either: video 1 frames 61431 and 62186, video 2 frame 67793, video 14 frame 64865; the 4 closed-eye frames are in videos 10 and 11, in two of which the model's eyelid points are themselves wrong. Of the 40 flagged right frames 38 pass the check as they are and are left alone, 2 are repaired, one of them pushed over the line (made worse). Figure 9-8 shows repaired frames and frames that stay flagged.</p>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_repair_examples.jpg" alt="Example wrong frames repaired and wrong frames that stay flagged"></div>
-    
-    <figcaption lang="en"><span class="tag">Figure 9-8:</span>Top: repaired wrong frames; red = model, blue = accepted second peak, green ring = human label. Bottom: wrong frames that stay flagged.</figcaption>
-  </figure>
-
-  <p class="text"><b><span lang="en">Result two: whole videos</span></b></p>
-  <p class="text"><b><span lang="en">Table 9-3-1: frame statuses over the whole of the 19 videos (% of frames)</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-2: frame statuses over the whole of the 19 videos (% of frames)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Frames</span></th><th><span lang="en">Flagged</span></th><th><span lang="en">Repaired</span></th><th><span lang="en">Flagged, not repaired</span></th><th><span lang="en">Plausible as it is</span></th><th><span lang="en">Closed</span></th></tr></thead>
     <tbody>
@@ -1009,33 +1092,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="text" lang="en">
     <p>4.2% of all frames are flagged by either finder: 1.10% repaired, 0.51% flagged and not repaired, 2.11% plausible as they are, 0.59% closed. Videos 1 and 8 have the most (flagged 15.3% and 8.9%, repaired 6.8% and 2.0%). Points put in: 15,159 in all, 11,571 pupil points, 1295 eyelid, 2293 corner; among the pupil points mostly pupil_left. Of the frames flagged and not repaired about two in five are false alarms (check by eye, below).</p>
   </div>
-
-  <p class="text"><b><span lang="en">Result three: check by eye (the whole videos have no labels, only the eye can tell whether a repair is right)</span></b></p>
-  
-  <div class="text" lang="en">
-    <p>There are only 1330 truth frames; nearly all frames the repair touches have no labels. Whether the point put in sits where it belongs, and whether a still-flagged frame is really wrong, only the eye can say. Two checks were made: one on repaired frames with pupil points replaced and on still-flagged frames, one on repaired frames with an eyelid or corner replaced.</p>
-  </div>
-  <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Check one</span></th><td><span lang="en">Two groups: repaired frames (pupil points replaced) and still-flagged frames; up to 10 per video and group, one per run of touched frames, 358 in all, 355 judged; from the run with fitting as finder and the pupil range as check. Repaired frame, three panels: the frame, before (red = the model's 8 points), after (blue = the point put in); is the blue point where the pupil point belongs: yes / better but still not right / no / cannot tell. Still-flagged frame, two panels; is a red point really wrong: yes / no / cannot tell.</span></td></tr>
-    <tr><th><span lang="en">Check two</span></th><td><span lang="en">5 repaired frames per video with an eyelid or corner replaced, 90 frames, 139 points put in, one verdict per point: right / closer but still not right / no / was right before and should not have moved / cannot tell; from the whole-replacement run (not repeated on the smallest-subset run).</span></td></tr>
-    <tr><th><span lang="en">What counts as right</span></th><td><span lang="en">The blue point counts as right only where that point belongs (pupil edge, lid margin, corner); closer than before but not there is "closer but still not right".</span></td></tr>
-    <tr><th><span lang="en">Scripts and results</span></th><td><code>spotcheck_review.py</code>, <code>spotcheck_review_eval.py</code>, <code>outline_review.py</code>, <code>outline_review_eval.py</code>; <code>results/flag_and_repair/spotcheck_review/</code>, <code>outline_review/</code></td></tr>
-  </tbody></table></div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_spotcheck_review.png" alt="Spot check by eye of the repaired and still-flagged frames of the whole videos"></div>
-    
-    <figcaption lang="en"><span class="tag">Figure 9-9:</span>(the pupil-points-only run) Verdicts of check one. Left: repaired frames; right: still-flagged frames.</figcaption>
-  </figure>
-  
-  <div class="text" lang="en">
-    <p><b>Check one:</b> of 174 repaired frames the point put in is on the pupil where it belongs in 149, closer but still not right in 19 (mostly videos 14, 17, 18), not better in 4; of 184 still-flagged frames 101 really have a wrong point, 69 are false alarms, 14 cannot be told. None of these frames took part in setting the line, the threshold or the ranges. Figure 9-10 shows examples.</p>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_review_examples.jpg" alt="Repaired frames from the check by eye, before and after side by side"></div>
-    
-    <figcaption lang="en"><span class="tag">Figure 9-10:</span>(the pupil-points-only run) Repaired frames from check one, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
-  </figure>
-  <p class="text"><b><span lang="en">Table 9-3-2: (the all-8-points whole-replacement run) check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
+  <p class="text"><b><span lang="en">Check by eye of the eyelid and corner replacements</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-3: check by eye of repaired frames with an eyelid or corner replaced (whole-replacement version, 139 points put in)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Point put in</span></th><th><span lang="en">Right</span></th><th><span lang="en">Closer, not right</span></th><th><span lang="en">Was right, moved for nothing</span></th><th><span lang="en">Cannot tell</span></th><th><span lang="en">Total</span></th></tr></thead>
     <tbody>
@@ -1047,53 +1105,34 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_outline_examples.jpg" alt="Four repaired frames in which an eyelid or corner point was replaced, before and after side by side"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-11:</span>(the all-8-points whole-replacement run) Four frames of check two judged right, before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-14:</span>Four repaired frames with a corner or eyelid point replaced (judged right by eye), before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Check two:</b> 39 of the 41 judged eyelid points are right, 31 of 35 corners, though a third of the corners could not be judged from the crop; of the pupil points moved in the same frames, 10 of 32 judged were right before and moved for nothing, which is why the smallest subset replaced the whole replacement. The check by eye has not been repeated on the smallest-subset run.</p>
+    <p><b>Result.</b> Truth frames: the whole replacement repairs as many as the pupil-only run (12), differing on 8 frames: 6 right frames flagged because of a corner are now judged plausible as they are and left alone, one wrong eyelid frame of video 2 is repaired, and one frame of video 4 (62186, lower eyelid worst) is sent back instead, because the eyelid's second peak fails the outline range and the whole replacement is reverted. With the smallest subset 15 are repaired: the 3 gained are eyelid frames (video 2: 68086, 68379; video 4: 70429), still flagged falls from 7 to 4, made worse stays 1. Whole videos: the still-flagged share falls from 1.18% to 0.51%, most of it becoming "plausible as it is" (1.74% to 2.11%), the rest repaired (0.80% to 1.10%); the smallest subset repairs 1878 frames the whole replacement sent back and loses none; of the 12,517 frames both repair, 805 keep a pupil point the whole replacement would have moved. By eye (Table 9-3-3): 39 of the 41 judged eyelid points are right, 31 of 35 corners, though a third of the corners could not be judged from the crop; of the pupil points moved in the same frames, 10 of 32 judged were right before and moved for nothing, which is why the smallest subset was adopted. The check by eye has not been repeated on the smallest-subset version.</p>
   </div>
-
-  <p class="text"><b><span lang="en">How the check, the finder and the points to replace were chosen (one figure)</span></b></p>
   
-  <div class="text" lang="en">
-    <p>Each of the three choices was compared once, changing one thing at a time; the results are in Figure 9-12: top row the truth frames (wrong frames repaired, right frames made worse), bottom row the whole videos (frames repaired, frames flagged and not repaired), the option used on a green background.</p>
-    <ul>
-      <li><b>The check</b> (Figure 9-12 left, pupil points only, finder = fitting): of seven, the human-label range (a) and the hand-made geometry rule (b) are jointly best (12 frames repaired each); (a) has no hand-set number and makes fewer frames worse, so (a) is used. The finder's own score (c), the second-peak confidence (d) and the jump (e) are much worse as checks: finding asks whether the frame disagrees with the past, the check needs geometric evidence from the frame itself. (f) and (g) are (a) without its margin and repair 2 frames fewer each, so the margin stays.</li>
-      <li><b>The finder</b> (Figure 9-12 middle): fitting, the PCA and either are nearly the same on the truth frames (12, 11, 12 repaired); the union flags the most frames (4.2%), and the extra errors cannot be repaired by the second peak but are flagged, so the union is used.</li>
-      <li><b>Which points</b> (Figure 9-12 right): pupil points only repairs 12; all 8 points with the whole replacement repairs the same number but moves a third of the right pupil points in the same frames for nothing (Table 9-3-2); all 8 points by the smallest subset repairs 15, leaves 4 flagged and brings the still-flagged share of the whole videos from 1.18% to 0.51%, so the smallest subset is used.</li>
-    </ul>
-  </div>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_method_selection.png" alt="Three comparisons made while settling the repair: seven checks, three finders, three replacement scopes; truth frames above, whole videos below"></div>
-    
-    <figcaption lang="en"><span class="tag">Figure 9-12:</span>The three comparisons. Left: seven checks (pupil points only, finder = fitting); middle: three finders (check = label range, pupil points only); right: which points to replace (finder = either, check = label range). Top: of the 23 wrong truth frames the repaired (blue) and of the flagged right frames the made worse (red); bottom: share of all frames repaired (blue) and flagged and not repaired (orange). Green background = the option used.</figcaption>
-  </figure>
-
-  
-  <div class="concl" lang="en"><span class="tag">Conclusion on repair and check:</span>the heatmap's second peak with a two-part human-label-range check repairs 15 of the 23 wrong frames, the rest stay flagged, nothing is deleted; on the whole videos 1.1% of the frames are repaired and 0.5% stay flagged.
+  <div class="concl" lang="en"><span class="tag">Conclusion on the extension:</span>with eyelids and corners repaired too and the smallest subset replaced, 15 of the 23 wrong frames are repaired (12 with pupil points only), the rest stay flagged, nothing is deleted; on the whole videos 1.1% of the frames are repaired and 0.5% stay flagged.
     <ol>
-      <li>All 23 wrong frames are flagged: 15 repaired, 4 still flagged (several points thrown at once, the second peak not where the point belongs either), 4 closed-eye. Of the 40 flagged right frames 38 are left alone as plausible, 1 is made worse.</li>
-      <li>Whole videos: 4.2% flagged, 1.10% repaired, 0.51% flagged and not repaired, 2.11% plausible as they are, most in videos 1 and 8. By eye: about six of seven pupil-point repairs are right, 39 of 41 eyelid points, 31 of 35 corners; about three of five still-flagged frames are real errors.</li>
-      <li>The check is the human-label range: jointly best with the hand-made geometry rule, with no hand-set number and fewer frames made worse; the finder's own score is the worst check, because finding asks whether the frame disagrees with the past while the check needs evidence from the frame itself.</li>
-      <li>The finder is the union of fitting and the PCA: the extra errors the PCA finds cannot be repaired by the second peak and stay flagged, but they are flagged.</li>
-      <li>All 8 points may be replaced, by the smallest subset: wrong eyelids and corners are repaired too, and pupil points that were right in the same frame are no longer moved for nothing.</li>
-      <li>A repaired coordinate is precise to the heatmap cell (8 px, within half a cell), enough for errors of tens of px; the two peaks score alike, so the check cannot rely on confidence.</li>
-      <li>Not done: the check by eye on the smallest-subset run; cutting the two in five false alarms among the still-flagged frames.</li>
+      <li>Frames with a wrong eyelid or corner are repaired: 3 of the 4 whose worst point is an eyelid, 1 of the 3 with a corner; more frames repaired on every video.</li>
+      <li>Frames flagged because of an outline point that are plausible as they are no longer stay in "flagged, not repaired": 1.18% to 0.51% over the whole videos, video 1 from 4.7% to 1.9%.</li>
+      <li>Nothing more is made worse: still 1 truth frame.</li>
+      <li>The smallest subset keeps the right pupil points of the same frames (805 of the 12,517 frames both repair), repairs 1878 frames more than the whole replacement and none fewer. Of the eyelid points put in 39 of 41 are right, of the corners 31 of 35; the check by eye has not been repeated on the smallest-subset run.</li>
+      <li>This version is the repair every later section uses and the starting point of the loop of 9.4.</li>
     </ol>
   </div>
-  <h3><span lang="en">9.4 Closing the loop: the frames that passed the check and the repaired frames retrain the model, and the model gets better</span></h3>
+  <h3><span lang="en">9.4 Closing the loop: the unflagged frames and the repaired frames retrain the model, and the model gets better</span></h3>
   
   <div class="text" lang="en">
-    <p><b>The question:</b> after 9.2 finds the wrong frames and 9.3 repairs part of them, the frames that passed the check and the repaired frames have trustworthy coordinates nobody has looked at. Using them as new training labels together with the existing human labels, retraining the model with the same recipe and predicting the whole video again is a loop. The question is whether the model that comes out has fewer wrong frames than the starting model (the plateau model).</p>
-    <p><b>How:</b> starting model → find, repair, check (9.2, 9.3) → the checked and the repaired frames go back as labels → retrain → predict the whole video again → find and repair again, next turn. The three experiments differ only in which frames go back:</p>
+    <p><b>The question:</b> after 9.2 finds the wrong frames and 9.3 repairs part of them, the unflagged frames (neither finder flagged them, no point touched) and the repaired frames have trustworthy coordinates nobody has looked at. Using them as new training labels together with the existing human labels, retraining the model with the same recipe and predicting the whole video again is a loop. The question is whether the model that comes out has fewer wrong frames than the starting model (the plateau model).</p>
+    <p><b>How:</b> starting model → find, repair, check (9.2, 9.3) → the unflagged and the repaired frames go back as labels → retrain → predict the whole video again → find and repair again, next turn. The three experiments differ only in which frames go back:</p>
   </div>
   <div class="tablebox"><table>
     <thead><tr><th></th><th><span lang="en">Frames fed back</span></th><th><span lang="en">Turns</span></th><th><span lang="en">Videos</span></th></tr></thead>
     <tbody>
-      <tr><td><span lang="en">Experiment 1</span></td><td><span lang="en">frames that passed the check unchanged, every 30th</span></td><td>1<span lang="en"> (a second turn tried on videos 1, 8)</span></td><td>0 1 2 4 6 7 8 12 15 18</td></tr>
+      <tr><td><span lang="en">Experiment 1</span></td><td><span lang="en">unflagged frames unchanged, every 30th</span></td><td>1<span lang="en"> (a second turn tried on videos 1, 8)</span></td><td>0 1 2 4 6 7 8 12 15 18</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td><span lang="en">repaired frames only, count capped at experiment 1's</span></td><td>1</td><td>1 8 15 6</td></tr>
-      <tr><td><span lang="en">Experiment 3</span></td><td><span lang="en">the checked frames every 30th (as in experiment 1) plus all repaired frames, no cap</span></td><td><span lang="en">until saturation: flagged frames not 10% below the previous turn, or wrong blind frames not fewer. So far only turn 1 (videos 1, 8, 15; video 6 trained, not yet predicted); later turns not run yet</span></td><td>1 8 15 6</td></tr>
+      <tr><td><span lang="en">Experiment 3</span></td><td><span lang="en">the unflagged frames every 30th (as in experiment 1) plus all repaired frames, no cap</span></td><td><span lang="en">until saturation: flagged frames not 10% below the previous turn, or wrong blind frames not fewer. So far only turn 1 (videos 1, 8, 15; video 6 trained, not yet predicted); later turns not run yet</span></td><td>1 8 15 6</td></tr>
     </tbody>
   </table></div>
   <p class="text"><b><span lang="en">Shared configuration and formulas (the same for the three experiments, not repeated below)</span></b></p>
@@ -1118,23 +1157,23 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="text" lang="en">
     <ul>
-      <li><b>Per-point rule of a checked frame</b>: a point the repair replaced is kept; any other point is kept when <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>l</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>≥</mo><mn>0.01</mn></math> (likelihood), <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>d</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>≤</mo><mn>0.14</mn></math> (fitting deviation) and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>r</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>≤</mo><msub><mi>θ</mi><mtext>PCA</mtext></msub></math> (PCA residual), otherwise left blank; a frame is used when its four pupil points and at least 6 points remain. A repaired frame keeps all 8 points at their repaired coordinates, a point not replaced is blank only when its likelihood is under 0.01.</li>
+      <li><b>Per-point rule of an unflagged frame</b>: a point the repair replaced is kept; any other point is kept when <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>l</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>≥</mo><mn>0.01</mn></math> (likelihood), <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>d</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>≤</mo><mn>0.14</mn></math> (fitting deviation) and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>r</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>≤</mo><msub><mi>θ</mi><mtext>PCA</mtext></msub></math> (PCA residual), otherwise left blank; a frame is used when its four pupil points and at least 6 points remain. A repaired frame keeps all 8 points at their repaired coordinates, a point not replaced is blank only when its likelihood is under 0.01.</li>
       <li><b>Epochs</b>: the starting model trained 120 epochs; experiments 1 and 2 match the iteration count, rounded to a multiple of max(1, ⌊<i>E</i>/12⌋):<math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>E</mi><mo>=</mo><mi>round</mi><mrow><mo>(</mo><mfrac><mrow><mn>120</mn><mo>·</mo><mo>⌈</mo><msub><mi>N</mi><mi>h</mi></msub><mo>/</mo><mn>2</mn><mo>⌉</mo></mrow><mrow><mo>⌈</mo><mo>(</mo><msub><mi>N</mi><mi>h</mi></msub><mo>+</mo><msub><mi>N</mi><mi>p</mi></msub><mo>)</mo><mo>/</mo><mn>2</mn><mo>⌉</mo></mrow></mfrac><mo>)</mo></mrow></math>with <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>N</mi><mi>h</mi></msub></math> human frames and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>N</mi><mi>p</mi></msub></math> frames fed back.</li>
       <li><b>Truth-frame error</b>: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>e</mi><mi>t</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>W</mi></mfrac><msqrt><mfrac><mn>1</mn><mrow><mo>|</mo><msub><mi>K</mi><mi>t</mi></msub><mo>|</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>k</mi><mo>∈</mo><msub><mi>K</mi><mi>t</mi></msub></mrow></munder><msup><mrow><mo>‖</mo><msub><mi>p</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>−</mo><msub><mi>h</mi><mrow><mi>t</mi><mi>k</mi></mrow></msub><mo>‖</mo></mrow><mn>2</mn></msup></msqrt></math>, with <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mi>K</mi><mi>t</mi></msub></math> the points labeled in that frame, <i>h</i> the human points, <i>W</i> the eye width; wrong = <i>e</i> &gt; 0.14.</li>
       <li><b>Flagged share</b>: the two finders of 9.2 recomputed on the new model's prediction, same PCA multiple, the median the new model's own; the share flagged by either.</li>
       <li><b>Blind frames</b>: how they are drawn (strata, k-means, seed) and the weighted estimate of the whole-video wrong share <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><msub><mo>∑</mo><mi>s</mi></msub><msub><mi>share</mi><mi>s</mi></msub><mo>·</mo><msub><mi>wrong</mi><mi>s</mi></msub><mo>/</mo><msub><mi>n</mi><mi>s</mi></msub></math> are in the details block; paired comparison: on the same frame a model counts as better or worse only when the two errors differ by more than 1% of the eye width, sign test and Wilcoxon test.</li>
     </ul>
   </div>
-  <h4><span lang="en">Experiment 1: the checked frames go back</span></h4>
+  <h4><span lang="en">Experiment 1: the unflagged frames go back</span></h4>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Frames fed back</span></th><td><span lang="en">Frames with status passed or repaired, every 30th, points kept by the shared per-point rule (points over the line before the repair are left blank, so repaired frames almost never enter: experiment 1 in effect uses the starting model's own unflagged predictions).</span></td></tr>
+    <tr><th><span lang="en">Frames fed back</span></th><td><span lang="en">Frames with status unflagged or repaired, every 30th, points kept by the shared per-point rule (points over the line before the repair are left blank, so repaired frames almost never enter: experiment 1 in effect uses the starting model's own unflagged predictions).</span></td></tr>
     <tr><th><span lang="en">Videos and counts</span></th><td><span lang="en">Ten videos: 0, 1, 2, 4, 6, 7, 8, 12, 15, 18; 368 to 2030 frames fed back per video, epochs by iteration matching with the starting model (Tables 9-4-4, 9-4-7).</span></td></tr>
     <tr><th><span lang="en">Second turn</span></th><td><span lang="en">On videos 1 and 8 the new model's prediction gave a second batch of every-30th unflagged frames and one more training.</span></td></tr>
   </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp1.png" alt="Experiment 1: starting model against the loop model on ten videos: wrong truth frames, median error, flagged share, wrong blind frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-13:</span>Experiment 1, starting model (grey) against the loop model (orange) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 24 blind frames (the four videos with blind labels only).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-15:</span>Experiment 1, starting model (grey) against the loop model (orange) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 24 blind frames (the four videos with blind labels only).</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-1: experiment 1 on ten videos, starting model → loop model</span></b></p>
   <div class="tablebox"><table>
@@ -1164,7 +1203,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp2.png" alt="Experiment 2: starting model against the loop model on four videos: wrong truth frames, median error, flagged share, wrong blind frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-14:</span>Experiment 2, starting model (grey) against the loop model (red) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 24 blind frames.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-16:</span>Experiment 2, starting model (grey) against the loop model (red) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 24 blind frames.</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-2: experiment 2 on four videos, starting model → loop model</span></b></p>
   <div class="tablebox"><table>
@@ -1178,11 +1217,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
   
   <div class="text" lang="en">
-    <p>All four videos beat the starting model: wrong truth frames 8 → 2 and 1 → 0, the flagged share to about a third, the wrong blind frames to about a third, the median within 0.3%. The limit of feeding back repaired frames only is that they are of one kind (almost all pupil_left replacements), so the repair's own small bias is learned: on video 6 three supplementary blind frames have pupil_left misplaced. That is why experiment 3 adds the checked frames.</p>
+    <p>All four videos beat the starting model: wrong truth frames 8 → 2 and 1 → 0, the flagged share to about a third, the wrong blind frames to about a third, the median within 0.3%. The limit of feeding back repaired frames only is that they are of one kind (almost all pupil_left replacements), so the repair's own small bias is learned: on video 6 three supplementary blind frames have pupil_left misplaced. That is why experiment 3 adds the unflagged frames.</p>
   </div>
   <h4><span lang="en">Experiment 3: both kinds go back, turn after turn until saturation</span></h4>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Frames fed back</span></th><td><span lang="en">Every 30th checked frame (as in experiment 1) plus all repaired frames (as in experiment 2), no cap, no held-out blocks; 60 frames on each side of the truth frames and of all 60 blind frames are kept out, so the 34 blind frames stay valid for every turn.</span></td></tr>
+    <tr><th><span lang="en">Frames fed back</span></th><td><span lang="en">Every 30th unflagged frame (as in experiment 1) plus all repaired frames (as in experiment 2), no cap, no held-out blocks; 60 frames on each side of the truth frames and of all 60 blind frames are kept out, so the 34 blind frames stay valid for every turn.</span></td></tr>
     <tr><th><span lang="en">Videos and counts</span></th><td><span lang="en">Videos 1 / 8 / 15 / 6: 5347 / 2508 / 2254 / 2921 frames fed back in turn 1; epochs = experiment 1's on the video (8 / 22 / 34 / 21), so the iterations grow with the set and every human frame is seen as often as in experiment 1; every turn trains afresh from the ImageNet weights (Tables 9-4-6, 9-4-7).</span></td></tr>
     <tr><th><span lang="en">Next turn</span></th><td><span lang="en">The new model takes the place of the starting model: its whole-video prediction is flagged again (PCA threshold from its own median), the flagged and near-threshold frames get second peaks from its own heatmaps, repaired and checked as in 9.3, then the same frame rule and the same epochs train the next model.</span></td></tr>
     <tr><th><span lang="en">Saturation (stop)</span></th><td><span lang="en">After a turn, flagged frames not below 90% of the previous turn's, or wrong predictions among the 34 blind frames not fewer = saturated, stop; the number of turns is not a criterion.</span></td></tr>
@@ -1191,7 +1230,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp3.png" alt="Experiment 3, turn 1: starting model against the loop model on three videos: wrong truth frames, median error, flagged share, wrong blind frames of 34"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-15:</span>Experiment 3, turn 1, starting model (grey) against the loop model (blue) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 34 blind frames.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-17:</span>Experiment 3, turn 1, starting model (grey) against the loop model (blue) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 34 blind frames.</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-3: experiment 3 turn by turn and the saturation decision (turn 0 = the starting model)</span></b></p>
   <div class="tablebox"><table>
@@ -1209,7 +1248,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_turns.png" alt="Experiment 3 turn by turn on the four videos: flagged share, wrong blind frames and wrong truth frames against the turn number"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-16:</span>Experiment 3 turn by turn on the four videos: share of the whole video flagged by either finder (blue circles), wrong share of the 34 blind frames (orange squares), wrong share of the 70 truth frames (green triangles); turn 0 is the starting model. A dotted vertical line marks the turn at which the loop stopped.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-18:</span>Experiment 3 turn by turn on the four videos: share of the whole video flagged by either finder (blue circles), wrong share of the 34 blind frames (orange squares), wrong share of the 70 truth frames (green triangles); turn 0 is the starting model. A dotted vertical line marks the turn at which the loop stopped.</figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -1219,7 +1258,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="en"><span class="tag">Conclusion on the loop:</span>finding, repairing and checking made into a loop gives a retrained model with fewer wrong frames than the starting model on all four videos.
     <ol>
       <li>All three experiments beat the starting model: wrong truth frames 8 → 1 to 2 and 1 → 0, wrong blind frames to a third or less, the flagged share to a third or less, the median error unchanged. The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models.</li>
-      <li>The checked frames and the repaired frames each improve the model when fed back, and so do both together, so no ranking between them is made and both go back; experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
+      <li>The unflagged frames and the repaired frames each improve the model when fed back, and so do both together, so no ranking between them is made and both go back; experiment 3 is the form for actual use (every 30th unflagged frame plus all repaired frames go back, turn after turn until saturation).</li>
       <li>The remaining wrong frames are squinting frames both finders flag and the second peak cannot repair; the loop neither learns from them nor fixes them.</li>
       <li>The starting model has to be at its plateau: on video 0, with 60 human frames, the loop makes things worse (0 → 5 wrong).</li>
       <li>The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>
@@ -1368,7 +1407,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_truth.png" alt="Median error, wrong truth frames and flagged share of the starting model, the starting model with repair, and the loop models on videos 1, 8, 15 and 6"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-17:</span>Three numbers per model on the four videos: median error on the 70 truth frames (left), wrong truth frames (middle), share of the whole video flagged by either finder (right). Grey = starting model, hatched = starting model + the repair of 9.3 (no flagged share of its own), orange = experiment 1, red = experiment 2, pink = the second turn of experiment 1, blue = the first turn of experiment 3.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-19:</span>Three numbers per model on the four videos: median error on the 70 truth frames (left), wrong truth frames (middle), share of the whole video flagged by either finder (right). Grey = starting model, hatched = starting model + the repair of 9.3 (no flagged share of its own), orange = experiment 1, red = experiment 2, pink = the second turn of experiment 1, blue = the first turn of experiment 3.</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Blind frames by stratum</span></b></p>
   <p class="text"><b><span lang="en">Table 9-4-9: wrong frames on the 24 blind frames by stratum (A 10, B 3, C 8, D 3) and the paired comparison of each model against the starting model</span></b></p>
@@ -1401,7 +1440,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_examples.jpg" alt="Three stratum-A blind frames with the human labels, the starting model's points and the points of both loop models"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-18:</span>Three stratum-A blind frames (video 1: 62092, 60055; video 8: 31687): white rings = human labels, grey = starting model, orange = experiment 1, red = experiment 2, blue = experiment 3, first turn. The starting model has one point thrown onto the fur at the upper left; the 8 points of the three loop models sit next to the human labels.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-20:</span>Three stratum-A blind frames (video 1: 62092, 60055; video 8: 31687): white rings = human labels, grey = starting model, orange = experiment 1, red = experiment 2, blue = experiment 3, first turn. The starting model has one point thrown onto the fur at the upper left; the 8 points of the three loop models sit next to the human labels.</figcaption>
   </figure>
   
   <div class="text" lang="en">
@@ -1426,7 +1465,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_blind.png" alt="Blind frames of the four videos: error of the starting model against the error of the two loop models, one point per frame, marker by stratum"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-19:</span>The 24 blind frames of the four videos, one point per frame: the starting model's error on the x axis, the loop model's error on the y axis (orange = experiment 1, red = experiment 2, blue = experiment 3, first turn), marker by stratum (circle A, square B, triangle C, diamond D), dashed lines at the 14% wrong-frame line, below the diagonal = better than the starting model. The stratum-A frames (starting model flagged, experiment 1 not) sit almost all at the lower right: the starting model is wrong, both loop models are right.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-21:</span>The 24 blind frames of the four videos, one point per frame: the starting model's error on the x axis, the loop model's error on the y axis (orange = experiment 1, red = experiment 2, blue = experiment 3, first turn), marker by stratum (circle A, square B, triangle C, diamond D), dashed lines at the 14% wrong-frame line, below the diagonal = better than the starting model. The stratum-A frames (starting model flagged, experiment 1 not) sit almost all at the lower right: the starting model is wrong, both loop models are right.</figcaption>
   </figure>
   </details>
 </section>
