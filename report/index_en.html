@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 16:12 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 16:16 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1108,23 +1108,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 9-14:</span>Four repaired frames with a corner or eyelid point replaced (judged right by eye), before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
   </figure>
   
-  <div class="text" lang="en">
-    <p><b>Conclusion: eyelids and corners are repaired too, frames that are plausible as they are no longer wait for a person, and nothing more is made worse.</b></p>
-    <ul>
-      <li>Truth frames: wrong frames repaired from 12 to 15, the 3 gained all eyelid errors; still flagged from 7 down to 4; made worse still 1.</li>
-      <li>Whole videos: the frames flagged and not repaired halve (1.18% to 0.51%), most of them re-judged as plausible as they are, the rest repaired.</li>
-      <li>Why the smallest subset rather than the whole replacement: the whole replacement repairs as many as pupil points only, and the check by eye found that about a third of the pupil points moved along in the same frames were right before and moved for nothing; the smallest subset keeps those points and repairs more frames, never fewer.</li>
-      <li>By eye: more than nine in ten of the eyelid and corner points put in are right (a third of the corners could not be judged from the crop). The check has not been repeated on the smallest-subset run.</li>
-    </ul>
-  </div>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion on the extension:</span>with eyelids and corners repaired too and the smallest subset replaced, 15 of the 23 wrong frames are repaired (12 with pupil points only), the rest stay flagged, nothing is deleted; on the whole videos 1.1% of the frames are repaired and 0.5% stay flagged.
+  <div class="concl" lang="en"><span class="tag">Conclusion on the extension:</span>with eyelids and corners repaired too and the smallest subset replaced, 15 of the 23 wrong frames are repaired (12 with pupil points only), the rest stay flagged, nothing is deleted.
     <ol>
-      <li>Frames with a wrong eyelid or corner are repaired: 3 of the 4 whose worst point is an eyelid, 1 of the 3 with a corner; more frames repaired on every video.</li>
-      <li>Frames flagged because of an outline point that are plausible as they are no longer stay in "flagged, not repaired": 1.18% to 0.51% over the whole videos, video 1 from 4.7% to 1.9%.</li>
-      <li>Nothing more is made worse: still 1 truth frame.</li>
-      <li>The smallest subset keeps the right pupil points of the same frames (805 of the 12,517 frames both repair), repairs 1878 frames more than the whole replacement and none fewer. Of the eyelid points put in 39 of 41 are right, of the corners 31 of 35; the check by eye has not been repeated on the smallest-subset run.</li>
-      <li>This version is the repair every later section uses and the starting point of the loop of 9.4.</li>
+      <li>Frames with a wrong eyelid or corner are repaired; frames flagged because of an outline point but plausible as they are no longer wait for a person; nothing more is made worse.</li>
+      <li>Points are replaced by the smallest subset, not all at once: the whole replacement moves right pupil points of the same frame for nothing, the smallest subset keeps them and repairs more frames, never fewer.</li>
+      <li>This version is the repair every later section uses and the starting point of the loop of 9.4. Not done yet: the check by eye on the smallest-subset run.</li>
     </ol>
   </div>
   <h3><span lang="en">9.4 Closing the loop: the unflagged frames and the repaired frames retrain the model, and the model gets better</span></h3>

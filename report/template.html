@@ -1336,7 +1336,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <figcaption lang="en"><span class="tag">Figure 9-14:</span>Four repaired frames with a corner or eyelid point replaced (judged right by eye), before (red = model, squares = eyelid and corner points, circles = pupil points) and after (blue = the point put in, a thin line from the old to the new position) side by side: a temporal corner thrown onto the fur, a nasal corner thrown out of the view, an upper eyelid out of the view, a lower eyelid out of the view.</figcaption>
   </figure>
   <div class="text" lang="zh">
-    <p><b>结论：眼睑、眼角也能修了，本来合理的帧不再留在待看名单里，修坏的没有增加。</b></p>
+    <p><b>结果：</b></p>
     <ul>
       <li>真值帧：错帧修好从 12 帧到 15 帧，多出的 3 帧都是眼睑错的帧；仍标出 7 帧降到 4 帧；修坏仍是 1 帧。</li>
       <li>整段视频：标出未修的帧减半（1.18% 到 0.51%），其中大部分改判为"本来合理不动"，其余修好。</li>
@@ -1344,31 +1344,18 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>人眼核对：换上去的眼睑点和眼角点九成以上对（眼角有三分之一从裁剪图上看不清）。最小子集版本的人眼核对还没有重做。</li>
     </ul>
   </div>
-  <div class="text" lang="en">
-    <p><b>Conclusion: eyelids and corners are repaired too, frames that are plausible as they are no longer wait for a person, and nothing more is made worse.</b></p>
-    <ul>
-      <li>Truth frames: wrong frames repaired from 12 to 15, the 3 gained all eyelid errors; still flagged from 7 down to 4; made worse still 1.</li>
-      <li>Whole videos: the frames flagged and not repaired halve (1.18% to 0.51%), most of them re-judged as plausible as they are, the rest repaired.</li>
-      <li>Why the smallest subset rather than the whole replacement: the whole replacement repairs as many as pupil points only, and the check by eye found that about a third of the pupil points moved along in the same frames were right before and moved for nothing; the smallest subset keeps those points and repairs more frames, never fewer.</li>
-      <li>By eye: more than nine in ten of the eyelid and corner points put in are right (a third of the corners could not be judged from the crop). The check has not been repeated on the smallest-subset run.</li>
-    </ul>
-  </div>
-  <div class="concl" lang="zh"><span class="tag">拓展的结论：</span>眼睑和眼角也修、按最小子集替换后，23 帧错帧修好 15 帧（只修瞳孔点时 12 帧），其余仍标出，不删帧；整段视频修复 1.1% 的帧、标出未修 0.5%。
+  <div class="concl" lang="zh"><span class="tag">拓展的结论：</span>眼睑和眼角也修、按最小子集替换，23 帧错帧修好 15 帧（只修瞳孔点时 12 帧），其余仍标出，不删帧。
     <ol>
-      <li>眼睑、眼角错的帧能修了：最差点是眼睑的 4 帧修好 3 帧，是眼角的 3 帧修好 1 帧；整段每个视频修好的都更多。</li>
-      <li>因轮廓点触发而标出、但本来合理的帧不再留在"标出未修"里：整段 1.18% 降到 0.51%，视频 1 从 4.7% 到 1.9%。</li>
-      <li>修坏的没有增加：真值帧仍是 1 帧。</li>
-      <li>最小子集替换保住了同帧本来对的瞳孔点（两者都修的 12,517 帧里 805 帧），比整组换多修好 1878 帧、没有少修的。换上去的眼睑点 41 个里 39 个对，眼角 35 个里 31 个对；最小子集版本的人眼核对还没有重做。</li>
-      <li>这一版是后面各节用的修复，也是 9.4 的 loop 的起点。</li>
+      <li>眼睑、眼角错的帧能修了；因轮廓点触发而标出、但本来合理的帧不再占待看名单；修坏的没有增加。</li>
+      <li>换点按最小子集而不是整组：整组换会白动同帧本来对的瞳孔点，最小子集保住它们，修好的只多不少。</li>
+      <li>这一版是后面各节用的修复，也是 9.4 的 loop 的起点。还没做的：最小子集版本的人眼核对。</li>
     </ol>
   </div>
-  <div class="concl" lang="en"><span class="tag">Conclusion on the extension:</span>with eyelids and corners repaired too and the smallest subset replaced, 15 of the 23 wrong frames are repaired (12 with pupil points only), the rest stay flagged, nothing is deleted; on the whole videos 1.1% of the frames are repaired and 0.5% stay flagged.
+  <div class="concl" lang="en"><span class="tag">Conclusion on the extension:</span>with eyelids and corners repaired too and the smallest subset replaced, 15 of the 23 wrong frames are repaired (12 with pupil points only), the rest stay flagged, nothing is deleted.
     <ol>
-      <li>Frames with a wrong eyelid or corner are repaired: 3 of the 4 whose worst point is an eyelid, 1 of the 3 with a corner; more frames repaired on every video.</li>
-      <li>Frames flagged because of an outline point that are plausible as they are no longer stay in "flagged, not repaired": 1.18% to 0.51% over the whole videos, video 1 from 4.7% to 1.9%.</li>
-      <li>Nothing more is made worse: still 1 truth frame.</li>
-      <li>The smallest subset keeps the right pupil points of the same frames (805 of the 12,517 frames both repair), repairs 1878 frames more than the whole replacement and none fewer. Of the eyelid points put in 39 of 41 are right, of the corners 31 of 35; the check by eye has not been repeated on the smallest-subset run.</li>
-      <li>This version is the repair every later section uses and the starting point of the loop of 9.4.</li>
+      <li>Frames with a wrong eyelid or corner are repaired; frames flagged because of an outline point but plausible as they are no longer wait for a person; nothing more is made worse.</li>
+      <li>Points are replaced by the smallest subset, not all at once: the whole replacement moves right pupil points of the same frame for nothing, the smallest subset keeps them and repairs more frames, never fewer.</li>
+      <li>This version is the repair every later section uses and the starting point of the loop of 9.4. Not done yet: the check by eye on the smallest-subset run.</li>
     </ol>
   </div>
   <h3><span lang="zh">9.4 把这套纠错修复做成 loop：没被标出的帧和修复过的帧进入训练集重新训练模型，结果会变好</span><span lang="en">9.4 Closing the loop: the unflagged frames and the repaired frames retrain the model, and the model gets better</span></h3>
