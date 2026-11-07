@@ -75,7 +75,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 12:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 14:23 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1011,21 +1011,43 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="text" lang="en">
     <p>The three comparisons below were made while the method was being settled; the first two were run with pupil points only replaced and the pupil range alone as check (the outline range and the smallest subset came later), so the figures show 12 frames repaired rather than 15; the conclusions of the comparisons are unaffected.</p>
-    <p><b>The check.</b> One repair, seven checks, run on the frames fitting flags and on the frames the PCA flags (Figure 9-8): (a) the human-label range (the pupil part above); (b) a geometry rule: the same quantities with hand-set bands, video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order; (c) the same fitting score: the replaced point's distance to the prediction falls below the line (defined only for the frames fitting flags); (d) second-peak confidence at least 0.238; (e) jump: displacement of the replaced point to the previous and next frame at most 0.485 eye widths; (f) the label range without margin and without checking the frame as it is first; (g) without margin, with that check. The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise right repairs accepted minus wrong repairs accepted. Result: of the 23 wrong frames fitting flags, the label range repairs 12, leaves 7 flagged and 4 as closed-eye; the geometry rule the same; confidence 10, jump 5, the fitting score 5. Of the 28 flagged right frames the label range repairs 1 (1 made worse) and leaves 6 flagged; the geometry rule repairs 4, 7 flagged; the fitting score repairs 10 (2 worse). On the PCA route: label range 11, geometry rule 12, confidence 9, jump 4. The label range and the geometry rule are jointly best; the label range has no hand-set number and makes fewer frames worse, so it is the one used. Fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</p>
+    <p><b>The check.</b> One repair, seven checks, run on the frames fitting flags and on the frames the PCA flags (Figure 9-8):</p>
+    <ul>
+      <li>(a) <b>human-label range</b>: the pupil part of "how it is done" above.</li>
+      <li>(b) <b>geometry rule</b>: the same quantities with hand-set bands: video median ± 5 MAD, inside the corners and the eyelid band, correct left/right and top/bottom order.</li>
+      <li>(c) <b>the same fitting score</b>: the replaced point's distance to the prediction falls below the line (defined only for the frames fitting flags).</li>
+      <li>(d) <b>second-peak confidence</b> at least 0.238.</li>
+      <li>(e) <b>jump</b>: displacement of the replaced point to the previous and next frame at most 0.485 eye widths.</li>
+      <li>(f) the label range without margin and without checking the frame as it is first; (g) without margin, with that check.</li>
+    </ul>
+    <p>The numbers in (d) and (e) were chosen on the 37 candidate repairs to maximise right repairs accepted minus wrong repairs accepted. Results in Table 9-3-2: the label range and the geometry rule are jointly best; the label range has no hand-set number and makes fewer frames worse, so it is the one used. Fitting cannot double as the check: inside a run of wrong frames the prediction follows the wrong trajectory and the correct second peak is refused; a right frame flagged because the eye moved fast has a lagging prediction and a wrong second peak near it is accepted. Finding asks whether the frame disagrees with the past; the check needs evidence from the frame itself.</p>
     <p><b>The finder.</b> Fitting, the PCA and either of the two were each run on the 19 videos with the label range as check (Figure 9-9). On the truth frames the three are nearly the same: all 23 wrong frames found, 12, 11 and 12 repaired, 1, 0 and 1 right frames made worse. On the whole videos the PCA flags 2.4% of the frames and repairs 0.72%, fitting flags 3.8% and repairs 0.78%, the union flags 4.2% and repairs 0.80%. The extra frames the union flags are almost all beyond repair: for the errors the PCA alone finds the second peak fails the check, so they stay flagged and unrepaired. The union is used: the extra errors cannot be repaired but they are flagged.</p>
-    <p><b>The way of replacing.</b> With all 8 points allowed, the whole replacement was tried first (all candidates at once, accepted or the whole frame reverted): the same number of truth frames repaired (12), 6 right frames flagged because of a corner now judged plausible, one wrong eyelid frame of video 2 repaired, one frame of video 4 sent back instead (the eyelid's second peak fails the outline range and everything is reverted); the check by eye (Table 9-3-3) found that a third of the pupil points moved along in the same frames were right before and moved for nothing. With the smallest subset 15 frames are repaired and 4 stay flagged, the still-flagged share of the whole videos falls from 0.66% to 0.51%, 1878 more frames are repaired than with the whole replacement and none fewer, and of the 12,517 frames both repair, 805 keep a pupil point the whole replacement would have moved (Table 9-3-2). Against pupil points only (Figure 9-9b) the gain is in three places: frames with a wrong eyelid or corner are repaired (truth frames 12 to 15, more repaired on every video); frames flagged because of an outline point that are plausible as they are no longer stay in "flagged, not repaired" (whole videos 1.18% to 0.51%, video 1 from 4.7% to 1.9%); nothing more is made worse (still 1 truth frame).</p>
+    <p><b>The way of replacing.</b> With all 8 points allowed, the whole replacement was tried first (all candidates at once, accepted or the whole frame reverted): the same number of truth frames repaired (12), 6 right frames flagged because of a corner now judged plausible, one wrong eyelid frame of video 2 repaired, one frame of video 4 sent back instead (the eyelid's second peak fails the outline range and everything is reverted); the check by eye (Table 9-3-4) found that a third of the pupil points moved along in the same frames were right before and moved for nothing. With the smallest subset 15 frames are repaired and 4 stay flagged, the still-flagged share of the whole videos falls from 0.66% to 0.51%, 1878 more frames are repaired than with the whole replacement and none fewer, and of the 12,517 frames both repair, 805 keep a pupil point the whole replacement would have moved (Table 9-3-3). Against pupil points only (Figure 9-9b) the gain is in three places: frames with a wrong eyelid or corner are repaired (truth frames 12 to 15, more repaired on every video); frames flagged because of an outline point that are plausible as they are no longer stay in "flagged, not repaired" (whole videos 1.18% to 0.51%, video 1 from 4.7% to 1.9%); nothing more is made worse (still 1 truth frame).</p>
   </div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_acceptance_by_finder.png" alt="Acceptance tests under each finder: outcome on the 23 wrong frames and on the flagged right frames"></div>
     
     <figcaption lang="en"><span class="tag">Figure 9-8:</span>The acceptance tests (pupil points only replaced), (a)–(g) as in the text; top row on the frames fitting flags, bottom row on the frames the PCA flags. Left: of the 23 wrong frames, repaired (blue), still flagged (orange), left alone as closed-eye (grey). Right: of the flagged right frames, repaired (blue, of which made worse in red), still flagged (orange), judged plausible as they are and left alone (grey); the three add up to the flagged right frames.</figcaption>
   </figure>
+  <p class="text"><b><span lang="en">Table 9-3-2: the seven checks on the truth frames (pupil points only replaced)</span></b></p>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="en">Check</span></th><th><span lang="en">23 wrong frames flagged by fitting: repaired / still flagged / closed</span></th><th><span lang="en">28 right frames flagged by fitting: repaired (made worse) / still flagged</span></th><th><span lang="en">23 wrong frames flagged by the PCA: repaired</span></th><th><span lang="en">14 right frames flagged by the PCA: repaired (made worse)</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="en">(a) human-label range</span></td><td>12 / 7 / 4</td><td>1 (1) / 6</td><td>11</td><td>1 (0)</td></tr>
+      <tr><td><span lang="en">(b) geometry rule</span></td><td>12 / 7 / 4</td><td>4 (0) / 7</td><td>12</td><td>5 (2)</td></tr>
+      <tr><td><span lang="en">(c) the same fitting score</span></td><td>5 / 14 / 4</td><td>10 (2) / 18</td><td></td><td></td></tr>
+      <tr><td><span lang="en">(d) second-peak confidence</span></td><td>10 / 9 / 4</td><td></td><td>9</td><td>11 (3)</td></tr>
+      <tr><td><span lang="en">(e) jump</span></td><td>5 / 14 / 4</td><td></td><td>4</td><td>13 (4)</td></tr>
+    </tbody>
+  </table></div>
+  
+  <p class="text" lang="en">(f), (g) and the remaining cells for the right frames are in Figure 9-8. No check pushes a right frame over the line.</p>
   <figure>
     <div class="figbox wide"><img src="assets/fig_finders_repair.png" alt="The repair with each finder: truth frames and whole videos"></div>
     
     <figcaption lang="en"><span class="tag">Figure 9-9:</span>The repair with each finder (pupil points only replaced), acceptance = the human-label range. Left: of the 23 wrong frames, flagged, repaired, still wrong; right: on whole videos, repaired, flagged and not repaired, flagged but plausible.</figcaption>
   </figure>
-  <p class="text"><b><span lang="en">Table 9-3-2: the three replacement scopes compared</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-3: the three replacement scopes compared</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th></th><th><span lang="en">Pupil points only</span></th><th><span lang="en">All 8, whole replacement</span></th><th><span lang="en">All 8, smallest subset (used)</span></th></tr></thead>
     <tbody>
@@ -1069,7 +1091,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 9-12:</span>Repaired frames from check one, before (red = model) and after (blue = the point put in) side by side. The eight frames above were judged to have the point on the pupil where it belongs, one per video; the two below were judged closer but still not right, the second peak not on the pupil edge either. A point thrown outside the view is marked by a filled red dot at the border.</figcaption>
   </figure>
-  <p class="text"><b><span lang="en">Table 9-3-3: check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-3-4: check two, repaired frames with an eyelid or corner replaced (139 points put in)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Point put in</span></th><th><span lang="en">Right</span></th><th><span lang="en">Closer, not right</span></th><th><span lang="en">Was right, moved for nothing</span></th><th><span lang="en">Cannot tell</span></th><th><span lang="en">Total</span></th></tr></thead>
     <tbody>
