@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:37 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:39 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -814,7 +814,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Error</span></th><td><span lang="en">Frame RMSE (distance between the 8 predicted and the 8 labeled points, formula at the top of the page) divided by the video's eye width. Eye width = the median corner-to-corner distance over the video's predictions, no labels needed; 392–497 px on the 19 videos.</span></td></tr>
     <tr><th><span lang="en">Scripts and results</span></th><td><span lang="en"><code>v2_new_pupil_top_video_scaling/scripts/error_tier.py</code>, <code>fit_threshold.py</code>, <code>acceptance_thresholds.py</code>, <code>flag_and_repair.py</code>, <code>finder_comparison.py</code>, <code>pca_threshold.py</code>; results in the <code>results/</code> folders of the same names.</span></td></tr>
   </tbody></table></div>
-  <h3><span lang="en">9.1 What counts as a wrong frame: error in units of eye width, the line at 14% of the eye width</span></h3>
+  <h3><span lang="en">9.1 Defining the wrong-frame threshold: error in units of eye width, the line at 14% of the eye width</span></h3>
   
   <div class="text" lang="en">
     <p>Errors are in units of eye width rather than pixels so that the same numbers hold on another camera or at another distance. The histogram of the 1330 errors (Figure 9-1) has one main group that ends at about 13% of the eye width and, to its right, a sparse tail. <b>The line is at 14% of the eye width</b>; there is no frame between 12.7% and 15.4%. Frames above the line are wrong frames, every other frame counts as right. The line was read off the histogram, as the blink threshold of step 11 was.</p>
