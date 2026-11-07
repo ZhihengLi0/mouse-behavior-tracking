@@ -77,7 +77,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:24 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1092,7 +1092,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tbody>
       <tr><td><span lang="en">Experiment 1</span></td><td><span lang="en">frames that passed the check unchanged, every 30th</span></td><td>1<span lang="en"> (a second turn tried on videos 1, 8)</span></td><td>0 1 2 4 6 7 8 12 15 18</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td><span lang="en">repaired frames only, count capped at experiment 1's</span></td><td>1</td><td>1 8 15 6</td></tr>
-      <tr><td><span lang="en">Experiment 3</span></td><td><span lang="en">both kinds, no cap</span></td><td><span lang="en">until saturation (flagged frames not 10% fewer, or blind wrong not fewer, at most 3)</span></td><td>1 8 15 6</td></tr>
+      <tr><td><span lang="en">Experiment 3</span></td><td><span lang="en">the checked frames every 30th (as in experiment 1) plus all repaired frames, no cap</span></td><td><span lang="en">until saturation (flagged frames not 10% fewer, or blind wrong not fewer, at most 3)</span></td><td>1 8 15 6</td></tr>
     </tbody>
   </table></div>
   
@@ -1147,7 +1147,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="en"><span class="tag">Conclusion on the loop:</span>finding, repairing and checking made into a loop gives a retrained model with fewer wrong frames than the starting model on all four videos.
     <ol>
       <li>All three experiments beat the starting model: wrong truth frames 8 → 1 to 2 and 1 → 0, wrong blind frames to a third or less, the flagged share to a third or less, the median error unchanged. The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models.</li>
-      <li>Whether the checked frames, the repaired frames or both go back cannot be told apart; experiment 3 is the form for actual use (both go back, turn after turn until saturation).</li>
+      <li>Whether the checked frames, the repaired frames or both go back cannot be told apart; experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
       <li>The remaining wrong frames are squinting frames both finders flag and the second peak cannot repair; the loop neither learns from them nor fixes them.</li>
       <li>The starting model has to be at its plateau: on video 0, with 60 human frames, the loop makes things worse (0 → 5 wrong).</li>
       <li>The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>

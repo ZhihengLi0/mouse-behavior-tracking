@@ -1313,7 +1313,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tbody>
       <tr><td><span lang="zh">实验一</span><span lang="en">Experiment 1</span></td><td><span lang="zh">通过验收、没改动的帧，每 30 帧取一帧</span><span lang="en">frames that passed the check unchanged, every 30th</span></td><td>1<span lang="zh">（视频 1、8 另试了第二圈）</span><span lang="en"> (a second turn tried on videos 1, 8)</span></td><td>0 1 2 4 6 7 8 12 15 18</td></tr>
       <tr><td><span lang="zh">实验二</span><span lang="en">Experiment 2</span></td><td><span lang="zh">只用修复过的帧，帧数不超过实验一</span><span lang="en">repaired frames only, count capped at experiment 1's</span></td><td>1</td><td>1 8 15 6</td></tr>
-      <tr><td><span lang="zh">实验三</span><span lang="en">Experiment 3</span></td><td><span lang="zh">两种帧都要，不设上限</span><span lang="en">both kinds, no cap</span></td><td><span lang="zh">转到饱和（标出帧不再少 10%，或盲测错帧不再少，最多 3 圈）</span><span lang="en">until saturation (flagged frames not 10% fewer, or blind wrong not fewer, at most 3)</span></td><td>1 8 15 6</td></tr>
+      <tr><td><span lang="zh">实验三</span><span lang="en">Experiment 3</span></td><td><span lang="zh">通过验收的帧每 30 帧取一帧（同实验一），加全部修复过的帧，不设上限</span><span lang="en">the checked frames every 30th (as in experiment 1) plus all repaired frames, no cap</span></td><td><span lang="zh">转到饱和（标出帧不再少 10%，或盲测错帧不再少，最多 3 圈）</span><span lang="en">until saturation (flagged frames not 10% fewer, or blind wrong not fewer, at most 3)</span></td><td>1 8 15 6</td></tr>
     </tbody>
   </table></div>
   <div class="text" lang="zh">
@@ -1372,7 +1372,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="zh"><span class="tag">loop 的结论：</span>把找帧、修复、验收做成循环，再训练出来的模型在四个视频上都比起点模型错帧更少。
     <ol>
       <li>三个实验都好于起点模型：真值错帧 8 → 1 到 2、1 → 0，盲测错帧减到三分之一以下，整段标出率减到三分之一以下，中位误差不变。9.3 的修复达不到这一步：同样的盲测难帧上修复后仍错 15 帧，loop 模型错 0 到 3 帧。</li>
-      <li>回头的是通过验收的帧、修复帧还是两种一起，分不出高下；实验三是实际使用的形式（两种都回头，转到饱和）。</li>
+      <li>回头的是通过验收的帧、修复帧还是两种一起，分不出高下；实验三是实际使用的形式（通过验收的帧每 30 帧一帧加全部修复帧回头，转到饱和）。</li>
       <li>剩下的错帧是两种信号都标出、第二峰也修不了的眯眼帧；loop 不会学它们，也修不了它们。</li>
       <li>起点模型要到平台点：视频 0 只有 60 帧人工标注，loop 反而变差（0 → 5 帧错）。</li>
       <li>整条链对新视频是自动的：阈值都来自该视频自己的标注，不需要再标。</li>
@@ -1381,7 +1381,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="en"><span class="tag">Conclusion on the loop:</span>finding, repairing and checking made into a loop gives a retrained model with fewer wrong frames than the starting model on all four videos.
     <ol>
       <li>All three experiments beat the starting model: wrong truth frames 8 → 1 to 2 and 1 → 0, wrong blind frames to a third or less, the flagged share to a third or less, the median error unchanged. The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models.</li>
-      <li>Whether the checked frames, the repaired frames or both go back cannot be told apart; experiment 3 is the form for actual use (both go back, turn after turn until saturation).</li>
+      <li>Whether the checked frames, the repaired frames or both go back cannot be told apart; experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
       <li>The remaining wrong frames are squinting frames both finders flag and the second peak cannot repair; the loop neither learns from them nor fixes them.</li>
       <li>The starting model has to be at its plateau: on video 0, with 60 human frames, the loop makes things worse (0 → 5 wrong).</li>
       <li>The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>
