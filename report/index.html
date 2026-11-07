@@ -81,7 +81,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:39 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-07 15:40 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1097,7 +1097,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ol>
   </div>
 
-  <h3><span lang="zh">9.2 找错帧：fitting 看时间上的突变，PCA 看形状上的异常，两者互补</span><span lang="en">9.2 Finding wrong frames: fitting sees jumps in time, the PCA sees implausible shapes, the two complement each other</span></h3>
+  <h3><span lang="zh">9.2 找错帧的方法确定：fitting 看时间上的突变，PCA 看形状上的异常，两者互补</span><span lang="en">9.2 Settling the method for finding wrong frames: fitting sees jumps in time, the PCA sees implausible shapes, the two complement each other</span></h3>
   <div class="text" lang="zh">
     <p>找错帧的信号只看模型的预测，给每一帧一个数，超过阈值就标出这一帧。候选信号都在 14% 的线上比过（图 9-3），本页用两个：fitting 看时间上的突变，PCA 看形状上的异常。两者都能找全 23 帧错帧，找到的却不是同一批。</p>
     <ol>
