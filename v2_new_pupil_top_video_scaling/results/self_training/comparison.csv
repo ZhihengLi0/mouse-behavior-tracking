@@ -17,6 +17,7 @@ video,model,shuffle,eye_width_px,truth_frames,median_error_pct,p90_error_pct,wro
 6,teacher,711.0,454.0,70.0,1.49,2.47,0,0.0,0.0,6.75,2.23,0.33,0.45,0.97,1.37,1.5,0.96,1.05,5.32,0.988,9.0,3.13,3.13,5.41,6_20251028_Pluto_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle711_snapshot_120.h5,
 6,teacher + repair,,,,1.49,2.47,0,,,,,,,,,,,,,,,,,,,0.77
 6,round1_every30,4061.0,454.0,70.0,1.44,2.45,0,0.0,0.0,6.51,2.34,0.39,0.45,0.88,1.32,0.96,0.78,0.96,0.39,0.908,9.0,0.34,0.33,0.44,6_20251028_Pluto_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle4061_snapshot_021.h5,
+6,round1_repaired,4065.0,454.0,70.0,1.52,2.61,0,0.0,0.0,6.75,1.94,0.51,0.56,1.56,1.17,0.62,0.65,1.1,2.24,1.009,9.0,2.5,2.53,3.39,6_20251028_Pluto_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle4065_snapshot_032.h5,
 7,teacher,811.0,443.9,70.0,1.29,1.8,0,0.0,0.0,5.86,1.99,0.54,0.53,0.92,1.91,0.65,0.53,0.81,0.65,0.734,7.0,0.82,0.82,0.99,7_20251027_Pluto_spont1DLC_Resnet50_EyePupilEllipseSep20shuffle811_snapshot_best-120.h5,
 7,teacher + repair,,,,1.29,1.72,0,,,,,,,,,,,,,,,,,,,0.18
 7,round1_every30,4071.0,443.9,70.0,1.34,1.77,0,0.0,0.0,5.97,1.97,0.6,0.56,0.96,1.97,0.66,0.58,0.77,0.35,0.689,7.0,0.4,0.36,0.45,7_20251027_Pluto_spont1DLC_Resnet50_EyePupilEllipseSep20shuffle4071_snapshot_021.h5,
@@ -34,6 +35,7 @@ video,model,shuffle,eye_width_px,truth_frames,median_error_pct,p90_error_pct,wro
 15,teacher,1612.0,428.8,70.0,2.42,4.34,0,0.0,0.0,9.73,2.21,1.08,0.62,2.46,3.34,0.76,1.1,0.7,7.48,1.127,9.0,4.32,4.32,7.67,15_20251013_Terra_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle1612_snapshot_120.h5,
 15,teacher + repair,,,,2.41,4.34,0,,,,,,,,,,,,,,,,,,,0.77
 15,round1_every30,4151.0,428.8,70.0,2.39,4.75,0,0.0,0.0,10.25,2.1,1.41,0.77,2.45,3.37,0.6,0.88,0.8,2.54,1.079,9.0,1.59,1.55,2.69,15_20251013_Terra_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle4151_snapshot_034.h5,
+15,round1_repaired,4155.0,428.8,70.0,2.75,6.13,0,0.0,0.0,10.69,2.1,1.15,0.96,3.69,3.5,0.7,1.24,0.93,3.23,1.206,9.0,1.47,1.59,3.37,15_20251013_Terra_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle4155_snapshot_065.h5,
 18,teacher,1912.0,436.2,70.0,2.57,5.86,0,0.0,0.0,12.38,2.54,2.26,1.28,2.02,0.88,1.59,3.17,0.82,5.7,1.058,8.0,3.2,3.2,6.6,18_20251008_Terra_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle1912_snapshot_120.h5,
 18,teacher + repair,,,,2.57,5.86,0,,,,,,,,,,,,,,,,,,,0.77
 18,round1_every30,4181.0,436.2,70.0,2.67,6.31,0,0.0,0.0,12.59,2.43,2.37,1.46,2.3,0.99,1.47,3.4,1.11,3.29,0.961,8.0,3.42,2.06,5.03,18_20251008_Terra_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle4181_snapshot_042.h5,
