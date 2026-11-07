@@ -239,3 +239,73 @@ if __name__ == "__main__":
     fig_turns()
     print("examples:", fig_examples())
     print("written to", OUT)
+
+
+# ---- one figure per experiment: starting model against the experiment's model, video by video (page 9.4, 2026-11-07) ----
+EXPS = {"round1_every30": ("experiment 1", "#e69f00", 24), "round1_repaired": ("experiment 2", "#d55e00", 24),
+        "round1_both": ("experiment 3, turn 1", "#56b4e9", 34)}
+
+
+def blind_wrong_n(v, model, n):
+    """Wrong frames of a model on the 24 stratified blind frames (n = 24) or on all 34 (n = 34)."""
+    files = ["per_frame.csv"] + (["supplement/per_frame.csv"] if n == 34 else [])
+    tot = 0
+    for f in files:
+        P = pd.read_csv(RES / "blind_test" / f"video{v:02d}" / f)
+        if model not in set(P.model):
+            return np.nan
+        tot += int((P[P.model == model].error > LINE / 100).sum())
+    return tot
+
+
+def fig_experiment(model):
+    label, colour, nblind = EXPS[model]
+    C = pd.read_csv(RES / "self_training" / "comparison.csv")
+    vids = [int(v) for v in sorted(C[C.model == model].video.unique())]
+    fig, axes = plt.subplots(1, 4, figsize=(13.5, 3.6), gridspec_kw={"width_ratios": [len(vids), len(vids), len(vids), max(3, len(vids) // 2)]})
+    cols = [("wrong_frames", "wrong truth frames (of 70)", "{:.0f}"), ("median_error_pct", "median truth error, % of eye width", "{:.1f}"),
+            ("flagged_either_pct", "frames flagged, % of the video", "{:.1f}")]
+    w = 0.38
+    for ax, (col, ylabel, fmt) in zip(axes[:3], cols):
+        for j, (m, c, lab) in enumerate((("teacher", COL["teacher"], "starting model"), (model, colour, label))):
+            ys = [float(C[(C.video == v) & (C.model == m)].iloc[0][col]) for v in vids]
+            xs = np.arange(len(vids)) + (j - 0.5) * w
+            ax.bar(xs, ys, w * 0.92, color=c, label=lab, edgecolor="white", linewidth=0.5)
+            for x, y in zip(xs, ys):
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=6.5 if len(vids) > 4 else 8, color="#222",
+                        rotation=90 if len(vids) > 4 else 0)
+        ax.set_xticks(range(len(vids)))
+        ax.set_xticklabels([str(v) for v in vids])
+        ax.set_xlabel("video")
+        ax.set_ylabel(ylabel)
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.18)
+    bv = [v for v in vids if (RES / "blind_test" / f"video{v:02d}" / "per_frame.csv").exists()]
+    ax = axes[3]
+    for j, (m, c, lab) in enumerate((("teacher", COL["teacher"], "starting model"), (model, colour, label))):
+        ys = [blind_wrong_n(v, m, nblind) for v in bv]
+        xs = np.arange(len(bv)) + (j - 0.5) * w
+        ax.bar(xs, ys, w * 0.92, color=c, edgecolor="white", linewidth=0.5)
+        for x, y in zip(xs, ys):
+            if np.isfinite(y):
+                ax.text(x, y, f"{y:.0f}", ha="center", va="bottom", fontsize=8, color="#222")
+    ax.set_xticks(range(len(bv)))
+    ax.set_xticklabels([str(v) for v in bv])
+    ax.set_xlabel("video")
+    ax.set_ylabel(f"wrong blind frames (of {nblind})")
+    ax.set_ylim(0, 20)
+    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+    ax.set_axisbelow(True)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.9))
+    name = {"round1_every30": "loop_exp1", "round1_repaired": "loop_exp2", "round1_both": "loop_exp3"}[model]
+    fig.savefig(OUT / f"{name}.png", dpi=170)
+    plt.close(fig)
+
+
+if __name__ == "__main__" and "--experiments" in sys.argv:
+    for m in EXPS:
+        fig_experiment(m)
+    print("experiment figures written")
