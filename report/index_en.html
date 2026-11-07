@@ -77,7 +77,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:29 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-07 15:30 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1145,14 +1145,14 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="text" lang="en">
     <p><b>What it says:</b> on every video the three experiments' models are wrong less often than the starting model: wrong truth frames 8 → 1 to 2 (video 1), 1 → 0 (video 8); wrong predictions among the 24 blind frames from 7 to 11 down to 2 to 4 (experiment 3 on the 34 frames from 10 to 17 down to 3 to 4); the flagged share below a third of the starting model's; the median error of ordinary frames unchanged (within 0.3%). The loop removes the gross errors, it does not make every frame more precise.</p>
-    <p>The three experiments are compared with each other on the 70 truth frames only, since the blind frames were drawn by each model's own flags and do not suit that comparison: on the truth frames their wrong frames and median errors are almost the same, and they cannot be told apart. The remaining wrong frames are almost all squinting frames both the starting and the loop model flag, which no experiment repairs. After turn 1 of experiment 3 all three videos still meet the condition for another turn (Figure 9-16); video 6's first turn is trained and not yet predicted.</p>
+    <p>The checked frames alone improve the model, the repaired frames alone improve it, and both together improve it as well, so both go back (experiment 3); no ranking between the experiments is needed, and on the truth frames their wrong frames and median errors are almost the same anyway. The remaining wrong frames are almost all squinting frames both the starting and the loop model flag, which no experiment repairs. After turn 1 of experiment 3 all three videos still meet the condition for another turn (Figure 9-16); video 6's first turn is trained and not yet predicted.</p>
   </div>
 
   
   <div class="concl" lang="en"><span class="tag">Conclusion on the loop:</span>finding, repairing and checking made into a loop gives a retrained model with fewer wrong frames than the starting model on all four videos.
     <ol>
       <li>All three experiments beat the starting model: wrong truth frames 8 → 1 to 2 and 1 → 0, wrong blind frames to a third or less, the flagged share to a third or less, the median error unchanged. The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models.</li>
-      <li>Whether the checked frames, the repaired frames or both go back cannot be told apart on the 70 truth frames (the blind frames serve the comparison with the starting model, not between experiments); experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
+      <li>The checked frames and the repaired frames each improve the model when fed back, and so do both together, so no ranking between them is made and both go back; experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
       <li>The remaining wrong frames are squinting frames both finders flag and the second peak cannot repair; the loop neither learns from them nor fixes them.</li>
       <li>The starting model has to be at its plateau: on video 0, with 60 human frames, the loop makes things worse (0 → 5 wrong).</li>
       <li>The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>

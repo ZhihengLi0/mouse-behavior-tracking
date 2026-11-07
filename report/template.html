@@ -1372,17 +1372,17 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   <div class="text" lang="zh">
     <p><b>看什么：</b>三个实验的模型在每个视频上都比起点模型错得少：真值错帧 8 → 1 到 2（视频 1）、1 → 0（视频 8）；24 帧盲测帧里预测错的从 7 到 11 降到 2 到 4（实验三在 34 帧上从 10 到 17 降到 3 到 4）；整段标出率降到起点模型的三分之一以下；普通帧的中位误差不变（相差 0.3% 以内）。loop 修掉的是大错帧，不是把每帧都变准。</p>
-    <p>三个实验之间只在 70 帧真值帧上比，因为盲测帧是按各自的标出结果抽的，不适合互比：真值帧上三个实验的错帧和中位误差几乎相同，分不出高下。剩下的错帧几乎都是起点模型和 loop 模型都标出的眯眼帧，三个实验都修不了。实验三第一圈后三个视频都还满足"再转一圈"的条件（图 9-16），视频 6 的第一圈训练完、尚未预测。</p>
+    <p>通过验收的帧单独回头变好，修复帧单独回头也变好，两种一起回头同样变好，所以采用两种一起（实验三）；三个实验之间不需要分高下，真值帧上它们的错帧和中位误差也几乎相同。剩下的错帧几乎都是起点模型和 loop 模型都标出的眯眼帧，三个实验都修不了。实验三第一圈后三个视频都还满足"再转一圈"的条件（图 9-16），视频 6 的第一圈训练完、尚未预测。</p>
   </div>
   <div class="text" lang="en">
     <p><b>What it says:</b> on every video the three experiments' models are wrong less often than the starting model: wrong truth frames 8 → 1 to 2 (video 1), 1 → 0 (video 8); wrong predictions among the 24 blind frames from 7 to 11 down to 2 to 4 (experiment 3 on the 34 frames from 10 to 17 down to 3 to 4); the flagged share below a third of the starting model's; the median error of ordinary frames unchanged (within 0.3%). The loop removes the gross errors, it does not make every frame more precise.</p>
-    <p>The three experiments are compared with each other on the 70 truth frames only, since the blind frames were drawn by each model's own flags and do not suit that comparison: on the truth frames their wrong frames and median errors are almost the same, and they cannot be told apart. The remaining wrong frames are almost all squinting frames both the starting and the loop model flag, which no experiment repairs. After turn 1 of experiment 3 all three videos still meet the condition for another turn (Figure 9-16); video 6's first turn is trained and not yet predicted.</p>
+    <p>The checked frames alone improve the model, the repaired frames alone improve it, and both together improve it as well, so both go back (experiment 3); no ranking between the experiments is needed, and on the truth frames their wrong frames and median errors are almost the same anyway. The remaining wrong frames are almost all squinting frames both the starting and the loop model flag, which no experiment repairs. After turn 1 of experiment 3 all three videos still meet the condition for another turn (Figure 9-16); video 6's first turn is trained and not yet predicted.</p>
   </div>
 
   <div class="concl" lang="zh"><span class="tag">loop 的结论：</span>把找帧、修复、验收做成循环，再训练出来的模型在四个视频上都比起点模型错帧更少。
     <ol>
       <li>三个实验都好于起点模型：真值错帧 8 → 1 到 2、1 → 0，盲测错帧减到三分之一以下，整段标出率减到三分之一以下，中位误差不变。9.3 的修复达不到这一步：同样的盲测难帧上修复后仍错 15 帧，loop 模型错 0 到 3 帧。</li>
-      <li>回头的是通过验收的帧、修复帧还是两种一起，在 70 帧真值帧上分不出高下（盲测帧只用来和起点模型比，不用来互比）；实验三是实际使用的形式（通过验收的帧每 30 帧一帧加全部修复帧回头，转到饱和）。</li>
+      <li>通过验收的帧和修复帧各自回头都变好，一起回头也变好，所以不在三者间分高下，采用两种一起；实验三是实际使用的形式（通过验收的帧每 30 帧一帧加全部修复帧回头，转到饱和）。</li>
       <li>剩下的错帧是两种信号都标出、第二峰也修不了的眯眼帧；loop 不会学它们，也修不了它们。</li>
       <li>起点模型要到平台点：视频 0 只有 60 帧人工标注，loop 反而变差（0 → 5 帧错）。</li>
       <li>整条链对新视频是自动的：阈值都来自该视频自己的标注，不需要再标。</li>
@@ -1391,7 +1391,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="en"><span class="tag">Conclusion on the loop:</span>finding, repairing and checking made into a loop gives a retrained model with fewer wrong frames than the starting model on all four videos.
     <ol>
       <li>All three experiments beat the starting model: wrong truth frames 8 → 1 to 2 and 1 → 0, wrong blind frames to a third or less, the flagged share to a third or less, the median error unchanged. The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models.</li>
-      <li>Whether the checked frames, the repaired frames or both go back cannot be told apart on the 70 truth frames (the blind frames serve the comparison with the starting model, not between experiments); experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
+      <li>The checked frames and the repaired frames each improve the model when fed back, and so do both together, so no ranking between them is made and both go back; experiment 3 is the form for actual use (every 30th checked frame plus all repaired frames go back, turn after turn until saturation).</li>
       <li>The remaining wrong frames are squinting frames both finders flag and the second peak cannot repair; the loop neither learns from them nor fixes them.</li>
       <li>The starting model has to be at its plateau: on video 0, with 60 human frames, the loop makes things worse (0 → 5 wrong).</li>
       <li>The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>
