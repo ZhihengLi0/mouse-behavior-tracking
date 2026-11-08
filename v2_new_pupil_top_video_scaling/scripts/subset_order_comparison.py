@@ -95,7 +95,7 @@ def disagreements(frames, videos):
     rows = []
     for v in videos:
         A, B, C = (frames[k][v] for k in ("A", "B", "C"))
-        pa, pb, pc = (f.points.fillna("").to_numpy() for f in (A, B, C))
+        pa, pb, pc = (f.points.fillna("").map(lambda x: "+".join(sorted(x.split("+")))).to_numpy() for f in (A, B, C))
         sa, sb, sc = (f.status.to_numpy() for f in (A, B, C))
         diff = (sa != sb) | (sa != sc) | (pa != pb) | (pa != pc)
         for i in np.flatnonzero(diff):
@@ -162,20 +162,42 @@ def render(v, rows):
         raw = img.crop(box).resize((PW, PH), Image.LANCZOS)
         sc = PW / (box[2] - box[0])
 
+        SHORT = {"pupil_top": "p-top", "pupil_bottom": "p-bot", "pupil_left": "p-left", "pupil_right": "p-right",
+                 "eyelid_top": "lid-top", "eyelid_bottom": "lid-bot", "eye_nasal_corner": "c-nasal", "eye_temporal_corner": "c-temp"}
+
+        def clamp(px, py):
+            return min(max(px, 6), PW - 6), min(max(py, 6), PH - 6)
+
         def panel(points, ring=None):
             im = raw.copy()
             dr = ImageDraw.Draw(im)
+            outside = []
             for b in BPS:
                 rep = b in points
                 src = p2[b][f] if rep else xy[b][f]
                 px, py = (src - box[:2]) * sc
                 col = (80, 120, 255) if rep else ((255, 60, 60) if b in P4 else (255, 200, 0))
+                if rep:                                   # arrow from where the model put the point to where the repair moved it
+                    ox, oy = (xy[b][f] - box[:2]) * sc
+                    ox, oy = clamp(ox, oy)
+                    qx, qy = clamp(px, py)
+                    dr.line([ox, oy, qx, qy], fill=(80, 120, 255), width=2)
+                    dr.ellipse([ox - 3, oy - 3, ox + 3, oy + 3], fill=(255, 60, 60) if b in P4 else (255, 200, 0))
+                    v = np.array([qx - ox, qy - oy]); nv = np.hypot(*v)
+                    if nv > 1:
+                        u = v / nv; n = np.array([-u[1], u[0]])
+                        a1 = (qx - 9 * u[0] + 5 * n[0], qy - 9 * u[1] + 5 * n[1]); a2 = (qx - 9 * u[0] - 5 * n[0], qy - 9 * u[1] - 5 * n[1])
+                        dr.polygon([(qx, qy), a1, a2], fill=(80, 120, 255))
+                    dr.text((qx + 7, qy - 7), SHORT[b], fill=(80, 120, 255), font=FONT)
                 if 0 <= px < PW and 0 <= py < PH:
                     dr.ellipse([px - 5, py - 5, px + 5, py + 5], outline=col, width=2)
                     if b == ring:
                         dr.ellipse([px - 10, py - 10, px + 10, py + 10], outline=(255, 0, 255), width=2)
-                else:
-                    dr.text((6, PH - 18), f"{b}: outside the crop", fill=col, font=FONT)
+                        dr.text((px + 11, py + 4), SHORT[b], fill=(255, 0, 255), font=FONT)
+                elif not rep:
+                    outside.append(SHORT[b])
+            if outside:
+                dr.text((6, PH - 18), "outside the crop: " + ", ".join(outside), fill=(255, 200, 0), font=FONT)
             return im
 
         if getattr(r, "item", "").endswith("_w"):
@@ -233,8 +255,8 @@ def page(C, Wc=None):
 img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}}.q{{font-weight:600;margin-right:6px}}
 .done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
 button{{font:inherit;padding:4px 12px}}</style>
-<div id="bar"><b>Subset order check</b> ({n} frames; part 1 = frames where the three variants disagree, part 2 = frames repaired without the largest-deviation point). Panels: the frame; the model's points (red = pupil, yellow = eyelids and corners); then one panel per distinct result, blue = the points that variant replaced (its second peaks). Answer from the images only.<br>
-每帧问：哪个变体的 8 个点全都在正确位置？A = 现在的顺序（先轮廓后瞳孔），B = 偏差最大的点先试，C = B 加验收余量平手裁决。同样结果的变体合成一个面板。都不对选 none of them，看不清选 cannot tell。第二部分：品红圈 = 偏差最大、但修复没动的点，问它原地对不对；蓝点 = 修复换上的点，问换得对不对。
+<div id="bar"><b>Subset order check</b> ({n} frames; part 1 = frames where the three variants disagree, part 2 = frames repaired without the largest-deviation point). Panels: the frame; the model's points (red = pupil, yellow = eyelids and corners); then one panel per distinct result: blue = the points that variant replaced, with an arrow from where the model had the point (small filled dot) to where the repair moved it, and the point's name (p = pupil, lid = eyelid, c = corner). Answer from the images only.<br>
+每帧问：哪个变体的 8 个点全都在正确位置？A = 现在的顺序（先轮廓后瞳孔），B = 偏差最大的点先试，C = B 加验收余量平手裁决。蓝圈 = 修复换上去的点，箭头从模型原来的位置（实心小点）指向换后的位置，旁边是点名（p 瞳孔、lid 眼睑、c 眼角）。同样结果的变体合成一个面板。都不对选 none of them，看不清选 cannot tell。第二部分：品红圈 = 偏差最大、但修复没动的点，问它原地对不对；蓝点 = 修复换上的点，问换得对不对。
 &nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {"".join(parts)}
 <script>

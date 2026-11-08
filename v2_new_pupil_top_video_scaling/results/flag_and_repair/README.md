@@ -222,8 +222,8 @@ and every table are committed.
 deviation first, then the pairs that contain it (`--order deviation`), C = B with a tie-break among the passing subsets
 of the smallest size: the one farthest inside the label ranges (`--tiebreak margin`, `range_margin`). On the 1330 truth
 frames the three are identical (15 of 23 wrong frames repaired, 4 still flagged, 4 called closed, 1 good frame made
-worse). On the whole videos all three repair the same 14,395 frames; the replaced points differ in 424 frames (A vs B
-412, B vs C 26); more than one subset of the chosen size passes in 46 frames only, so the tie-break hardly ever acts.
+worse). On the whole videos all three repair the same 14,395 frames; the replaced point sets differ in 35 frames (A vs B
+15, B vs C 26); more than one subset of the chosen size passes in 46 frames only, so the tie-break hardly ever acts.
 The earlier count "9.8 % of the repaired frames do not replace the largest-deviation point" (1398 frames) is the same
 with B: in those frames that point's second peak was tried alone and in pairs and failed the ranges, another point's
 replacement passed. Whether that is right is judged by eye (`subset_review/`, part 2: 20 of those frames; part 1: 40
