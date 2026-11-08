@@ -425,9 +425,18 @@ def fig_exp4c():
                 n = int(B_[B_.model == m].wrong_frames.sum()); tot = int(B_[B_.model == m].frames.sum())
                 bl = f"\nblind {n} of {tot}"
             axes[0].text(x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f} %\ntruth {int(e.wrong_frames)} of 70{bl}", ha="center", va="bottom", fontsize=7.5, color="#222")
-            op, cf = _closed_counts(v, m)
-            axes[1].bar([x], [cf], w * 0.92, color=c, label=lab if i == 0 else None, edgecolor="white", linewidth=0.5)
-            axes[1].text(x, cf, f"{cf:,}", ha="center", va="bottom", fontsize=8, color="#222")
+    # (b) the reopened frames the student was NOT trained on (within 60 frames of a truth or blind frame): the teacher
+    # flagged every one of them (a repaired frame is a flagged frame); how many does the student still flag?
+    for i, v in enumerate(vids):
+        F = pd.read_csv(RES / "self_training" / f"video{v:02d}" / "pseudo_reopened" / "pseudo_frames.csv")
+        held = F.frame[~F.kept].to_numpy()
+        Sf = pd.read_csv(RES / "self_training" / f"video{v:02d}" / "round1_reopened" / "flags.csv.gz").set_index("frame").loc[held]
+        st = int((Sf.fit_flag | Sf.pca_flag).sum())
+        for j, (m, c, lab) in enumerate(series):
+            y = len(held) if m == "teacher" else st
+            x = i + (j - 0.5) * w
+            axes[1].bar([x], [y], w * 0.92, color=c, label=lab if i == 0 else None, edgecolor="white", linewidth=0.5)
+            axes[1].text(x, y, f"{y} of {len(held)}", ha="center", va="bottom", fontsize=8, color="#222")
     for ax in axes:
         ax.set_xticks(range(len(vids)))
         ax.set_xticklabels([str(v) for v in vids])
@@ -438,8 +447,8 @@ def fig_exp4c():
     axes[0].set_ylabel("frames flagged, % of the video")
     axes[0].set_title("(a) flagged share; labels: wrong truth frames, wrong blind frames", loc="left")
     axes[0].legend(frameon=False, fontsize=8, loc="upper right")
-    axes[1].set_ylabel("frames the confidence rule calls closed")
-    axes[1].set_title("(b) frames called closed on the whole-video prediction", loc="left")
+    axes[1].set_ylabel("frames flagged")
+    axes[1].set_title("(b) reopened frames left out of the training set:\nhow many are still flagged", loc="left")
     fig.tight_layout()
     fig.savefig(OUT / "loop_exp4c.png", dpi=170)
     plt.close(fig)
