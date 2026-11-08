@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1482,7 +1482,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   </details>
 
-  <h4><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
+  <h4 id="exp4"><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
   
   <div class="text" lang="en">
     <p>Experiments 1 to 3 showed that the model improves when the unflagged and the repaired frames enter the training set. One kind of frame is left: the frames called closed. In 9.3 closed frames are not repaired, and a frame is called closed when its eyelid opening is below half the video's median. But when the model misplaces the eyelid points the opening collapses too, so an open eye is called closed and never repaired.</p>
@@ -1537,7 +1537,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion of 4c (video 15, the others pending):</span>trained on the 660 reopened and repaired frames only, the student beats its starting model and has learned this kind of frame. Flagged share 7.67% to 4.41%, wrong blind frames 10 to 5, truth frames still 0 wrong, median error within 0.1%. Of the 186 reopened frames left out of the training set, the starting model flags all and the student 3: in video 15 these are frames with the eye narrowed to a slit, the eyelid points right and the left pupil point thrown outside the eye (left to right pupil point 1.15 eye widths for the starting model, 0.26 for the student, a normal pupil width). The eye is narrowed, so the opening rule still calls 177 of the 186 closed on the student's prediction; these are exactly the frames the opening rule gets wrong, and the confidence criterion calls none of them closed.</div>
 
-  <h4><span lang="en">Experiment 5: the final loop version</span></h4>
+  <h4 id="exp5"><span lang="en">Experiment 5: the final loop version</span></h4>
   
   <div class="text" lang="en">
     <p>Experiments 1 to 4 each proved one part of the loop: the unflagged frames help, the repaired frames help, both together improve turn after turn, and with the confidence closed-eye rule the reopened frames help too. Experiment 5 puts the settled parts together as the final version. One part is still to settle: when several points of a frame are over the threshold and more than one replacement passes the acceptance, which points to replace. 9.3 used an order set at design time; here it is settled by experiment (5a), then the loop is run again from the starting models with every settled rule (5b).</p>

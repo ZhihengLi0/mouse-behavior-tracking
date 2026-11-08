@@ -81,7 +81,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-08 10:44 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-08 10:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1944,7 +1944,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </figure>
   </details>
 
-  <h4><span lang="zh">实验四：关于闭眼状态的修复</span><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
+  <h4 id="exp4"><span lang="zh">实验四：关于闭眼状态的修复</span><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
   <div class="text" lang="zh">
     <p>实验一到三已经证明：没被标出的帧和修复过的帧进训练集，模型会变好。剩下一类帧没有处理：被判为闭眼的帧。9.3 的流程里闭眼帧不修，判闭眼用的是"眼睑开度小于本视频中位数的一半"。但模型把眼睑点预测错时，开度也会塌缩，睁着的眼就被误判为闭眼、不被修复。</p>
     <p><b>问题：这部分帧能不能修复？</b></p>
@@ -2008,7 +2008,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="zh"><span class="tag">4c 的结论（视频 15，其余待出）：</span>只用 660 帧放出来修好的帧训练，学生比起点模型好，而且学会了这类帧。整段标出率 7.67% 到 4.41%，盲测错帧 10 到 5，真值帧仍 0 错，中位误差相差 0.1% 以内。没进训练集的 186 帧放出来的帧，起点模型全部标出，学生只标出 3 帧：这些帧在视频 15 里是眼睛眯成一条缝、眼睑点本身没错、左瞳孔点被扔到眼外的帧（起点模型左右瞳孔点相距 1.15 个眼宽，学生 0.26 个眼宽，正常瞳孔宽度）。眼睛确实眯着，所以开度规则在学生的预测上仍把它们判为闭眼（186 帧里 177 帧），这正是开度规则误判的那类帧，置信度判据不把它们判闭眼（0 帧）。</div>
   <div class="concl" lang="en"><span class="tag">Conclusion of 4c (video 15, the others pending):</span>trained on the 660 reopened and repaired frames only, the student beats its starting model and has learned this kind of frame. Flagged share 7.67% to 4.41%, wrong blind frames 10 to 5, truth frames still 0 wrong, median error within 0.1%. Of the 186 reopened frames left out of the training set, the starting model flags all and the student 3: in video 15 these are frames with the eye narrowed to a slit, the eyelid points right and the left pupil point thrown outside the eye (left to right pupil point 1.15 eye widths for the starting model, 0.26 for the student, a normal pupil width). The eye is narrowed, so the opening rule still calls 177 of the 186 closed on the student's prediction; these are exactly the frames the opening rule gets wrong, and the confidence criterion calls none of them closed.</div>
 
-  <h4><span lang="zh">实验五：最终循环训练版本</span><span lang="en">Experiment 5: the final loop version</span></h4>
+  <h4 id="exp5"><span lang="zh">实验五：最终循环训练版本</span><span lang="en">Experiment 5: the final loop version</span></h4>
   <div class="text" lang="zh">
     <p>实验一到四各自证明了 loop 的一个零件：没被标出的帧有用、修复的帧有用、两者一起能逐圈变好、闭眼规则换成置信度后放出来的帧也有用。实验五把定稿的零件装在一起作为最终版本。在这之前还有一个零件要定：修复时多个点都过线、不止一种换法能通过验收的时候，换哪些点。9.3 的做法是设计时定的顺序，这里用实验把它定下来（5a），然后用全部定稿的规则从起点模型重新跑 loop（5b）。</p>
   </div>
