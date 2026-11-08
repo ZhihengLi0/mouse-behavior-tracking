@@ -286,6 +286,9 @@ all eight points as accepted, a non-replaced point dropped only below the likeli
 and the blind band; no cap, no held-out blocks), iterations matched to the teacher. Evaluation as in experiments 1 to 3
 (70 truth frames, flagged share, blind frames where a set exists), plus the number of frames each rule calls closed on
 the student's prediction. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11, 1 in turn.
+Like experiments 1 to 3, 4c repairs with the subset order in use (A); only the closed-eye rule is changed, so the
+student is compared with the same video's teacher and `round1_both` on one changed variable. The subset rule D chosen
+in the audit is used in the formal loop only, where every settled piece is applied together (user, 2026-11-08).
 
 | video | reopened frames | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | closed (opening / confidence rule) | blind wrong | 
 |---|---|---|---|---|---|---|---|---|---|
