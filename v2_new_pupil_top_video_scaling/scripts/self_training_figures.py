@@ -347,9 +347,9 @@ def _closed_counts(v, model):
 
 
 def fig_exp4a():
-    """Experiment 4a: why the closed-eye line sits at a mean pupil confidence of 0.40. (a) the judged frames' confidence
-    by verdict; (b) accuracy of every candidate line on the judged frames, the best opening-ratio line as reference;
-    (c) what each line costs on the labeled truth frames."""
+    """Experiment 4a, two questions: why the pupil confidence (the opening ratio does not separate the judged closed
+    frames from the open ones, the confidence does) and why 0.40 (accuracy of every candidate line, with the truth
+    frames each line would remove)."""
     S = pd.read_csv(FAR / "closed_frames" / "sample.csv")
     V = pd.read_csv(FAR / "closed_frames" / "closed_review_verdicts.csv")
     V = V[~V.item.str.contains(":")]
@@ -358,50 +358,47 @@ def fig_exp4a():
     chosen = float(pd.read_csv(FAR / "closed_frames" / "closed_line_chosen.csv").iloc[0].pupil_confidence_line)
     C = pd.read_csv(FAR / "closed_frames" / "confidence_line_candidates.csv")
     O = pd.read_csv(FAR / "closed_frames" / "line_candidates.csv")
+    closed = J.verdict == "fully closed"
     cats = [("fully closed", "#444444"), ("half open, pupil can be labeled", "#56b4e9"), ("open, eyelid points wrong", "#e69f00")]
-    fig, axes = plt.subplots(1, 3, figsize=(14, 4.4), gridspec_kw={"width_ratios": [1.2, 1, 1]})
-    ax = axes[0]
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.8))
     rng = np.random.default_rng(0)
-    for k, (cat, c) in enumerate(cats):
-        y = J.pupil_lk_mean[J.verdict == cat].to_numpy()
-        ax.scatter(k + rng.uniform(-0.18, 0.18, len(y)), y, s=26, color=c, edgecolor="white", linewidth=0.5, zorder=3)
-        ax.text(k, -0.06, f"{len(y)} frames", ha="center", va="top", fontsize=8.5, color="#222")
-    ax.axhline(chosen, color="#d55e00", lw=1.2, ls="--")
-    ax.text(2.45, chosen + 0.015, f"line {chosen:.2f}", color="#d55e00", fontsize=9, ha="right")
-    ax.set_xticks(range(3))
-    ax.set_xticklabels(["fully closed", "half open,\npupil can be labeled", "open, eyelid\npoints wrong"], fontsize=9)
-    ax.set_ylabel("mean heatmap confidence of the 4 pupil points")
-    ax.set_ylim(-0.12, 1.02)
-    ax.set_title(f"(a) the {len(J)} judged frames by the judge's verdict", loc="left")
-    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
-    ax.set_axisbelow(True)
-    ax = axes[1]
-    ax.plot(C.line, C.accuracy_pct, "-o", color="#0072b2", ms=5, lw=1.6, label="pupil confidence line")
-    ax.axhline(O.accuracy_pct.max(), color="#888", lw=1.2, ls=":", label=f"best opening-ratio line ({O.accuracy_pct.max():.0f} %)")
-    ax.axvline(chosen, color="#d55e00", lw=1.2, ls="--")
+
+    def strip(ax, col, ylabel, title, line=None, line_label=None):
+        for k, (cat, c) in enumerate(cats):
+            y = J[col][J.verdict == cat].to_numpy()
+            ax.scatter(k + rng.uniform(-0.18, 0.18, len(y)), y, s=26, color=c, edgecolor="white", linewidth=0.5, zorder=3)
+        if line is not None:
+            ax.axhline(line, color="#d55e00", lw=1.2, ls="--")
+            ax.text(2.45, line, line_label, color="#d55e00", fontsize=9, ha="right", va="bottom")
+        ax.set_xticks(range(3))
+        ax.set_xticklabels([f"{lab}\n({int((J.verdict == cat).sum())} frames)" for (cat, _), lab in zip(cats, ("fully closed", "half open,\npupil can be labeled", "open, eyelid\npoints wrong"))], fontsize=9)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title, loc="left")
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+
+    ob = O.loc[O.accuracy_pct.idxmax()]
+    strip(axes[0], "r", "eyelid opening, ratio to the video's median", f"(a) why not the opening: {len(J)} judged frames",
+          line=float(ob.line), line_label=f"best line {ob.line:.2f}: {ob.accuracy_pct:.0f} % right")
+    axes[0].set_ylim(-0.02, 0.75)
     r = C[np.isclose(C.line, chosen)].iloc[0]
-    ax.annotate(f"{chosen:.2f}: {r.accuracy_pct:.0f} % right\n{int(r.closed_caught)} of {int(r.closed_total)} closed caught\n{int(r.not_closed_called_closed)} of {len(J) - int(r.closed_total)} open called closed",
-                (chosen, r.accuracy_pct), (0.52, 0.30), textcoords="axes fraction", fontsize=8.5, color="#222",
-                arrowprops=dict(arrowstyle="-", color="#999", lw=0.8))
+    strip(axes[1], "pupil_lk_mean", "mean heatmap confidence of the 4 pupil points", "(b) why the pupil confidence: same frames",
+          line=chosen, line_label=f"line {chosen:.2f}: {r.accuracy_pct:.0f} % right")
+    axes[1].set_ylim(-0.02, 1.02)
+    axes[1].text(0.02, 0.97, f"below {chosen:.2f}: {int((closed & (J.pupil_lk_mean < chosen)).sum())} of {int(closed.sum())} closed frames,\n{int((~closed & (J.pupil_lk_mean < chosen)).sum())} of {int((~closed).sum())} open frames",
+                 transform=axes[1].transAxes, va="top", fontsize=8.5, color="#222")
+    ax = axes[2]
+    ax.plot(C.line, C.accuracy_pct, "-o", color="#0072b2", ms=5, lw=1.6)
+    ax.axvline(chosen, color="#d55e00", lw=1.2, ls="--")
+    for _, q in C.iterrows():
+        ax.text(q.line, q.accuracy_pct - 2.2, f"{int(q.labeled_truth_frames_called_closed)}", ha="center", va="top", fontsize=7.5, color="#cc79a7")
+    ax.text(0.03, 0.06, "pink numbers: truth frames with a human pupil label the line would call closed (of 1318)", transform=ax.transAxes, fontsize=8, color="#cc79a7")
+    ax.annotate(f"{chosen:.2f}: {r.accuracy_pct:.0f} % right, {int(r.labeled_truth_frames_called_closed)} truth frames removed, all already wrong",
+                (chosen, r.accuracy_pct), (0.35, 0.93), textcoords="axes fraction", fontsize=8.5, color="#222", arrowprops=dict(arrowstyle="-", color="#999", lw=0.8))
     ax.set_xlabel("candidate line on the mean pupil confidence")
     ax.set_ylabel("judged frames classified right, %")
     ax.set_ylim(50, 100)
-    ax.set_title("(b) accuracy of each candidate line", loc="left")
-    ax.legend(frameon=False, fontsize=8, loc="lower left")
-    ax.grid(color="#e4e4e4", linewidth=0.6)
-    ax.set_axisbelow(True)
-    ax = axes[2]
-    ax.plot(C.line, C.labeled_truth_frames_called_closed, "-o", color="#0072b2", ms=5, lw=1.6, label="truth frames with a pupil label called closed")
-    ax.plot(C.line, C.of_which_wrong_frames, "-s", color="#cc79a7", ms=4, lw=1.2, label="of which the model already had wrong")
-    ax.axvline(chosen, color="#d55e00", lw=1.2, ls="--")
-    r = C[np.isclose(C.line, chosen)].iloc[0]
-    ax.annotate(f"{chosen:.2f}: {int(r.labeled_truth_frames_called_closed)} of {int(r.labeled_truth_frames)} removed,\nall {int(r.of_which_wrong_frames)} already wrong",
-                (chosen, r.labeled_truth_frames_called_closed), (0.08, 0.55), textcoords="axes fraction", fontsize=8.5, color="#222",
-                arrowprops=dict(arrowstyle="-", color="#999", lw=0.8))
-    ax.set_xlabel("candidate line on the mean pupil confidence")
-    ax.set_ylabel("labeled truth frames the line removes")
-    ax.set_title(f"(c) cost on the {int(C.labeled_truth_frames.iloc[0])} labeled truth frames", loc="left")
-    ax.legend(frameon=False, fontsize=8, loc="upper left")
+    ax.set_title("(c) why 0.40: every candidate line", loc="left")
     ax.grid(color="#e4e4e4", linewidth=0.6)
     ax.set_axisbelow(True)
     fig.tight_layout()
