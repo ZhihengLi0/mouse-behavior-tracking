@@ -201,8 +201,8 @@ def render(v, rows):
             return im
 
         if getattr(r, "item", "").endswith("_w"):
-            panels = [("frame", raw), (f"model's points; magenta ring = {r.worst_point} (largest deviation, left as is)", panel((), r.worst_point)),
-                      (f"variant B: blue = replaced {str(r.points_B).replace('+', ', ')}", panel(set(str(r.points_B).split("+")), r.worst_point))]
+            panels = [("frame", raw), (f"model's points; magenta = {SHORT[r.worst_point]} (largest deviation, left as is)", panel((), r.worst_point)),
+                      (f"variant B: replaced {', '.join(SHORT[q] for q in str(r.points_B).split('+') if q in SHORT)}", panel(set(str(r.points_B).split("+")), r.worst_point))]
             S = Image.new("RGB", (len(panels) * PW + 10 * (len(panels) - 1), PH + 22), (255, 255, 255))
             d2 = ImageDraw.Draw(S)
             for k, (title, im) in enumerate(panels):
@@ -218,14 +218,14 @@ def render(v, rows):
             if key in seen:
                 seen[key][0] += "+" + k
                 continue
-            label = [k, f"{'not repaired' if st != 'repaired' else 'blue = replaced ' + str(pts).replace('+', ', ')}"]
+            label = [k, f"{'not repaired' if st != 'repaired' else 'replaced ' + ', '.join(SHORT[q] for q in str(pts).split('+') if q in SHORT)}"]
             seen[key] = label
             panels.append((label, panel(set(str(pts).split("+")) if st == "repaired" else ())))
         S = Image.new("RGB", (len(panels) * PW + 10 * (len(panels) - 1), PH + 22), (255, 255, 255))
         d2 = ImageDraw.Draw(S)
         for k, (title, im) in enumerate(panels):
             S.paste(im, (k * (PW + 10), 22))
-            t = title if isinstance(title, str) else f"variant {title[0]}: {title[1]}"
+            t = title if isinstance(title, str) else f"{title[0]}: {title[1]}"
             d2.text((k * (PW + 10) + 4, 3), t, fill=(0, 0, 0), font=FONT)
         S.save(ITEMS / f"video{v:02d}_f{f:06d}.jpg", quality=90)
     cap.release()
@@ -237,7 +237,7 @@ def page(C, Wc=None):
         groups = {}
         for k, pts, st in (("A", r.points_A, r.status_A), ("B", r.points_B, r.status_B), ("C", r.points_C, r.status_C)):
             groups.setdefault((st, str(pts)), []).append(k)
-        opts = ["+".join(g) for g in groups.values()] + ["none of them", "cannot tell"]
+        opts = ["+".join(g) for g in groups.values()] + ["model as it was (no repair needed)", "both changes needed (more than one point)", "moved point right, another point still wrong (not caught)", "none of them", "cannot tell"]
         parts.append(f'<div class="it" data-item="{r.item}"><div class="h">frame {r.item}</div><img src="items/{r.item}.jpg" loading="lazy">'
                      f'<div class="b"><span class="q">Which variant has every point in the right place?</span>' +
                      "".join(f'<label><input type="radio" name="{r.item}" value="{o}"> {o}</label>' for o in opts) + "</div></div>")
@@ -256,7 +256,7 @@ img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{ma
 .done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
 button{{font:inherit;padding:4px 12px}}</style>
 <div id="bar"><b>Subset order check</b> ({n} frames; part 1 = frames where the three variants disagree, part 2 = frames repaired without the largest-deviation point). Panels: the frame; the model's points (red = pupil, yellow = eyelids and corners); then one panel per distinct result: blue = the points that variant replaced, with an arrow from where the model had the point (small filled dot) to where the repair moved it, and the point's name (p = pupil, lid = eyelid, c = corner). Answer from the images only.<br>
-每帧问：哪个变体的 8 个点全都在正确位置？A = 现在的顺序（先轮廓后瞳孔），B = 偏差最大的点先试，C = B 加验收余量平手裁决。蓝圈 = 修复换上去的点，箭头从模型原来的位置（实心小点）指向换后的位置，旁边是点名（p 瞳孔、lid 眼睑、c 眼角）。同样结果的变体合成一个面板。都不对选 none of them，看不清选 cannot tell。第二部分：品红圈 = 偏差最大、但修复没动的点，问它原地对不对；蓝点 = 修复换上的点，问换得对不对。
+每帧问：哪个变体的 8 个点全都在正确位置？A = 现在的顺序（先轮廓后瞳孔），B = 偏差最大的点先试，C = B 加验收余量平手裁决。蓝圈 = 修复换上去的点，箭头从模型原来的位置（实心小点）指向换后的位置，旁边是点名（p 瞳孔、lid 眼睑、c 眼角）。同样结果的变体合成一个面板。模型原来的点就全对、不该修的选 model as it was；几个面板里换的点都该换、要合起来才对的选 both changes needed；换上去的点对了、但还有一个没被找出来的点仍然错的选 moved point right, another point still wrong；都不对选 none of them；看不清选 cannot tell。第二部分：品红圈 = 偏差最大、但修复没动的点，问它原地对不对；蓝点 = 修复换上的点，问换得对不对。
 &nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {"".join(parts)}
 <script>
@@ -278,6 +278,9 @@ def evaluate(verdicts):
         rows.append({"variant": k, "judged": len(J), "right": int(right.sum()), "right_pct": round(100 * float(right.mean()), 1)})
     S = pd.DataFrame(rows)
     S["none_right"] = int((J.verdict == "none of them").sum())
+    S["model_was_right"] = int((J.verdict == "model as it was (no repair needed)").sum())
+    S["both_changes_needed"] = int((J.verdict == "both changes needed (more than one point)").sum())
+    S["another_point_not_caught"] = int((J.verdict == "moved point right, another point still wrong (not caught)").sum())
     S.to_csv(OUT / "subset_order_verdicts.csv", index=False)
     print(S.to_string(index=False))
     Vd = pd.read_csv(verdicts)

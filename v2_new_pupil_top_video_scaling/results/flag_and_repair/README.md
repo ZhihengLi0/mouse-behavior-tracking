@@ -226,8 +226,16 @@ worse). On the whole videos all three repair the same 14,395 frames; the replace
 15, B vs C 26); more than one subset of the chosen size passes in 46 frames only, so the tie-break hardly ever acts.
 The earlier count "9.8 % of the repaired frames do not replace the largest-deviation point" (1398 frames) is the same
 with B: in those frames that point's second peak was tried alone and in pairs and failed the ranges, another point's
-replacement passed. Whether that is right is judged by eye (`subset_review/`, part 2: 20 of those frames; part 1: 40
-frames where the variants disagree); verdicts pending.
+replacement passed. Judged by eye by the user (`all_videos/subset_review_verdicts.csv`, `subset_order_verdicts.csv`,
+`subset_order_worst_left_verdicts.csv`, 2026-11-08 00:05):
+- Part 2, 20 of those 1398 frames: the untouched largest-deviation point was right where it was in 19, and the point
+  the repair moved instead was right in 19. Leaving the point whose second peak fails the ranges is the correct
+  behaviour; the finder had flagged a right point.
+- Part 1, the 35 frames where the variants disagree: C has every point right in 21, B in 5, A in 3; in 2 the model
+  needed no repair, in 7 more than one of the shown replacements was needed together (the frame passed the ranges
+  with one point moved while another candidate was still wrong), in 1 a point the finders did not catch was still
+  wrong, in 4 none was right. Where the tie-break acts, the subset farthest inside the label ranges is the right
+  one far more often than the first passing subset.
 
 **2. Leave-one-video-out ranges** (`acceptance_thresholds/label_region_lovo_ranges.csv`,
 `label_region_outline_lovo_ranges.csv`, runs `videoNN_..._lovo`). With the ranges built from the other 18 videos'
