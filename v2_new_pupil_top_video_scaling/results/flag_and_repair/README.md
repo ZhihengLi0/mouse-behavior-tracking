@@ -266,3 +266,19 @@ Decision for the formal pipeline (to be implemented as an option, default unchan
 confidence < 0.40 (calibrated as above); a frame with a collapsed opening but a confident pupil is an open eye with
 wrong outline points and goes through the ordinary flagged path (candidates = points over the threshold, smallest
 subset, both ranges); no separate "reopen" branch and no new hand-set number.
+
+**1b. Variant D** (`--tiebreak margin-all`: the largest range margin among the passing subsets of ANY size, runs
+`videoNN_..._devorder_marginall`, 2026-11-08 00:15): truth frames identical to C (15 / 4 / 1); same 14,395 repaired
+frames; replaces more points than C in 374 frames (15,552 against 15,159 points). Of the 7 frames the user judged
+"both changes needed", D moves both points in 4. Whether the extra points are right is for a by-eye check
+(`subset_review/subset_d_review.html`, 20 frames); verdicts pending.
+
+**3b. The confidence closed-eye rule in the repair** (`flag_and_repair.py --closed confidence`, line 0.40 in
+`closed_frames/closed_line_chosen.csv`, runs `videoNN_..._confclosed` and `_devorder_margin_confclosed`, 2026-11-08
+00:15). Against the opening rule: truth frames 16 of 23 wrong frames repaired (15), 2 still flagged (4), 5 called
+closed (4; the 4 labeled ones are the same already-wrong frames, the fifth has no pupil label), 1 good frame made worse
+(1). Whole videos: 15,878 frames repaired (14,395), 4404 flagged and not repaired (6694), 7358 closed (8058). Of the
+8058 frames the opening rule called closed, 2008 are now repaired, 1793 pass without a flag, 469 are flagged and
+plausible as they are, 575 stay flagged, 3213 are still closed. Of the 7358 the confidence rule calls closed, 2865
+were "flagged, not repaired" before (no visible pupil: nothing to repair) and 525 were repaired before; those 525 are
+for a by-eye check (`subset_review/closed_conf_review.html`, 20 frames); verdicts pending.

@@ -92,7 +92,9 @@ def peak2_pixels(d, P):
 class Geometry:
     """Eye-frame coordinates and the per-video bands (label-free, from all open frames of the video)."""
 
-    def __init__(self, xy, scale=None):
+    def __init__(self, xy, scale=None, closed=None):
+        """closed: optional boolean mask per frame that replaces the opening rule (audit 2026-11-08: closed = mean pupil
+        confidence below the calibrated line, flag_and_repair.py --closed confidence). Default None: unchanged."""
         N, T = xy["eye_nasal_corner"], xy["eye_temporal_corner"]
         self.C = (N + T) / 2
         u = T - N
@@ -104,7 +106,7 @@ class Geometry:
         self.lid_lo = np.minimum(E["eyelid_top"][:, 1], E["eyelid_bottom"][:, 1]) - LID_MARGIN
         self.lid_hi = np.maximum(E["eyelid_top"][:, 1], E["eyelid_bottom"][:, 1]) + LID_MARGIN
         opening = np.abs(E["eyelid_bottom"][:, 1] - E["eyelid_top"][:, 1])
-        self.closed = opening < 0.5 * np.nanmedian(opening)
+        self.closed = (opening < 0.5 * np.nanmedian(opening)) if closed is None else np.asarray(closed, bool)
         self.sign_lr = np.sign(np.nanmedian(E["pupil_right"][:, 0] - E["pupil_left"][:, 0]))
         self.sign_tb = np.sign(np.nanmedian(E["pupil_bottom"][:, 1] - E["pupil_top"][:, 1]))
         self.med, self.mad, self.own_mad = {}, {}, {}

@@ -216,6 +216,7 @@ def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand
             pool = [b for b in cand if b not in P4 and np.isfinite(p2[b][i]).all()] + [b for b in cand if b in P4 and np.isfinite(p2[b][i]).all()]
         else:
             pool = sorted([b for b in cand if np.isfinite(p2[b][i]).all()], key=lambda b: -float(np.nan_to_num(order_score[BPS.index(b)], nan=-1)))
+        best_all, n_pass_all = None, 0
         for k in range(1, len(pool) + 1):
             best, n_pass = None, 0
             for sub in combinations(pool, k):
@@ -235,9 +236,18 @@ def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand
                     if best is None:
                         best = (0.0, sub, new)
             if best is not None:
+                if tiebreak == "all":                      # keep searching the larger subsets, take the largest margin of any size
+                    n_pass_all += n_pass
+                    if best_all is None or best[0] > best_all[0]:
+                        best_all = best
+                    continue
                 if info is not None:
                     info["n_passing"] = n_pass
                 return "repaired", best[1], best[2]
+        if best_all is not None:
+            if info is not None:
+                info["n_passing"] = n_pass_all
+            return "repaired", best_all[1], best_all[2]
         return "flagged_not_repaired", (), xy_frame(xy, i)
     if not cand or any(not np.isfinite(p2[b][i]).all() for b in cand):
         return "flagged_not_repaired", (), xy_frame(xy, i)
@@ -277,11 +287,12 @@ def main():
     ap.add_argument("--pca-own", action="store_true", help="PCA finder: residuals of that prediction against the video's labeled-pose PCA, threshold = multiple x its own median score")
     # audit of the smallest-subset repair (2026-11-07); defaults unchanged
     ap.add_argument("--order", choices=["type", "deviation"], default="type", help="--replace smallest: subset search order, outline points first (default) or the largest deviation first; folder suffix _devorder")
-    ap.add_argument("--tiebreak", choices=["none", "margin"], default="none", help="--replace smallest: among the passing subsets of the smallest size take the first (default) or the one farthest inside the label ranges; folder suffix _margin")
+    ap.add_argument("--tiebreak", choices=["none", "margin", "margin-all"], default="none", help="--replace smallest: among the passing subsets of the smallest size take the first (default) or the one farthest inside the label ranges (margin; folder suffix _margin); margin-all: the one farthest inside among the passing subsets of any size (suffix _marginall)")
     ap.add_argument("--lovo-range", action="store_true", help="acceptance ranges built from the other 18 videos' labels (label_region_lovo_ranges.py); folder suffix _lovo")
+    ap.add_argument("--closed", choices=["opening", "confidence"], default="opening", help="closed-eye rule: eyelid opening below half the video's median (default) or mean pupil confidence below the line of results/flag_and_repair/closed_frames/closed_line_chosen.csv (calibrated on judged frames, 2026-11-08); folder suffix _confclosed")
     a = ap.parse_args()
     assert a.replace == "smallest" or (a.order == "type" and a.tiebreak == "none"), "--order / --tiebreak are only defined with --replace smallest"
-    audit = a.order != "type" or a.tiebreak != "none" or a.lovo_range
+    audit = a.order != "type" or a.tiebreak != "none" or a.lovo_range or a.closed != "opening"
     assert a.replace == "whole" or a.points == "all", "--replace smallest is only defined with --points all"
     assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
     assert a.points == "pupil" or a.accept == "labelregion", "--points all is only defined with --accept labelregion"
@@ -289,13 +300,18 @@ def main():
     line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
     tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
     out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else "") + ("_smallest" if a.replace == "smallest" else "")
-                                       + ("_devorder" if a.order == "deviation" else "") + ("_margin" if a.tiebreak == "margin" else "") + ("_lovo" if a.lovo_range else ""))
+                                       + ("_devorder" if a.order == "deviation" else "") + {"none": "", "margin": "_margin", "margin-all": "_marginall"}[a.tiebreak] + ("_lovo" if a.lovo_range else "") + ("_confclosed" if a.closed == "confidence" else ""))
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video, a.pred_h5, a.peaks_csv)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
     p2, off = peak2_pixels(d, P)
     B, scale = pooled_bands(RES / "second_peak_repair")
-    G = Geometry(xy, scale)
+    closed_mask = None
+    if a.closed == "confidence":
+        closed_line = float(pd.read_csv(RES / "flag_and_repair" / "closed_frames" / "closed_line_chosen.csv").iloc[0].pupil_confidence_line)
+        closed_mask = np.nanmean(np.c_[[d[b]["likelihood"].to_numpy(float) for b in P4]].T, axis=1) < closed_line
+        print(f"closed-eye rule: mean pupil confidence < {closed_line:.2f} ({int(closed_mask.sum())} frames)")
+    G = Geometry(xy, scale, closed=closed_mask)
     n = len(d)
     dev_px = np.load(a.dev_npy) if a.dev_npy else fwd["200"]
     assert dev_px.shape == (n, len(BPS))
@@ -375,7 +391,7 @@ def main():
         elif audit:
             info = {}
             st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref, a.replace == "smallest",
-                                         order_score=(cdev[i] if a.order == "deviation" else None), tiebreak=(a.tiebreak == "margin"), info=info)
+                                         order_score=(cdev[i] if a.order == "deviation" else None), tiebreak={"none": False, "margin": True, "margin-all": "all"}[a.tiebreak], info=info)
             n_passing[i] = info.get("n_passing", -1)
         else:
             st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref, a.replace == "smallest")
@@ -394,7 +410,7 @@ def main():
         extra["points"] = "all"
         extra["replace"] = a.replace
     if audit:
-        extra.update({"order": a.order, "tiebreak": a.tiebreak, "lovo_range": a.lovo_range})
+        extra.update({"order": a.order, "tiebreak": a.tiebreak, "lovo_range": a.lovo_range, "closed_rule": a.closed})
         F["n_passing"] = n_passing
         F["worst_in_points"] = [w in p.split("+") for w, p in zip(worst, reps)]
     for b in PTS:

@@ -1,0 +1,2 @@
+pupil_confidence_line,basis,judged_frames,accuracy_pct,closed_caught,closed_total,open_called_closed,open_total,labeled_truth_frames_called_closed,chosen_on
+0.40,"mean heatmap confidence of the four pupil points; line with the highest accuracy on the 79 judged frames (tie with 0.35 broken toward the larger closed recall); see confidence_line_candidates.csv",79,92.4,32,33,5,46,4,2026-11-08

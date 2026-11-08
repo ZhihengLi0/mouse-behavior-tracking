@@ -44,6 +44,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 MODELS = PROJECT / "dlc-models-pytorch" / "iteration-0"
 T0 = time.time()
 STATS = ["peak1", "peak2", "ratio", "dist_px", "n_peaks", "entropy", "mass_near"]
+MIN_CELLS = 3   # minimum distance of the second peak from the first, in heatmap cells; set by second_peak_distance_test.py for the audit
 PEAKS = ["x1c", "y1c", "x2c", "y2c", "stride"]
 
 
@@ -72,7 +73,7 @@ def heatmap_stats(H, stride, peaks=False):
     xx = torch.arange(w, device=H.device).view(1, 1, 1, w).float()
     d = torch.sqrt((yy - y1.view(B, K, 1, 1)) ** 2 + (xx - x1.view(B, K, 1, 1)) ** 2)  # cells from peak1
     lm = H == Fn.max_pool2d(H, 3, stride=1, padding=1)  # local maxima
-    far = d >= 3
+    far = d >= MIN_CELLS                         # second peak at least MIN_CELLS cells from the first (3 = 24 px at stride 8; audit option 2026-11-08)
     cand = torch.where(lm & far, H, torch.zeros_like(H)).reshape(B, K, -1)
     peak2, i2 = cand.max(dim=2)
     y2, x2 = (i2 // w).float(), (i2 % w).float()

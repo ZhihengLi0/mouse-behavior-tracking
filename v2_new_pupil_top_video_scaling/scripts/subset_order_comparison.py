@@ -142,7 +142,7 @@ def draw_worst_left(frames, videos):
     return C
 
 
-def render(v, rows):
+def render(v, rows, names=("A", "B", "C")):
     rr, d, Pk, H, truth, fwd, sig = load(v)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
     p2, off = peak2_pixels(d, Pk)
@@ -213,8 +213,8 @@ def render(v, rows):
 
         panels = [("frame", raw), ("model's points (red pupil, yellow outline)", panel(()))]
         seen = {}
-        for k, pts, st in (("A", r.points_A, r.status_A), ("B", r.points_B, r.status_B), ("C", r.points_C, r.status_C)):
-            key = (st, pts)
+        for k, pts, st in ((names[0], r.points_A, r.status_A), (names[1], r.points_B, r.status_B), (names[2], r.points_C, r.status_C)):
+            key = (st, "+".join(sorted(str(pts).split("+"))))
             if key in seen:
                 seen[key][0] += "+" + k
                 continue
@@ -231,12 +231,12 @@ def render(v, rows):
     cap.release()
 
 
-def page(C, Wc=None):
+def page(C, Wc=None, names=("A", "B", "C"), out_html="subset_review.html", key="subset_review"):
     parts = []
     for r in C.sample(frac=1, random_state=SEED).itertuples():
         groups = {}
-        for k, pts, st in (("A", r.points_A, r.status_A), ("B", r.points_B, r.status_B), ("C", r.points_C, r.status_C)):
-            groups.setdefault((st, str(pts)), []).append(k)
+        for k, pts, st in ((names[0], r.points_A, r.status_A), (names[1], r.points_B, r.status_B), (names[2], r.points_C, r.status_C)):
+            groups.setdefault((st, "+".join(sorted(str(pts).split("+")))), []).append(k)
         opts = ["+".join(g) for g in groups.values()] + ["model as it was (no repair needed)", "both changes needed (more than one point)", "moved point right, another point still wrong (not caught)", "none of them", "cannot tell"]
         parts.append(f'<div class="it" data-item="{r.item}"><div class="h">frame {r.item}</div><img src="items/{r.item}.jpg" loading="lazy">'
                      f'<div class="b"><span class="q">Which variant has every point in the right place?</span>' +
@@ -250,7 +250,7 @@ def page(C, Wc=None):
                          f'</div><div class="b"><span class="q">Blue replacement:</span>' +
                          "".join(f'<label><input type="radio" name="{r.item}:blue" value="{o}"> {o}</label>' for o in ("right", "wrong", "cannot tell")) + "</div></div>")
     n = len(C) + (len(Wc) if Wc is not None else 0)
-    (REV / "subset_review.html").write_text(f"""<!doctype html><meta charset="utf-8"><title>Subset order check</title>
+    (REV / out_html).write_text(f"""<!doctype html><meta charset="utf-8"><title>Subset order check</title>
 <style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{margin:0 0 22px;padding:8px;background:#fff;border:1px solid #ddd;max-width:{5 * PW + 60}px}}
 img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}}.q{{font-weight:600;margin-right:6px}}
 .done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
@@ -260,12 +260,12 @@ button{{font:inherit;padding:4px 12px}}</style>
 &nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {"".join(parts)}
 <script>
-const K='subset_review';let V={{}};try{{V=JSON.parse(localStorage.getItem(K)||'{{}}')}}catch(e){{}}
+const K='{key}';let V={{}};try{{V=JSON.parse(localStorage.getItem(K)||'{{}}')}}catch(e){{}}
 function upd(){{document.getElementById('n').textContent=new Set(Object.keys(V).map(k=>k.split(':')[0])).size+' of {n} judged.';document.querySelectorAll('.it').forEach(d=>d.classList.toggle('done',!!V[d.dataset.item]))}}
 document.querySelectorAll('input[type=radio]').forEach(r=>{{if(V[r.name]===r.value)r.checked=true;r.addEventListener('change',()=>{{V[r.name]=r.value;try{{localStorage.setItem(K,JSON.stringify(V))}}catch(e){{}}upd()}})}});upd();
 function save(){{const rows=['item,verdict'].concat(Object.keys(V).sort().map(k=>k+',"'+V[k]+'"'));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\\n')],{{type:'text/csv'}}));a.download='subset_review_verdicts.csv';a.click()}}
 </script>""", encoding="utf-8")
-    print(n, "items ->", REV / "subset_review.html")
+    print(n, "items ->", REV / out_html)
 
 
 def evaluate(verdicts):
