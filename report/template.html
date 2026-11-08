@@ -1845,7 +1845,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>4b</b> 按这个判据修复，人眼核对修得对不对。</li>
       <li><b>4c</b> 把修好的帧放进训练集训一个学生，和它的起点模型比。</li>
     </ul>
-    <p>判据只能在人眼判定的帧上定：1330 帧真值帧里没有真正闭着的眼。这和第 11 步的眨眼判据不冲突：第 11 步判的是眼睛是否非睁眼，只在眼睑点正常的帧上用眼睑距离；这里处理的正是眼睑点错的帧。</p>
   </div>
   <div class="text" lang="en">
     <p>Experiments 1 to 3 showed that the model improves when the unflagged and the repaired frames enter the training set. One kind of frame is left: the frames called closed. In 9.3 closed frames are not repaired, and a frame is called closed when its eyelid opening is below half the video's median. But when the model misplaces the eyelid points the opening collapses too, so an open eye is called closed and never repaired.</p>
@@ -1855,7 +1854,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li><b>4b</b> repair under this criterion and check the repairs by eye.</li>
       <li><b>4c</b> train a student with the repaired frames and compare it with its starting model.</li>
     </ul>
-    <p>The criterion can only be settled on judged frames: the 1330 truth frames hold no truly closed eye. It does not conflict with the blink criterion of step 11: step 11 decides whether an eye is not open, using the eyelid distance on frames whose eyelid points are normal; here the frames are exactly those with wrong eyelid points.</p>
   </div>
 
   <p class="text"><b><span lang="zh">4a 判闭眼：用瞳孔置信度，线取 0.40</span><span lang="en">4a Calling an eye closed: the pupil confidence, line at 0.40</span></b></p>
