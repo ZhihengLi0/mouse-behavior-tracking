@@ -296,6 +296,13 @@ in the audit is used in the formal loop only, where every settled piece is appli
 | 15 | 846 | 660 (1 near truth, 185 near blind) | 60 | 40800 | 2.50 | 0 | 4.41 | teacher 3403 / 901, student 3978 / 942 | 3 + 2 |
 | 11 | 628 | 512 (116 near truth, no blind set) | | | | | | teacher 683 / 73 | no blind set |
 
+Video 15, the reopened frames left out of the training set (186, within 60 frames of a truth or blind frame): the
+teacher flags all of them (a repaired frame is a flagged frame), the student 3. They are narrowed eyes with right
+eyelid points and the left pupil point thrown outside the eye: left-to-right pupil distance 1.15 eye widths on the
+teacher's prediction, 0.26 on the student's. The opening rule still calls 177 of the 186 closed on the student's
+prediction (the eye is narrowed), the confidence rule none; so the whole-video closed counts below are not the measure
+of 4c, the held-out reopened frames are (figure `loop_exp4c.png`, panel b).
+
 Video 15 against the other students of the same video (`videoNN/round1_*/eval.csv`, blind `round1_reopened/blind_scores.csv`,
 closed counts from the prediction with both rules): teacher median 2.42 %, p90 4.34, flagged 7.67 %, blind wrong 7 + 3;
 every30 2.39 / 4.75 / 2.69 / 2 + 1; repaired only 2.75 / 6.13 / 3.37 / (not scored); both 2.50 / 4.99 / 2.77 / 2 + 2;
