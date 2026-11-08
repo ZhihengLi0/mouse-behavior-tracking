@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 11:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 13:07 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1516,7 +1516,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
   <p class="text"><b><span lang="en">4c These frames in the training set: student against starting model</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Training set</span></th><td><span lang="en">The starting model's human labels plus only the repaired frames of 4b (all 8 points at their repaired coordinates, a non-replaced point dropped only below likelihood 0.01), excluding 60 frames around every truth and blind frame, no cap; iterations as the starting model's (the recipe of experiments 1 to 3). On the three videos with most reopened frames: video 15, 660 frames; video 11, 512 frames; video 1 in training.</span></td></tr>
+    <tr><th><span lang="en">Training set</span></th><td><span lang="en">The starting model's human labels plus only the repaired frames of 4b (all 8 points at their repaired coordinates, a non-replaced point dropped only below likelihood 0.01), excluding 60 frames around every truth and blind frame, no cap; iterations as the starting model's (the recipe of experiments 1 to 3). On the three videos with most reopened frames: video 15, 660 frames; video 11, 512; video 1, 98 (most of video 1's reopened frames lie too close to blind frames and are excluded).</span></td></tr>
     <tr><th><span lang="en">What counts as truth</span></th><td><span lang="en">As in experiments 1 to 3: the 70 human-labeled truth frames of each video (wrong = error above 0.14 eye widths), the 34 human-labeled blind frames (videos 15 and 1 have them, video 11 does not), the flagged share of the video; plus the reopened frames left out of the training set (within 60 frames of a truth or blind frame): the starting model flags every one of them (a repaired frame is a flagged frame), and a student that has learned this kind of frame should no longer flag them.</span></td></tr>
   </tbody></table></div>
   <figure>
@@ -1530,11 +1530,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tbody>
       <tr><td>15</td><td>660</td><td>2.42 → 2.50</td><td>0 → 0</td><td>7.67 → 4.41</td><td>10 → 5</td><td>186 → 3</td></tr>
       <tr><td>11</td><td>512</td><td>2.12 → 2.15</td><td>4 → 0</td><td>4.02 → 0.73</td><td>–</td><td>116 → 0</td></tr>
-      <tr><td>1</td><td></td><td colspan="5"><span lang="en">training</span></td></tr>
+      <tr><td>1</td><td>98</td><td>2.94 → 2.88</td><td>8 → 1</td><td>15.31 → 7.37</td><td>17 → 8</td><td>174 → 3</td></tr>
     </tbody>
   </table></div>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion of 4c (videos 15 and 11, video 1 pending):</span>on both videos the student beats its starting model and hardly flags the frames of this kind it was not trained on, so the model has learned them. The cause of the wrong closed call differs: in video 15 a narrowed eye with the left pupil point thrown outside the eye; in video 11 the nasal corner point thrown away, which widens the eye and makes the opening look collapsed. Once the video-11 student puts the corner back, the frames the opening rule calls closed fall sharply as well.</div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 4c:</span>on all three videos, adding only these reopened and repaired frames gives a student better than its starting model: fewer wrong truth and blind frames, a lower flagged share; and the student hardly flags the frames of this kind it was not trained on, so it has learned them rather than memorised the training frames. The cause of the wrong closed call differs by video: in video 15 a narrowed eye with the left pupil point thrown outside the eye; in videos 11 and 1 a corner point thrown away, which widens the eye and makes the opening look collapsed. Video 1 improves with only 98 frames. The repaired closed-eye frames belong in the training set of the final version.</div>
 
   <h4 id="exp5"><span lang="en">Experiment 5: the final loop version</span></h4>
   
