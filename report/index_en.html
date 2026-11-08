@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:09 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1553,7 +1553,8 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Rules</span></th><td><span lang="en">The procedure of experiment 3 with the repair's subset rule D of 5a and the confidence closed-eye rule of experiment 4; everything else unchanged: frames found by fitting and PCA side by side (9.2), the wrong-frame line at 0.14 eye widths (9.1), the acceptance ranges and margins (9.3), the second peak at least 3 cells from the first (2, 3 and 4 cells give the same truth-frame result). Each turn adds every 30th unflagged frame and every repaired frame to the training set, excluding 60 frames around every truth and blind frame.</span></td></tr>
     <tr><th><span lang="en">Stop rule and its basis</span></th><td><span lang="en">Stop when the flagged frames are not below 90% of the previous turn's. Basis of the 90%: video 8's first-turn model trained again with another random seed only gives a flagged share of 3.00% against 3.30%, a ratio of 0.91, so training noise alone moves the flagged share by 9%, and a turn that stays above 90% cannot be told from no change. The wrong blind frames are watched too, but the two seeds differ by one blind frame of 34, so they do not stop the loop on their own.</span></td></tr>
-    <tr><th><span lang="en">Progress</span></th><td><span lang="en">To start: after experiment 4c's videos 11 and 1 finish, run again from the starting models; on the videos of experiment 3, the comparison with its first turn is the joint effect of D and the confidence rule.</span></td></tr>
+    <tr><th><span lang="en">What to read in the result</span></th><td><span lang="en">On videos 1, 8 and 15, which experiment 3 ran, the final version's first turn is read against experiment 3's first turn on four numbers: the wrong truth frames of 70 must not grow; the flagged share must fall by more than 9% (the difference between two random seeds) to count as a real gain; the wrong blind frames of 34 are a tie within one frame; the frames the confidence rule calls closed should fall. The final version changes two things against experiment 3 (subset rule D, the confidence closed-eye rule with its reopened frames). Video 8 has only 5 reopened frames, so its change is essentially D's effect; what videos 15 (846 reopened frames) and 1 (272) change beyond that is the effect of the reopened frames.</span></td></tr>
+    <tr><th><span lang="en">Progress</span></th><td><span lang="en">To start: after experiment 4c's videos 11 and 1 finish, run again from the starting models.</span></td></tr>
   </tbody></table></div>
   </details>
 </section>
