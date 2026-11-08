@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 11:00 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 11:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1516,7 +1516,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
   <p class="text"><b><span lang="en">4c These frames in the training set: student against starting model</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Training set</span></th><td><span lang="en">The starting model's human labels plus only the repaired frames of 4b (all 8 points at their repaired coordinates, a non-replaced point dropped only below likelihood 0.01), excluding 60 frames around every truth and blind frame, no cap; iterations as the starting model's (the recipe of experiments 1 to 3). On the three videos with most reopened frames: video 15, 660 frames and 60 epochs; video 11, 512 frames; video 1 queued.</span></td></tr>
+    <tr><th><span lang="en">Training set</span></th><td><span lang="en">The starting model's human labels plus only the repaired frames of 4b (all 8 points at their repaired coordinates, a non-replaced point dropped only below likelihood 0.01), excluding 60 frames around every truth and blind frame, no cap; iterations as the starting model's (the recipe of experiments 1 to 3). On the three videos with most reopened frames: video 15, 660 frames; video 11, 512 frames; video 1 in training.</span></td></tr>
     <tr><th><span lang="en">What counts as truth</span></th><td><span lang="en">As in experiments 1 to 3: the 70 human-labeled truth frames of each video (wrong = error above 0.14 eye widths), the 34 human-labeled blind frames (videos 15 and 1 have them, video 11 does not), the flagged share of the video; plus the reopened frames left out of the training set (within 60 frames of a truth or blind frame): the starting model flags every one of them (a repaired frame is a flagged frame), and a student that has learned this kind of frame should no longer flag them.</span></td></tr>
   </tbody></table></div>
   <figure>
@@ -1529,12 +1529,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Frames added</span></th><th><span lang="en">Median error (% eye width)</span></th><th><span lang="en">Wrong of the 70 truth frames</span></th><th><span lang="en">Flagged share %</span></th><th><span lang="en">Wrong of the 34 blind frames</span></th><th><span lang="en">Reopened frames left out of training, still flagged</span></th></tr></thead>
     <tbody>
       <tr><td>15</td><td>660</td><td>2.42 → 2.50</td><td>0 → 0</td><td>7.67 → 4.41</td><td>10 → 5</td><td>186 → 3</td></tr>
-      <tr><td>11</td><td>512</td><td colspan="5"><span lang="en">training</span></td></tr>
-      <tr><td>1</td><td></td><td colspan="5"><span lang="en">queued</span></td></tr>
+      <tr><td>11</td><td>512</td><td>2.12 → 2.15</td><td>4 → 0</td><td>4.02 → 0.73</td><td>–</td><td>116 → 0</td></tr>
+      <tr><td>1</td><td></td><td colspan="5"><span lang="en">training</span></td></tr>
     </tbody>
   </table></div>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion of 4c (video 15, the others pending):</span>trained on the 660 reopened and repaired frames only, the student beats its starting model and has learned this kind of frame. Flagged share 7.67% to 4.41%, wrong blind frames 10 to 5, truth frames still 0 wrong, median error within 0.1%. Of the 186 reopened frames left out of the training set, the starting model flags all and the student 3: in video 15 these are frames with the eye narrowed to a slit, the eyelid points right and the left pupil point thrown outside the eye (left to right pupil point 1.15 eye widths for the starting model, 0.26 for the student, a normal pupil width). The eye is narrowed, so the opening rule still calls 177 of the 186 closed on the student's prediction; these are exactly the frames the opening rule gets wrong, and the confidence criterion calls none of them closed.</div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 4c (videos 15 and 11, video 1 pending):</span>on both videos the student beats its starting model and hardly flags the frames of this kind it was not trained on, so the model has learned them. The cause of the wrong closed call differs: in video 15 a narrowed eye with the left pupil point thrown outside the eye; in video 11 the nasal corner point thrown away, which widens the eye and makes the opening look collapsed. Once the video-11 student puts the corner back, the frames the opening rule calls closed fall sharply as well.</div>
 
   <h4 id="exp5"><span lang="en">Experiment 5: the final loop version</span></h4>
   

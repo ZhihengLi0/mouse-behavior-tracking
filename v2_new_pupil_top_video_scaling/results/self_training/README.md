@@ -294,7 +294,7 @@ in the audit is used in the formal loop only, where every settled piece is appli
 | video | reopened frames | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | closed (opening / confidence rule) | blind wrong | 
 |---|---|---|---|---|---|---|---|---|---|
 | 15 | 846 | 660 (1 near truth, 185 near blind) | 60 | 40800 | 2.50 | 0 | 4.41 | teacher 3403 / 901, student 3978 / 942 | 3 + 2 |
-| 11 | 628 | 512 (116 near truth, no blind set) | | | | | | teacher 683 / 73 | no blind set |
+| 11 | 628 | 512 (116 near truth, no blind set) | 65 | 35490 | 2.15 (teacher 2.12) | 0 (teacher 4) | 0.73 (teacher 4.02) | teacher 683 / 73, student 80 / 28 | no blind set |
 
 Video 15, the reopened frames left out of the training set (186, within 60 frames of a truth or blind frame): the
 teacher flags all of them (a repaired frame is a flagged frame), the student 3. They are narrowed eyes with right
@@ -302,6 +302,13 @@ eyelid points and the left pupil point thrown outside the eye: left-to-right pup
 teacher's prediction, 0.26 on the student's. The opening rule still calls 177 of the 186 closed on the student's
 prediction (the eye is narrowed), the confidence rule none; so the whole-video closed counts below are not the measure
 of 4c, the held-out reopened frames are (figure `loop_exp4c.png`, panel b).
+
+Video 11 (2026-11-08 11:12): the reopened frames are nearly all nasal-corner replacements (592 of 628 alone, 28 with a
+pupil point): the corner thrown away widens the eye (corner distance 1.27 x the video median on the teacher) and the
+opening, measured in eye widths, looks collapsed. Of the 116 held-out reopened frames the teacher flags all, the
+student none; corner distance 0.96 x median, opening rule closed 0 of 116. Whole video: wrong truth frames 4 to 0
+(7 frames better by more than 1 %, none worse), flagged 4.02 to 0.73 %, opening-rule closed 683 to 80, confidence-rule
+closed 73 to 28. The teacher's evaluation of video 11 was made for this comparison (`evaluate --teacher --save-flags`).
 
 Video 15 against the other students of the same video (`videoNN/round1_*/eval.csv`, blind `round1_reopened/blind_scores.csv`,
 closed counts from the prediction with both rules): teacher median 2.42 %, p90 4.34, flagged 7.67 %, blind wrong 7 + 3;
