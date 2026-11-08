@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:20 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:24 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1485,7 +1485,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h4><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
   
   <div class="text" lang="en">
-    <p>The repair of 9.3 first calls a frame "closed" and then decides whether to repair: closed frames are not repaired and kept as they are. The closed-eye rule was "eyelid opening below half the video's median opening", a number set at design time without a basis: the 1330 truth frames hold no truly closed eye (the 4 truth frames the model calls closed all have a human pupil label), so the line cannot be derived from the labels. The experiment has three steps: settle the rule on frames judged by eye (4a), check that the repairs the confidence rule lets through are right (4b), and, as in experiment 2, train a model on these frames alone to see whether they are useful in the training set (4c).</p>
+    <p>Experiments 1 to 3 showed that retraining with the unflagged frames and the repaired frames improves the model. This section deals with the remaining kind of frame: the frames called closed. The repair of 9.3 first calls a frame "closed" and only then decides whether to repair; closed frames are not repaired and kept as they are; the rule was "eyelid opening below half the video's median opening". The problem: when the model misplaces the upper or lower eyelid point the opening collapses too, so an open eye is called closed and never repaired. The question here is whether these frames can be repaired. First, on frames judged by eye, how often the opening rule is wrong and whether some quantity separates the cases, which leads to the pupil confidence as the closed-eye criterion (4a); then whether the repairs the confidence rule lets through are right (4b); finally, as in experiment 2, a model trained on these frames alone, to see whether they are useful in the training set (4c). The half of the opening rule was set at design time: the 1330 truth frames hold no truly closed eye (the 4 truth frames the opening rule calls closed all have a human pupil label), so the line cannot be derived from the labels and has to be settled on judged frames.</p>
   </div>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">What counts as truth in this section</span></th><td><span lang="en">4a and 4b have no existing labels to fall back on: the truth is the labeler's own frame-by-frame judgment of the raw frame (below, for each judgment: how many frames, what was shown, what was asked, which answers were offered); the judge sees the images only and not any rule's verdict. 4c uses the same truth as experiments 1 to 3: the 70 human-labeled truth frames and the 34 human-labeled blind frames of each video.</span></td></tr>
