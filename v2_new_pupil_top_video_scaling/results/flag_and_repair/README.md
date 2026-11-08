@@ -299,3 +299,20 @@ an eye width) in a narrow, half-open eye; on video 0 the top eyelid point sat on
 page (`subset_review/reopened_review.html`, one frame per episode, at most 5 per video) asks whether the repair is
 right; the verdict gates experiment 4 (`results/self_training/README.md`). The item images of the three pending pages
 are now named after the page's items (the first build of the D and confidence pages linked images that did not exist).
+
+**1c. A, B, C and D judged together** (`scripts/subset_abcd_review.py`, `all_videos/subset_abcd_sample.csv`,
+`subset_abcd_review_verdicts.csv`, `subset_abcd_verdicts.csv`, 2026-11-08 09:45). At the user's request the four
+variants were put side by side on one page: the 35 frames where A, B, C disagree (yesterday's verdicts carried over
+as the pre-selected answer, changed by the user where D did better) and the 20 frames where C and D disagree, 55
+frames, 53 judged (2 cannot tell). Variants with the same result share a panel, so a verdict "C+D" counts for both.
+- Every point right: D 38 of 53 (72 %), C 24 (45 %), B 10 (19 %), A 6 (11 %). On the 35 frames D 24, C 20; on the 20
+  frames D 14, C 4.
+- Where D replaces a different point set than C (29 of the 55): D right 20, C right 6, none 1, cannot tell 2. D's
+  extra point is right far more often than not.
+- Of yesterday's 7 "both changes needed" frames, D now has every point right in 3; 3 still need more than one of the
+  shown replacements; 1 cannot tell. Model as it was 1, another point not caught 1, none right 4.
+- Changes against yesterday on the 35 frames: 8 (5 to D where D moves a further point, 1 "model as it was" to B+C+D,
+  1 "none" to D, 1 to cannot tell).
+Decision (user, 2026-11-08): the formal pipeline uses D, `--order deviation --tiebreak margin-all`: candidates by
+deviation, every passing subset of any size scored by its range margin, the largest margin wins. A stays available as
+the old default; the committed results of the earlier sections are unchanged.
