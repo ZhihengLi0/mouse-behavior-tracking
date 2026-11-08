@@ -346,127 +346,106 @@ def _closed_counts(v, model):
     return int(Geometry(xy).closed.sum()), int((conf < line).sum())
 
 
-def fig_exp4():
-    """Experiment 4, repair of the closed-eye frames: (a) the 80 judged frames by opening-ratio bin and the confidence
-    line; (b) where the opening rule's closed frames go under the confidence rule (19 videos); (c) flagged share and
-    (d) closed frames of the students of 4c against the other models of the same videos."""
-    fig, axes = plt.subplots(2, 2, figsize=(14, 8.6))
-    # (a) judged frames
+def fig_exp4a():
+    """Experiment 4a: why the closed-eye line sits at a mean pupil confidence of 0.40. (a) the judged frames' confidence
+    by verdict; (b) accuracy of every candidate line on the judged frames, the best opening-ratio line as reference;
+    (c) what each line costs on the labeled truth frames."""
     S = pd.read_csv(FAR / "closed_frames" / "sample.csv")
     V = pd.read_csv(FAR / "closed_frames" / "closed_review_verdicts.csv")
     V = V[~V.item.str.contains(":")]
     J = S.merge(V, on="item")
     J = J[J.verdict != "cannot tell"]
+    chosen = float(pd.read_csv(FAR / "closed_frames" / "closed_line_chosen.csv").iloc[0].pupil_confidence_line)
+    C = pd.read_csv(FAR / "closed_frames" / "confidence_line_candidates.csv")
+    O = pd.read_csv(FAR / "closed_frames" / "line_candidates.csv")
     cats = [("fully closed", "#444444"), ("half open, pupil can be labeled", "#56b4e9"), ("open, eyelid points wrong", "#e69f00")]
-    bins = sorted(J.bin.unique())
-    ax = axes[0, 0]
-    bottom = np.zeros(len(bins))
-    for cat, c in cats:
-        ys = np.array([int(((J.bin == b) & (J.verdict == cat)).sum()) for b in bins])
-        ax.bar(range(len(bins)), ys, 0.6, bottom=bottom, color=c, label=cat, edgecolor="white", linewidth=0.5)
-        for i, (y, b0) in enumerate(zip(ys, bottom)):
-            if y:
-                ax.text(i, b0 + y / 2, str(y), ha="center", va="center", fontsize=8, color="white" if c == "#444444" else "#222")
-        bottom += ys
-    ax.set_xticks(range(len(bins)))
-    ax.set_xticklabels([f"{b} x median" for b in bins])
-    ax.set_xlabel("eyelid opening, ratio to the video's median (the opening rule calls < 0.5 closed)")
-    ax.set_ylabel("judged frames")
-    ax.set_title("(a) 80 frames the opening rule calls closed, judged by eye", loc="left")
-    ax.legend(frameon=False, fontsize=8, loc="upper right")
-    line = float(pd.read_csv(FAR / "closed_frames" / "closed_line_chosen.csv").iloc[0].pupil_confidence_line)
-    closed = J.verdict == "fully closed"
-    low = J.pupil_lk_mean < line
-    ax.text(0.02, 0.97, f"mean pupil confidence < {line:.2f}: {int((closed & low).sum())} of {int(closed.sum())} closed frames caught,\n"
-            f"{int((~closed & low).sum())} of {int((~closed).sum())} open frames called closed ({100 * float((closed == low).mean()):.0f} % right)",
-            transform=ax.transAxes, va="top", fontsize=8.5, color="#222")
-    ax.set_ylim(0, bottom.max() * 1.45)
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4.4), gridspec_kw={"width_ratios": [1.2, 1, 1]})
+    ax = axes[0]
+    rng = np.random.default_rng(0)
+    for k, (cat, c) in enumerate(cats):
+        y = J.pupil_lk_mean[J.verdict == cat].to_numpy()
+        ax.scatter(k + rng.uniform(-0.18, 0.18, len(y)), y, s=26, color=c, edgecolor="white", linewidth=0.5, zorder=3)
+        ax.text(k, -0.06, f"{len(y)} frames", ha="center", va="top", fontsize=8.5, color="#222")
+    ax.axhline(chosen, color="#d55e00", lw=1.2, ls="--")
+    ax.text(2.45, chosen + 0.015, f"line {chosen:.2f}", color="#d55e00", fontsize=9, ha="right")
+    ax.set_xticks(range(3))
+    ax.set_xticklabels(["fully closed", "half open,\npupil can be labeled", "open, eyelid\npoints wrong"], fontsize=9)
+    ax.set_ylabel("mean heatmap confidence of the 4 pupil points")
+    ax.set_ylim(-0.12, 1.02)
+    ax.set_title(f"(a) the {len(J)} judged frames by the judge's verdict", loc="left")
     ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
     ax.set_axisbelow(True)
-    # (b) fate of the opening rule's closed frames
-    fate = {k: 0 for k, _, _ in FATE}
-    n_closed_new = n_closed_old = n_rep_old = n_rep_new = 0
-    for v in range(19):
-        A, Cc = _frames(v, ""), _frames(v, "_confclosed")
-        was = (A.status == "closed").to_numpy()
-        for k, _, _ in FATE:
-            fate[k] += int((was & (Cc.status == k).to_numpy()).sum())
-        n_closed_old += int(was.sum()); n_closed_new += int((Cc.status == "closed").sum())
-        n_rep_old += int((A.status == "repaired").sum()); n_rep_new += int((Cc.status == "repaired").sum())
-    ax = axes[0, 1]
-    left = 0
-    for k, lab, c in FATE:
-        n = fate[k]
-        if not n:
-            continue
-        ax.barh([0], [n], left=left, color=c, label=f"{lab}: {n:,}", height=0.5, edgecolor="white", linewidth=0.5)
-        if n > 400:
-            ax.text(left + n / 2, 0, f"{n:,}", ha="center", va="center", fontsize=8, color="white" if c in ("#444444", "#009e73") else "#222")
-        left += n
-    ax.set_yticks([])
-    ax.set_xlabel(f"the {n_closed_old:,} frames the opening rule calls closed on the 19 videos")
-    ax.set_title("(b) where those frames go under the confidence rule", loc="left")
-    ax.legend(frameon=False, fontsize=8, loc="lower center", bbox_to_anchor=(0.5, -0.02), ncol=3)
-    ax.text(0.0, 0.92, f"closed frames {n_closed_old:,} to {n_closed_new:,}; repaired frames {n_rep_old:,} to {n_rep_new:,}", transform=ax.transAxes, fontsize=8.5, color="#222")
-    ax.set_ylim(-0.9, 0.9)
-    for s in ("left",):
-        ax.spines[s].set_visible(False)
-    # (c), (d) the students of 4c
-    vids = [v for v in range(19) if (RES / "self_training" / f"video{v:02d}" / "round1_reopened" / "eval.csv").exists()]
-    models = ["teacher", "round1_every30", "round1_both", "round1_reopened"]
-    present = [m for m in models if any((RES / "self_training" / f"video{v:02d}" / m / "eval.csv").exists() for v in vids)]
-    k = len(present)
-    w = 0.8 / k
-    ax = axes[1, 0]
-    for j, m in enumerate(present):
-        for i, v in enumerate(vids):
-            f = RES / "self_training" / f"video{v:02d}" / m / "eval.csv"
-            if not f.exists():
-                continue
-            e = pd.read_csv(f).iloc[0]
-            x = i + (j - (k - 1) / 2) * w
-            ax.bar([x], [e.flagged_either_pct], w * 0.92, color=COL[m], label=MODELS[m] if i == 0 else None, edgecolor="white", linewidth=0.5)
-            bl = ""
-            if m == "round1_reopened":
-                bs = RES / "self_training" / f"video{v:02d}" / m / "blind_scores.csv"
-                if bs.exists():
-                    bl = f"\nblind {int(pd.read_csv(bs).query('model == @m').wrong_frames.sum())}"
-            elif (RES / "blind_test" / f"video{v:02d}" / "per_frame.csv").exists():
-                bw = blind_wrong_n(v, m, 34)
-                bl = f"\nblind {bw:.0f}" if np.isfinite(bw) else ""
-            ax.text(x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f}\nwrong {int(e.wrong_frames)}{bl}", ha="center", va="bottom", fontsize=7, color="#222")
-    ax.set_xticks(range(len(vids)))
-    ax.set_xticklabels([str(v) for v in vids])
-    ax.set_xlabel("video")
-    ax.set_ylabel("frames flagged, % of the video")
-    ax.set_title("(c) 4c: the student trained on the reopened frames only,\nagainst the other models of the same video", loc="left")
-    ax.set_ylim(0, ax.get_ylim()[1] * 1.45)
-    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+    ax = axes[1]
+    ax.plot(C.line, C.accuracy_pct, "-o", color="#0072b2", ms=5, lw=1.6, label="pupil confidence line")
+    ax.axhline(O.accuracy_pct.max(), color="#888", lw=1.2, ls=":", label=f"best opening-ratio line ({O.accuracy_pct.max():.0f} %)")
+    ax.axvline(chosen, color="#d55e00", lw=1.2, ls="--")
+    r = C[np.isclose(C.line, chosen)].iloc[0]
+    ax.annotate(f"{chosen:.2f}: {r.accuracy_pct:.0f} % right\n{int(r.closed_caught)} of {int(r.closed_total)} closed caught\n{int(r.not_closed_called_closed)} of {len(J) - int(r.closed_total)} open called closed",
+                (chosen, r.accuracy_pct), (0.52, 0.30), textcoords="axes fraction", fontsize=8.5, color="#222",
+                arrowprops=dict(arrowstyle="-", color="#999", lw=0.8))
+    ax.set_xlabel("candidate line on the mean pupil confidence")
+    ax.set_ylabel("judged frames classified right, %")
+    ax.set_ylim(50, 100)
+    ax.set_title("(b) accuracy of each candidate line", loc="left")
+    ax.legend(frameon=False, fontsize=8, loc="lower left")
+    ax.grid(color="#e4e4e4", linewidth=0.6)
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, fontsize=8, loc="upper right")
-    ax = axes[1, 1]
-    for j, m in enumerate(present):
-        for i, v in enumerate(vids):
-            if not (RES / "self_training" / f"video{v:02d}" / m / "eval.csv").exists():
-                continue
-            op, cf = _closed_counts(v, m)
-            x = i + (j - (k - 1) / 2) * w
-            ax.bar([x - w * 0.23], [op], w * 0.42, color=COL[m], hatch="///", edgecolor="white", linewidth=0.5)
-            ax.bar([x + w * 0.23], [cf], w * 0.42, color=COL[m], edgecolor="white", linewidth=0.5)
-            ax.text(x - w * 0.23, op, f"{op:,}", ha="center", va="bottom", fontsize=6.5, color="#222", rotation=90)
-            ax.text(x + w * 0.23, cf, f"{cf:,}", ha="center", va="bottom", fontsize=6.5, color="#222", rotation=90)
-    ax.set_xticks(range(len(vids)))
-    ax.set_xticklabels([str(v) for v in vids])
-    ax.set_xlabel("video")
-    ax.set_ylabel("frames called closed")
-    ax.set_title("(d) frames called closed on each model's prediction:\nopening rule (hatched), confidence rule (solid)", loc="left")
-    ax.set_ylim(0, ax.get_ylim()[1] * 1.3)
-    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+    ax = axes[2]
+    ax.plot(C.line, C.labeled_truth_frames_called_closed, "-o", color="#0072b2", ms=5, lw=1.6, label="truth frames with a pupil label called closed")
+    ax.plot(C.line, C.of_which_wrong_frames, "-s", color="#cc79a7", ms=4, lw=1.2, label="of which the model already had wrong")
+    ax.axvline(chosen, color="#d55e00", lw=1.2, ls="--")
+    r = C[np.isclose(C.line, chosen)].iloc[0]
+    ax.annotate(f"{chosen:.2f}: {int(r.labeled_truth_frames_called_closed)} of {int(r.labeled_truth_frames)} removed,\nall {int(r.of_which_wrong_frames)} already wrong",
+                (chosen, r.labeled_truth_frames_called_closed), (0.08, 0.55), textcoords="axes fraction", fontsize=8.5, color="#222",
+                arrowprops=dict(arrowstyle="-", color="#999", lw=0.8))
+    ax.set_xlabel("candidate line on the mean pupil confidence")
+    ax.set_ylabel("labeled truth frames the line removes")
+    ax.set_title(f"(c) cost on the {int(C.labeled_truth_frames.iloc[0])} labeled truth frames", loc="left")
+    ax.legend(frameon=False, fontsize=8, loc="upper left")
+    ax.grid(color="#e4e4e4", linewidth=0.6)
     ax.set_axisbelow(True)
     fig.tight_layout()
-    fig.savefig(OUT / "loop_exp4.png", dpi=170)
+    fig.savefig(OUT / "loop_exp4a.png", dpi=170)
     plt.close(fig)
-    return fate
+
+
+def fig_exp4c():
+    """Experiment 4c: the student trained on the reopened frames only against its teacher, per video: flagged share
+    (with wrong truth and blind frames), and frames the confidence rule calls closed on the prediction."""
+    vids = [v for v in range(19) if (RES / "self_training" / f"video{v:02d}" / "round1_reopened" / "eval.csv").exists()]
+    series = [("teacher", COL["teacher"], "starting model (teacher)"), ("round1_reopened", COL["round1_reopened"], "student: human labels + reopened frames only")]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.4))
+    w = 0.36
+    for j, (m, c, lab) in enumerate(series):
+        for i, v in enumerate(vids):
+            e = pd.read_csv(RES / "self_training" / f"video{v:02d}" / m / "eval.csv").iloc[0]
+            x = i + (j - 0.5) * w
+            axes[0].bar([x], [e.flagged_either_pct], w * 0.92, color=c, label=lab if i == 0 else None, edgecolor="white", linewidth=0.5)
+            bl = ""
+            bs = RES / "self_training" / f"video{v:02d}" / "round1_reopened" / "blind_scores.csv"
+            if bs.exists():
+                B_ = pd.read_csv(bs)
+                n = int(B_[B_.model == m].wrong_frames.sum()); tot = int(B_[B_.model == m].frames.sum())
+                bl = f"\nblind {n} of {tot}"
+            axes[0].text(x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f} %\ntruth {int(e.wrong_frames)} of 70{bl}", ha="center", va="bottom", fontsize=7.5, color="#222")
+            op, cf = _closed_counts(v, m)
+            axes[1].bar([x], [cf], w * 0.92, color=c, label=lab if i == 0 else None, edgecolor="white", linewidth=0.5)
+            axes[1].text(x, cf, f"{cf:,}", ha="center", va="bottom", fontsize=8, color="#222")
+    for ax in axes:
+        ax.set_xticks(range(len(vids)))
+        ax.set_xticklabels([str(v) for v in vids])
+        ax.set_xlabel("video")
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.35)
+    axes[0].set_ylabel("frames flagged, % of the video")
+    axes[0].set_title("(a) flagged share; labels: wrong truth frames, wrong blind frames", loc="left")
+    axes[0].legend(frameon=False, fontsize=8, loc="upper right")
+    axes[1].set_ylabel("frames the confidence rule calls closed")
+    axes[1].set_title("(b) frames called closed on the whole-video prediction", loc="left")
+    fig.tight_layout()
+    fig.savefig(OUT / "loop_exp4c.png", dpi=170)
+    plt.close(fig)
 
 
 def fig_exp5a():
@@ -538,6 +517,7 @@ def fig_exp5a():
 
 
 if __name__ == "__main__" and "--audit" in sys.argv:
-    print("exp4 fate:", fig_exp4())
+    fig_exp4a()
+    fig_exp4c()
     print("exp5a:", fig_exp5a())
     print("audit figures written")
