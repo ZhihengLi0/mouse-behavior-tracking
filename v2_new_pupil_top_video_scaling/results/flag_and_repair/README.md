@@ -208,3 +208,53 @@ and video 4 (70429). Whole videos: repaired 1.10 % (0.96 %), still flagged 0.51 
 keep a pupil point the whole replacement would have moved (841 points). Points put in: 11,571 pupil, 1295 eyelid,
 2293 corner. This is the variant to carry forward; the by-eye count of pupil points moved for nothing (10 of 32)
 was taken on the whole replacement and should be repeated on this one.
+
+## Audit of the repair, 2026-11-07 (subset order, leave-one-video-out ranges, closed-eye frames)
+
+After the meeting of 2026-11-07 the chain is audited before the formal self-training loop: every number must have a
+stated basis. Three items concern the repair. Scripts: `label_region_lovo_ranges.py`, `flag_and_repair.py` options
+`--order deviation`, `--tiebreak margin`, `--lovo-range` (defaults unchanged: video 0 rerun with defaults is byte-identical),
+`subset_order_comparison.py`, `closed_frames_check.py`. Pop-up pages and their items are local only; the verdict CSVs
+and every table are committed.
+
+**1. Order of the smallest-subset search** (`all_videos/subset_order_*.csv`). Variants on all 19 videos: A = in use
+(outline points first, then pupil points, singles before pairs, first passing subset), B = the point of largest
+deviation first, then the pairs that contain it (`--order deviation`), C = B with a tie-break among the passing subsets
+of the smallest size: the one farthest inside the label ranges (`--tiebreak margin`, `range_margin`). On the 1330 truth
+frames the three are identical (15 of 23 wrong frames repaired, 4 still flagged, 4 called closed, 1 good frame made
+worse). On the whole videos all three repair the same 14,395 frames; the replaced points differ in 424 frames (A vs B
+412, B vs C 26); more than one subset of the chosen size passes in 46 frames only, so the tie-break hardly ever acts.
+The earlier count "9.8 % of the repaired frames do not replace the largest-deviation point" (1398 frames) is the same
+with B: in those frames that point's second peak was tried alone and in pairs and failed the ranges, another point's
+replacement passed. Whether that is right is judged by eye (`subset_review/`, part 2: 20 of those frames; part 1: 40
+frames where the variants disagree); verdicts pending.
+
+**2. Leave-one-video-out ranges** (`acceptance_thresholds/label_region_lovo_ranges.csv`,
+`label_region_outline_lovo_ranges.csv`, runs `videoNN_..._lovo`). With the ranges built from the other 18 videos'
+labels (same margins 0.42 and 0.23) the truth-frame outcome is identical for every variant, and the whole videos
+change by 8 repaired frames (14,403 against 14,395) and 22 still-flagged frames (6716 against 6694) in 1.31 million.
+The acceptance does not depend on the video's own labels.
+
+**3. Closed-eye frames** (`closed_frames/`). The rule in use calls a frame closed when the eyelid opening is below
+0.5 x the video's median opening (hand-set). Facts: 8058 such frames (0.59 %, 2417 runs, 1310 of them one frame long);
+the 1330 truth frames hold no truly closed eye (the 4 frames the rule calls closed all have human pupil labels; humans
+labeled pupils down to an opening ratio of 0.36), so the line cannot be derived from the labels. The user judged a
+stratified sample of 80 frames (`sample.csv`, `closed_review_verdicts.csv`; opening-ratio bins < 0.2 / 0.2-0.35 /
+0.35-0.5 / 0.5-0.7 x eyelid point flagged or not, 10 each; 79 judged): 33 fully closed, 30 open with wrong eyelid or
+corner points (the pupil right in 20 of them), 16 half open with a labelable pupil. Findings (`verdict_summary.csv`,
+`feature_crosstabs.csv`, `line_candidates.csv`, `confidence_line_candidates.csv`):
+- The opening ratio does not separate a closed eye from an open eye with collapsed eyelid points: no line between
+  0.1 and 0.7 does better than 61 % on the judged frames. Among the frames the rule calls closed, about half are
+  open eyes with wrong outline points.
+- The finders flag all of them (fitting and PCA flag every judged closed-now frame); an eyelid point over the
+  threshold marks a real blink (28 of 35 flagged frames closed) rather than a wrong eyelid (7 of 30 wrong-eyelid
+  frames flagged): the finder cannot tell the two apart.
+- The mean heatmap confidence of the four pupil points does: closed frames 0.20 (median; max 0.67), wrong-eyelid
+  frames 0.64, half-open frames 0.60. The line confidence < 0.40 calls 32 of 33 closed frames closed and 5 of 46 open
+  frames (accuracy 92 %, the best of 0.20 ... 0.70 together with 0.35); on the 1318 labeled-pupil truth frames it
+  calls 4 closed, all four wrong frames the model had already lost. This is the same construction as step 11's
+  not-open rule for implausible frames (confidence < 0.527 on judged frames), with its own judged set.
+Decision for the formal pipeline (to be implemented as an option, default unchanged until then): closed = mean pupil
+confidence < 0.40 (calibrated as above); a frame with a collapsed opening but a confident pupil is an open eye with
+wrong outline points and goes through the ordinary flagged path (candidates = points over the threshold, smallest
+subset, both ranges); no separate "reopen" branch and no new hand-set number.

@@ -1,0 +1,7 @@
+variant,frames,repaired,repaired_pct,flagged_not_repaired,flagged_not_repaired_pct,repaired_worst_point_replaced,repaired_worst_point_replaced_pct,repaired_more_than_one_passing_subset,replaced_points_outline,replaced_points_pupil_only
+A,1309478,14395,1.099,6694,0.511,12987,90.2,,3522,10873
+B,1309478,14395,1.099,6694,0.511,12997,90.3,46.0,3520,10875
+C,1309478,14395,1.099,6694,0.511,12979,90.2,46.0,3519,10876
+A_lovo,1309478,14403,1.1,6716,0.513,12989,90.2,,3527,10876
+B_lovo,1309478,14403,1.1,6716,0.513,12998,90.2,43.0,3525,10878
+C_lovo,1309478,14403,1.1,6716,0.513,12980,90.1,43.0,3524,10879

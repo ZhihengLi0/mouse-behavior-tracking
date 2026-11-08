@@ -71,8 +71,8 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
-from acceptance_thresholds import eye_quantities, inside
-from outline_region import VideoRef, inside_outline, outline_quantities
+from acceptance_thresholds import QUANTS, eye_quantities, inside
+from outline_region import OQUANTS, VideoRef, inside_outline, outline_quantities
 from second_peak_repair import BPS, P4, RES, Geometry, frame_rmse, load, peak2_pixels, pooled_bands, xy_frame
 from triggered_repair import repair_triggered
 
@@ -184,7 +184,24 @@ def repair_fit(G, xy, p2, pm, dev, i, thr, flagged, cand_fn=None):
     return "repaired", tuple(cand), new
 
 
-def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None, R_out=None, ref=None, smallest=False):
+def range_margin(pts, G, R, R_out=None, ref=None):
+    """Smallest distance of the frame's acceptance quantities to the nearest bound of their label range, as a fraction
+    of that range's width; negative when a quantity is outside, so margin >= 0 is the same test as plausible().
+    Tie-break of --tiebreak margin (audit 2026-11-07)."""
+    q = eye_quantities(pts, G.sign_lr, G.sign_tb)
+    vals = [(q[k], R.loc[k, "min"], R.loc[k, "max"]) for k in QUANTS]
+    if R_out is not None:
+        qo = outline_quantities(pts, ref)
+        vals += [(qo[k], R_out.loc[k, "min"], R_out.loc[k, "max"]) for k in OQUANTS]
+    return min(min(x - lo, hi - x) / max(hi - lo, 1e-9) if np.isfinite(x) else -np.inf for x, lo, hi in vals)
+
+
+def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand_fn=None, R_out=None, ref=None, smallest=False, order_score=None, tiebreak=False, info=None):
+    """order_score: per-point score of this frame (deviation / threshold, BPS order); when given, the smallest-subset
+    search tries the candidate points in decreasing score (the largest deviation first, then the pairs that contain it)
+    instead of outline points first. tiebreak: among the passing subsets of the smallest size take the one with the
+    largest range_margin instead of the first. info: dict that receives n_passing (passing subsets of the chosen size)
+    for the audit runs. Defaults (None / False / None) leave the behaviour unchanged."""
     if G.closed[i]:
         return "closed", (), xy_frame(xy, i)
     if not flagged:
@@ -195,14 +212,32 @@ def repair_scored(G, xy, p2, peak2, dev, i, thr, flagged, mode, cutv, R, n, cand
             return "flagged_not_repaired", (), xy_frame(xy, i)
         if plausible(xy_frame(xy, i), G, R, R_out, ref):
             return "flagged_passes_check", (), xy_frame(xy, i)
-        pool = [b for b in cand if b not in P4 and np.isfinite(p2[b][i]).all()] + [b for b in cand if b in P4 and np.isfinite(p2[b][i]).all()]
+        if order_score is None:
+            pool = [b for b in cand if b not in P4 and np.isfinite(p2[b][i]).all()] + [b for b in cand if b in P4 and np.isfinite(p2[b][i]).all()]
+        else:
+            pool = sorted([b for b in cand if np.isfinite(p2[b][i]).all()], key=lambda b: -float(np.nan_to_num(order_score[BPS.index(b)], nan=-1)))
         for k in range(1, len(pool) + 1):
+            best, n_pass = None, 0
             for sub in combinations(pool, k):
                 new = xy_frame(xy, i)
                 for b in sub:
                     new[b] = p2[b][i]
-                if plausible(new, G, R, R_out, ref):
-                    return "repaired", tuple(sub), new
+                if tiebreak:
+                    m = range_margin(new, G, R, R_out, ref)
+                    if m >= 0:
+                        n_pass += 1
+                        if best is None or m > best[0]:
+                            best = (m, sub, new)
+                elif plausible(new, G, R, R_out, ref):
+                    if info is None:
+                        return "repaired", tuple(sub), new
+                    n_pass += 1
+                    if best is None:
+                        best = (0.0, sub, new)
+            if best is not None:
+                if info is not None:
+                    info["n_passing"] = n_pass
+                return "repaired", best[1], best[2]
         return "flagged_not_repaired", (), xy_frame(xy, i)
     if not cand or any(not np.isfinite(p2[b][i]).all() for b in cand):
         return "flagged_not_repaired", (), xy_frame(xy, i)
@@ -240,14 +275,21 @@ def main():
     ap.add_argument("--peaks-csv", default=None, help="heatmap peaks (+ stats) of that prediction, one row per frame (default: results/heatmap_signals)")
     ap.add_argument("--dev-npy", default=None, help="one-step fitting deviations in px of that prediction, shape (frames, 8) (default: the sweep's cache)")
     ap.add_argument("--pca-own", action="store_true", help="PCA finder: residuals of that prediction against the video's labeled-pose PCA, threshold = multiple x its own median score")
+    # audit of the smallest-subset repair (2026-11-07); defaults unchanged
+    ap.add_argument("--order", choices=["type", "deviation"], default="type", help="--replace smallest: subset search order, outline points first (default) or the largest deviation first; folder suffix _devorder")
+    ap.add_argument("--tiebreak", choices=["none", "margin"], default="none", help="--replace smallest: among the passing subsets of the smallest size take the first (default) or the one farthest inside the label ranges; folder suffix _margin")
+    ap.add_argument("--lovo-range", action="store_true", help="acceptance ranges built from the other 18 videos' labels (label_region_lovo_ranges.py); folder suffix _lovo")
     a = ap.parse_args()
+    assert a.replace == "smallest" or (a.order == "type" and a.tiebreak == "none"), "--order / --tiebreak are only defined with --replace smallest"
+    audit = a.order != "type" or a.tiebreak != "none" or a.lovo_range
     assert a.replace == "whole" or a.points == "all", "--replace smallest is only defined with --points all"
     assert a.finder == "fit" or a.accept != "fit", "the acceptance test 'fit' is only defined for the fitting finder"
     assert a.points == "pupil" or a.accept == "labelregion", "--points all is only defined with --accept labelregion"
     thr = a.thr if a.thr is not None else float(pd.read_csv(RES / "fit_threshold" / "chosen.csv").iloc[0].threshold_eye_widths)
     line = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
     tag = a.accept if a.margin is None else f"{a.accept}{int(round(100 * a.margin))}"
-    out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else "") + ("_smallest" if a.replace == "smallest" else ""))
+    out = Path(a.out) if a.out else OUT / ((f"video{a.video:02d}_{tag}" if a.finder == "fit" else f"video{a.video:02d}_{a.finder}_{tag}") + ("_all" if a.points == "all" else "") + ("_smallest" if a.replace == "smallest" else "")
+                                       + ("_devorder" if a.order == "deviation" else "") + ("_margin" if a.tiebreak == "margin" else "") + ("_lovo" if a.lovo_range else ""))
     out.mkdir(parents=True, exist_ok=True)
     rr, d, P, H, truth, fwd, sig = load(a.video, a.pred_h5, a.peaks_csv)
     xy = {b: np.c_[d[b]["x"].to_numpy(float), d[b]["y"].to_numpy(float)] for b in BPS}
@@ -306,20 +348,35 @@ def main():
             w = R0["max"] - R0["min"]
             R = pd.DataFrame({"min": R0["min"] - a.margin * w, "max": R0["max"] + a.margin * w, "margin": a.margin})
         print(f"label region widened by margin {R.margin.iloc[0]:.2f}")
+        if a.lovo_range:
+            Rl = pd.read_csv(RES / "acceptance_thresholds" / "label_region_lovo_ranges.csv")
+            R = Rl[Rl.held_out_video == a.video].set_index("quantity")[["min", "max", "margin"]]
+            assert len(R) == len(QUANTS), "no leave-one-video-out range for this video"
+            print(f"leave-one-video-out: pupil range from the other 18 videos' labels (margin {R.margin.iloc[0]:.2f})")
     R_out, ref = None, None
     if a.points == "all":
         R_out = pd.read_csv(RES / "acceptance_thresholds" / "label_region_outline.csv").set_index("quantity")
+        if a.lovo_range:
+            Rl = pd.read_csv(RES / "acceptance_thresholds" / "label_region_outline_lovo_ranges.csv")
+            R_out = Rl[Rl.held_out_video == a.video].set_index("quantity")[["min", "max", "margin"]]
+            assert len(R_out) == len(OQUANTS), "no leave-one-video-out outline range for this video"
         ref = VideoRef(xy)
-        print(f"outline range (margin {R_out.margin.iloc[0]:.2f}) in use: all eight points may be repaired")
+        print(f"outline range (margin {R_out.margin.iloc[0]:.2f}) in use: all eight points may be repaired" + (" (leave-one-video-out)" if a.lovo_range else ""))
     peak2 = {b: H[f"{b}_peak2"].to_numpy(float) for b in BPS}
 
     status, reps, new_xy = [], [], {b: xy[b].copy() for b in BPS}
+    n_passing = np.full(n, -1, int)
     for i in range(n):
         if a.accept == "fit":
             st, rep, new = repair_fit(G, xy, p2, pm, dev, i, thr, bool(flag[i]), cand_fn)
         elif a.accept == "geometry":
             st, rep, new = repair_triggered(G, xy, p2, i, a.k_mad, bool(flag[i]), worst[i])
             st = {"flagged_ok": "flagged_passes_check", "drop": "flagged_not_repaired"}.get(st, st)
+        elif audit:
+            info = {}
+            st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref, a.replace == "smallest",
+                                         order_score=(cdev[i] if a.order == "deviation" else None), tiebreak=(a.tiebreak == "margin"), info=info)
+            n_passing[i] = info.get("n_passing", -1)
         else:
             st, rep, new = repair_scored(G, xy, p2, peak2, dev, i, thr, bool(flag[i]), a.accept, cutv, R, n, cand_fn, R_out, ref, a.replace == "smallest")
         status.append(st)
@@ -336,6 +393,10 @@ def main():
     if a.points == "all":
         extra["points"] = "all"
         extra["replace"] = a.replace
+    if audit:
+        extra.update({"order": a.order, "tiebreak": a.tiebreak, "lovo_range": a.lovo_range})
+        F["n_passing"] = n_passing
+        F["worst_in_points"] = [w in p.split("+") for w, p in zip(worst, reps)]
     for b in PTS:
         F[f"{b}_moved_px"] = np.hypot(*(new_xy[b] - xy[b]).T)
     F.to_csv(out / "frames_all.csv.gz", index=False, float_format="%.4f")

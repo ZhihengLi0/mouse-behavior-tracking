@@ -1,0 +1,17 @@
+feature,value,judged,closed,lid_wrong,open
+lid_flagged,False,39,5,23,11
+lid_flagged,True,40,28,7,5
+pupil_flagged,False,34,1,22,11
+pupil_flagged,True,45,32,8,5
+flag_fit,False,7,0,0,7
+flag_fit,True,72,33,30,9
+flag_pca,False,9,0,0,9
+flag_pca,True,70,33,30,7
+pupil_like,False,66,33,28,5
+pupil_like,True,13,0,2,11
+pupil_lidfrac_ok,False,64,32,27,5
+pupil_lidfrac_ok,True,15,1,3,11
+pupil_lk_mean,0.0-0.3,32,29,2,1
+pupil_lk_mean,0.3-0.5,8,3,2,3
+pupil_lk_mean,0.5-0.7,27,1,19,7
+pupil_lk_mean,0.7-1.0,12,0,7,5
