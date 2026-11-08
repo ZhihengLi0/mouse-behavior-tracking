@@ -315,7 +315,8 @@ frames, 53 judged (2 cannot tell). Variants with the same result share a panel, 
   1 "none" to D, 1 to cannot tell).
 Decision (user, 2026-11-08): the formal pipeline uses D, `--order deviation --tiebreak margin-all`: candidates by
 deviation, every passing subset of any size scored by its range margin, the largest margin wins. A stays available as
-the old default; the committed results of the earlier sections are unchanged.
+the old default; the committed results of the earlier sections are unchanged. Items 1, 1b and 1c together are
+experiment 5a, "choosing the repair's subset rule", of the final loop version (user's naming, 2026-11-08).
 
 **3d. Reopened frames judged** (`all_videos/reopened_review_verdicts.csv`, `reopened_verdicts.csv`, 2026-11-08 09:55,
 20 frames, 20 judged). The repair the confidence rule lets through is right with every point in place in 18 of 20;

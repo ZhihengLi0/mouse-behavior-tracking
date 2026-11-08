@@ -285,7 +285,8 @@ confidence run re-made into `videoNN/repair_confclosed/` with `--save-coords` an
 all eight points as accepted, a non-replaced point dropped only below the likelihood bound; excluded: the truth band
 and the blind band; no cap, no held-out blocks), iterations matched to the teacher. Evaluation as in experiments 1 to 3
 (70 truth frames, flagged share, blind frames where a set exists), plus the number of frames each rule calls closed on
-the student's prediction. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11, 1 in turn.
+the student's prediction. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11, 1 in turn. Figure `figures/loop_exp4.png`
+(`self_training_figures.py --audit`).
 Like experiments 1 to 3, 4c repairs with the subset order in use (A); only the closed-eye rule is changed, so the
 student is compared with the same video's teacher and `round1_both` on one changed variable. The subset rule D chosen
 in the audit is used in the formal loop only, where every settled piece is applied together (user, 2026-11-08).
@@ -305,6 +306,26 @@ student's prediction puts into a closed eye does not fall under either rule (ope
 anything on top of them is a question for the formal loop (both sources together), not for this experiment.
 
 Rows are added as the students finish. Files: `videoNN/pseudo_reopened/`, `videoNN/round1_reopened/{eval,truth_errors,train_info}.csv`.
+
+### Experiment 5: the final loop version (2026-11-08)
+
+Experiments 1 to 4 each prove one part of the loop; experiment 5 puts the settled parts together (user's naming).
+
+**5a. Choosing the repair's subset rule.** The four variants A (order in use), B (largest deviation first), C (B with
+the largest acceptance margin within the smallest passing size), D (largest margin over every size) and their
+evaluation are in `results/flag_and_repair/README.md`, items 1, 1b, 1c. Summary: identical on the 1330 truth frames
+(15 / 4 / 4 / 1), also with leave-one-video-out ranges; on the whole videos the same 14,395 frames repaired, 15,159
+points replaced by A, B, C and 15,552 by D, replaced point sets differing in 15 (A vs B), 26 (B vs C), 374 (C vs D)
+frames; judged by eye on 53 frames, every point right for D in 38 (72 %), C 24, B 10, A 6. Decision: D
+(`flag_and_repair.py --order deviation --tiebreak margin-all`) in the final loop; the earlier sections keep A.
+Figure `figures/loop_exp5a.png` and the example sheet `loop_exp5a_examples.jpg` (`self_training_figures.py --audit`).
+
+**5b. The loop in its final version.** Experiment 3's procedure with the repair options of 5a and experiment 4
+(`--order deviation --tiebreak margin-all --closed confidence`); finders, error line, ranges and second peak
+unchanged (the audit found the second-peak distance immaterial between 2 and 4 cells); stop rule 90 % with the seed
+noise band above as its basis, the blind count watched but not stopping on its own. New shuffle range (6000 + 10 x
+video + round), model name `round{r}_formal`. To start after experiment 4c's videos 11 and 1 finish; videos, blind
+labeling and order of start to be decided with the user.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
