@@ -276,7 +276,17 @@ enter the formal loop. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11,
 
 | video | reopened frames | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | closed (opening / confidence rule) | blind wrong | 
 |---|---|---|---|---|---|---|---|---|---|
-| 15 | 846 | 660 (1 near truth, 185 near blind) | 60 | 40800 | | | | teacher 3403 / 901 | |
+| 15 | 846 | 660 (1 near truth, 185 near blind) | 60 | 40800 | 2.50 | 0 | 4.41 | teacher 3403 / 901, student 3978 / 942 | 3 + 2 |
+| 11 | 628 | 512 (116 near truth, no blind set) | | | | | | teacher 683 / 73 | no blind set |
+
+Video 15 against the other students of the same video (`videoNN/round1_*/eval.csv`, blind `round1_reopened/blind_scores.csv`,
+closed counts from the prediction with both rules): teacher median 2.42 %, p90 4.34, flagged 7.67 %, blind wrong 7 + 3;
+every30 2.39 / 4.75 / 2.69 / 2 + 1; repaired only 2.75 / 6.13 / 3.37 / (not scored); both 2.50 / 4.99 / 2.77 / 2 + 2;
+reopened only 2.50 / 5.88 / 4.41 / 3 + 2. The 660 reopened frames do improve on the teacher (flagged share 7.67 to
+4.41 %, blind wrong 10 to 5 of 34) but less than the grid frames or the repaired frames, and the number of frames the
+student's prediction puts into a closed eye does not fall under either rule (opening rule 3403 to 3978, confidence rule
+901 to 942). On this video the reopened frames are not a substitute for the other pseudo labels; whether they add
+anything on top of them is a question for the formal loop (both sources together), not for this experiment.
 
 Rows are added as the students finish. Files: `videoNN/pseudo_reopened/`, `videoNN/round1_reopened/{eval,truth_errors,train_info}.csv`.
 
