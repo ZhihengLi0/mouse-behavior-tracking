@@ -350,12 +350,28 @@ frames; judged by eye on 53 frames, every point right for D in 38 (72 %), C 24, 
 (`flag_and_repair.py --order deviation --tiebreak margin-all`) in the final loop; the earlier sections keep A.
 Figure `figures/loop_exp5a.png` and the example sheet `loop_exp5a_examples.jpg` (`self_training_figures.py --audit`).
 
-**5b. The loop in its final version.** Experiment 3's procedure with the repair options of 5a and experiment 4
-(`--order deviation --tiebreak margin-all --closed confidence`); finders, error line, ranges and second peak
-unchanged (the audit found the second-peak distance immaterial between 2 and 4 cells); stop rule 90 % with the seed
-noise band above as its basis, the blind count watched but not stopping on its own. New shuffle range (6000 + 10 x
-video + round), model name `round{r}_formal`. To start after experiment 4c's videos 11 and 1 finish; videos, blind
-labeling and order of start to be decided with the user.
+**5b. The loop in its final version** (`self_training.py --source formal`, shuffle 6000 + 10 x video + round, model
+`round{r}_formal`, driver `self_training_formal.sh`, log `formal_loop.log`; started 2026-11-08 14:05 on videos 1, 8,
+15, 6, user's choice). Experiment 3's procedure with the settled repair (`PIPE_FORMAL` = the pipeline options plus
+`--order deviation --tiebreak margin-all --closed confidence`); finders, error line, ranges and second peak unchanged.
+Differences from experiment 3 besides the repair options: (1) from round 2 the previous model's prediction is flagged
+with its OWN eye width, exactly as `flag_and_repair.py` judges it, and the second peaks are computed on the flagged
+frames only; a flagged frame found without peaks is computed on demand and the repair rerun (the 0.9 margin of
+experiment 3 is gone, user 2026-11-08); (2) `evaluate` records two independent detectors the loop never uses to pick
+or repair frames, as a check that a falling flagged share means fewer errors: the share of frames whose lowest point
+confidence is below the starting model's 5 % quantile, and the share whose largest frame-to-frame move exceeds the
+starting model's 95 % quantile (`indep_lowconf_pct`, `indep_jump_pct`; the starting model is 5.0 / 5.0 by
+construction); (3) `loop-status --source formal` writes `videoNN/loop_status_formal.csv` with those columns and the
+wrong truth frames beside the stop rule (flagged frames not below 90 % of the previous round's, the blind count
+watched; neither monitoring column stops the loop). Round 0 of the formal loop = `videoNN/repair_formal/` (the
+settled repair on the starting model's prediction; summary and whole_video committed). Blind frames stay 24 + 10
+(user: no further labeling before the loop).
+
+| video | round | fed back (grid + repaired) | epochs | iterations | median % | wrong of 70 | flagged either % | low confidence % | jump % | blind wrong 34 (prev → now) | flagged frames (prev → now) | decision |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 8 | 1 | 2498 (1703 + 795) | 22 | 32098 | | | | | | 12 → | 6383 → | |
+
+Rows are added as rounds finish.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 

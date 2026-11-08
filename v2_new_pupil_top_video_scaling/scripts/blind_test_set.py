@@ -365,7 +365,7 @@ def models_of(v, extra):
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))
         if h5:
             m[name] = h5[-1]
-    for d in sorted((LOCAL / f"video{v:02d}").glob("round*_both")):   # the loop models (experiment 3), when predicted
+    for d in sorted((LOCAL / f"video{v:02d}").glob("round*_both")) + sorted((LOCAL / f"video{v:02d}").glob("round*_formal")):   # the loop models (experiment 3, and the final loop 5b), when predicted
         h5 = sorted((d / "predictions").glob("*.h5"))
         if h5:
             m[d.name] = h5[-1]
