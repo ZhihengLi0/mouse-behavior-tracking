@@ -541,7 +541,7 @@ def teacher_training_set(v):
     return sh, prior, own, len(tr), len(te)
 
 
-def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag="", source="pipeline", dry_run=False):
+def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag="", source="pipeline", dry_run=False, seed=42):
     unit, pu = unit_of(v), pseudo_unit(v, every, rnd, source)
     shuffle = shuffle_override or student_shuffle(v, every, rnd, source)
     name = model_name(every, rnd, source=source) + (f"_{tag}" if tag else "")
@@ -610,7 +610,7 @@ def train(v, every, rnd, epochs_override=None, shuffle_override=None, tag="", so
                                        net_type="resnet_50", userfeedback=False, engine=deeplabcut.Engine.PYTORCH)
     pc = mdir / "pytorch_config.yaml"
     c = yaml.safe_load(pc.read_text())
-    c["train_settings"].update(batch_size=BATCH, epochs=E, seed=42)
+    c["train_settings"].update(batch_size=BATCH, epochs=E, seed=seed)       # seed 42 unless --seed (audit of the stop rule, 2026-11-08)
     c["runner"]["scheduler"]["params"]["milestones"] = milestones
     c["runner"]["snapshots"].update(save_epochs=s, max_snapshots=14)
     pc.write_text(yaml.safe_dump(c, sort_keys=False))
@@ -862,6 +862,7 @@ def main():
     ap.add_argument("--epochs", type=int, default=None, help="override the iteration-matched epoch count (smoke tests only)")
     ap.add_argument("--shuffle", type=int, default=None, help="override the shuffle number (smoke tests only)")
     ap.add_argument("--tag", default="", help="suffix of the model folder (smoke tests only)")
+    ap.add_argument("--seed", type=int, default=42, help="train: random seed of the training (default 42; another seed with --shuffle and --tag for the stop-rule noise band, audit 2026-11-08)")
     ap.add_argument("--out", default=None, help="predict: output folder")
     ap.add_argument("--limit", type=int, default=0, help="predict: first N frames only (tests)")
     ap.add_argument("--info", default=None, help="predict: train_info.csv to complete with predict_minutes / prediction_h5")
@@ -875,7 +876,7 @@ def main():
     if a.cmd == "pseudo":
         pseudo(a.video, a.every, a.round, a.source)
     elif a.cmd == "train":
-        train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag, a.source, a.dry_run)
+        train(a.video, a.every, a.round, a.epochs, a.shuffle, a.tag, a.source, a.dry_run, a.seed)
     elif a.cmd == "predict":
         t1 = time.time()
         predict_video(a.video, a.shuffle, Path(a.out), a.limit)

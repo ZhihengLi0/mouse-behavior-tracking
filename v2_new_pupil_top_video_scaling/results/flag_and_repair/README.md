@@ -282,3 +282,12 @@ closed (4; the 4 labeled ones are the same already-wrong frames, the fifth has n
 plausible as they are, 575 stay flagged, 3213 are still closed. Of the 7358 the confidence rule calls closed, 2865
 were "flagged, not repaired" before (no visible pupil: nothing to repair) and 525 were repaired before; those 525 are
 for a by-eye check (`subset_review/closed_conf_review.html`, 20 frames); verdicts pending.
+
+**4. Minimum distance of the second peak** (`scripts/second_peak_distance_test.py`, tables
+`second_peak_distance/second_peak_distance.csv`, `second_peak_distance_totals.csv`, 2026-11-08 01:10). The second
+peak is the highest local maximum of the heatmap at least `MIN_CELLS` = 3 cells (24 px at stride 8) from the first
+peak; the 3 was set at design time. The peaks of the 1330 truth frames were recomputed from the plateau snapshots with
+2, 3 and 4 cells (16, 24, 32 px) and the repair rerun (either finder, label-range acceptance, all eight points,
+smallest subset). The outcome is identical for the three distances on every video: 23 wrong frames, 15 repaired,
+4 still flagged, 4 called closed, 1 good frame made worse, 2 good frames repaired, same median error after. The
+distance does not matter within 2 to 4 cells; 3 stays, now recorded as a value the result is insensitive to.
