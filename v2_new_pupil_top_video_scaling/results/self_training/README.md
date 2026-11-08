@@ -259,6 +259,27 @@ round's cannot be told from no change, which is what the rule means by stopping.
 not lower" has a noise of one frame on 34 frames and should not stop the loop on its own when the flagged share still
 falls; the formal loop keeps both criteria and records this band next to them.
 
+### Experiment 4: the reopened frames of the confidence closed-eye rule (`round1_reopened`, shuffle 8000 + 10 x video + 1, 2026-11-08)
+
+The audit of the closed-eye rule (`results/flag_and_repair/README.md`, items 3 and 3b) replaces "opening below half the
+video's median" by "mean pupil confidence below 0.40" as an option. Frames the opening rule called closed but the
+confidence rule hands to the ordinary repair, where they pass the acceptance ranges, are "reopened": 2008 on the 19
+videos (video 15: 846, video 11: 628, video 1: 272, the other videos 1 to 49). Like experiment 2, a student is trained
+on the human labels plus only these frames (`self_training.py pseudo --source reopened`: the confidence run re-made
+into `videoNN/repair_confclosed/` with `--save-coords` and checked against the committed run; all eight points as
+accepted, a non-replaced point dropped only below the likelihood bound; excluded: the truth band and the blind band;
+no cap, no held-out blocks), iterations matched to the teacher. Evaluation as in experiments 1 to 3 (70 truth frames,
+flagged share, blind frames where a set exists), plus the number of frames each rule calls closed on the student's
+prediction. The 20-frame by-eye page `flag_and_repair/subset_review/reopened_review.html` (sample
+`all_videos/reopened_sample.csv`) asks whether the reopened repair is right; its verdict decides whether these frames
+enter the formal loop. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11, 1 in turn.
+
+| video | reopened frames | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | closed (opening / confidence rule) | blind wrong | 
+|---|---|---|---|---|---|---|---|---|---|
+| 15 | 846 | 660 (1 near truth, 185 near blind) | 60 | 40800 | | | | teacher 3403 / 901 | |
+
+Rows are added as the students finish. Files: `videoNN/pseudo_reopened/`, `videoNN/round1_reopened/{eval,truth_errors,train_info}.csv`.
+
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
 ## Files

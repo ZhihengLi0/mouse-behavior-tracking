@@ -93,7 +93,9 @@ MIN_POINTS = 6
 PIPE = ["--finder", "either", "--accept", "labelregion", "--points", "all", "--replace", "smallest"]
 FINAL = "video{v:02d}_either_labelregion_all_smallest"
 VARIANT = {30: 1, 100: 2}
-SOURCES = ("pipeline", "repaired", "both")
+SOURCES = ("pipeline", "repaired", "both", "reopened")
+REOPENED_BASE = 8000                                  # experiment 4 (audit 2026-11-08): shuffle 8000 + 10 * video + 1, the reopened-frames student
+CONFCLOSED = "video{v:02d}_either_labelregion_all_smallest_confclosed"   # the committed run of the confidence closed-eye rule
 BOTH_BASE, MAX_ROUND = 5000, 3                      # the loop: shuffle 5000 + 10 * video + round; MAX_ROUND = the driver's run budget per launch, NOT part of the stop rule (user 2026-11-07)
 REPAIRED_VARIANT = 5                                  # shuffle 4000 + 10 * video + 5: the repaired-frames student
 HOLDOUT_BLOCKS, HELD_OUT = 20, (4, 9, 14, 19)         # repaired source: the time line in 20 equal blocks, these never trained on
@@ -121,22 +123,24 @@ def student_shuffle(v, every, rnd, source="pipeline"):
         return BOTH_BASE + 10 * v + rnd
     if source == "repaired":
         return 4000 + 10 * v + 2 * (rnd - 1) + REPAIRED_VARIANT
+    if source == "reopened":
+        return REOPENED_BASE + 10 * v + rnd
     return 4000 + 10 * v + 2 * (rnd - 1) + VARIANT[every]
 
 
 def model_name(every=None, rnd=None, teacher=False, source="pipeline"):
     if teacher:
         return "teacher"
-    return f"round{rnd}_{source}" if source in ("repaired", "both") else f"round{rnd}_every{every}"
+    return f"round{rnd}_{source}" if source in ("repaired", "both", "reopened") else f"round{rnd}_every{every}"
 
 
 def pseudo_unit(v, every, rnd=1, source="pipeline"):
-    tag = {"repaired": "pseudorep", "both": "pseudoboth"}.get(source, f"pseudo{every}")
+    tag = {"repaired": "pseudorep", "both": "pseudoboth", "reopened": "pseudoreopen"}.get(source, f"pseudo{every}")
     return f"{unit_of(v)}_{tag}" + (f"r{rnd}" if rnd > 1 else "")
 
 
 def pseudo_dirname(every, rnd=1, source="pipeline"):
-    base = {"repaired": "pseudo_repaired", "both": "pseudo_both"}.get(source, f"pseudo_every{every}")
+    base = {"repaired": "pseudo_repaired", "both": "pseudo_both", "reopened": "pseudo_reopened"}.get(source, f"pseudo_every{every}")
     return base + (f"_round{rnd}" if rnd > 1 else "")
 
 
@@ -248,6 +252,67 @@ def repaired_candidates(v, C, lik, near, n, every, source_name):
          "replaced_points": " ".join(f"{b}:{c}" for b, c in Counter(p for s in K.replaced for p in s.split("+") if p).most_common()),
          "eye_width_px": np.nan, "thr_eye_widths": np.nan, "thr_pca_eye_widths": np.nan, "guard_frames": GUARD, "holdout_blocks": HOLDOUT_BLOCKS,
          "held_out_block_ids": "+".join(map(str, HELD_OUT))}
+    return F, S
+
+
+def reopened_candidates(v, C0, lik, near, n, source_name):
+    """Reopened source (experiment 4, audit 2026-11-08): the frames the opening closed-eye rule called closed and the
+    confidence rule (closed = mean pupil confidence < 0.40, calibrated on judged frames) hands to the ordinary repair,
+    where they pass the acceptance ranges: status closed in the pipeline run, repaired in the --closed confidence run.
+    The confidence run is re-made into videoNN/repair_confclosed/ with --save-coords and checked against the committed
+    run. All eight points as accepted (a non-replaced point is dropped only below the likelihood bound); excluded: the
+    truth band and the blind-set band; no held-out blocks, no cap (every such frame trains, as in the loop)."""
+    rep = OUT / f"video{v:02d}" / "repair_confclosed"
+    if not (rep / "coords_after.csv.gz").exists():
+        log(f"video {v}: re-running the confidence closed-eye pipeline into {rep}")
+        subprocess.run([sys.executable, str(HERE / "scripts" / "flag_and_repair.py"), "--video", str(v), *PIPE, "--closed", "confidence",
+                        "--out", str(rep), "--save-coords"], check=True, cwd=str(HERE / "scripts"), stdout=subprocess.DEVNULL)
+    for f in ("summary.csv", "whole_video.csv"):
+        a, b = pd.read_csv(rep / f), pd.read_csv(RES / "flag_and_repair" / CONFCLOSED.format(v=v) / f)
+        pd.testing.assert_frame_equal(a, b)
+    log(f"video {v}: confidence-rule re-run summary and whole_video identical to the committed run")
+    C = pd.read_csv(rep / "coords_after.csv.gz")
+    assert len(C) == len(C0) == n and (C.frame.to_numpy() == C0.frame.to_numpy()).all()
+    bl = blind_frames(v)
+    near_blind = np.zeros(n, bool)
+    for f in bl:
+        near_blind[max(0, f - GUARD):f + GUARD + 1] = True
+    was_closed = (C0.status == "closed").to_numpy()
+    rep_now = (C.status == "repaired").to_numpy()
+    reopened = was_closed & rep_now
+    cand = reopened & ~near & ~near_blind
+    rows, drop_count = [], Counter()
+    for i in np.flatnonzero(reopened):
+        replaced = set(str(C.points[i]).split("+")) if isinstance(C.points[i], str) and C.points[i] else set()
+        kept, reasons = {}, {}
+        for b in BPS:
+            if b not in replaced and lik[b][i] < FIT_PBOUND:
+                reasons[b] = "likelihood"
+                if cand[i]:
+                    drop_count["likelihood"] += 1
+            else:
+                kept[b] = (float(C[f"{b}_x"][i]), float(C[f"{b}_y"][i]))
+        passes = all(b in kept for b in P4) and len(kept) >= MIN_POINTS
+        r = {"frame": int(C.frame[i]), "status": C.status[i], "status_opening_rule": C0.status[i], "replaced": "+".join(sorted(replaced)),
+             "points_kept": len(kept), "points_dropped": "+".join(f"{b}:{w}" for b, w in reasons.items()),
+             "near_truth": bool(near[i]), "near_blind": bool(near_blind[i]), "in_band": bool(cand[i]), "passes_points": passes,
+             "kept": bool(cand[i] and passes)}
+        for b in BPS:
+            r[f"{b}_x"], r[f"{b}_y"] = kept.get(b, (np.nan, np.nan))
+        rows.append(r)
+    F = pd.DataFrame(rows)
+    K = F[F.kept]
+    assert not (K.near_truth | K.near_blind).any()
+    S = {"video": v, "unit": unit_of(v), "every": np.nan, "round": 1, "source": source_name, "frames": n,
+         "closed_opening_rule": int(was_closed.sum()), "closed_confidence_rule": int((C.status == "closed").sum()),
+         "candidates_reopened": int(reopened.sum()), "near_truth_excluded": int((reopened & near).sum()),
+         "blind_excluded": int((reopened & ~near & near_blind).sum()), "candidates": int(cand.sum()),
+         "dropped_frames": int((F.in_band & ~F.passes_points).sum()), "cap": np.nan, "kept_frames": len(K), "kept_ok": 0, "kept_repaired": len(K),
+         "points_total": int(cand.sum()) * len(BPS), **{f"points_dropped_{w}": drop_count.get(w, 0) for w in ("likelihood", "fitting", "pca")},
+         "labeled_points_in_kept_frames": int(K[[f"{b}_x" for b in BPS]].notna().sum().sum()),
+         "frames_with_8_points": int((K.points_kept == 8).sum()),
+         "replaced_points": " ".join(f"{b}:{c}" for b, c in Counter(p for s in K.replaced for p in s.split("+") if p).most_common()),
+         "eye_width_px": np.nan, "thr_eye_widths": np.nan, "thr_pca_eye_widths": np.nan, "guard_frames": GUARD}
     return F, S
 
 
@@ -394,6 +459,9 @@ def pseudo(v, every, rnd=1, source="pipeline"):
     if source == "repaired":
         assert rnd == 1, "the repaired source is round 1 only"
         every = 30                                            # the count cap and the file names refer to the every-30 student
+    if source == "reopened":
+        assert rnd == 1, "the reopened source is round 1 only"
+        every = 30
     if source == "both":
         every = 30
     if rnd > 1 and source == "both":
@@ -439,6 +507,14 @@ def pseudo(v, every, rnd=1, source="pipeline"):
         return
     if source == "repaired":
         F, S = repaired_candidates(v, C, lik, near, n, every, source_name)
+        F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
+        K = F[F.kept]
+        pd.DataFrame([S]).to_csv(out / "pseudo_summary.csv", index=False)
+        print(pd.Series(S).to_string())
+        write_pseudo_set(v, every, rnd, source, K, S, out, loc, unit)
+        return
+    if source == "reopened":
+        F, S = reopened_candidates(v, C, lik, near, n, source_name)
         F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
         K = F[F.kept]
         pd.DataFrame([S]).to_csv(out / "pseudo_summary.csv", index=False)
@@ -870,7 +946,7 @@ def main():
     ap.add_argument("--h5", default=None, help="evaluate: whole-video prediction of another model of the video (with --model-name)")
     ap.add_argument("--model-name", default=None, help="evaluate: folder name under results/self_training/videoNN/ for --h5")
     ap.add_argument("--source", choices=SOURCES, default="pipeline",
-                    help="pseudo/train/evaluate: 'pipeline' (every N-th passed frame, default), 'repaired' (the repaired frames only) or 'both' (the loop: grid + all repaired frames; --every ignored)")
+                    help="pseudo/train/evaluate: 'pipeline' (every N-th passed frame, default), 'repaired' (the repaired frames only) or 'both' (the loop: grid + all repaired frames; --every ignored); reopened = experiment 4: the frames the confidence closed-eye rule turns from closed into repaired (shuffle 8000 + 10 x video + 1)")
     ap.add_argument("--dry-run", action="store_true", help="train: print the schedule and stop before staging anything")
     a = ap.parse_args()
     if a.cmd == "pseudo":

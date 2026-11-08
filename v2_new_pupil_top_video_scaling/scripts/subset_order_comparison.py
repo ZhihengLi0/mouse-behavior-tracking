@@ -227,7 +227,7 @@ def render(v, rows, names=("A", "B", "C")):
             S.paste(im, (k * (PW + 10), 22))
             t = title if isinstance(title, str) else f"{title[0]}: {title[1]}"
             d2.text((k * (PW + 10) + 4, 3), t, fill=(0, 0, 0), font=FONT)
-        S.save(ITEMS / f"video{v:02d}_f{f:06d}.jpg", quality=90)
+        S.save(ITEMS / (f"{r.item}.jpg" if getattr(r, "item", "") else f"video{v:02d}_f{f:06d}.jpg"), quality=90)   # the page links items/<item>.jpg
     cap.release()
 
 
