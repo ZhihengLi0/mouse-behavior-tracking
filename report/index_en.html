@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:54 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 11:00 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1539,25 +1539,34 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <h4 id="exp5"><span lang="en">Experiment 5: the final loop version</span></h4>
   
   <div class="text" lang="en">
-    <p>Experiments 1 to 4 each proved one part of the loop. Experiment 5 puts the settled parts together:</p>
+    <p>Experiments 1 to 4 showed that the unflagged frames, the repaired frames, and the frames wrongly called closed and then repaired each improve the model when added to the training set. Experiment 5 trains with all three together.</p>
     <ul>
-      <li><b>5a</b> settles the one part left: when several points of a frame are over the threshold and several replacements pass the acceptance, which points to replace.</li>
-      <li><b>5b</b> runs the loop again from the starting models with every settled rule.</li>
+      <li><b>5a</b> before training, settles the replacement rule by experiment: when several points of a frame could be replaced and several replacements pass the acceptance, which points to replace.</li>
+      <li><b>5b</b> runs the loop again from the starting models with that rule and the closed-eye criterion of experiment 4.</li>
     </ul>
   </div>
 
   <p class="text"><b><span lang="en">5a Experiment: choosing the repair method</span></b></p>
   <div class="tablebox"><table>
-    <thead><tr><th><span lang="en">Variant</span></th><th><span lang="en">Point tried first</span></th><th><span lang="en">When several replacements pass</span></th></tr></thead>
+    <thead><tr><th><span lang="en">Rule</span></th><th><span lang="en">Order in which candidates are tried</span></th><th><span lang="en">When several replacements pass</span></th></tr></thead>
     <tbody>
-      <tr><td><b>A</b></td><td><span lang="en">outline points first, then pupil (the order of 9.3)</span></td><td><span lang="en">the first that passes</span></td></tr>
-      <tr><td><b>B</b></td><td><span lang="en">the point of largest deviation</span></td><td><span lang="en">the first that passes</span></td></tr>
-      <tr><td><b>C</b></td><td><span lang="en">the point of largest deviation</span></td><td><span lang="en">the largest margin among those replacing as few points</span></td></tr>
-      <tr><td><b>D</b></td><td><span lang="en">the point of largest deviation</span></td><td><span lang="en">the largest margin among all that pass (may replace one point more)</span></td></tr>
+      <tr><td><b>A</b></td><td><span lang="en">outline points first, then pupil points (the order of 9.3)</span></td><td><span lang="en">the first that passes among the fewest points</span></td></tr>
+      <tr><td><b>B</b></td><td><span lang="en">by deviation s, largest first</span></td><td><span lang="en">the first that passes among the fewest points</span></td></tr>
+      <tr><td><b>C</b></td><td><span lang="en">by deviation s, largest first</span></td><td><span lang="en">the largest margin M among the fewest points</span></td></tr>
+      <tr><td><b>D</b></td><td><span lang="en">by deviation s, largest first</span></td><td><span lang="en">the largest margin M among all that pass (may replace more points)</span></td></tr>
     </tbody>
   </table></div>
-  
-  <p class="text" lang="en">Margin: after the replacement, the smallest distance of any acceptance quantity to its label-range boundary, relative to the range width. A larger margin means the frame's shape sits well inside the label ranges rather than passing at the edge.</p>
+  <p class="text"><b><span lang="en">Definitions (enough to reproduce)</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="en">Eye coordinates</span></th><td><span lang="en">The 8 points of a frame are p<sub>b</sub> (pixels). N = nasal corner, T = temporal corner, C = (N + T) / 2, W = |T − N|, u = (T − N) / W, v = u turned by 90°. Eye coordinates of point b: a<sub>b</sub> = (p<sub>b</sub> − C) · u / W (along the corner line), e<sub>b</sub> = (p<sub>b</sub> − C) · v / W (across it). W̄, θ̄, C̄: the video's medians of W, of the corner-line angle and of C over its prediction.</span></td></tr>
+    <tr><th><span lang="en">Deviation and candidates</span></th><td><span lang="en">Temporal deviation d<sub>b</sub> = |p<sub>b</sub>(t) − p̂<sub>b</sub>(t)| / W̄, p̂ the one-step prediction of SARIMAX(2,0,0) fitted separately to x and y over the whole video (points with confidence &lt; 0.01 treated as missing). Shape residual r<sub>b</sub> = |p<sub>b</sub> − p̃<sub>b</sub>| / W̄, p̃ the reconstruction of the 16-dimensional pose by the PCA of the video's human-labeled poses (99% of the variance, at least 2 components). When fitting flags the frame (max<sub>b</sub> d<sub>b</sub> &gt; 0.14) the candidates are all points with d<sub>b</sub> &gt; 0.14; when PCA flags it (root mean square of r &gt; 3.93 × the video's median = τ) the candidate is the point of largest r<sub>b</sub>; the union when both flag. Only candidates with a second peak are kept. Deviation s<sub>b</sub> = max(d<sub>b</sub> / 0.14, r<sub>b</sub> / τ).</span></td></tr>
+    <tr><th><span lang="en">Replacement</span></th><td><span lang="en">Point b is moved to the second peak of its heatmap: the highest 3 × 3 local maximum at least 3 cells (Euclidean) from the highest cell; pixel position = cell × stride (8) + the point's median offset in the video (model output minus highest cell × stride).</span></td></tr>
+    <tr><th><span lang="en">Acceptance quantities: pupil, 12</span></th><td><span lang="en">For each of the four pupil points b (top, bottom, left, right), three: position a<sub>b</sub>; relative height between the eyelids (e<sub>b</sub> − e<sub>lid top</sub>) / (e<sub>lid bottom</sub> − e<sub>lid top</sub>); reach from the pupil's midline. Reach: h = |e<sub>bottom</sub> − e<sub>top</sub>|, w = |a<sub>right</sub> − a<sub>left</sub>|, m<sub>1</sub> = (a<sub>top</sub> + a<sub>bottom</sub>) / 2, m<sub>2</sub> = (e<sub>left</sub> + e<sub>right</sub>) / 2; left = σ<sub>1</sub>(m<sub>1</sub> − a<sub>left</sub>) / h, right = σ<sub>1</sub>(a<sub>right</sub> − m<sub>1</sub>) / h, top = σ<sub>2</sub>(m<sub>2</sub> − e<sub>top</sub>) / w, bottom = σ<sub>2</sub>(e<sub>bottom</sub> − m<sub>2</sub>) / w; σ<sub>1</sub>, σ<sub>2</sub> = ±1, the sign of the video's median of a<sub>right</sub> − a<sub>left</sub> and of e<sub>bottom</sub> − e<sub>top</sub> (subscripts are pupil points).</span></td></tr>
+    <tr><th><span lang="en">Acceptance quantities: outline, 8</span></th><td><span lang="en">Width ratio W / W̄; corner-line angle minus θ̄ (degrees, wrapped to −180 to 180); centre shift |C − C̄| / W̄; a and e of the top eyelid point; a and e of the bottom eyelid point; opening σ<sub>3</sub>(e<sub>lid bottom</sub> − e<sub>lid top</sub>), σ<sub>3</sub> the sign of the video's median of that difference.</span></td></tr>
+    <tr><th><span lang="en">Acceptance ranges</span></th><td><span lang="en">For each quantity q, the minimum lo<sub>q</sub> and maximum hi<sub>q</sub> over the 1330 human labels, widened by m(hi<sub>q</sub> − lo<sub>q</sub>) on each side: L<sub>q</sub> = lo<sub>q</sub> − m(hi<sub>q</sub> − lo<sub>q</sub>), U<sub>q</sub> = hi<sub>q</sub> + m(hi<sub>q</sub> − lo<sub>q</sub>). m is the smallest value (steps of 0.01) at which every video's labels fall inside the range built from the other 18 videos' labels: m = 0.42 for the pupil, 0.23 for the outline. A frame passes when all 20 quantities lie in [L<sub>q</sub>, U<sub>q</sub>]; a frame that already passes is not changed.</span></td></tr>
+    <tr><th><span lang="en">Margin M</span></th><td><span lang="en">M = min<sub>q</sub> min(x<sub>q</sub> − L<sub>q</sub>, U<sub>q</sub> − x<sub>q</sub>) / (U<sub>q</sub> − L<sub>q</sub>), x<sub>q</sub> the frame's 20 quantities after the replacement. M ≥ 0 is the same as passing; M = 0.5 when every quantity is at the centre of its range. A larger M means the replaced frame sits well inside the human-label ranges rather than passing at the edge.</span></td></tr>
+    <tr><th><span lang="en">Search</span></th><td><span lang="en">The candidates are put in a list in the order of the table above, and every subset of 1, 2, … points is tried (within a size in the list's lexicographic order). A and B take the first passing subset of the smallest passing size; C takes the largest M within that size; D tries every size and takes the largest M. If none passes, nothing is replaced and the frame stays flagged.</span></td></tr>
+  </tbody></table></div>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Truth</span></th><td><span lang="en">The 1330 truth frames; plus 55 frames judged one by one by the labeler where the variants replace different points (all 35 where A, B, C differ, 20 drawn where C and D differ), each showing the variants' results side by side, judged for which has all 8 points right.</span></td></tr>
   </tbody></table></div>
