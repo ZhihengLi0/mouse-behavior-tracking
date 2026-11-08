@@ -370,7 +370,7 @@ def fig_exp4():
         bottom += ys
     ax.set_xticks(range(len(bins)))
     ax.set_xticklabels([f"{b} x median" for b in bins])
-    ax.set_xlabel("eyelid opening, ratio to the video's median (the rule in use calls < 0.5 closed)")
+    ax.set_xlabel("eyelid opening, ratio to the video's median (the opening rule calls < 0.5 closed)")
     ax.set_ylabel("judged frames")
     ax.set_title("(a) 80 frames the opening rule calls closed, judged by eye", loc="left")
     ax.legend(frameon=False, fontsize=8, loc="upper right")
