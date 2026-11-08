@@ -297,7 +297,7 @@ distance does not matter within 2 to 4 cells; 3 stays, now recorded as a value t
 almost all replace the left pupil point, which the model had put far outside the eye (median move 528 px, more than
 an eye width) in a narrow, half-open eye; on video 0 the top eyelid point sat on the nasal corner. A 20-frame by-eye
 page (`subset_review/reopened_review.html`, one frame per episode, at most 5 per video) asks whether the repair is
-right; the verdict gates experiment 4 (`results/self_training/README.md`). The item images of the three pending pages
+right; the verdict gates experiment 4c (`results/self_training/README.md`). Items 3, 3b, 3c and 3d together are experiment 4, "repair of the closed-eye frames" (user's naming, 2026-11-08). The item images of the three pending pages
 are now named after the page's items (the first build of the D and confidence pages linked images that did not exist).
 
 **1c. A, B, C and D judged together** (`scripts/subset_abcd_review.py`, `all_videos/subset_abcd_sample.csv`,

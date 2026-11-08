@@ -259,20 +259,33 @@ round's cannot be told from no change, which is what the rule means by stopping.
 not lower" has a noise of one frame on 34 frames and should not stop the loop on its own when the flagged share still
 falls; the formal loop keeps both criteria and records this band next to them.
 
-### Experiment 4: the reopened frames of the confidence closed-eye rule (`round1_reopened`, shuffle 8000 + 10 x video + 1, 2026-11-08)
+### Experiment 4: repair of the closed-eye frames (2026-11-08)
 
-The audit of the closed-eye rule (`results/flag_and_repair/README.md`, items 3 and 3b) replaces "opening below half the
-video's median" by "mean pupil confidence below 0.40" as an option. Frames the opening rule called closed but the
-confidence rule hands to the ordinary repair, where they pass the acceptance ranges, are "reopened": 2008 on the 19
-videos (video 15: 846, video 11: 628, video 1: 272, the other videos 1 to 49). Like experiment 2, a student is trained
-on the human labels plus only these frames (`self_training.py pseudo --source reopened`: the confidence run re-made
-into `videoNN/repair_confclosed/` with `--save-coords` and checked against the committed run; all eight points as
-accepted, a non-replaced point dropped only below the likelihood bound; excluded: the truth band and the blind band;
-no cap, no held-out blocks), iterations matched to the teacher. Evaluation as in experiments 1 to 3 (70 truth frames,
-flagged share, blind frames where a set exists), plus the number of frames each rule calls closed on the student's
-prediction. The 20-frame by-eye page `flag_and_repair/subset_review/reopened_review.html` (sample
-`all_videos/reopened_sample.csv`) asks whether the reopened repair is right; its verdict decides whether these frames
-enter the formal loop. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11, 1 in turn.
+The closed-eye branch of the repair, audited and tested in three parts after experiment 3 (user's naming, 2026-11-08).
+Details and tables in `results/flag_and_repair/README.md`, items 3, 3b, 3c, 3d.
+
+**4a. The closed-eye rule.** The rule in use called a frame closed when the eyelid opening was below half the video's
+median (hand-set; the 1330 truth frames hold no truly closed eye, so it could not be derived from labels). The user
+judged a stratified sample of 80 frames: 33 fully closed, 30 open with wrong eyelid or corner points, 16 half open
+with a labelable pupil. The opening ratio does not separate closed from open eyes (no line better than 61 %); the mean
+heatmap confidence of the four pupil points does: confidence < 0.40 is right on 92 % of the judged frames (32 of 33
+closed caught, 5 of 46 open called closed) and on the 1318 labeled truth frames calls 4 closed, all already wrong.
+Rule: closed = mean pupil confidence < 0.40 (`flag_and_repair.py --closed confidence`). Under it the 19 videos have
+7358 closed frames (8058 before), 15,878 repaired (14,395), 4404 flagged and not repaired (6694); truth frames 16 of
+23 wrong repaired (15), 2 still flagged (4), 1 made worse (1).
+
+**4b. The reopened repairs judged.** 2008 frames the opening rule called closed go through the ordinary repair under
+the confidence rule and pass the acceptance (video 15: 846, video 11: 628, video 1: 272). On 20 of them, one per
+episode, the user found the repair right with every point in place in 18, one frame with a further uncaught wrong
+point, one wrong; no truly closed eye among them. Same quality as the repair's own check by eye (87 %).
+
+**4c. A student on the reopened frames only** (`round1_reopened`, shuffle 8000 + 10 x video + 1). Like experiment 2, a
+student is trained on the human labels plus only these frames (`self_training.py pseudo --source reopened`: the
+confidence run re-made into `videoNN/repair_confclosed/` with `--save-coords` and checked against the committed run;
+all eight points as accepted, a non-replaced point dropped only below the likelihood bound; excluded: the truth band
+and the blind band; no cap, no held-out blocks), iterations matched to the teacher. Evaluation as in experiments 1 to 3
+(70 truth frames, flagged share, blind frames where a set exists), plus the number of frames each rule calls closed on
+the student's prediction. Driver `exp4_reopened.sh`, log `exp4.log`; videos 15, 11, 1 in turn.
 
 | video | reopened frames | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | closed (opening / confidence rule) | blind wrong | 
 |---|---|---|---|---|---|---|---|---|---|
