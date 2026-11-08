@@ -1,0 +1,56 @@
+video,frame,source,status_A,points_A,status_B,points_B,status_C,points_C,status_D,points_D,worst_point,item,note
+0,9620,cd,repaired,eyelid_top+eyelid_bottom+pupil_top+pupil_bottom,repaired,pupil_top+eyelid_bottom+eyelid_top+pupil_bottom,repaired,pupil_top+eyelid_bottom+eyelid_top+pupil_bottom,repaired,pupil_top+eyelid_bottom+eyelid_top+pupil_bottom+eye_temporal_corner,pupil_left,video00_f009620_abcd,
+1,12341,cd,repaired,pupil_left,repaired,pupil_left,repaired,pupil_left,repaired,pupil_left+eye_nasal_corner,pupil_left,video01_f012341_abcd,
+1,19082,cd,repaired,pupil_left,repaired,pupil_left,repaired,pupil_left,repaired,pupil_left+eye_nasal_corner,pupil_left,video01_f019082_abcd,
+2,67874,cd,repaired,eye_temporal_corner,repaired,eye_temporal_corner,repaired,eye_temporal_corner,repaired,eye_temporal_corner+pupil_top,eye_temporal_corner,video02_f067874_abcd,
+2,67934,cd,repaired,eye_temporal_corner,repaired,eye_temporal_corner,repaired,eye_temporal_corner,repaired,eye_temporal_corner+eyelid_top+pupil_top,eye_temporal_corner,video02_f067934_abcd,
+3,1180,cd,repaired,eyelid_bottom,repaired,eyelid_bottom,repaired,eyelid_bottom,repaired,pupil_bottom+eyelid_bottom,pupil_bottom,video03_f001180_abcd,
+3,25861,cd,repaired,eye_nasal_corner,repaired,eye_nasal_corner,repaired,eye_nasal_corner,repaired,eye_nasal_corner+pupil_right,pupil_bottom,video03_f025861_abcd,
+4,3293,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_left,repaired,pupil_left,pupil_top,video04_f003293_abcd,yesterday: none of them
+4,60447,cd,repaired,pupil_right,repaired,pupil_right,repaired,pupil_right,repaired,pupil_right+eye_nasal_corner,pupil_right,video04_f060447_abcd,
+4,70415,cd,repaired,pupil_bottom+pupil_left,repaired,pupil_bottom+pupil_left,repaired,pupil_bottom+pupil_left,repaired,pupil_bottom+pupil_left+eye_nasal_corner,pupil_bottom,video04_f070415_abcd,
+5,19031,cd,repaired,eyelid_top+pupil_top,repaired,pupil_top+eyelid_top,repaired,pupil_top+eyelid_top,repaired,pupil_top+eyelid_top+pupil_left,pupil_bottom,video05_f019031_abcd,
+5,23085,cd,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top+pupil_left,pupil_right,video05_f023085_abcd,
+6,24961,cd,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top,repaired,pupil_top+eyelid_top,eye_nasal_corner,video06_f024961_abcd,
+6,27272,cd,repaired,eye_nasal_corner,repaired,eye_nasal_corner,repaired,eye_nasal_corner,repaired,eye_nasal_corner+pupil_left,eye_nasal_corner,video06_f027272_abcd,
+6,36478,abc,repaired,pupil_top+pupil_bottom,repaired,pupil_bottom+pupil_left,repaired,pupil_bottom+pupil_left,repaired,pupil_bottom+pupil_left,pupil_bottom,video06_f036478_abcd,yesterday: B+C (pre-selected as B+C+D)
+7,21879,cd,repaired,eyelid_bottom,repaired,eyelid_bottom,repaired,eyelid_bottom,repaired,eyelid_bottom+eye_temporal_corner+eyelid_top,eyelid_bottom,video07_f021879_abcd,
+7,22180,cd,repaired,eye_nasal_corner+pupil_left,repaired,pupil_left+eye_nasal_corner,repaired,pupil_left+eye_nasal_corner,repaired,pupil_left+eye_nasal_corner+pupil_top,pupil_left,video07_f022180_abcd,
+8,23927,abc,repaired,eye_nasal_corner,repaired,eye_temporal_corner,repaired,eye_temporal_corner,repaired,eye_temporal_corner,eyelid_bottom,video08_f023927_abcd,yesterday: model as it was (no repair needed)
+8,23929,cd,repaired,pupil_top,repaired,pupil_top,repaired,pupil_top,repaired,pupil_top+pupil_left,pupil_top,video08_f023929_abcd,
+8,63251,cd,repaired,eyelid_bottom,repaired,eyelid_bottom,repaired,eyelid_bottom,repaired,eyelid_bottom+pupil_left,eyelid_bottom,video08_f063251_abcd,
+9,8681,cd,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top+pupil_top,pupil_bottom,video09_f008681_abcd,
+9,8692,cd,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top,repaired,eyelid_top+pupil_top,eyelid_top,video09_f008692_abcd,
+9,49917,abc,repaired,eyelid_bottom,repaired,eye_nasal_corner,repaired,eyelid_bottom,repaired,eyelid_bottom,eye_nasal_corner,video09_f049917_abcd,yesterday: both changes needed (more than one point)
+10,42787,abc,repaired,pupil_bottom+pupil_right,repaired,pupil_right+pupil_bottom,repaired,pupil_right+pupil_left,repaired,pupil_right+pupil_left,pupil_right,video10_f042787_abcd,yesterday: C (pre-selected as C+D)
+10,43075,abc,repaired,pupil_bottom,repaired,pupil_left,repaired,pupil_left,repaired,pupil_left,pupil_left,video10_f043075_abcd,yesterday: B+C (pre-selected as B+C+D)
+10,43248,abc,repaired,eyelid_top,repaired,eye_nasal_corner,repaired,eyelid_top,repaired,eyelid_top,pupil_top,video10_f043248_abcd,yesterday: model as it was (no repair needed)
+10,61329,cd,repaired,pupil_right,repaired,pupil_right,repaired,pupil_right,repaired,pupil_right+pupil_bottom,pupil_left,video10_f061329_abcd,
+11,3035,abc,repaired,eye_temporal_corner,repaired,pupil_bottom,repaired,pupil_bottom,repaired,pupil_bottom+eye_temporal_corner,pupil_bottom,video11_f003035_abcd,yesterday: both changes needed (more than one point)
+12,14114,abc,repaired,eye_temporal_corner+pupil_top,repaired,pupil_top+eye_temporal_corner,repaired,eye_temporal_corner+pupil_right,repaired,eye_temporal_corner+pupil_right,pupil_top,video12_f014114_abcd,yesterday: C (pre-selected as C+D)
+13,50351,abc,repaired,eyelid_bottom+pupil_top,repaired,pupil_top+eyelid_bottom,repaired,pupil_right+eyelid_bottom,repaired,pupil_right+eyelid_bottom,pupil_top,video13_f050351_abcd,yesterday: both changes needed (more than one point)
+14,22121,abc,repaired,eye_temporal_corner+pupil_top+pupil_bottom,repaired,pupil_bottom+eye_temporal_corner+pupil_top,repaired,pupil_bottom+eye_temporal_corner+pupil_right,repaired,pupil_bottom+eye_temporal_corner+pupil_right,pupil_bottom,video14_f022121_abcd,yesterday: C (pre-selected as C+D)
+14,25447,abc,repaired,eyelid_top+pupil_top+pupil_bottom+pupil_left,repaired,pupil_right+pupil_left+pupil_top+eyelid_top,repaired,pupil_right+pupil_left+pupil_top+eyelid_top,repaired,pupil_right+pupil_left+pupil_top+eyelid_top,pupil_right,video14_f025447_abcd,yesterday: B+C (pre-selected as B+C+D)
+15,10287,abc,repaired,eyelid_top,repaired,eye_temporal_corner,repaired,eyelid_top,repaired,pupil_top+eyelid_top,eye_temporal_corner,video15_f010287_abcd,yesterday: A+C
+15,10412,abc,repaired,eyelid_top+pupil_top,repaired,pupil_left+eyelid_top,repaired,pupil_left+eyelid_top,repaired,pupil_left+eyelid_top,pupil_left,video15_f010412_abcd,yesterday: none of them
+15,11163,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_left,repaired,pupil_top+pupil_left,pupil_top,video15_f011163_abcd,yesterday: C
+15,11464,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_left,repaired,pupil_left,pupil_top,video15_f011464_abcd,yesterday: C (pre-selected as C+D)
+15,19516,abc,repaired,pupil_top,repaired,pupil_bottom,repaired,pupil_bottom,repaired,pupil_bottom+pupil_top,pupil_left,video15_f019516_abcd,yesterday: none of them
+15,19920,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_left,repaired,pupil_left,pupil_top,video15_f019920_abcd,yesterday: C (pre-selected as C+D)
+15,35618,abc,repaired,eyelid_top+eye_temporal_corner+pupil_left,repaired,pupil_left+eye_temporal_corner+eyelid_top,repaired,pupil_left+pupil_top+eyelid_top,repaired,pupil_left+eye_temporal_corner+pupil_top+eyelid_top,pupil_left,video15_f035618_abcd,yesterday: C
+15,35865,abc,repaired,eye_nasal_corner+pupil_left,repaired,pupil_left+eye_nasal_corner,repaired,eye_nasal_corner+pupil_right,repaired,pupil_left+eye_nasal_corner+pupil_right,pupil_left,video15_f035865_abcd,yesterday: both changes needed (more than one point)
+15,35980,abc,repaired,eyelid_top,repaired,eyelid_top,repaired,eye_nasal_corner,repaired,eye_nasal_corner,pupil_left,video15_f035980_abcd,yesterday: C (pre-selected as C+D)
+15,37012,abc,repaired,eyelid_bottom+pupil_bottom,repaired,pupil_bottom+eyelid_bottom,repaired,pupil_left+eyelid_bottom,repaired,pupil_left+eyelid_bottom,pupil_bottom,video15_f037012_abcd,yesterday: C (pre-selected as C+D)
+17,1275,abc,repaired,pupil_left,repaired,pupil_right,repaired,pupil_left,repaired,pupil_left,pupil_right,video17_f001275_abcd,yesterday: A+C (pre-selected as A+C+D)
+17,2279,abc,repaired,eye_temporal_corner,repaired,eye_temporal_corner,repaired,pupil_top,repaired,eye_temporal_corner+pupil_top,eye_temporal_corner,video17_f002279_abcd,yesterday: C
+17,2452,abc,repaired,pupil_top+pupil_bottom,repaired,pupil_top+pupil_left,repaired,pupil_top+pupil_bottom,repaired,pupil_top+pupil_bottom,eye_nasal_corner,video17_f002452_abcd,"yesterday: moved point right, another point still wrong (not caught)"
+17,3725,abc,repaired,eyelid_bottom+pupil_bottom+pupil_right,repaired,pupil_bottom+eyelid_bottom+pupil_right,repaired,pupil_bottom+pupil_right+eye_nasal_corner,repaired,pupil_bottom+pupil_right+eye_nasal_corner,pupil_bottom,video17_f003725_abcd,yesterday: C (pre-selected as C+D)
+17,20721,abc,repaired,pupil_left,repaired,pupil_right,repaired,pupil_left,repaired,pupil_left,pupil_right,video17_f020721_abcd,yesterday: A+C (pre-selected as A+C+D)
+17,29513,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_left,repaired,pupil_left,pupil_top,video17_f029513_abcd,yesterday: both changes needed (more than one point)
+18,6321,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_right,repaired,pupil_right,pupil_top,video18_f006321_abcd,yesterday: C (pre-selected as C+D)
+18,6853,abc,repaired,pupil_top,repaired,pupil_right,repaired,pupil_right,repaired,pupil_right,pupil_right,video18_f006853_abcd,yesterday: B+C (pre-selected as B+C+D)
+18,6865,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_left,repaired,pupil_left,pupil_top,video18_f006865_abcd,yesterday: C (pre-selected as C+D)
+18,6978,abc,repaired,eye_temporal_corner,repaired,pupil_top,repaired,pupil_top,repaired,pupil_top,pupil_top,video18_f006978_abcd,yesterday: B+C (pre-selected as B+C+D)
+18,7268,abc,repaired,pupil_bottom,repaired,pupil_bottom,repaired,pupil_right,repaired,pupil_bottom+pupil_right,eye_temporal_corner,video18_f007268_abcd,yesterday: both changes needed (more than one point)
+18,7293,abc,repaired,pupil_bottom,repaired,pupil_bottom,repaired,pupil_right,repaired,pupil_right,pupil_bottom,video18_f007293_abcd,yesterday: none of them
+18,7947,abc,repaired,pupil_top,repaired,pupil_top,repaired,pupil_right,repaired,pupil_top+pupil_right,pupil_top,video18_f007947_abcd,yesterday: both changes needed (more than one point)

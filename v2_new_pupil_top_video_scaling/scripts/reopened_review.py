@@ -61,7 +61,9 @@ def main():
     if not a.html_only:
         for v, g in S.groupby("video"):
             M.render(int(v), list(g.itertuples()), names=("opening", "conf", "conf"))
-    M.page(S, None, names=("opening", "conf", "conf"), out_html="reopened_review.html", key="reopened_review")
+    M.page(S, None, names=("opening", "conf", "conf"), out_html="reopened_review.html", key="reopened_review",
+           extra_opts=["model as it was (no repair needed)", "moved point right, another point still wrong (not caught)", "none of them", "cannot tell"],
+           header="""<b>Confidence closed-eye rule: frames handed back to the repair</b> ({n} frames). Panels: the frame; the model's points (red = pupil, yellow = eyelids and corners); opening = the rule in use calls the eye closed and repairs nothing; conf = the confidence rule lets the ordinary repair run (blue = the points it replaced, arrow from where the model had the point to where the repair moved it).<br>每帧问：放出来修得对不对？眼睛睁着、蓝点全换对了选 <b>conf+conf</b>（换了两个点就是两个都对）；眼睛确实闭着或看不到瞳孔、不该修选 <b>opening</b>；模型原来的点就全对、不该修选 model as it was；换上去的点对了但还有一个没被找出来的点仍错选 moved point right, another point still wrong；都不对选 none of them；看不清选 cannot tell。""".format(n=len(S)), title="Confidence rule: frames handed back to the repair")
 
 
 if __name__ == "__main__":

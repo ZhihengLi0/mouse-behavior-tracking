@@ -24,6 +24,7 @@ replacement passed), one per episode, at most 2 per video; panels: the frame, th
 in magenta, B's result; questions: is the magenta point right as it is, is the blue replacement right.
 Nothing existing is modified."""
 import argparse
+import json
 import sys
 from itertools import combinations
 from pathlib import Path
@@ -213,7 +214,7 @@ def render(v, rows, names=("A", "B", "C")):
 
         panels = [("frame", raw), ("model's points (red pupil, yellow outline)", panel(()))]
         seen = {}
-        for k, pts, st in ((names[0], r.points_A, r.status_A), (names[1], r.points_B, r.status_B), (names[2], r.points_C, r.status_C)):
+        for k, pts, st in ((k, getattr(r, f"points_{L}"), getattr(r, f"status_{L}")) for k, L in zip(names, "ABCDEF")):   # any number of variants
             key = (st, "+".join(sorted(str(pts).split("+"))))
             if key in seen:
                 seen[key][0] += "+" + k
@@ -231,14 +232,20 @@ def render(v, rows, names=("A", "B", "C")):
     cap.release()
 
 
-def page(C, Wc=None, names=("A", "B", "C"), out_html="subset_review.html", key="subset_review"):
+DEFAULT_HEADER = """<b>Subset order check</b> ({n} frames; part 1 = frames where the three variants disagree, part 2 = frames repaired without the largest-deviation point). Panels: the frame; the model's points (red = pupil, yellow = eyelids and corners); then one panel per distinct result: blue = the points that variant replaced, with an arrow from where the model had the point (small filled dot) to where the repair moved it, and the point's name (p = pupil, lid = eyelid, c = corner). Answer from the images only.<br>
+每帧问：哪个变体的 8 个点全都在正确位置？A = 现在的顺序（先轮廓后瞳孔），B = 偏差最大的点先试，C = B 加验收余量平手裁决。蓝圈 = 修复换上去的点，箭头从模型原来的位置（实心小点）指向换后的位置，旁边是点名（p 瞳孔、lid 眼睑、c 眼角）。同样结果的变体合成一个面板。模型原来的点就全对、不该修的选 model as it was；几个面板里换的点都该换、要合起来才对的选 both changes needed；换上去的点对了、但还有一个没被找出来的点仍然错的选 moved point right, another point still wrong；都不对选 none of them；看不清选 cannot tell。第二部分：品红圈 = 偏差最大、但修复没动的点，问它原地对不对；蓝点 = 修复换上的点，问换得对不对。
+"""
+
+
+def page(C, Wc=None, names=("A", "B", "C"), out_html="subset_review.html", key="subset_review", extra_opts=None, header=None, title="Subset order check", prefill=None):
     parts = []
     for r in C.sample(frac=1, random_state=SEED).itertuples():
         groups = {}
-        for k, pts, st in ((names[0], r.points_A, r.status_A), (names[1], r.points_B, r.status_B), (names[2], r.points_C, r.status_C)):
+        for k, pts, st in ((k, getattr(r, f"points_{L}"), getattr(r, f"status_{L}")) for k, L in zip(names, "ABCDEF")):   # any number of variants
             groups.setdefault((st, "+".join(sorted(str(pts).split("+")))), []).append(k)
-        opts = ["+".join(g) for g in groups.values()] + ["model as it was (no repair needed)", "both changes needed (more than one point)", "moved point right, another point still wrong (not caught)", "none of them", "cannot tell"]
-        parts.append(f'<div class="it" data-item="{r.item}"><div class="h">frame {r.item}</div><img src="items/{r.item}.jpg" loading="lazy">'
+        opts = ["+".join(g) for g in groups.values()] + (extra_opts if extra_opts is not None else ["model as it was (no repair needed)", "both changes needed (more than one point)", "moved point right, another point still wrong (not caught)", "none of them", "cannot tell"])
+        note = f' <span style="font-weight:400;color:#777">{r.note}</span>' if getattr(r, "note", "") and isinstance(r.note, str) else ""
+        parts.append(f'<div class="it" data-item="{r.item}"><div class="h">frame {r.item}{note}</div><img src="items/{r.item}.jpg" loading="lazy">'
                      f'<div class="b"><span class="q">Which variant has every point in the right place?</span>' +
                      "".join(f'<label><input type="radio" name="{r.item}" value="{o}"> {o}</label>' for o in opts) + "</div></div>")
     if Wc is not None and len(Wc):
@@ -250,17 +257,16 @@ def page(C, Wc=None, names=("A", "B", "C"), out_html="subset_review.html", key="
                          f'</div><div class="b"><span class="q">Blue replacement:</span>' +
                          "".join(f'<label><input type="radio" name="{r.item}:blue" value="{o}"> {o}</label>' for o in ("right", "wrong", "cannot tell")) + "</div></div>")
     n = len(C) + (len(Wc) if Wc is not None else 0)
-    (REV / out_html).write_text(f"""<!doctype html><meta charset="utf-8"><title>Subset order check</title>
+    (REV / out_html).write_text(f"""<!doctype html><meta charset="utf-8"><title>{title}</title>
 <style>body{{font:15px -apple-system,Arial,sans-serif;margin:16px;background:#fafafa;color:#222}}.it{{margin:0 0 22px;padding:8px;background:#fff;border:1px solid #ddd;max-width:{5 * PW + 60}px}}
 img{{max-width:100%;display:block}}.h{{font-weight:600;margin-bottom:4px}}.b{{margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}}.q{{font-weight:600;margin-right:6px}}
 .done{{border-color:#2a9d8f;background:#f3fbf9}}#bar{{position:sticky;top:0;background:#fafafa;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:12px;z-index:2}}
 button{{font:inherit;padding:4px 12px}}</style>
-<div id="bar"><b>Subset order check</b> ({n} frames; part 1 = frames where the three variants disagree, part 2 = frames repaired without the largest-deviation point). Panels: the frame; the model's points (red = pupil, yellow = eyelids and corners); then one panel per distinct result: blue = the points that variant replaced, with an arrow from where the model had the point (small filled dot) to where the repair moved it, and the point's name (p = pupil, lid = eyelid, c = corner). Answer from the images only.<br>
-每帧问：哪个变体的 8 个点全都在正确位置？A = 现在的顺序（先轮廓后瞳孔），B = 偏差最大的点先试，C = B 加验收余量平手裁决。蓝圈 = 修复换上去的点，箭头从模型原来的位置（实心小点）指向换后的位置，旁边是点名（p 瞳孔、lid 眼睑、c 眼角）。同样结果的变体合成一个面板。模型原来的点就全对、不该修的选 model as it was；几个面板里换的点都该换、要合起来才对的选 both changes needed；换上去的点对了、但还有一个没被找出来的点仍然错的选 moved point right, another point still wrong；都不对选 none of them；看不清选 cannot tell。第二部分：品红圈 = 偏差最大、但修复没动的点，问它原地对不对；蓝点 = 修复换上的点，问换得对不对。
-&nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
+<div id="bar">{header if header is not None else DEFAULT_HEADER.format(n=n)}&nbsp; <span id="n"></span> <button onclick="save()">Download verdicts (CSV)</button></div>
 {"".join(parts)}
 <script>
 const K='{key}';let V={{}};try{{V=JSON.parse(localStorage.getItem(K)||'{{}}')}}catch(e){{}}
+const PRE={json.dumps(prefill or {{}}, ensure_ascii=False)};for(const k in PRE){{if(!(k in V))V[k]=PRE[k]}}
 function upd(){{document.getElementById('n').textContent=new Set(Object.keys(V).map(k=>k.split(':')[0])).size+' of {n} judged.';document.querySelectorAll('.it').forEach(d=>d.classList.toggle('done',!!V[d.dataset.item]))}}
 document.querySelectorAll('input[type=radio]').forEach(r=>{{if(V[r.name]===r.value)r.checked=true;r.addEventListener('change',()=>{{V[r.name]=r.value;try{{localStorage.setItem(K,JSON.stringify(V))}}catch(e){{}}upd()}})}});upd();
 function save(){{const rows=['item,verdict'].concat(Object.keys(V).sort().map(k=>k+',"'+V[k]+'"'));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\\n')],{{type:'text/csv'}}));a.download='subset_review_verdicts.csv';a.click()}}
