@@ -318,6 +318,14 @@ better by more than 1 %, 3 worse), flagged 15.31 to 7.37 %, blind wrong 17 to 8 
 Experiment 4c is complete: on all three videos the student beats its teacher and stops flagging the held-out reopened
 frames; the repaired closed-eye frames go into the final loop's training set.
 
+Held-out reopened frames still flagged by the other students of the same video (not shown on the page): video 1
+(174) every30 4, repaired only 11, experiment 3 turn 1 12, reopened only 3; video 15 (186) every30 13, repaired only
+22, experiment 3 turn 1 39, reopened only 3. The students without these frames already fix most of them; the reopened
+frames fix the rest. Truth frames changed by more than 1 % of the eye width (reopened student against teacher): video 1
+14 better / 3 worse, video 11 7 / 0, video 15 3 / 10 (none crossing the error line): trained on one kind of frame
+alone the student shifts slightly on ordinary frames, as in experiment 2, so these frames belong mixed with the grid
+frames in the final loop, not on their own.
+
 Video 15 against the other students of the same video (`videoNN/round1_*/eval.csv`, blind `round1_reopened/blind_scores.csv`,
 closed counts from the prediction with both rules): teacher median 2.42 %, p90 4.34, flagged 7.67 %, blind wrong 7 + 3;
 every30 2.39 / 4.75 / 2.69 / 2 + 1; repaired only 2.75 / 6.13 / 3.37 / (not scored); both 2.50 / 4.99 / 2.77 / 2 + 2;
