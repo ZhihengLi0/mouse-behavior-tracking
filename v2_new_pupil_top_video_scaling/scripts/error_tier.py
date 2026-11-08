@@ -12,7 +12,8 @@ the blink threshold was: the main group ends at about 13 % of the eye width (no 
 sparse tail of thrown points starts after it, so LINE = 0.14 of the eye width (about 60 px on these videos).
 
 Outputs in results/error_tier/: eye_width.csv (per video), truth_errors.csv (1330 frames, error in px and in eye
-widths), tier.csv (the line, its pixel equivalent per video, the number of wrong frames), error_histogram.png.
+widths), tier.csv (the line, its pixel equivalent per video, the number of wrong frames), line_sensitivity.csv (wrong-frame
+count for every line 0.10-0.20 and the mechanical first-empty-bin readings; audit 2026-11-08), error_histogram.png.
 Nothing existing is modified."""
 import sys
 from pathlib import Path
@@ -55,6 +56,16 @@ def main():
                        "wrong_per_video": " ".join(f"{int(v)}:{int(n)}" for v, n in L[L.error_rel > line].groupby("video").size().items())}])
     T.to_csv(OUT / "tier.csv", index=False)
     print(T.T.to_string())
+    # audit 2026-11-08: how much the choice of the line matters, and what a mechanical reading of the histogram gives.
+    # (a) wrong-frame count for every line from 0.10 to 0.20: identical for any line inside the gap 0.1273-0.1535;
+    # (b) "first empty bin after the mode" for several bin widths: 0.13 for widths of 0.01 or less, 0.21-0.22 for 0.02,
+    # so a mechanical rule needs a bin width (another number) and is not used; the line stays as read off the histogram.
+    rows = [{"rule": f"line {ln:.2f}", "value": round(ln, 2), "wrong_frames": int((x > ln).sum())} for ln in np.round(np.arange(0.10, 0.205, 0.01), 2)]
+    for w in (0.005, 0.01, 0.02):
+        h, e = np.histogram(x, bins=np.arange(0, 1 + w, w))
+        k = next(i for i in range(int(np.argmax(h)), len(h)) if h[i] == 0)
+        rows.append({"rule": f"first empty bin after the mode, bin width {w}", "value": round(float(e[k]), 4), "wrong_frames": int((x > e[k]).sum())})
+    pd.DataFrame(rows).to_csv(OUT / "line_sensitivity.csv", index=False)
 
     import matplotlib
     matplotlib.use("Agg")
