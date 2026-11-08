@@ -81,7 +81,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-08 13:07 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-08 13:10 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -1984,7 +1984,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="concl" lang="zh"><span class="tag">4b 的结论：</span>20 帧里 19 帧换上去的点都对，没有一帧是真闭眼。这些帧可以和其他修复帧一样进训练集。</div>
   <div class="concl" lang="en"><span class="tag">Conclusion of 4b:</span>in 19 of the 20 frames the replaced points are right, and none is a truly closed eye. These frames can enter the training set like any other repaired frame.</div>
 
-  <p class="text"><b><span lang="zh">4c 这些帧进训练集：学生对起点模型</span><span lang="en">4c These frames in the training set: student against starting model</span></b></p>
+  <p class="text" id="exp4c"><b><span lang="zh">4c 这些帧进训练集：学生对起点模型</span><span lang="en">4c These frames in the training set: student against starting model</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">训练集</span><span lang="en">Training set</span></th><td><span lang="zh">起点模型的人工标注，加上只有 4b 的那些修好的帧（8 个点都取修复后的坐标，没换的点只在置信度低于 0.01 时去掉），避开真值帧和盲测帧前后各 60 帧，不设上限；迭代次数和起点模型相同（和实验一到三同一配方）。在放出来的帧最多的三个视频上做：视频 15 进入 660 帧，视频 11 进入 512 帧，视频 1 进入 98 帧（视频 1 放出来的帧大多离盲测帧太近，被排除）。</span><span lang="en">The starting model's human labels plus only the repaired frames of 4b (all 8 points at their repaired coordinates, a non-replaced point dropped only below likelihood 0.01), excluding 60 frames around every truth and blind frame, no cap; iterations as the starting model's (the recipe of experiments 1 to 3). On the three videos with most reopened frames: video 15, 660 frames; video 11, 512; video 1, 98 (most of video 1's reopened frames lie too close to blind frames and are excluded).</span></td></tr>
     <tr><th><span lang="zh">真值是什么</span><span lang="en">What counts as truth</span></th><td><span lang="zh">和实验一到三相同：每个视频 70 帧人工标注的真值帧（错帧 = 误差超过 0.14 眼宽）、34 帧人工标注的盲测帧（视频 15 和 1 有，视频 11 没有）、整段标出率；另看没进训练集的那部分放出来的帧（离真值帧或盲测帧 60 帧以内、被排除在训练集外的）：起点模型在这些帧上全部被标出（修复帧都是被标出的帧），学生如果学会了这类帧，应该不再标出它们。</span><span lang="en">As in experiments 1 to 3: the 70 human-labeled truth frames of each video (wrong = error above 0.14 eye widths), the 34 human-labeled blind frames (videos 15 and 1 have them, video 11 does not), the flagged share of the video; plus the reopened frames left out of the training set (within 60 frames of a truth or blind frame): the starting model flags every one of them (a repaired frame is a flagged frame), and a student that has learned this kind of frame should no longer flag them.</span></td></tr>

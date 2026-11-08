@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 13:07 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 13:10 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1514,7 +1514,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion of 4b:</span>in 19 of the 20 frames the replaced points are right, and none is a truly closed eye. These frames can enter the training set like any other repaired frame.</div>
 
-  <p class="text"><b><span lang="en">4c These frames in the training set: student against starting model</span></b></p>
+  <p class="text" id="exp4c"><b><span lang="en">4c These frames in the training set: student against starting model</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Training set</span></th><td><span lang="en">The starting model's human labels plus only the repaired frames of 4b (all 8 points at their repaired coordinates, a non-replaced point dropped only below likelihood 0.01), excluding 60 frames around every truth and blind frame, no cap; iterations as the starting model's (the recipe of experiments 1 to 3). On the three videos with most reopened frames: video 15, 660 frames; video 11, 512; video 1, 98 (most of video 1's reopened frames lie too close to blind frames and are excluded).</span></td></tr>
     <tr><th><span lang="en">What counts as truth</span></th><td><span lang="en">As in experiments 1 to 3: the 70 human-labeled truth frames of each video (wrong = error above 0.14 eye widths), the 34 human-labeled blind frames (videos 15 and 1 have them, video 11 does not), the flagged share of the video; plus the reopened frames left out of the training set (within 60 frames of a truth or blind frame): the starting model flags every one of them (a repaired frame is a flagged frame), and a student that has learned this kind of frame should no longer flag them.</span></td></tr>
