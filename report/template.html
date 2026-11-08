@@ -1838,10 +1838,24 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
   <h4><span lang="zh">实验四：关于闭眼状态的修复</span><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
   <div class="text" lang="zh">
-    <p>实验一到三已经证明：没被标出的帧和修复过的帧进训练集重新训练，模型会变好。这里处理剩下的一类帧：被判为闭眼的帧。9.3 的修复流程先把一帧判为"闭眼"再决定修不修，闭眼帧不修、直接保留；判闭眼的规则是"眼睑开度小于本视频开度中位数的一半"。问题是，模型把上下眼睑点预测错了位置，开度也会塌缩，这样的睁眼帧会被误判成闭眼而不被修复。这一节要回答：这部分帧能不能修复？分三步：4a 在人眼判定的帧上研究判闭眼的判据，定下瞳孔置信度 0.40 这条线；4b 用这条线放出来的帧做修复，人眼核对修得对不对；4c 把这些修好的帧放进训练集训一个学生，和它的起点模型比。开度规则里的"一半"是设计时定的：1330 帧真值帧里没有真正闭着的眼（开度规则判闭眼的 4 帧真值帧，人都标了瞳孔），所以闭眼的判据无法从标注推出来，只能在人眼判定的帧上定。这和第 11 步的眨眼判据不冲突：第 11 步问的是眼睛是不是非睁眼，用上下眼睑距离，但它的阈值只在眼睑点正常的帧上定，眼睑点失效的帧另用置信度规则；这里问的是有没有可见的瞳孔可修，处理的正是眼睑点错的帧。</p>
+    <p>实验一到三已经证明：没被标出的帧和修复过的帧进训练集，模型会变好。剩下一类帧没有处理：被判为闭眼的帧。9.3 的流程里闭眼帧不修，判闭眼用的是"眼睑开度小于本视频中位数的一半"。但模型把眼睑点预测错时，开度也会塌缩，睁着的眼就被误判为闭眼、不被修复。</p>
+    <p><b>问题：这部分帧能不能修复？</b></p>
+    <ul>
+      <li><b>4a</b> 在人眼判定的帧上找判闭眼的判据。</li>
+      <li><b>4b</b> 按这个判据修复，人眼核对修得对不对。</li>
+      <li><b>4c</b> 把修好的帧放进训练集训一个学生，和它的起点模型比。</li>
+    </ul>
+    <p>判据只能在人眼判定的帧上定：1330 帧真值帧里没有真正闭着的眼。这和第 11 步的眨眼判据不冲突：第 11 步判的是眼睛是否非睁眼，只在眼睑点正常的帧上用眼睑距离；这里处理的正是眼睑点错的帧。</p>
   </div>
   <div class="text" lang="en">
-    <p>Experiments 1 to 3 showed that retraining with the unflagged frames and the repaired frames improves the model. This section deals with the remaining kind of frame: the frames called closed. The repair of 9.3 first calls a frame "closed" and only then decides whether to repair; closed frames are not repaired and kept as they are; the rule was "eyelid opening below half the video's median opening". The problem: when the model misplaces the upper or lower eyelid point the opening collapses too, so an open eye is called closed and never repaired. The question is whether these frames can be repaired, in three steps: 4a studies the closed-eye criterion on frames judged by eye and settles the line at a pupil confidence of 0.40; 4b repairs the frames this line hands back and checks the repairs by eye; 4c puts the repaired frames into the training set of a student and compares it with its starting model. The "half" of the opening rule was set at design time: the 1330 truth frames hold no truly closed eye (the 4 truth frames the opening rule calls closed all have a human pupil label), so the criterion cannot be derived from the labels and has to be settled on judged frames. This does not conflict with the blink criterion of step 11: step 11 asks whether the eye is not open and uses the eyelid distance, but its threshold is set on frames whose eyelid points are normal, with a confidence rule for frames whose eyelid points failed; here the question is whether a visible pupil is there to repair, on exactly the frames with wrong eyelid points.</p>
+    <p>Experiments 1 to 3 showed that the model improves when the unflagged and the repaired frames enter the training set. One kind of frame is left: the frames called closed. In 9.3 closed frames are not repaired, and a frame is called closed when its eyelid opening is below half the video's median. But when the model misplaces the eyelid points the opening collapses too, so an open eye is called closed and never repaired.</p>
+    <p><b>Question: can these frames be repaired?</b></p>
+    <ul>
+      <li><b>4a</b> find the closed-eye criterion on frames judged by eye.</li>
+      <li><b>4b</b> repair under this criterion and check the repairs by eye.</li>
+      <li><b>4c</b> train a student with the repaired frames and compare it with its starting model.</li>
+    </ul>
+    <p>The criterion can only be settled on judged frames: the 1330 truth frames hold no truly closed eye. It does not conflict with the blink criterion of step 11: step 11 decides whether an eye is not open, using the eyelid distance on frames whose eyelid points are normal; here the frames are exactly those with wrong eyelid points.</p>
   </div>
 
   <p class="text"><b><span lang="zh">4a 判闭眼：用瞳孔置信度，线取 0.40</span><span lang="en">4a Calling an eye closed: the pupil confidence, line at 0.40</span></b></p>
