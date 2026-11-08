@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:14 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-08 10:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1480,6 +1480,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     
     <figcaption lang="en"><span class="tag">Figure 9-21:</span>The 24 blind frames of the four videos, one point per frame: the starting model's error on the x axis, the loop model's error on the y axis (orange = experiment 1, red = experiment 2, blue = experiment 3, first turn), marker by stratum (circle A, square B, triangle C, diamond D), dashed lines at the 14% wrong-frame line, below the diagonal = better than the starting model. The stratum-A frames (starting model flagged, experiment 1 not) sit almost all at the lower right: the starting model is wrong, both loop models are right.</figcaption>
   </figure>
+  </details>
 
   <h4><span lang="en">Experiment 4: repair of the closed-eye frames</span></h4>
   
@@ -1556,7 +1557,6 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">What to read in the result</span></th><td><span lang="en">On videos 1, 8 and 15, which experiment 3 ran, the final version's first turn is read against experiment 3's first turn on four numbers: the wrong truth frames of 70 must not grow; the flagged share must fall by more than 9% (the difference between two random seeds) to count as a real gain; the wrong blind frames of 34 are a tie within one frame; the frames the confidence rule calls closed should fall. The final version changes two things against experiment 3 (subset rule D, the confidence closed-eye rule with its reopened frames). Video 8 has only 5 reopened frames, so its change is essentially D's effect; what videos 15 (846 reopened frames) and 1 (272) change beyond that is the effect of the reopened frames.</span></td></tr>
     <tr><th><span lang="en">Progress</span></th><td><span lang="en">To start: after experiment 4c's videos 11 and 1 finish, run again from the starting models.</span></td></tr>
   </tbody></table></div>
-  </details>
 </section>
 <!-- 10 -->
 <section id="s10">
