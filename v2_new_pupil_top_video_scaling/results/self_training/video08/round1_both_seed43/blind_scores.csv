@@ -1,0 +1,5 @@
+set,model,frames,median_error_pct,wrong_frames
+main,round1_both,24,6.3,2
+main,round1_both_seed43,24,6.02,2
+supplement,round1_both,10,11.44,1
+supplement,round1_both_seed43,10,11.53,0

@@ -230,6 +230,35 @@ Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `vide
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
 `train_v*_both_r*.log`, `eval_v*_both_r*.log`, `score_v*_both_r*.log`, `status_v*_r*.log` (local).
 
+### Noise band of the stop rule: the same round with another seed (`round1_both_seed43`, 2026-11-08)
+
+The stop rule's 90 percent was set at design time. To give it a basis, video 8's round 1 (source both, same 2508
+fed-back frames, same 22 epochs) was trained again with seed 43 instead of 42 (`self_training.py train --seed 43
+--shuffle 7081 --tag seed43`, then `evaluate --save-flags`; driver `seed_experiment.sh`, log `seed_experiment.log`).
+Everything else is identical, so the difference between the two models is the training noise alone.
+
+| model | median % | p90 % | wrong of 70 | flagged fit % | flagged PCA % | flagged either % | flagged frames | blind wrong (24 + 10) |
+|---|---|---|---|---|---|---|---|---|
+| teacher (40 labels) | 5.02 | 11.80 | 1 | 8.84 | 3.15 | 8.90 | 6383 | 12 (main set) |
+| round1_both, seed 42 | 4.85 | 11.65 | 0 | 3.26 | 0.88 | 3.30 | 2365 | 2 + 1 |
+| round1_both, seed 43 | 4.92 | 11.32 | 0 | 2.98 | 0.84 | 3.00 | 2150 | 2 + 0 |
+
+- Flagged share: 3.00 against 3.30 percent, a ratio of 0.91. The two seeds flag different frames: of the fitting
+  flags (2341 and 2137) only 1106 are shared; of the PCA flags (631 and 600) 561 are shared.
+- Truth frames: per-frame errors differ by 0.08 percent of the eye width in the median (largest 5.6); seed 43 is
+  better by more than 1 percent on 4 frames and worse on none; both have 0 wrong frames.
+- Blind frames (`round1_both_seed43/blind_scores.csv`, scored with the same function as `blind_test/video08/`, the
+  committed blind tables untouched): median 6.02 against 6.30 percent on the 24 main frames, 20 of 24 within 1
+  percent of each other; wrong frames 2 against 2 on the main set and 0 against 1 on the supplement, so the blind
+  wrong count moves by one frame from the seed alone.
+
+Reading for the stop rule: one training's flagged share differs from another's by about 9 percent of itself when
+only the seed changes (one pair measured; the round-to-round drop teacher → round 1 was 63 percent). The 90 percent
+line therefore sits at the edge of the seed noise: a round whose flagged share stays above 90 percent of the previous
+round's cannot be told from no change, which is what the rule means by stopping. The blind criterion "wrong frames
+not lower" has a noise of one frame on 34 frames and should not stop the loop on its own when the flagged share still
+falls; the formal loop keeps both criteria and records this band next to them.
+
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
 ## Files
