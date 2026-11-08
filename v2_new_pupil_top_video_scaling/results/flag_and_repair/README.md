@@ -316,3 +316,15 @@ frames, 53 judged (2 cannot tell). Variants with the same result share a panel, 
 Decision (user, 2026-11-08): the formal pipeline uses D, `--order deviation --tiebreak margin-all`: candidates by
 deviation, every passing subset of any size scored by its range margin, the largest margin wins. A stays available as
 the old default; the committed results of the earlier sections are unchanged.
+
+**3d. Reopened frames judged** (`all_videos/reopened_review_verdicts.csv`, `reopened_verdicts.csv`, 2026-11-08 09:55,
+20 frames, 20 judged). The repair the confidence rule lets through is right with every point in place in 18 of 20;
+in 1 the moved point is right but another point the finders did not catch is still wrong; in 1 (three points
+replaced) none is right. In none of the 20 was the eye closed or the pupil invisible: the opening rule had called
+20 open eyes closed, all with a thrown corner, eyelid or pupil point. This is the same level as the repair's own
+check by eye (87 % of repaired frames right, section "Spot check by eye"), so the reopened frames are of the same
+quality as the other repaired frames and can enter the training set of the formal loop.
+Decision (user, 2026-11-08): the formal pipeline uses the confidence closed-eye rule (`--closed confidence`, line
+0.40); the opening rule stays as the old default option. The 525 frames the rule takes away from the repair
+(`closed_conf_review.html`) are left unjudged: on the 1318 labeled truth frames the rule removes 1 more frame than the
+opening rule, all already wrong, and the whole-video cost (525 of 15,878 repairs) is known.
