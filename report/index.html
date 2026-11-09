@@ -81,7 +81,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-08 20:18 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-09 01:16 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -2064,7 +2064,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">做法</span><span lang="en">Procedure</span></th><td><span lang="zh">实验三的流程；修复用 5a 的 D 和实验四的置信度判据，其余规则不变。</span><span lang="en">The procedure of experiment 3; the repair uses D of 5a and the confidence criterion of experiment 4; every other rule unchanged.</span></td></tr>
     <tr><th><span lang="zh">停止</span><span lang="en">Stop</span></th><td><span lang="zh">标出帧数不低于上一圈的 90% 就停。90% 的依据：同一圈只换随机种子重训，标出率就会差约 9%。</span><span lang="en">Stop when the flagged frames are not below 90% of the previous turn's. Basis: the same turn retrained with another random seed differs by about 9% in flagged share.</span></td></tr>
     <tr><th><span lang="zh">看什么</span><span lang="en">What to read</span></th><td><span lang="zh">在实验三的视频 1、8、15 上和实验三第一圈比。视频 8 几乎没有放出来的闭眼帧，它的变化是 D 的效果；视频 15、1 多出来的变化是闭眼帧的效果。</span><span lang="en">Against experiment 3's first turn on its videos 1, 8 and 15. Video 8 has almost no reopened frames, so its change is D's effect; what videos 15 and 1 change beyond that is the effect of the reopened frames.</span></td></tr>
-    <tr><th><span lang="zh">进度</span><span lang="en">Progress</span></th><td><span lang="zh">第一圈：视频 1、8 完成（表 9-4-12），视频 15 训练中，视频 6 排队。每圈另记录两项 loop 本身不用的检测指标：8 个点里最低置信度低于起点模型 5% 分位的帧占比，相邻帧最大位移超过起点模型 95% 分位的帧占比；用来检查标出率下降是不是错误真的变少。</span><span lang="en">Turn 1: videos 1 and 8 done (Table 9-4-12), video 15 training, video 6 queued. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
+    <tr><th><span lang="zh">进度</span><span lang="en">Progress</span></th><td><span lang="zh">第一圈：视频 1、8、15 完成（表 9-4-12），视频 6 训练中。每圈另记录两项 loop 本身不用的检测指标：8 个点里最低置信度低于起点模型 5% 分位的帧占比，相邻帧最大位移超过起点模型 95% 分位的帧占比；用来检查标出率下降是不是错误真的变少。</span><span lang="en">Turn 1: videos 1, 8 and 15 done (Table 9-4-12), video 6 training. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
   </tbody></table></div>
   <p class="text"><b><span lang="zh">表 9-4-12：实验五 5b，和实验三第一圈对照</span><span lang="en">Table 9-4-12: experiment 5b against the first turn of experiment 3</span></b></p>
   <div class="tablebox"><table>
@@ -2076,6 +2076,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td>8</td><td><span lang="zh">起点模型</span><span lang="en">Starting model</span></td><td>–</td><td>5.02</td><td>1</td><td>8.90</td><td>12</td><td>5.0</td><td>5.0</td></tr>
       <tr><td>8</td><td><span lang="zh">实验三第一圈</span><span lang="en">Experiment 3, turn 1</span></td><td>2508</td><td>4.85</td><td>0</td><td>3.30</td><td>3</td><td>0.78</td><td>1.06</td></tr>
       <tr><td>8</td><td><span lang="zh">最终版本第一圈</span><span lang="en">Final version, turn 1</span></td><td>2498</td><td>5.08</td><td>0</td><td>3.41</td><td>2</td><td>0.86</td><td>1.09</td></tr>
+      <tr><td>15</td><td><span lang="zh">起点模型</span><span lang="en">Starting model</span></td><td>–</td><td>2.42</td><td>0</td><td>7.67</td><td>10</td><td>5.0</td><td>5.0</td></tr>
+      <tr><td>15</td><td><span lang="zh">实验三第一圈</span><span lang="en">Experiment 3, turn 1</span></td><td>2254</td><td>2.50</td><td>0</td><td>2.77</td><td>4</td><td>2.37</td><td>1.80</td></tr>
+      <tr><td>15</td><td><span lang="zh">最终版本第一圈</span><span lang="en">Final version, turn 1</span></td><td>2934</td><td>2.32</td><td>0</td><td>2.70</td><td>4</td><td>2.08</td><td>1.84</td></tr>
     </tbody>
   </table></div>
 </section>

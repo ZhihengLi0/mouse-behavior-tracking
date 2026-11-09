@@ -19,6 +19,11 @@ round1_both,teacher,B,3,2,1,0,-19.17,1.0,0.5
 round1_both,teacher,C,8,0,0,8,-0.0,,0.9453
 round1_both,teacher,D,3,0,1,2,0.34,1.0,0.75
 round1_both,teacher,all,24,8,3,13,-0.15,0.2266,0.0564
+round1_formal,teacher,A,10,6,0,4,-21.93,0.0312,0.0137
+round1_formal,teacher,B,3,2,1,0,-1.96,1.0,0.75
+round1_formal,teacher,C,8,0,1,7,-0.02,1.0,0.8438
+round1_formal,teacher,D,3,0,0,3,-0.1,,0.75
+round1_formal,teacher,all,24,8,2,14,-0.22,0.1094,0.015
 human40,teacher,A,10,0,0,10,0.0,,
 human40,teacher,B,3,0,0,3,0.0,,
 human40,teacher,C,8,0,0,8,0.0,,

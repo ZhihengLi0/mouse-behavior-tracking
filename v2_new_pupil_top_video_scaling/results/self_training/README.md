@@ -371,6 +371,7 @@ settled repair on the starting model's prediction; summary and whole_video commi
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 1 | 5440 (1668 + 3772) | 8 | 22240 | 2.64 | 1 | 0.80 | 0.70 | 0.42 | 17 → 4 | 10987 → 575 | continue |
 | 8 | 1 | 2498 (1703 + 795) | 22 | 32098 | 5.08 | 0 | 3.41 | 0.86 | 1.09 | 12 → 2 | 6383 → 2449 | continue |
+| 15 | 1 | 2934 (1734 + 1200) | 34 | 61778 | 2.32 | 0 | 2.70 | 2.08 | 1.84 | 10 → 4 | 5500 → 1935 | continue |
 
 Rows are added as rounds finish.
 
@@ -383,6 +384,12 @@ Video 8, against experiment 3 round 1: median 4.85, wrong 0, flagged 3.30 %, low
 flagged frames 2365, fed back 2508 (1704 + 804); the same within the seed band. Video 8 has almost no reopened frames, so
 this is subset rule D's effect alone: none measurable. Closed frames under the confidence rule: starting model 880,
 experiment 3 round 1 510, final round 1 518; under the opening rule 213, 211, 221.
+Video 15, against experiment 3 round 1: median 2.50, wrong 0, flagged 2.77 %, low confidence 2.37 %, jump 1.80 %, blind 4,
+flagged frames 1988, fed back 2254 (1688 + 566). Blind, truth and flagged frames are the same within the seed band; the
+median is 0.18 lower (the one seed pair differed by 0.07). The final round feeds back 634 more repaired frames, about
+the 660 reopened frames experiment 4 found on this video: with the confidence rule 901 frames count as closed instead of
+3403, and the whole-video repair (`repair_formal/`) repairs 1630 frames instead of 826. Closed frames under the
+confidence rule: starting model 901, experiment 3 round 1 757, final round 1 654; under the opening rule 3403, 3268, 3579.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
