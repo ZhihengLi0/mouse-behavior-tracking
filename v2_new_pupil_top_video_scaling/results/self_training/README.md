@@ -372,7 +372,9 @@ settled repair on the starting model's prediction; summary and whole_video commi
 | 1 | 1 | 5440 (1668 + 3772) | 8 | 22240 | 2.64 | 1 | 0.80 | 0.70 | 0.42 | 17 → 4 | 10987 → 575 | continue |
 | 1 | 2 | 1922 (1908 + 14) | 8 | 8168 | 2.70 | 2 | 0.97 | 0.50 | 0.56 | 4 → 5 | 575 → 698 | stop |
 | 8 | 1 | 2498 (1703 + 795) | 22 | 32098 | 5.08 | 0 | 3.41 | 0.86 | 1.09 | 12 → 2 | 6383 → 2449 | continue |
+| 8 | 2 | 1794 (1759 + 35) | 22 | 24354 | 4.95 | 0 | 2.56 | 0.94 | 1.05 | 2 → 4 | 2449 → 1838 | stop |
 | 15 | 1 | 2934 (1734 + 1200) | 34 | 61778 | 2.32 | 0 | 2.70 | 2.08 | 1.84 | 10 → 4 | 5500 → 1935 | continue |
+| 15 | 2 | 1867 (1832 + 35) | 34 | 43656 | 2.46 | 0 | 1.77 | 2.02 | 1.29 | 4 → 3 | 1935 → 1269 | continue |
 | 6 | 1 | 2922 (1725 + 1197) | 21 | 34881 | 1.42 | 0 | 0.45 | 0.32 | 1.24 | 9 → 5 | 3883 → 322 | continue |
 
 Rows are added as rounds finish.
@@ -404,6 +406,14 @@ as much as the seed alone moves them; the flagged frames rise by 21 %, beyond th
 the round-1 model flags only 575 frames, so 14 repaired frames are fed back against round 1's 3772, and with the same
 8 epochs it trains 8168 iterations against 22240. Rounds 2 of videos 8, 15 and 6 were not run in this launch (the
 driver's estimate for video 8 ended after the 2026-11-09 08:00 deadline).
+Relaunched without a deadline on 2026-11-09 08:57 (`self_training_formal.sh`, finished rounds skipped).
+Video 8, round 2 against round 1: flagged frames 2449 → 1838 (75 %), blind 2 → 4, truth 0 → 0, median 5.08 → 4.95;
+low confidence 0.86 → 0.94 %, jump 1.09 → 1.05 %. The stop rule fires on the blind count (4 not below 2), not on the
+flagged frames, so video 8's loop stops at round 2; the seed alone moved this video's blind count by one frame.
+35 repaired frames are fed back against round 1's 795.
+Video 15, round 2 against round 1: flagged frames 1935 → 1269 (66 %), blind 4 → 3, truth 0 → 0, median 2.32 → 2.46;
+low confidence 2.08 → 2.02 %, jump 1.84 → 1.29 %. Both conditions say continue; 35 repaired frames are fed back
+against round 1's 1200.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
