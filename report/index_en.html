@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-09 04:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-09 06:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1588,7 +1588,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Procedure</span></th><td><span lang="en">The procedure of experiment 3; the repair uses D of 5a and the confidence criterion of experiment 4; every other rule unchanged.</span></td></tr>
     <tr><th><span lang="en">Stop</span></th><td><span lang="en">Stop when the flagged frames are not below 90% of the previous turn's. Basis: the same turn retrained with another random seed differs by about 9% in flagged share.</span></td></tr>
     <tr><th><span lang="en">What to read</span></th><td><span lang="en">Against experiment 3's first turn on its videos 1, 8 and 15. Video 8 has almost no reopened frames, so its change is D's effect; what videos 15 and 1 change beyond that is the effect of the reopened frames.</span></td></tr>
-    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done (Table 9-4-12); turn 2: video 1 running. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
+    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done (Table 9-4-12). Turn 2: video 1 done; it flags more frames than turn 1 and the wrong blind frames do not fall, so the stop rule fires and video 1's loop stops at turn 2; few repaired frames enter turn 2's training set, because the first turn's model already flags few frames. Turn 2 of videos 8, 15 and 6 has not been run yet. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
   </tbody></table></div>
   <p class="text"><b><span lang="en">Table 9-4-12: experiment 5b against the first turn of experiment 3</span></b></p>
   <div class="tablebox"><table>
@@ -1597,6 +1597,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td>1</td><td><span lang="en">Starting model</span></td><td>–</td><td>2.94</td><td>8</td><td>15.31</td><td>17</td><td>5.0</td><td>5.0</td></tr>
       <tr><td>1</td><td><span lang="en">Experiment 3, turn 1</span></td><td>5347</td><td>2.56</td><td>1</td><td>0.83</td><td>4</td><td>0.58</td><td>0.42</td></tr>
       <tr><td>1</td><td><span lang="en">Final version, turn 1</span></td><td>5440</td><td>2.64</td><td>1</td><td>0.80</td><td>4</td><td>0.70</td><td>0.42</td></tr>
+      <tr><td>1</td><td><span lang="en">Final version, turn 2</span></td><td>1922</td><td>2.70</td><td>2</td><td>0.97</td><td>5</td><td>0.50</td><td>0.56</td></tr>
       <tr><td>8</td><td><span lang="en">Starting model</span></td><td>–</td><td>5.02</td><td>1</td><td>8.90</td><td>12</td><td>5.0</td><td>5.0</td></tr>
       <tr><td>8</td><td><span lang="en">Experiment 3, turn 1</span></td><td>2508</td><td>4.85</td><td>0</td><td>3.30</td><td>3</td><td>0.78</td><td>1.06</td></tr>
       <tr><td>8</td><td><span lang="en">Final version, turn 1</span></td><td>2498</td><td>5.08</td><td>0</td><td>3.41</td><td>2</td><td>0.86</td><td>1.09</td></tr>

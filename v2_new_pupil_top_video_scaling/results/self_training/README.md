@@ -370,6 +370,7 @@ settled repair on the starting model's prediction; summary and whole_video commi
 | video | round | fed back (grid + repaired) | epochs | iterations | median % | wrong of 70 | flagged either % | low confidence % | jump % | blind wrong 34 (prev → now) | flagged frames (prev → now) | decision |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 1 | 5440 (1668 + 3772) | 8 | 22240 | 2.64 | 1 | 0.80 | 0.70 | 0.42 | 17 → 4 | 10987 → 575 | continue |
+| 1 | 2 | 1922 (1908 + 14) | 8 | 8168 | 2.70 | 2 | 0.97 | 0.50 | 0.56 | 4 → 5 | 575 → 698 | stop |
 | 8 | 1 | 2498 (1703 + 795) | 22 | 32098 | 5.08 | 0 | 3.41 | 0.86 | 1.09 | 12 → 2 | 6383 → 2449 | continue |
 | 15 | 1 | 2934 (1734 + 1200) | 34 | 61778 | 2.32 | 0 | 2.70 | 2.08 | 1.84 | 10 → 4 | 5500 → 1935 | continue |
 | 6 | 1 | 2922 (1725 + 1197) | 21 | 34881 | 1.42 | 0 | 0.45 | 0.32 | 1.24 | 9 → 5 | 3883 → 322 | continue |
@@ -396,6 +397,13 @@ the starting model: median 1.49, wrong 0, flagged 5.41 %, blind 9, flagged frame
 experiment 3's (2921 = 1725 + 1196): the video has few closed frames (129 under the confidence rule, 122 under the
 opening rule), so the confidence rule changes little, and the whole-video repair repairs 1471 frames against 1460.
 Closed frames under the confidence rule: starting model 129, final round 1 107; under the opening rule 122, 119.
+Video 1, round 2 against round 1: flagged frames 575 → 698, blind 4 → 5, truth 1 → 2, median 2.64 → 2.70; the
+low-confidence detector falls (0.70 → 0.50 %), the jump detector rises (0.42 → 0.56 %). The stop rule fires (698 not
+below 90 % of 575, blind not lower), so video 1's loop stops at round 2. The blind and truth changes are one frame each,
+as much as the seed alone moves them; the flagged frames rise by 21 %, beyond the seed band. Round 2's set is smaller:
+the round-1 model flags only 575 frames, so 14 repaired frames are fed back against round 1's 3772, and with the same
+8 epochs it trains 8168 iterations against 22240. Rounds 2 of videos 8, 15 and 6 were not run in this launch (the
+driver's estimate for video 8 ended after the 2026-11-09 08:00 deadline).
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
