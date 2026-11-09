@@ -1,0 +1,2 @@
+video,round,flagged_prev,flagged,blind_frames,blind_wrong_prev,blind_wrong,stop,reason,wrong_truth,flagged_pct,indep_lowconf_pct,indep_jump_pct
+8,1,6383,2449,34,12,2,False,,0,3.41,0.86,1.09
