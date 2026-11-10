@@ -207,7 +207,7 @@ def student_source(v, every, rnd):
     return C, d, lik, dev, res, Wm, thr, thr_pca, truth, Path(h5).name
 
 
-def repaired_candidates(v, C, lik, near, n, every, source_name):
+def repaired_candidates(v, C, lik, near, n, every, source_name, rnd=1):
     """Repaired source: every frame the final pipeline repaired, all eight points as accepted (a non-replaced point
     is dropped only below the likelihood bound); excluded: the truth band, the blind-set band, the held-out time
     blocks; then evenly spaced down to the every-30 student's pseudo count, so both students train on the same
@@ -246,7 +246,7 @@ def repaired_candidates(v, C, lik, near, n, every, source_name):
     F.loc[elig, "kept"] = True
     K = F[F.kept]
     assert not (K.held_out | K.near_truth | K.near_blind).any() and len(K) <= cap
-    S = {"video": v, "unit": unit_of(v), "every": np.nan, "round": 1, "source": source_name, "frames": n, "candidates_repaired": int(rep.sum()),
+    S = {"video": v, "unit": unit_of(v), "every": np.nan, "round": rnd, "source": source_name, "frames": n, "candidates_repaired": int(rep.sum()),
          "held_out_frames": int((rep & held).sum()), "near_truth_excluded": int((rep & ~held & near).sum()), "blind_excluded": int((rep & ~held & ~near & near_blind).sum()),
          "candidates": int(cand.sum()), "dropped_frames": int((F.in_band & ~F.passes_points).sum()),
          "cap": cap, "kept_frames": len(K), "kept_ok": 0, "kept_repaired": len(K),
@@ -483,15 +483,14 @@ def pseudo(v, every, rnd=1, source="pipeline"):
     unit = unit_of(v)
     out = mkdir(OUT / f"video{v:02d}" / pseudo_dirname(every, rnd, source))
     loc = mkdir(LOCAL / f"video{v:02d}" / pseudo_dirname(every, rnd, source))
-    if source == "repaired":
-        assert rnd == 1, "the repaired source is round 1 only"
+    if source == "repaired":                              # round >= 2 (user 2026-11-09): the round rnd-1 repaired-only student, repaired with its own second peaks as in experiment 3
         every = 30                                            # the count cap and the file names refer to the every-30 student
     if source == "reopened":
         assert rnd == 1, "the reopened source is round 1 only"
         every = 30
     if source in ("both", "formal"):
         every = 30
-    if rnd > 1 and source in ("both", "formal"):
+    if rnd > 1 and source in ("both", "formal", "repaired"):
         C, d, lik, dev, res, Wm, thr, thr_pca, truth, source_name = student_repair(v, rnd, source)
         n = len(C)
     elif rnd == 1:
@@ -538,7 +537,7 @@ def pseudo(v, every, rnd=1, source="pipeline"):
         write_pseudo_set(v, every, rnd, source, K, S, out, loc, unit)
         return
     if source == "repaired":
-        F, S = repaired_candidates(v, C, lik, near, n, every, source_name)
+        F, S = repaired_candidates(v, C, lik, near, n, every, source_name, rnd)
         F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
         K = F[F.kept]
         pd.DataFrame([S]).to_csv(out / "pseudo_summary.csv", index=False)

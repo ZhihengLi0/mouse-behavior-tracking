@@ -361,7 +361,7 @@ def coords_of(path):
 def models_of(v, extra):
     unit = unit_of(v)
     m = {"teacher": teacher_h5(v), "teacher + repair": RES / "self_training" / f"video{v:02d}" / "repair" / "coords_after.csv.gz"}
-    for name in ("round1_every30", "round1_every100", "round2_every30", NEW_STUDENT, "human40"):
+    for name in ("round1_every30", "round1_every100", "round2_every30", NEW_STUDENT, "round2_repaired", "human40"):
         h5 = sorted((LOCAL / f"video{v:02d}" / name / "predictions").glob("*.h5"))
         if h5:
             m[name] = h5[-1]
@@ -448,7 +448,7 @@ def figure(E, v, out, strata=None):
     fig, axes = plt.subplots(1, len(strata), figsize=(17, 4.4), sharex=True, sharey=True)
     colors = {"teacher + repair": "#9e9e9e", "round1_every30": "#e69f00", "round1_every100": "#0072b2", "round2_every30": "#cc79a7", "human40": "#009e73",
               "round1_both": "#56b4e9", "round2_both": "#1f78b4", "round3_both": "#0b3d91",
-              NEW_STUDENT: "#d55e00"}
+              NEW_STUDENT: "#d55e00", "round2_repaired": "#8c2d04"}
     lim = max(float(np.nanmax(E.error)) * 100, LINE * 100) * 1.05
     for ax, s in zip(axes, strata):
         for m in students:
