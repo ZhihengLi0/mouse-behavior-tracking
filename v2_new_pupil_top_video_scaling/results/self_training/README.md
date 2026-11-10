@@ -375,6 +375,7 @@ settled repair on the starting model's prediction; summary and whole_video commi
 | 8 | 2 | 1794 (1759 + 35) | 22 | 24354 | 4.95 | 0 | 2.56 | 0.94 | 1.05 | 2 → 4 | 2449 → 1838 | stop |
 | 15 | 1 | 2934 (1734 + 1200) | 34 | 61778 | 2.32 | 0 | 2.70 | 2.08 | 1.84 | 10 → 4 | 5500 → 1935 | continue |
 | 15 | 2 | 1867 (1832 + 35) | 34 | 43656 | 2.46 | 0 | 1.77 | 2.02 | 1.29 | 4 → 3 | 1935 → 1269 | continue |
+| 15 | 3 | 1880 (1850 + 30) | 34 | 43860 | 2.56 | 0 | 1.71 | 1.92 | 1.26 | 3 → 3 | 1269 → 1228 | stop |
 | 6 | 1 | 2922 (1725 + 1197) | 21 | 34881 | 1.42 | 0 | 0.45 | 0.32 | 1.24 | 9 → 5 | 3883 → 322 | continue |
 
 Rows are added as rounds finish.
@@ -414,6 +415,12 @@ flagged frames, so video 8's loop stops at round 2; the seed alone moved this vi
 Video 15, round 2 against round 1: flagged frames 1935 → 1269 (66 %), blind 4 → 3, truth 0 → 0, median 2.32 → 2.46;
 low confidence 2.08 → 2.02 %, jump 1.84 → 1.29 %. Both conditions say continue; 35 repaired frames are fed back
 against round 1's 1200.
+The Mac restarted at about 18:01 on 2026-11-09 and cut video 6's round 2 at epoch 16 of 21; the interrupted shuffle 6062
+was moved aside to `local_data/interrupted/shuffle6062_cut_20261109/` (not deleted) and round 2 retrained from scratch
+from 22:13 (user: all four videos finish round 2; `tools/retrain_v6_r2_after_driver.sh`).
+Video 15, round 3 against round 2: flagged frames 1269 → 1228 (97 %), blind 3 → 3, truth 0 → 0, median 2.46 → 2.56;
+low confidence 2.02 → 1.92 %, jump 1.29 → 1.26 %. Both conditions fire, so video 15's loop stops at round 3; 30 repaired
+frames are fed back.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
