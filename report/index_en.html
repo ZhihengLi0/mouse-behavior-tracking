@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-09 22:15 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-10 00:55 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1588,7 +1588,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Procedure</span></th><td><span lang="en">The procedure of experiment 3; the repair uses D of 5a and the confidence criterion of experiment 4; every other rule unchanged.</span></td></tr>
     <tr><th><span lang="en">Stop</span></th><td><span lang="en">Stop when the flagged frames are not below 90% of the previous turn's. Basis: the same turn retrained with another random seed differs by about 9% in flagged share.</span></td></tr>
     <tr><th><span lang="en">What to read</span></th><td><span lang="en">Against experiment 3's first turn on its videos 1, 8 and 15. Video 8 has almost no reopened frames, so its change is D's effect; what videos 15 and 1 change beyond that is the effect of the reopened frames.</span></td></tr>
-    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done (Table 9-4-12). Turn 2: the stop rule fires on videos 1 and 8, whose loops stop at turn 2 (video 1 flags more frames than turn 1 and its wrong blind frames do not fall; video 8 flags fewer frames but its wrong blind frames do not fall); video 15 continues. Turn 3: on video 15 the flagged frames and the wrong blind frames hardly change, so it stops at turn 3. Video 6's turn 2 is training (the first attempt was cut by a restart of the computer and is retrained from scratch). From turn 2 on few repaired frames enter the training set, because the previous turn's model already flags few frames. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
+    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done (Table 9-4-12). Turn 2: the stop rule fires on videos 1 and 8, whose loops stop at turn 2 (video 1 flags more frames than turn 1 and its wrong blind frames do not fall; video 8 flags fewer frames but its wrong blind frames do not fall); video 15 continues. Turn 3: on video 15 the flagged frames and the wrong blind frames hardly change, so it stops at turn 3. On video 6 turn 2 flags only slightly fewer frames than turn 1 (its wrong blind frames fall), so the stop rule fires and it stops at turn 2 (the first attempt was cut by a restart of the computer and was retrained from scratch). All four loops have stopped. From turn 2 on few repaired frames enter the training set, because the previous turn's model already flags few frames. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
   </tbody></table></div>
   <p class="text"><b><span lang="en">Table 9-4-12: experiment 5b against the first turn of experiment 3</span></b></p>
   <div class="tablebox"><table>
@@ -1609,6 +1609,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td>15</td><td><span lang="en">Final version, turn 3</span></td><td>1880</td><td>2.56</td><td>0</td><td>1.71</td><td>3</td><td>1.92</td><td>1.26</td></tr>
       <tr><td>6</td><td><span lang="en">Starting model</span></td><td>–</td><td>1.49</td><td>0</td><td>5.41</td><td>9</td><td>5.0</td><td>5.0</td></tr>
       <tr><td>6</td><td><span lang="en">Final version, turn 1</span></td><td>2922</td><td>1.42</td><td>0</td><td>0.45</td><td>5</td><td>0.32</td><td>1.24</td></tr>
+      <tr><td>6</td><td><span lang="en">Final version, turn 2</span></td><td>1855</td><td>1.45</td><td>0</td><td>0.42</td><td>3</td><td>0.29</td><td>0.88</td></tr>
     </tbody>
   </table></div>
   <p class="text"><span lang="en">On video 6 experiment 3's first turn was trained but never run on the whole video, so it is compared with the starting model only.</span></p>

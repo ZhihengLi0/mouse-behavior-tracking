@@ -377,6 +377,7 @@ settled repair on the starting model's prediction; summary and whole_video commi
 | 15 | 2 | 1867 (1832 + 35) | 34 | 43656 | 2.46 | 0 | 1.77 | 2.02 | 1.29 | 4 → 3 | 1935 → 1269 | continue |
 | 15 | 3 | 1880 (1850 + 30) | 34 | 43860 | 2.56 | 0 | 1.71 | 1.92 | 1.26 | 3 → 3 | 1269 → 1228 | stop |
 | 6 | 1 | 2922 (1725 + 1197) | 21 | 34881 | 1.42 | 0 | 0.45 | 0.32 | 1.24 | 9 → 5 | 3883 → 322 | continue |
+| 6 | 2 | 1855 (1851 + 4) | 21 | 23688 | 1.45 | 0 | 0.42 | 0.29 | 0.88 | 5 → 3 | 322 → 298 | stop |
 
 Rows are added as rounds finish.
 
@@ -421,6 +422,10 @@ from 22:13 (user: all four videos finish round 2; `tools/retrain_v6_r2_after_dri
 Video 15, round 3 against round 2: flagged frames 1269 → 1228 (97 %), blind 3 → 3, truth 0 → 0, median 2.46 → 2.56;
 low confidence 2.02 → 1.92 %, jump 1.29 → 1.26 %. Both conditions fire, so video 15's loop stops at round 3; 30 repaired
 frames are fed back.
+Video 6, round 2 against round 1 (the retrained run): flagged frames 322 → 298 (93 %), blind 5 → 3, truth 0 → 0, median
+1.42 → 1.45; low confidence 0.32 → 0.29 %, jump 1.24 → 0.88 %. The flagged condition fires while the blind count falls,
+so video 6's loop stops at round 2; 4 repaired frames are fed back. All four loops have now stopped: videos 1, 8 and 6
+at round 2, video 15 at round 3.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
 
