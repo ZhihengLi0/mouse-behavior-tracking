@@ -188,6 +188,13 @@ Against the first turn: video 1 wrong 2 → 1, video 8 0 → 0; flagged share 1.
 blind frames unchanged (`../blind_test/`). A second turn without repair brings back only self-prediction and
 saturates.
 
+Blind band of experiment 1 (checked 2026-11-10): experiment 1's pseudo frames avoid only the truth band, not the
+blind band (the blind frames were drawn after experiment 1, excluding its pseudo frames exactly). No pseudo frame of
+either turn is a blind frame, but of the 60 blind frames, those with a pseudo frame within 60 / within 15 frames:
+video 1 turn 1 41 / 23, turn 2 56 / 43; video 8 52 / 29 and 56 / 40; video 15 turn 1 50 / 21; video 6 turn 1 56 / 34.
+Experiments 2 and 3 exclude the band (none within 60, one frame on video 15 in experiment 2). Experiment 1's blind
+counts are therefore measured on frames whose neighbours it trained on.
+
 ### Experiment 2: repaired frames only (`round1_repaired`, shuffle 4000 + 10 x video + 5)
 
 `self_training.py pseudo --source repaired`: every frame the final pipeline repaired, all 8 points at the repaired
@@ -242,6 +249,14 @@ wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion;
 | 8 | 1 | 2508 (1704 + 804) | 22 | 32208 | 4.85 | 0 | 3.30 | 6383 → 2365 | 12 → 3 | continue |
 | 15 | 1 | 2254 (1688 + 566) | 34 | 50218 | 2.50 | 0 | 2.77 | 5500 → 1988 | 10 → 4 | continue |
 | 6 | 1 | 2921 (1725 + 1196) | 21 | | | | | 3883 → | 9 → | |
+| 1 | 2 | 1922 (1903 + 19) | 8 | 8168 | 2.63 | 1 | 1.08 | 598 → 774 | 4 → 4 | stop |
+
+Second turn (2026-11-10, run with the second turns of experiments 1 and 2, `tools/earlier_round2.sh`): video 1 round
+2 against round 1: flagged frames 598 → 774, blind 4 → 4, truth 1 → 1, median 2.56 → 2.63; both conditions fire, so the
+loop stops at round 2 (19 repaired frames fed back). The status step failed in the driver: since commit 584c710 (5b)
+`loop-status` takes `--source` with default `pipeline`, and `self_training_loop.sh` did not pass it; it was re-run by
+hand with `--source both` (rule unchanged) and the driver now passes it. `compare` fails as well (the palette is too
+short for the new models; summary figure only, not used by the page).
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,

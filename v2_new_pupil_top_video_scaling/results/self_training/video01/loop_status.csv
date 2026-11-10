@@ -1,2 +1,3 @@
 video,round,flagged_prev,flagged,blind_frames,blind_wrong_prev,blind_wrong,stop,reason
 1,1,10987,598,34,17,4,False,
+1,2,598,774,34,4,4,True,flagged 774 not below 90 % of 598; blind wrong 4 not below 4

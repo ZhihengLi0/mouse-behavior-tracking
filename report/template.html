@@ -1508,7 +1508,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">视频和帧数</span><span lang="en">Videos and counts</span></th><td><span lang="zh">视频 1 / 8 / 15 / 6 第一圈进入训练集 5347 / 2508 / 2254 / 2921 帧；轮次取实验一在该视频的轮次（8 / 22 / 34 / 21），迭代次数随帧数增加，每张人工帧被看到的次数和实验一相同；每一圈都从 ImageNet 权重重新训练（表 9-4-6、9-4-7）。</span><span lang="en">Videos 1 / 8 / 15 / 6: 5347 / 2508 / 2254 / 2921 frames added to the training set in turn 1; epochs = experiment 1's on the video (8 / 22 / 34 / 21), so the iterations grow with the set and every human frame is seen as often as in experiment 1; every turn trains afresh from the ImageNet weights (Tables 9-4-6, 9-4-7).</span></td></tr>
     <tr><th><span lang="zh">下一圈</span><span lang="en">Next turn</span></th><td><span lang="zh">新模型取代起点模型：用它的整段预测重新找帧（PCA 阈值用它自己的中位数），被标出和接近阈值的帧用它自己的热图算第二峰、按 9.3 修复验收，再按同样的规则选帧、同样的轮次训练下一个模型。</span><span lang="en">The new model takes the place of the starting model: its whole-video prediction is flagged again (PCA threshold from its own median), the flagged and near-threshold frames get second peaks from its own heatmaps, repaired and checked as in 9.3, then the same frame rule and the same epochs train the next model.</span></td></tr>
     <tr><th><span lang="zh">饱和（停止）</span><span lang="en">Saturation (stop)</span></th><td><span lang="zh">一圈之后，标出的帧数不低于上一圈的 90%，或 34 帧盲测帧里预测错的没有减少，就算饱和、停止；圈数不是条件。</span><span lang="en">After a turn, flagged frames not below 90% of the previous turn's, or wrong predictions among the 34 blind frames not fewer = saturated, stop; the number of turns is not a criterion.</span></td></tr>
-    <tr><th><span lang="zh">进度</span><span lang="en">Progress</span></th><td><span lang="zh">第一圈：视频 1、8、15 完成；视频 6 训练完、尚未预测。第二圈起还没跑。</span><span lang="en">Turn 1: videos 1, 8, 15 done; video 6 trained, not yet predicted. Turn 2 onward not run yet.</span></td></tr>
+    <tr><th><span lang="zh">进度</span><span lang="en">Progress</span></th><td><span lang="zh">第一圈：视频 1、8、15 完成；视频 6 训练完、尚未预测，在它的第二圈之前补预测。第二圈（和实验一、二的第二圈一起跑，表 9-4-13）：视频 1 标出帧数比第一圈多、盲测错帧没有减少，停在第二圈；视频 8、15、6 在跑。</span><span lang="en">Turn 1: videos 1, 8, 15 done; video 6 trained, not yet predicted; it is predicted before its turn 2. Turn 2 (run together with the second turns of experiments 1 and 2, Table 9-4-13): video 1 flags more frames than in turn 1 and its wrong blind frames do not fall, so it stops at turn 2; videos 8, 15 and 6 running.</span></td></tr>
   </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp3.png" alt="Experiment 3, turn 1: starting model against the loop model on three videos: wrong truth frames, median error, flagged share, wrong blind frames of 34"></div>
@@ -1519,8 +1519,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table>
     <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">圈</span><span lang="en">Turn</span></th><th><span lang="zh">进入训练集的帧</span><span lang="en">Frames added to the training set</span></th><th><span lang="zh">标出的帧（帧数，占整段 %）</span><span lang="en">Flagged frames (count, % of the video)</span></th><th><span lang="zh">真值错帧（/70）</span><span lang="en">Wrong truth frames (of 70)</span></th><th><span lang="zh">34 帧盲测帧里预测错的</span><span lang="en">Wrong predictions among the 34 blind frames</span></th><th><span lang="zh">判定</span><span lang="en">Decision</span></th></tr></thead>
     <tbody>
-      <tr><td rowspan="2">1</td><td>0</td><td></td><td>10987 (15.3)</td><td>8</td><td>17</td><td></td></tr>
+      <tr><td rowspan="3">1</td><td>0</td><td></td><td>10987 (15.3)</td><td>8</td><td>17</td><td></td></tr>
       <tr><td>1</td><td>5347</td><td>598 (0.8)</td><td>1</td><td>4</td><td><span lang="zh">继续</span><span lang="en">continue</span></td></tr>
+      <tr><td>2</td><td>1922</td><td>774 (1.1)</td><td>1</td><td>4</td><td><span lang="zh">停止</span><span lang="en">stop</span></td></tr>
       <tr><td rowspan="2">8</td><td>0</td><td></td><td>6383 (8.9)</td><td>1</td><td>12</td><td></td></tr>
       <tr><td>1</td><td>2508</td><td>2365 (3.3)</td><td>0</td><td>3</td><td><span lang="zh">继续</span><span lang="en">continue</span></td></tr>
       <tr><td rowspan="2">15</td><td>0</td><td></td><td>5500 (7.7)</td><td>0</td><td>10</td><td></td></tr>
@@ -1539,7 +1540,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>真值帧：错帧 8 → 1、1 → 0、0 → 0；中位误差不变（相差 0.3% 以内）。</li>
       <li>整段标出率：降到起点模型的 5% 到 37%。</li>
       <li>盲测帧（34 帧）：预测错的从 17 / 12 / 10 降到 4 / 3 / 4。</li>
-      <li>三个视频都满足再转一圈的条件；第二圈起还没跑。</li>
+      <li>三个视频都满足再转一圈的条件；第二圈见表 9-4-3 和表 9-4-13。</li>
     </ul>
   </div>
   <div class="text" lang="en">
@@ -1548,7 +1549,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Truth frames: wrong frames 8 → 1, 1 → 0, 0 → 0; the median error is unchanged (within 0.3%).</li>
       <li>Flagged share: down to 5% to 37% of the starting model's.</li>
       <li>Blind frames (34): wrong predictions from 17 / 12 / 10 down to 4 / 3 / 4.</li>
-      <li>All three videos meet the condition for another turn; turn 2 onward has not been run.</li>
+      <li>All three videos meet the condition for another turn; turn 2 in Tables 9-4-3 and 9-4-13.</li>
     </ul>
   </div>
   <div class="concl" lang="zh"><span class="tag">loop 的结论：</span>把找帧、修复、验收做成循环，再训练出来的模型在四个视频上都比起点模型错帧更少。
@@ -1983,6 +1984,27 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text"><span lang="zh">视频 6 在实验三里第一圈只训练、没有预测整段视频，所以只和起点模型比。</span><span lang="en">On video 6 experiment 3's first turn was trained but never run on the whole video, so it is compared with the starting model only.</span></p>
   <div class="concl" lang="zh"><span class="tag">5b 第一圈的结论：</span>四个视频上，最终版本第一圈都比起点模型好：盲测帧错得更少，整段标出率下降。在视频 1、8、15 上，它和实验三第一圈在盲测帧、真值帧和标出率上的差别都在只换随机种子的波动之内，所以换成 D 和置信度判据没有改变第一圈的结果；变化最大的是闭眼帧多的视频 15，进训练集的修复帧明显更多。四个视频的停止规则都判继续。</div>
   <div class="concl" lang="en"><span class="tag">Conclusion of turn 1 of 5b:</span>on all four videos the final version's first turn is better than its starting model: fewer wrong blind frames and a lower flagged share. On videos 1, 8 and 15 its differences from experiment 3's first turn in blind frames, truth frames and flagged share are within what the random seed alone changes, so D and the confidence criterion do not change the result of the first turn; the largest change is on video 15, which has many closed-eye frames, where clearly more repaired frames enter the training set. On all four videos the stop rule says continue.</div>
+
+  <p class="text"><b><span lang="zh">实验一、二、三的第二圈：哪种帧起作用</span><span lang="en">Turn 2 of experiments 1, 2 and 3: which frames help</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">做法</span><span lang="en">Procedure</span></th><td><span lang="zh">每个实验按自己第一圈的规则再转一圈：第一圈的模型取代起点模型，用它的整段预测重新找帧；实验二、三用它自己的热图第二峰修复（同实验三的下一圈）。实验一只取没被标出的帧，实验二只取修复帧，实验三两种都取。</span><span lang="en">Each experiment turns once more under its own first-turn rules: the first-turn model takes the place of the starting model and its whole-video prediction is flagged again; experiments 2 and 3 repair with its own heatmap second peaks (as in experiment 3's next turn). Experiment 1 takes only unflagged frames, experiment 2 only repaired frames, experiment 3 both.</span></td></tr>
+    <tr><th><span lang="zh">视频</span><span lang="en">Videos</span></th><td><span lang="zh">1、8、15、6；实验一在视频 1、8 上的第二圈 11 月 4 日已做过。</span><span lang="en">1, 8, 15, 6; experiment 1's second turn on videos 1 and 8 was run on 4 November.</span></td></tr>
+    <tr><th><span lang="zh">盲测帧</span><span lang="en">Blind frames</span></th><td><span lang="zh">所有模型都在同样的 34 帧（24 帧分层盲测帧加 10 帧补充盲测帧）上数预测错的帧。实验二、三进入训练集的帧避开盲测帧前后各 60 帧；实验一只避开真值帧（盲测帧是在实验一之后抽的），没有一帧和盲测帧重合，但视频 1 第二圈 60 帧盲测帧里有 43 帧在 15 帧以内就有实验一的训练帧，所以实验一的盲测数和实验二、三不在同一条件下。</span><span lang="en">Every model is counted on the same 34 frames (24 stratified plus 10 supplementary blind frames). Experiments 2 and 3 keep 60 frames on each side of the blind frames out of the training set; experiment 1 avoids only the truth frames (the blind frames were drawn after it). None of its training frames is a blind frame, but in its second turn on video 1, 43 of the 60 blind frames have one of its training frames within 15 frames, so its blind counts are not measured under the same condition as those of experiments 2 and 3.</span></td></tr>
+    <tr><th><span lang="zh">进度</span><span lang="en">Progress</span></th><td><span lang="zh">视频 1 完成；视频 8、15、6 在跑。结论等四个视频都完成后再写。</span><span lang="en">Video 1 done; videos 8, 15 and 6 running. The conclusion is written when all four are done.</span></td></tr>
+  </tbody></table></div>
+  <p class="text"><b><span lang="zh">表 9-4-13：实验一、二、三的第一圈和第二圈</span><span lang="en">Table 9-4-13: turns 1 and 2 of experiments 1, 2 and 3</span></b></p>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">模型</span><span lang="en">Model</span></th><th><span lang="zh">圈</span><span lang="en">Turn</span></th><th><span lang="zh">进入训练集的帧</span><span lang="en">Frames added</span></th><th><span lang="zh">真值帧中位误差（% 眼宽）</span><span lang="en">Median truth error (% of eye width)</span></th><th><span lang="zh">真值错帧（/70）</span><span lang="en">Wrong truth frames (of 70)</span></th><th><span lang="zh">整段标出率（%）</span><span lang="en">Flagged share (%)</span></th><th><span lang="zh">34 帧盲测帧里预测错的</span><span lang="en">Wrong among the 34 blind frames</span></th></tr></thead>
+    <tbody>
+      <tr><td rowspan="7">1</td><td><span lang="zh">起点模型</span><span lang="en">Starting model</span></td><td>0</td><td></td><td>2.94</td><td>8</td><td>15.31</td><td>17</td></tr>
+      <tr><td><span lang="zh">实验一</span><span lang="en">Experiment 1</span></td><td>1</td><td>1784</td><td>2.67</td><td>2</td><td>1.34</td><td>7</td></tr>
+      <tr><td><span lang="zh">实验一</span><span lang="en">Experiment 1</span></td><td>2</td><td>2064</td><td>2.82</td><td>1</td><td>0.98</td><td>3</td></tr>
+      <tr><td><span lang="zh">实验二</span><span lang="en">Experiment 2</span></td><td>1</td><td>1784</td><td>2.73</td><td>2</td><td>1.51</td><td>4</td></tr>
+      <tr><td><span lang="zh">实验二</span><span lang="en">Experiment 2</span></td><td>2</td><td>93</td><td>2.70</td><td>1</td><td>2.17</td><td>3</td></tr>
+      <tr><td><span lang="zh">实验三</span><span lang="en">Experiment 3</span></td><td>1</td><td>5347</td><td>2.56</td><td>1</td><td>0.83</td><td>4</td></tr>
+      <tr><td><span lang="zh">实验三</span><span lang="en">Experiment 3</span></td><td>2</td><td>1922</td><td>2.63</td><td>1</td><td>1.08</td><td>4</td></tr>
+    </tbody>
+  </table></div>
 </section>
 <!-- 10 -->
 <section id="s10">
