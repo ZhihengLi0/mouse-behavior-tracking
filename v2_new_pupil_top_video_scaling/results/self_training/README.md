@@ -206,6 +206,23 @@ indices). Videos 1, 8, 15, 6 (2026-11-05/06).
 Same wrong counts as experiment 1 on the truth frames; medians within 0.33 percent; flagged share a little higher
 than experiment 1 on every video. On the blind frames the two experiments cannot be told apart (`../blind_test/`).
 
+### Second turn of experiment 2 (`round2_repaired`, shuffle 4000 + 10 x video + 7, 2026-11-10)
+
+User 2026-11-09: after the final loop, the second turn of experiments 1 to 3 on videos 1, 8, 15, 6, to see which kind
+of frames helps (driver `tools/earlier_round2.sh`, log `earlier_round2.log`). The round-1 repaired-only student's
+whole-video prediction is flagged with its own PCA median and repaired with its own second peaks, as experiment 3 does
+from round 2 (`student_repair`, same pipeline and acceptance as experiment 2's first turn); then experiment 2's rule
+unchanged: every repaired frame, all points, minus the held-out blocks, the truth band and the blind band, capped at
+experiment 1's first-turn count; iterations matched to the teacher.
+
+| video | flagged by the round-1 student | repaired | removed: held out / near truth / near blind | kept | epochs | iterations | median % | wrong of 70 | flagged either % | blind wrong 24 + 10 (turn 1 → turn 2) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 1086 | 206 | 13 / 8 / 92 | 93 | 65 | 6955 | 2.70 | 1 | 2.17 | 4 + 0 → 1 + 2 |
+
+Video 1 against experiment 2's first turn: median 2.73 → 2.70, wrong truth frames 2 → 1, flagged share 1.51 → 2.17 %,
+blind 4 → 3 of 34. Only 93 repaired frames are fed back (1784 in the first turn), so the student trains on the human
+labels almost alone, with 65 epochs to match the teacher's iterations. Rows are added as the students finish.
+
 ### Experiment 3: both kinds of frames, repeated (`round{r}_both`, shuffle 5000 + 10 x video + r)
 
 `self_training.py pseudo --source both --round r`, `train`, `evaluate --save-flags`, `loop-status`; driver
