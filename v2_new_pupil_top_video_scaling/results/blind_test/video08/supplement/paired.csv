@@ -24,6 +24,11 @@ round1_repaired,teacher,E_t,2,2,0,0,-23.62,0.5,0.5
 round1_repaired,teacher,F_n,2,0,1,1,2.27,1.0,1.0
 round1_repaired,teacher,F_t,2,1,0,1,-18.35,1.0,1.0
 round1_repaired,teacher,all,10,4,1,5,-0.53,0.375,0.0645
+round2_repaired,teacher,E_n,4,0,1,3,0.37,1.0,0.125
+round2_repaired,teacher,E_t,2,2,0,0,-21.56,0.5,0.5
+round2_repaired,teacher,F_n,2,0,0,2,0.53,,0.5
+round2_repaired,teacher,F_t,2,2,0,0,-17.11,0.5,0.5
+round2_repaired,teacher,all,10,4,1,5,0.05,0.375,0.5566
 round1_both,teacher,E_n,4,1,0,3,-0.26,1.0,0.25
 round1_both,teacher,E_t,2,2,0,0,-23.57,0.5,0.5
 round1_both,teacher,F_n,2,0,0,2,0.43,,0.5
