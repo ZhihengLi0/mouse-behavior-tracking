@@ -234,6 +234,7 @@ experiment 1's first-turn count; iterations matched to the teacher.
 |---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 1086 | 206 | 13 / 8 / 92 | 93 | 65 | 6955 | 2.70 | 1 | 2.17 | 4 + 0 → 1 + 2 |
 | 8 | 2403 | 47 | 4 / 0 / 21 | 22 | 117 | 25857 | 5.26 | 1 | 5.27 | 2 + 0 → 1 + 4 |
+| 15 | 2417 | 158 | 31 / 1 / 68 | 58 | 108 | 40932 | 2.39 | 0 | 4.10 | 3 + 1 → 1 + 1 |
 
 Video 1 against experiment 2's first turn: median 2.73 → 2.70, wrong truth frames 2 → 1, flagged share 1.51 → 2.17 %,
 blind 4 → 3 of 34. Only 93 repaired frames are fed back (1784 in the first turn), so the student trains on the human
@@ -243,6 +244,10 @@ Video 8 against experiment 2's first turn: median 5.08 → 5.26, wrong truth fra
 blind 2 → 5 of 34 (24: 2 → 1, supplement: 0 → 4). The round-1 student repairs only 47 of its 2403 flagged frames and 22
 remain after the exclusions (616 in the first turn), so the student trains on the human labels almost alone, with 117
 epochs to match the teacher's iterations.
+
+Video 15 against experiment 2's first turn: median 2.75 → 2.39, wrong truth frames 0 → 0, flagged share 3.37 → 4.10 %,
+blind 4 → 2 of 34 (24: 3 → 1, supplement: 1 → 1). 158 of the round-1 student's 2417 flagged frames are repaired and 58
+remain after the exclusions (548 in the first turn); 108 epochs to match the teacher's iterations.
 
 ### Experiment 3: both kinds of frames, repeated (`round{r}_both`, shuffle 5000 + 10 x video + r)
 
