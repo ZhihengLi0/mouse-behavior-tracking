@@ -270,6 +270,7 @@ wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion;
 | 6 | 1 | 2921 (1725 + 1196) | 21 | | | | | 3883 → | 9 → | |
 | 1 | 2 | 1922 (1903 + 19) | 8 | 8168 | 2.63 | 1 | 1.08 | 598 → 774 | 4 → 4 | stop |
 | 8 | 2 | 1779 (1759 + 20) | 22 | 24200 | 5.93 | 0 | 2.10 | 2365 → 1507 | 3 → 4 | stop |
+| 15 | 2 | 1789 (1745 + 44) | 34 | 42330 | 2.45 | 0 | 2.37 | 1988 → 1697 | 4 → 6 | stop |
 
 Second turn (2026-11-10, run with the second turns of experiments 1 and 2, `tools/earlier_round2.sh`): video 1 round
 2 against round 1: flagged frames 598 → 774, blind 4 → 4, truth 1 → 1, median 2.56 → 2.63; both conditions fire, so the
@@ -281,6 +282,13 @@ short for the new models; summary figure only, not used by the page).
 Video 8 round 2 against round 1 (prediction resumed 2026-11-10 22:50 after the user's stop at 08:17; the model trained
 in the morning was used unchanged): flagged frames 2365 → 1507 (64 %), blind 3 → 4 (24: 2 → 2, supplement: 1 → 2),
 truth 0 → 0, median 4.85 → 5.93; the blind condition fires, so the loop stops at round 2 (20 repaired frames fed back).
+
+Video 15 round 2 against round 1: flagged frames 1988 → 1697 (85 %), blind 4 → 6 (24: 2 → 3, supplement: 2 → 3),
+truth 0 → 0, median 2.50 → 2.45; the blind condition fires, so the loop stops at round 2 (44 repaired frames fed back).
+
+Video 6 is not run: the user stopped the chain on 2026-11-11 at 11:58 ("不损失的前提下，尽快停止") during video 6's
+second turn of experiment 1 (shuffle 4063); that training is let finish and its prediction is stopped at its start, so
+video 6 has no second-turn result yet for any experiment (its experiment 3 round 1 is trained, not predicted).
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
