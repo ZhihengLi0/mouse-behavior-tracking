@@ -183,6 +183,7 @@ every 30th unflagged frame, same per-point filter, same iteration matching. Vide
 |---|---|---|---|---|---|---|
 | 1 | 2088 / 2064 | 7 | 7644 | 2.82 | 1 | 0.98 |
 | 8 | 2040 / 1994 | 21 | 25347 | 5.06 | 0 | 2.13 |
+| 15 | 2055 / 1958 | 32 | 42528 | 2.46 | 0 | 2.23 |
 
 Against the first turn: video 1 wrong 2 → 1, video 8 0 → 0; flagged share 1.34 → 0.98 and 3.22 → 2.13 percent; the
 blind frames unchanged (`../blind_test/`). A second turn without repair brings back only self-prediction and
@@ -194,6 +195,13 @@ either turn is a blind frame, but of the 60 blind frames, those with a pseudo fr
 video 1 turn 1 41 / 23, turn 2 56 / 43; video 8 52 / 29 and 56 / 40; video 15 turn 1 50 / 21; video 6 turn 1 56 / 34.
 Experiments 2 and 3 exclude the band (none within 60, one frame on video 15 in experiment 2). Experiment 1's blind
 counts are therefore measured on frames whose neighbours it trained on.
+
+Video 15, second turn (2026-11-11, `tools/earlier_round2.sh`): wrong truth 0 → 0, flagged share 2.69 → 2.23 %,
+median 2.39 → 2.46, blind 3 → 4 of 34 (24: 2 → 2, supplement: 1 → 2). Blind band: 51 / 34 of the 60 blind frames have
+a pseudo frame within 60 / 15, and one blind frame is itself a pseudo frame: frame 17550 (`img037.png`, stratum A, one
+of the 24 scored). The teacher flagged it, so turn 1 did not take it and the blind selection (which excluded turn 1's
+pseudo frames) kept it; the round-1 student does not flag it, so turn 2 takes it as an every-30th frame. Every model's
+error on it is 0.074 to 0.077 eye widths (right), so no wrong count changes; the frame stays in both sets (rule unchanged).
 
 ### Experiment 2: repaired frames only (`round1_repaired`, shuffle 4000 + 10 x video + 5)
 

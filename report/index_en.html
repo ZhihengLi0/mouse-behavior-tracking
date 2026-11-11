@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-11 00:22 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-11 03:57 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1622,7 +1622,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Procedure</span></th><td><span lang="en">Each experiment turns once more under its own first-turn rules: the first-turn model takes the place of the starting model and its whole-video prediction is flagged again; experiments 2 and 3 repair with its own heatmap second peaks (as in experiment 3's next turn). Experiment 1 takes only unflagged frames, experiment 2 only repaired frames, experiment 3 both.</span></td></tr>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">1, 8, 15, 6; experiment 1's second turn on videos 1 and 8 was run on 4 November.</span></td></tr>
-    <tr><th><span lang="en">Blind frames</span></th><td><span lang="en">Every model is counted on the same 34 frames (24 stratified plus 10 supplementary blind frames). Experiments 2 and 3 keep 60 frames on each side of the blind frames out of the training set; experiment 1 avoids only the truth frames (the blind frames were drawn after it). None of its training frames is a blind frame, but in its second turn on video 1, 43 of the 60 blind frames have one of its training frames within 15 frames, so its blind counts are not measured under the same condition as those of experiments 2 and 3.</span></td></tr>
+    <tr><th><span lang="en">Blind frames</span></th><td><span lang="en">Every model is counted on the same 34 frames (24 stratified plus 10 supplementary blind frames). Experiments 2 and 3 keep 60 frames on each side of the blind frames out of the training set; experiment 1 avoids only the truth frames (the blind frames were drawn after its first turn and exclude only that turn's training frames). In its second turn on video 1, 43 of the 60 blind frames have one of its training frames within 15 frames; in its second turn on video 15 one blind frame (one of the 24 scored) is itself in the training set, and every model predicts that frame correctly. So its blind counts are not measured under the same condition as those of experiments 2 and 3.</span></td></tr>
     <tr><th><span lang="en">Progress</span></th><td><span lang="en">Videos 1 and 8 done; videos 15 and 6 running. The conclusion is written when all four are done.</span></td></tr>
   </tbody></table></div>
   <p class="text"><b><span lang="en">Table 9-4-13: turns 1 and 2 of experiments 1, 2 and 3</span></b></p>
