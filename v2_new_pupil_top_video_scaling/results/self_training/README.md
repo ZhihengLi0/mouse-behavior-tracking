@@ -233,7 +233,7 @@ labels almost alone, with 65 epochs to match the teacher's iterations. Rows are 
 
 Video 8 against experiment 2's first turn: median 5.08 → 5.26, wrong truth frames 0 → 1, flagged share 3.35 → 5.27 %,
 blind 2 → 5 of 34 (24: 2 → 1, supplement: 0 → 4). The round-1 student repairs only 47 of its 2403 flagged frames and 22
-remain after the exclusions (1829 in the first turn), so the student trains on the human labels almost alone, with 117
+remain after the exclusions (616 in the first turn), so the student trains on the human labels almost alone, with 117
 epochs to match the teacher's iterations.
 
 ### Experiment 3: both kinds of frames, repeated (`round{r}_both`, shuffle 5000 + 10 x video + r)
@@ -256,6 +256,7 @@ wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion;
 | 15 | 1 | 2254 (1688 + 566) | 34 | 50218 | 2.50 | 0 | 2.77 | 5500 → 1988 | 10 → 4 | continue |
 | 6 | 1 | 2921 (1725 + 1196) | 21 | | | | | 3883 → | 9 → | |
 | 1 | 2 | 1922 (1903 + 19) | 8 | 8168 | 2.63 | 1 | 1.08 | 598 → 774 | 4 → 4 | stop |
+| 8 | 2 | 1779 (1759 + 20) | 22 | 24200 | 5.93 | 0 | 2.10 | 2365 → 1507 | 3 → 4 | stop |
 
 Second turn (2026-11-10, run with the second turns of experiments 1 and 2, `tools/earlier_round2.sh`): video 1 round
 2 against round 1: flagged frames 598 → 774, blind 4 → 4, truth 1 → 1, median 2.56 → 2.63; both conditions fire, so the
@@ -263,6 +264,10 @@ loop stops at round 2 (19 repaired frames fed back). The status step failed in t
 `loop-status` takes `--source` with default `pipeline`, and `self_training_loop.sh` did not pass it; it was re-run by
 hand with `--source both` (rule unchanged) and the driver now passes it. `compare` fails as well (the palette is too
 short for the new models; summary figure only, not used by the page).
+
+Video 8 round 2 against round 1 (prediction resumed 2026-11-10 22:50 after the user's stop at 08:17; the model trained
+in the morning was used unchanged): flagged frames 2365 → 1507 (64 %), blind 3 → 4 (24: 2 → 2, supplement: 1 → 2),
+truth 0 → 0, median 4.85 → 5.93; the blind condition fires, so the loop stops at round 2 (20 repaired frames fed back).
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
