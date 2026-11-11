@@ -1,0 +1,2 @@
+video,model,shuffle,teacher_shuffle,train_human,train_pseudo,val,teacher_iterations,epochs,iterations,milestones,snapshot_every,final_snapshot,train_minutes,predict_minutes,prediction_h5
+6,round2_every30,4063,711,400,2021,20,24000,20,24220,16/19,1,snapshot-best-020.pt,71.9,88.2,6_20251028_Pluto_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle4063_snapshot_020.h5

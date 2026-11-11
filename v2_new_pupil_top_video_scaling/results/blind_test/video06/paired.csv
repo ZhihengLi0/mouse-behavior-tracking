@@ -9,6 +9,11 @@ round1_every30,teacher,B,3,2,1,0,-6.03,1.0,1.0
 round1_every30,teacher,C,8,0,0,8,0.01,,0.4609
 round1_every30,teacher,D,3,0,1,2,-0.37,1.0,1.0
 round1_every30,teacher,all,24,11,2,11,-0.76,0.0225,0.0291
+round2_every30,teacher,A,10,9,0,1,-30.75,0.0039,0.002
+round2_every30,teacher,B,3,2,1,0,-5.8,1.0,1.0
+round2_every30,teacher,C,8,0,0,8,0.03,,0.25
+round2_every30,teacher,D,3,2,0,1,-1.37,0.5,0.5
+round2_every30,teacher,all,24,13,1,10,-1.68,0.0018,0.0043
 round1_repaired,teacher,A,10,9,0,1,-30.24,0.0039,0.0039
 round1_repaired,teacher,B,3,2,0,1,-2.78,0.5,0.25
 round1_repaired,teacher,C,8,0,1,7,0.06,1.0,0.3125

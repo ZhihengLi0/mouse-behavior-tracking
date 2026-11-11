@@ -184,6 +184,7 @@ every 30th unflagged frame, same per-point filter, same iteration matching. Vide
 | 1 | 2088 / 2064 | 7 | 7644 | 2.82 | 1 | 0.98 |
 | 8 | 2040 / 1994 | 21 | 25347 | 5.06 | 0 | 2.13 |
 | 15 | 2055 / 1958 | 32 | 42528 | 2.46 | 0 | 2.23 |
+| 6 | 2103 / 2021 | 20 | 24220 | 1.43 | 0 | 0.35 |
 
 Against the first turn: video 1 wrong 2 → 1, video 8 0 → 0; flagged share 1.34 → 0.98 and 3.22 → 2.13 percent; the
 blind frames unchanged (`../blind_test/`). A second turn without repair brings back only self-prediction and
@@ -202,6 +203,14 @@ a pseudo frame within 60 / 15, and one blind frame is itself a pseudo frame: fra
 of the 24 scored). The teacher flagged it, so turn 1 did not take it and the blind selection (which excluded turn 1's
 pseudo frames) kept it; the round-1 student does not flag it, so turn 2 takes it as an every-30th frame. Every model's
 error on it is 0.074 to 0.077 eye widths (right), so no wrong count changes; the frame stays in both sets (rule unchanged).
+
+Video 6, second turn (2026-11-11): training (shuffle 4063, 20 epochs, `snapshot-best-020.pt`) finished at 12:26 after
+the user's 11:58 stop, and its prediction was stopped at its start; the prediction was then run from the saved snapshot
+with the same command train() hands over to (13:14 to 14:42), and `tools/finish_round_then_stop.sh` evaluated and
+scored it. Wrong truth 0 → 0, flagged share 0.44 → 0.35 %, median 1.44 → 1.43, blind 4 → 2 of 34 (24: 3 → 2,
+supplement: 1 → 0). The two stratum-B frames wrong in turn 1 (`img024.png`, `img030.png`) are still wrong; `img031.png`
+(stratum D) and `img105.png` (supplement, E_t) are right in turn 2; no blind frame became wrong. Blind band: 59 / 37 of
+the 60 blind frames have a pseudo frame within 60 / 15 (turn 1: 56 / 34); no blind frame is a pseudo frame.
 
 ### Experiment 2: repaired frames only (`round1_repaired`, shuffle 4000 + 10 x video + 5)
 
@@ -289,6 +298,10 @@ truth 0 → 0, median 2.50 → 2.45; the blind condition fires, so the loop stop
 Video 6 is not run: the user stopped the chain on 2026-11-11 at 11:58 ("不损失的前提下，尽快停止") during video 6's
 second turn of experiment 1 (shuffle 4063); that training is let finish and its prediction is stopped at its start, so
 video 6 has no second-turn result yet for any experiment (its experiment 3 round 1 is trained, not predicted).
+
+Update 2026-11-11 14:43: the user resumed at 13:14 ("继续跑") and at 13:22 asked to finish the running round and stop
+("最近一轮跑完不损失尽快结束"). Only video 6's second turn of experiment 1 was finished (row and paragraph in that
+section). Video 6's second turn of experiment 2 and its experiment 3 (round 1 prediction, round 2) are not run.
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
