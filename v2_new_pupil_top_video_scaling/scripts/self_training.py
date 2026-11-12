@@ -259,23 +259,26 @@ def repaired_candidates(v, C, lik, near, n, every, source_name, rnd=1):
     return F, S
 
 
-def reopened_candidates(v, C0, lik, near, n, source_name):
+def reopened_candidates(v, C0, lik, near, n, source_name, rnd=1, C=None):
     """Reopened source (experiment 4, audit 2026-11-08): the frames the opening closed-eye rule called closed and the
     confidence rule (closed = mean pupil confidence < 0.40, calibrated on judged frames) hands to the ordinary repair,
     where they pass the acceptance ranges: status closed in the pipeline run, repaired in the --closed confidence run.
     The confidence run is re-made into videoNN/repair_confclosed/ with --save-coords and checked against the committed
     run. All eight points as accepted (a non-replaced point is dropped only below the likelihood bound); excluded: the
     truth band and the blind-set band; no held-out blocks, no cap (every such frame trains, as in the loop)."""
-    rep = OUT / f"video{v:02d}" / "repair_confclosed"
-    if not (rep / "coords_after.csv.gz").exists():
-        log(f"video {v}: re-running the confidence closed-eye pipeline into {rep}")
-        subprocess.run([sys.executable, str(HERE / "scripts" / "flag_and_repair.py"), "--video", str(v), *PIPE, "--closed", "confidence",
-                        "--out", str(rep), "--save-coords"], check=True, cwd=str(HERE / "scripts"), stdout=subprocess.DEVNULL)
-    for f in ("summary.csv", "whole_video.csv"):
-        a, b = pd.read_csv(rep / f), pd.read_csv(RES / "flag_and_repair" / CONFCLOSED.format(v=v) / f)
-        pd.testing.assert_frame_equal(a, b)
-    log(f"video {v}: confidence-rule re-run summary and whole_video identical to the committed run")
-    C = pd.read_csv(rep / "coords_after.csv.gz")
+    if C is None:                                            # round 1: the teacher's prediction, the committed confidence run re-made
+        rep = OUT / f"video{v:02d}" / "repair_confclosed"
+        if not (rep / "coords_after.csv.gz").exists():
+            log(f"video {v}: re-running the confidence closed-eye pipeline into {rep}")
+            subprocess.run([sys.executable, str(HERE / "scripts" / "flag_and_repair.py"), "--video", str(v), *PIPE, "--closed", "confidence",
+                            "--out", str(rep), "--save-coords"], check=True, cwd=str(HERE / "scripts"), stdout=subprocess.DEVNULL)
+        for f in ("summary.csv", "whole_video.csv"):
+            a, b = pd.read_csv(rep / f), pd.read_csv(RES / "flag_and_repair" / CONFCLOSED.format(v=v) / f)
+            pd.testing.assert_frame_equal(a, b)
+        log(f"video {v}: confidence-rule re-run summary and whole_video identical to the committed run")
+        C = pd.read_csv(rep / "coords_after.csv.gz")
+    # round >= 2 (user 2026-11-12): C0 and C are the two repairs of the round rnd-1 reopened student's own prediction
+    # (opening rule, confidence rule), made by student_repair(); the definition of a reopened frame is unchanged
     assert len(C) == len(C0) == n and (C.frame.to_numpy() == C0.frame.to_numpy()).all()
     bl = blind_frames(v)
     near_blind = np.zeros(n, bool)
@@ -307,7 +310,7 @@ def reopened_candidates(v, C0, lik, near, n, source_name):
     F = pd.DataFrame(rows)
     K = F[F.kept]
     assert not (K.near_truth | K.near_blind).any()
-    S = {"video": v, "unit": unit_of(v), "every": np.nan, "round": 1, "source": source_name, "frames": n,
+    S = {"video": v, "unit": unit_of(v), "every": np.nan, "round": rnd, "source": source_name, "frames": n,
          "closed_opening_rule": int(was_closed.sum()), "closed_confidence_rule": int((C.status == "closed").sum()),
          "candidates_reopened": int(reopened.sum()), "near_truth_excluded": int((reopened & near).sum()),
          "blind_excluded": int((reopened & ~near & near_blind).sum()), "candidates": int(cand.sum()),
@@ -399,7 +402,7 @@ def both_candidates(v, C, lik, dev, res, thr, thr_pca, near, n, every, source_na
     return F, S
 
 
-def student_repair(v, rnd, source="both"):
+def student_repair(v, rnd, source="both", extra=(), sub="repair"):
     """Source both or formal (the final loop: PIPE_FORMAL, the prediction's own eye width, second peaks on the flagged
     frames only and on demand), round rnd >= 2: the round rnd-1 loop model's whole-video prediction is flagged by both finders
     (fitting threshold as the pipeline, PCA threshold = multiple x its own median), its heatmap second peaks are
@@ -408,7 +411,7 @@ def student_repair(v, rnd, source="both"):
     returns: C (coords after repair with statuses), d, lik, dev, res, Wm, thr, thr_pca, truth, source name."""
     unit, step = unit_of(v), step_of(v)
     formal = source == "formal"
-    pipe = PIPE_FORMAL if formal else PIPE
+    pipe = (PIPE_FORMAL if formal else PIPE) + list(extra)   # extra, sub: experiment 4c round 2 runs the repair twice on one prediction (opening rule into repair/, + --closed confidence into repair_confclosed/); defaults = the behaviour before
     prev = model_name(None, rnd - 1, source=source)
     pdir = OUT / f"video{v:02d}" / prev
     h5 = sorted((LOCAL / f"video{v:02d}" / prev / "predictions").glob("*.h5"))[-1]
@@ -438,7 +441,7 @@ def student_repair(v, rnd, source="both"):
     else:
         # the repair judges the fitting deviation with the prediction's own eye width, so the peaks are computed with a margin
         want = np.flatnonzero((fit_s > 0.9 * thr) | (score > 0.9 * thr_pca))
-    rep = mkdir(pdir / "repair")
+    rep = mkdir(pdir / sub)
     peaks_csv, dev_npy = rep / "peaks.csv", rep / "dev_px.npy"
     np.save(dev_npy, dev_px)
     log(f"video {v}: round {rnd} source = {prev} ({Path(h5).name}): {int(flagged.sum())} of {len(d)} frames flagged "
@@ -486,13 +489,17 @@ def pseudo(v, every, rnd=1, source="pipeline"):
     if source == "repaired":                              # round >= 2 (user 2026-11-09): the round rnd-1 repaired-only student, repaired with its own second peaks as in experiment 3
         every = 30                                            # the count cap and the file names refer to the every-30 student
     if source == "reopened":
-        assert rnd == 1, "the reopened source is round 1 only"
-        every = 30
+        every = 30                                            # round 1: the teacher; round >= 2 (user 2026-11-12): the round rnd-1 reopened student
     if source in ("both", "formal"):
         every = 30
     if rnd > 1 and source in ("both", "formal", "repaired"):
         C, d, lik, dev, res, Wm, thr, thr_pca, truth, source_name = student_repair(v, rnd, source)
         n = len(C)
+    elif rnd > 1 and source == "reopened":                  # experiment 4c round >= 2: the same prediction repaired under both closed-eye rules
+        C, d, lik, dev, res, Wm, thr, thr_pca, truth, source_name = student_repair(v, rnd, source)
+        C_conf = student_repair(v, rnd, source, extra=["--closed", "confidence"], sub="repair_confclosed")[0]
+        n = len(C)
+        assert len(C_conf) == n
     elif rnd == 1:
         formal = source == "formal"
         rep = OUT / f"video{v:02d}" / ("repair_formal" if formal else "repair")
@@ -545,7 +552,7 @@ def pseudo(v, every, rnd=1, source="pipeline"):
         write_pseudo_set(v, every, rnd, source, K, S, out, loc, unit)
         return
     if source == "reopened":
-        F, S = reopened_candidates(v, C, lik, near, n, source_name)
+        F, S = reopened_candidates(v, C, lik, near, n, source_name, rnd, C_conf if rnd > 1 else None)
         F.round(3).to_csv(out / "pseudo_frames.csv", index=False)
         K = F[F.kept]
         pd.DataFrame([S]).to_csv(out / "pseudo_summary.csv", index=False)

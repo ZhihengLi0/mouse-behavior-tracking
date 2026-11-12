@@ -447,6 +447,32 @@ anything on top of them is a question for the formal loop (both sources together
 
 Rows are added as the students finish. Files: `videoNN/pseudo_reopened/`, `videoNN/round1_reopened/{eval,truth_errors,train_info}.csv`.
 
+**4c, second turn** (user 2026-11-12: every experiment gets a second turn, "就可以分别看出来第二圈在哪些帧上是有好的";
+videos 1 and 15 only: videos 8 and 6 have 5 and 15 reopened frames on the starting model, so 4c is not run there).
+Same rules as turn 1, with the turn-1 reopened student's whole-video prediction as the source: it is flagged and
+repaired twice (`self_training.py pseudo --source reopened --round 2`: `student_repair()` as in experiments 2 and 3,
+once with the opening closed-eye rule into `round1_reopened/repair/`, once with `--closed confidence` into
+`round1_reopened/repair_confclosed/`); a reopened frame is closed under the first and repaired under the second;
+truth and blind bands excluded, no cap. The student is trained, like every student here, from the pretrained backbone on
+the human labels plus this turn's frames only (shuffle 8000 + 10 x video + 2). Blind frames scored with
+`scripts/blind_score_model.py` (one model, written to `round2_reopened/blind_scores.csv`; it reproduces both existing
+`round1_reopened/blind_scores.csv` files exactly). Driver `tools/exp4_round2.sh`, log `exp4_round2.log`.
+
+| video | closed on the source (opening / confidence rule) | reopened | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | blind wrong (24 + 10) |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 177 / 343 | 56 | 33 (1 near truth, 22 near blind) | 91 | 7007 | 3.14 (turn 1 2.88, teacher 2.94) | 7 (turn 1 1, teacher 8) | 12.31 (turn 1 7.37, teacher 15.31) | 10 + 8 = 18 (turn 1 4 + 4 = 8, teacher 11 + 6 = 17) |
+
+Video 1 (2026-11-12 16:36): the second turn falls back to about the starting model. Its 33 frames are other errors
+than turn 1's (top eyelid 33, top pupil point 27 replaced; turn 1 was the temporal corner), and the turn-1 frames are not
+in its training set. The turn-2 student flags 165 of the 174 held-out turn-1 reopened frames (turn-1 student 3) and 84 of
+the 98 turn-1 training frames (turn-1 student 2): what the turn-1 frames fixed is lost again. This follows from the
+design shared by all experiments (each turn = human labels + that turn's pseudo frames, no frames carried over): in
+experiments 1 and 3 a turn still has about 2000 grid frames labeled by the previous model, so its gain is carried in the
+labels; in experiments 2 and 4c a second turn has only the few frames the improved model still gets wrong (experiment 2:
+22 to 306, 4c: 33), so the student is close to one trained on the human labels alone. Experiment 2 on video 8 (22 frames,
+blind 2 to 5, flagged 3.35 to 5.27 %) fits the same effect (not checked frame by frame). A second turn of experiments 2 and 4c therefore
+measures "the new frames alone", not "turn 1 plus the new frames".
+
 ### Experiment 5: the final loop version (2026-11-08)
 
 Experiments 1 to 4 each prove one part of the loop; experiment 5 puts the settled parts together (user's naming).
