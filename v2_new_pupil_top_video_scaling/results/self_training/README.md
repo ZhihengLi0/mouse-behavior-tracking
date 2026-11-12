@@ -290,6 +290,7 @@ wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion;
 | 15 | 2 | 1789 (1745 + 44) | 34 | 42330 | 2.45 | 0 | 2.37 | 1988 → 1697 | 4 → 6 | stop |
 | 6 | 1 | 2921 (1725 + 1196) | 21 | 34881 | 1.47 | 0 | 0.54 | 3883 → 387 | 9 → 3 | continue |
 | 6 | 2 | 1892 (1886 + 6) | 21 | 24066 | 1.50 | 0 | 0.41 | 387 → 295 | 3 → 2 | continue (round 3 not run) |
+| 6 | 3 | 1910 (1907 + 3) | 21 | 24255 | 1.49 | 0 | 0.37 | 295 → 263 | 2 → 3 | stop |
 
 Second turn (2026-11-10, run with the second turns of experiments 1 and 2, `tools/earlier_round2.sh`): video 1 round
 2 against round 1: flagged frames 598 → 774, blind 4 → 4, truth 1 → 1, median 2.56 → 2.63; both conditions fire, so the
@@ -325,6 +326,15 @@ video of the four where it is. Round 3 was not run: this launch's budget was MAX
 turns), and the user asked to stop before 08:00. 6 repaired frames fed back. In the 24 scored frames `img033.png` (A)
 becomes right and `img024.png` (B) becomes wrong, `img030.png` (B) stays wrong; supplement `img107.png` (F_t) becomes
 right. `compare` failed again (palette, summary figure only).
+
+Video 6 round 3 against round 2 (user 2026-11-12 10:26 "继续跑"; launch VIDEOS=6, round 4 not to be started, user:
+"第三圈都不着急开始"): training 10:28 to 11:42 (shuffle 5063), prediction to 13:09. The evaluation at 13:09 failed
+because macOS took the shell's Desktop access away (PermissionError at import); after access was restored it was
+re-run at 14:31 on the same prediction (`self_training_loop.sh` VIDEOS=6 MAXR=3). Flagged frames 295 → 263 (89 %,
+below the 90 % line), blind 2 → 3 (24: 2 → 3, supplement: 0 → 0), truth 0 → 0, median 1.50 → 1.49; the blind
+condition fires, so the loop stops at round 3 (3 repaired frames fed back). In the 24 scored frames `img033.png` (A)
+becomes wrong again (right in round 2 only); `img024.png` and `img030.png` (B) stay wrong. All four videos have now
+stopped by the rule (1, 8, 15 at round 2, 6 at round 3).
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,

@@ -1,3 +1,4 @@
 video,round,flagged_prev,flagged,blind_frames,blind_wrong_prev,blind_wrong,stop,reason
 6,1,3883,387,34,9,3,False,
 6,2,387,295,34,3,2,False,
+6,3,295,263,34,2,3,True,blind wrong 3 not below 2
