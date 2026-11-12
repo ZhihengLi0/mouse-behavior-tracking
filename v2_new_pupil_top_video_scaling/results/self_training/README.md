@@ -288,6 +288,7 @@ wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion;
 | 1 | 2 | 1922 (1903 + 19) | 8 | 8168 | 2.63 | 1 | 1.08 | 598 → 774 | 4 → 4 | stop |
 | 8 | 2 | 1779 (1759 + 20) | 22 | 24200 | 5.93 | 0 | 2.10 | 2365 → 1507 | 3 → 4 | stop |
 | 15 | 2 | 1789 (1745 + 44) | 34 | 42330 | 2.45 | 0 | 2.37 | 1988 → 1697 | 4 → 6 | stop |
+| 6 | 1 | 2921 (1725 + 1196) | 21 | 34881 | 1.47 | 0 | 0.54 | 3883 → 387 | 9 → 3 | continue |
 
 Second turn (2026-11-10, run with the second turns of experiments 1 and 2, `tools/earlier_round2.sh`): video 1 round
 2 against round 1: flagged frames 598 → 774, blind 4 → 4, truth 1 → 1, median 2.56 → 2.63; both conditions fire, so the
@@ -310,6 +311,12 @@ video 6 has no second-turn result yet for any experiment (its experiment 3 round
 Update 2026-11-11 14:43: the user resumed at 13:14 ("继续跑") and at 13:22 asked to finish the running round and stop
 ("最近一轮跑完不损失尽快结束"). Only video 6's second turn of experiment 1 was finished (row and paragraph in that
 section). Video 6's second turn of experiment 2 and its experiment 3 (round 1 prediction, round 2) are not run.
+
+Video 6 round 1 (2026-11-12 01:51, after the user's "继续开始跑" on 2026-11-11 21:36): the model trained on 2026-11-07
+(shuffle 5061, final `snapshot-021.pt`) was predicted 00:24 to 01:50 by `earlier_round2.sh` before the loop driver.
+Against the starting model: flagged frames 3883 → 387, blind 9 → 3 (24: 8 → 2, supplement: 1 → 1), truth 0 → 0,
+median 1.49 → 1.47; neither condition fires, so the loop continues to round 2 (training since 01:53, shuffle 5062).
+The video 6 round 1 row with blanks is the state on 2026-11-07 (trained, not predicted); the full row is the last one.
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
