@@ -244,6 +244,7 @@ experiment 1's first-turn count; iterations matched to the teacher.
 | 1 | 1086 | 206 | 13 / 8 / 92 | 93 | 65 | 6955 | 2.70 | 1 | 2.17 | 4 + 0 → 1 + 2 |
 | 8 | 2403 | 47 | 4 / 0 / 21 | 22 | 117 | 25857 | 5.26 | 1 | 5.27 | 2 + 0 → 1 + 4 |
 | 15 | 2417 | 158 | 31 / 1 / 68 | 58 | 108 | 40932 | 2.39 | 0 | 4.10 | 3 + 1 → 1 + 1 |
+| 6 | 2429 | 563 | 184 / 47 / 26 | 306 | 70 | 24710 | 1.51 | 0 | 2.15 | 2 + 3 → 4 + 0 |
 
 Video 1 against experiment 2's first turn: median 2.73 → 2.70, wrong truth frames 2 → 1, flagged share 1.51 → 2.17 %,
 blind 4 → 3 of 34. Only 93 repaired frames are fed back (1784 in the first turn), so the student trains on the human
@@ -257,6 +258,13 @@ epochs to match the teacher's iterations.
 Video 15 against experiment 2's first turn: median 2.75 → 2.39, wrong truth frames 0 → 0, flagged share 3.37 → 4.10 %,
 blind 4 → 2 of 34 (24: 3 → 1, supplement: 1 → 1). 158 of the round-1 student's 2417 flagged frames are repaired and 58
 remain after the exclusions (548 in the first turn); 108 epochs to match the teacher's iterations.
+
+Video 6 against experiment 2's first turn (2026-11-12, resumed 2026-11-11 21:36): median 1.52 → 1.51, wrong truth
+frames 0 → 0, flagged share 3.39 → 2.15 %, blind 5 → 4 of 34 (24: 2 → 4, supplement: 3 → 0). 563 of the round-1
+student's 2429 flagged frames are repaired and 306 remain after the exclusions (1130 in the first turn), the most of
+the four videos; 70 epochs to match the teacher's iterations. In the 24 scored frames the two wrong in turn 1
+(`img030.png` B, `img042.png` A) stay wrong and `img011.png` (D) and `img024.png` (B) become wrong; the three
+supplement frames wrong in turn 1 (`img102`, `img106`, `img108`, all F_n) are right in turn 2.
 
 ### Experiment 3: both kinds of frames, repeated (`round{r}_both`, shuffle 5000 + 10 x video + r)
 
