@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-12 00:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-12 04:36 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1232,7 +1232,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Videos and counts</span></th><td><span lang="en">Videos 1 / 8 / 15 / 6: 5347 / 2508 / 2254 / 2921 frames added to the training set in turn 1; epochs = experiment 1's on the video (8 / 22 / 34 / 21), so the iterations grow with the set and every human frame is seen as often as in experiment 1; every turn trains afresh from the ImageNet weights (Tables 9-4-6, 9-4-7).</span></td></tr>
     <tr><th><span lang="en">Next turn</span></th><td><span lang="en">The new model takes the place of the starting model: its whole-video prediction is flagged again (PCA threshold from its own median), the flagged and near-threshold frames get second peaks from its own heatmaps, repaired and checked as in 9.3, then the same frame rule and the same epochs train the next model.</span></td></tr>
     <tr><th><span lang="en">Saturation (stop)</span></th><td><span lang="en">After a turn, flagged frames not below 90% of the previous turn's, or wrong predictions among the 34 blind frames not fewer = saturated, stop; the number of turns is not a criterion.</span></td></tr>
-    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: videos 1, 8, 15 done; video 6 trained, not yet predicted; it is predicted before its turn 2. Turn 2 (run together with the second turns of experiments 1 and 2, Table 9-4-13): video 1 flags more frames than in turn 1 and its wrong blind frames do not fall, so it stops at turn 2; video 8 flags 64% of its turn-1 count but its wrong blind frames rise from 3 to 4, so it also stops at turn 2; video 15 flags 85% of its turn-1 count but its wrong blind frames rise from 4 to 6, so it also stops at turn 2; video 6 running.</span></td></tr>
+    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done. Turn 2 (run together with the second turns of experiments 1 and 2, Table 9-4-13): video 1 flags more frames than in turn 1 and its wrong blind frames do not fall, so it stops at turn 2; video 8 flags 64% of its turn-1 count but its wrong blind frames rise from 3 to 4, so it also stops at turn 2; video 15 flags 85% of its turn-1 count but its wrong blind frames rise from 4 to 6, so it also stops at turn 2; video 6 flags 76% of its turn-1 count and its wrong blind frames fall from 3 to 2, so neither condition fires and the decision is continue; turn 3 was not run (this run went to turn 2 only).</span></td></tr>
   </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp3.png" alt="Experiment 3, turn 1: starting model against the loop model on three videos: wrong truth frames, median error, flagged share, wrong blind frames of 34"></div>
@@ -1252,7 +1252,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td rowspan="3">15</td><td>0</td><td></td><td>5500 (7.7)</td><td>0</td><td>10</td><td></td></tr>
       <tr><td>1</td><td>2254</td><td>1988 (2.8)</td><td>0</td><td>4</td><td><span lang="en">continue</span></td></tr>
       <tr><td>2</td><td>1789</td><td>1697 (2.4)</td><td>0</td><td>6</td><td><span lang="en">stop</span></td></tr>
-      <tr><td rowspan="1">6</td><td>0</td><td></td><td>3883 (5.4)</td><td>0</td><td>9</td><td></td></tr>
+      <tr><td rowspan="3">6</td><td>0</td><td></td><td>3883 (5.4)</td><td>0</td><td>9</td><td></td></tr>
+      <tr><td>1</td><td>2921</td><td>387 (0.5)</td><td>0</td><td>3</td><td><span lang="en">continue</span></td></tr>
+      <tr><td>2</td><td>1892</td><td>295 (0.4)</td><td>0</td><td>2</td><td><span lang="en">continue (turn 3 not run)</span></td></tr>
     </tbody>
   </table></div>
   <figure>
@@ -1611,11 +1613,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td>15</td><td><span lang="en">Final version, turn 2</span></td><td>1867</td><td>2.46</td><td>0</td><td>1.77</td><td>3</td><td>2.02</td><td>1.29</td></tr>
       <tr><td>15</td><td><span lang="en">Final version, turn 3</span></td><td>1880</td><td>2.56</td><td>0</td><td>1.71</td><td>3</td><td>1.92</td><td>1.26</td></tr>
       <tr><td>6</td><td><span lang="en">Starting model</span></td><td>–</td><td>1.49</td><td>0</td><td>5.41</td><td>9</td><td>5.0</td><td>5.0</td></tr>
+      <tr><td>6</td><td><span lang="en">Experiment 3, turn 1</span></td><td>2921</td><td>1.47</td><td>0</td><td>0.54</td><td>3</td><td>0.35</td><td>1.51</td></tr>
       <tr><td>6</td><td><span lang="en">Final version, turn 1</span></td><td>2922</td><td>1.42</td><td>0</td><td>0.45</td><td>5</td><td>0.32</td><td>1.24</td></tr>
       <tr><td>6</td><td><span lang="en">Final version, turn 2</span></td><td>1855</td><td>1.45</td><td>0</td><td>0.42</td><td>3</td><td>0.29</td><td>0.88</td></tr>
     </tbody>
   </table></div>
-  <p class="text"><span lang="en">On video 6 experiment 3's first turn was trained but never run on the whole video, so it is compared with the starting model only.</span></p>
+  <p class="text"><span lang="en">On video 6 experiment 3's first turn was run on the whole video only later (the second video-6 row); the conclusion below compares with it on videos 1, 8 and 15 only.</span></p>
   
   <div class="concl" lang="en"><span class="tag">Conclusion of turn 1 of 5b:</span>on all four videos the final version's first turn is better than its starting model: fewer wrong blind frames and a lower flagged share. On videos 1, 8 and 15 its differences from experiment 3's first turn in blind frames, truth frames and flagged share are within what the random seed alone changes, so D and the confidence criterion do not change the result of the first turn; the largest change is on video 15, which has many closed-eye frames, where clearly more repaired frames enter the training set. On all four videos the stop rule says continue.</div>
 
@@ -1624,7 +1627,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Procedure</span></th><td><span lang="en">Each experiment turns once more under its own first-turn rules: the first-turn model takes the place of the starting model and its whole-video prediction is flagged again; experiments 2 and 3 repair with its own heatmap second peaks (as in experiment 3's next turn). Experiment 1 takes only unflagged frames, experiment 2 only repaired frames, experiment 3 both.</span></td></tr>
     <tr><th><span lang="en">Videos</span></th><td><span lang="en">1, 8, 15, 6; experiment 1's second turn on videos 1 and 8 was run on 4 November.</span></td></tr>
     <tr><th><span lang="en">Blind frames</span></th><td><span lang="en">Every model is counted on the same 34 frames (24 stratified plus 10 supplementary blind frames). Experiments 2 and 3 keep 60 frames on each side of the blind frames out of the training set; experiment 1 avoids only the truth frames (the blind frames were drawn after its first turn and exclude only that turn's training frames). In its second turn on video 1, 43 of the 60 blind frames have one of its training frames within 15 frames; in its second turn on video 15 one blind frame (one of the 24 scored) is itself in the training set, and every model predicts that frame correctly. So its blind counts are not measured under the same condition as those of experiments 2 and 3.</span></td></tr>
-    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Videos 1, 8 and 15 done; video 6 running (the second turns of experiments 1 and 2 done, experiment 3 running; its rows are added when all three are done). The conclusion is written when all four are done.</span></td></tr>
+    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Videos 1, 8, 15 and 6 done. The conclusion is not written yet.</span></td></tr>
   </tbody></table></div>
   <p class="text"><b><span lang="en">Table 9-4-13: turns 1 and 2 of experiments 1, 2 and 3</span></b></p>
   <div class="tablebox"><table>
@@ -1651,6 +1654,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td><span lang="en">Experiment 2</span></td><td>2</td><td>58</td><td>2.39</td><td>0</td><td>4.10</td><td>2</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>1</td><td>2254</td><td>2.50</td><td>0</td><td>2.77</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>2</td><td>1789</td><td>2.45</td><td>0</td><td>2.37</td><td>6</td></tr>
+      <tr><td rowspan="7">6</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>1.49</td><td>0</td><td>5.41</td><td>9</td></tr>
+      <tr><td><span lang="en">Experiment 1</span></td><td>1</td><td>1859</td><td>1.44</td><td>0</td><td>0.44</td><td>4</td></tr>
+      <tr><td><span lang="en">Experiment 1</span></td><td>2</td><td>2021</td><td>1.43</td><td>0</td><td>0.35</td><td>2</td></tr>
+      <tr><td><span lang="en">Experiment 2</span></td><td>1</td><td>1130</td><td>1.52</td><td>0</td><td>3.39</td><td>5</td></tr>
+      <tr><td><span lang="en">Experiment 2</span></td><td>2</td><td>306</td><td>1.51</td><td>0</td><td>2.15</td><td>4</td></tr>
+      <tr><td><span lang="en">Experiment 3</span></td><td>1</td><td>2921</td><td>1.47</td><td>0</td><td>0.54</td><td>3</td></tr>
+      <tr><td><span lang="en">Experiment 3</span></td><td>2</td><td>1892</td><td>1.50</td><td>0</td><td>0.41</td><td>2</td></tr>
     </tbody>
   </table></div>
 </section>

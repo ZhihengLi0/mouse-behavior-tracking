@@ -289,6 +289,7 @@ wrong blind frames (24 + 10) not lower (the number of rounds is not a criterion;
 | 8 | 2 | 1779 (1759 + 20) | 22 | 24200 | 5.93 | 0 | 2.10 | 2365 → 1507 | 3 → 4 | stop |
 | 15 | 2 | 1789 (1745 + 44) | 34 | 42330 | 2.45 | 0 | 2.37 | 1988 → 1697 | 4 → 6 | stop |
 | 6 | 1 | 2921 (1725 + 1196) | 21 | 34881 | 1.47 | 0 | 0.54 | 3883 → 387 | 9 → 3 | continue |
+| 6 | 2 | 1892 (1886 + 6) | 21 | 24066 | 1.50 | 0 | 0.41 | 387 → 295 | 3 → 2 | continue (round 3 not run) |
 
 Second turn (2026-11-10, run with the second turns of experiments 1 and 2, `tools/earlier_round2.sh`): video 1 round
 2 against round 1: flagged frames 598 → 774, blind 4 → 4, truth 1 → 1, median 2.56 → 2.63; both conditions fire, so the
@@ -316,7 +317,14 @@ Video 6 round 1 (2026-11-12 01:51, after the user's "继续开始跑" on 2026-11
 (shuffle 5061, final `snapshot-021.pt`) was predicted 00:24 to 01:50 by `earlier_round2.sh` before the loop driver.
 Against the starting model: flagged frames 3883 → 387, blind 9 → 3 (24: 8 → 2, supplement: 1 → 1), truth 0 → 0,
 median 1.49 → 1.47; neither condition fires, so the loop continues to round 2 (training since 01:53, shuffle 5062).
-The video 6 round 1 row with blanks is the state on 2026-11-07 (trained, not predicted); the full row is the last one.
+The video 6 round 1 row with blanks is the state on 2026-11-07 (trained, not predicted); the full row is the second to last.
+
+Video 6 round 2 against round 1 (2026-11-12 04:33): flagged frames 387 → 295 (76 %), blind 3 → 2 (24: 2 → 2,
+supplement: 1 → 0), truth 0 → 0, median 1.47 → 1.50; neither condition fires, so the decision is continue, the only
+video of the four where it is. Round 3 was not run: this launch's budget was MAXR = 2 (the earlier-round-2 scope is two
+turns), and the user asked to stop before 08:00. 6 repaired frames fed back. In the 24 scored frames `img033.png` (A)
+becomes right and `img024.png` (B) becomes wrong, `img030.png` (B) stays wrong; supplement `img107.png` (F_t) becomes
+right. `compare` failed again (palette, summary figure only).
 
 Rows are added as rounds finish. Files: `videoNN/pseudo_both[_round{r}]/`, `videoNN/round{r}_both/{eval,truth_errors,train_info}.csv`
 (`flags.csv.gz`, `pred200.npy`, `repair/` local), `videoNN/loop_status.csv`, logs `loop.log`, `pseudo_v*_both_r*.log`,
