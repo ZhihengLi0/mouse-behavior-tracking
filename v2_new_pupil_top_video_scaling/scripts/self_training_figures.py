@@ -258,13 +258,13 @@ def blind_wrong_n(v, model, n):
     return tot
 
 
-def fig_experiment(model):
+def fig_experiment(model, second_label="experiment 1, second turn (videos 1, 8)"):
     label, colour, nblind = EXPS[model]
     C = pd.read_csv(RES / "self_training" / "comparison.csv")
     vids = [int(v) for v in sorted(C[C.model == model].video.unique())]
     series = [("teacher", COL["teacher"], "starting model"), (model, colour, label)]
     if model == "round1_every30" and "round2_every30" in set(C.model):
-        series.append(("round2_every30", COL["round2_every30"], "experiment 1, second turn (videos 1, 8)"))
+        series.append(("round2_every30", COL["round2_every30"], second_label))
     fig, axes = plt.subplots(2, 2, figsize=(13.5, 7.2))
     axes = axes.ravel()
     cols = [("wrong_frames", "wrong truth frames (of 70)", "{:.0f}"), ("median_error_pct", "median truth error, % of eye width", "{:.1f}"),
@@ -527,3 +527,155 @@ if __name__ == "__main__" and "--audit" in sys.argv:
     fig_exp4c()
     print("exp5a:", fig_exp5a())
     print("audit figures written")
+
+
+# ---- second turn of every experiment (page 9.4, 2026-11-12): reads results/self_training/round2_analysis/*.csv ----
+R2 = RES / "self_training" / "round2_analysis"
+R2EXP = [("every30", "experiment 1 (grid frames only)", "#e69f00", "o"), ("repaired", "experiment 2 (repaired frames only)", "#d55e00", "s"),
+         ("both", "experiment 3 (both kinds)", "#0072b2", "^"), ("reopened", "experiment 4c (reopened frames only)", "#009e73", "D"),
+         ("formal", "experiment 5b (final version)", "#cc79a7", "v")]
+
+
+def fig_round2():
+    """Every experiment turn by turn on the four videos: wrong blind frames of 34 (top) and flagged share (bottom, log
+    scale); turn 0 = the starting model."""
+    S = pd.read_csv(R2 / "summary.csv")
+    fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.6), sharex=True)
+    for j, v in enumerate(VIDEOS):
+        t = S[(S.video == v) & (S.experiment == "teacher")].iloc[0]
+        for i, (col, ylabel) in enumerate([("blind_wrong_34", "wrong blind frames (of 34)"), ("flagged_either_pct", "frames flagged, % of the video")]):
+            ax = axes[i, j]
+            for k, (src, lab, c, mk) in enumerate(R2EXP):
+                g = S[(S.video == v) & (S.experiment == src) & (S.turn <= 2)].sort_values("turn")
+                if not len(g):
+                    continue
+                xs = [0] + [int(x) for x in g.turn]
+                ys = [float(t[col])] + [float(y) for y in g[col]]
+                ax.plot(xs, ys, marker=mk, color=c, linewidth=1.5, markersize=5, label=lab, alpha=0.95)
+            ax.set_xticks([0, 1, 2])
+            ax.set_xticklabels(["start", "turn 1", "turn 2"])
+            ax.set_xlim(-0.25, 2.25)
+            ax.grid(color="#eee", linewidth=0.5)
+            ax.set_axisbelow(True)
+            if i == 0:
+                ax.set_title(f"video {v}")
+                ax.set_ylim(0, 20)
+            else:
+                ax.set_yscale("log")
+                ax.set_ylim(0.25, 22)
+                ax.set_yticks([0.3, 1, 3, 10])
+                ax.set_yticklabels(["0.3", "1", "3", "10"])
+            if j == 0:
+                ax.set_ylabel(ylabel)
+    axes[0, 3].errorbar([2.12], [10], yerr=[1], color="#555", capsize=3, linewidth=1)
+    axes[0, 3].text(2.05, 10, "seed alone:\n\u00b11 frame", ha="right", va="center", fontsize=7.5, color="#555")
+    h, l = axes[0, 0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    fig.savefig(OUT / "loop_round2.png", dpi=170)
+    plt.close(fig)
+
+
+def fig_round2_frames():
+    """Turn 1 against turn 2 on the blind frames, frame by frame, summed over the videos: frames wrong in both turns,
+    wrong -> right and right -> wrong, split by how the frame was drawn."""
+    C = pd.read_csv(R2 / "blind_changes.csv")
+    grp = {"A": "A: flagged by the starting model only", "B": "B: flagged by both models", "C": "C, D: other strata", "D": "C, D: other strata"}
+    C["group"] = [grp.get(s, "supplement: frames two models disagree on") for s in C.stratum]
+    gcol = {"A: flagged by the starting model only": "#56b4e9", "B: flagged by both models": "#444444", "C, D: other strata": "#b9b9b9",
+            "supplement: frames two models disagree on": "#e69f00"}
+    kinds = [("wrong_both", "wrong\nin both"), ("wrong_to_right", "wrong\n\u2192 right"), ("right_to_wrong", "right\n\u2192 wrong")]
+    fig, ax = plt.subplots(figsize=(12, 4.6))
+    w = 0.26
+    ticks, names = [], []
+    for i, (src, lab, _, _) in enumerate(R2EXP):
+        E = C[C.experiment == src]
+        if not len(E):
+            continue
+        nv = E.video.nunique()
+        for k, (col, klab) in enumerate(kinds):
+            x = i + (k - 1) * w
+            bottom = 0
+            for gname, c in gcol.items():
+                y = int(E[E.group == gname][col].sum())
+                ax.bar([x], [y], w * 0.9, bottom=bottom, color=c, edgecolor="white", linewidth=0.6, label=gname if (i == 0 and k == 0) else None)
+                bottom += y
+            ax.text(x, bottom + 0.25, f"{bottom}", ha="center", va="bottom", fontsize=8.5, color="#222")
+            ax.text(x, -0.4, klab, ha="center", va="top", fontsize=7.5, color="#444")
+        ticks.append(i)
+        names.append(lab.split(" (")[0] + f"\n{nv} video{'s' if nv > 1 else ''}, {int(E.frames.sum())} frames")
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(names)
+    ax.tick_params(axis="x", pad=30, length=0)
+    ax.set_ylabel("blind frames")
+    ax.set_ylim(0, 14)
+    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+    ax.set_axisbelow(True)
+    ax.legend(frameon=False, fontsize=8, loc="upper left", ncol=2)
+    fig.tight_layout()
+    fig.savefig(OUT / "loop_round2_frames.png", dpi=170)
+    plt.close(fig)
+
+
+def fig_exp4c_turns():
+    """Experiment 4c with its second turn: (a) flagged share per video for the starting model, turn 1 and turn 2, with
+    the wrong truth and blind frames; (b) the turn-1 reopened frames left out of the training set: how many each model flags."""
+    ST_ = RES / "self_training"
+    vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / "round1_reopened" / "eval.csv").exists()]
+    series = [("teacher", COL["teacher"], "starting model"), ("round1_reopened", "#009e73", "turn 1: human labels + reopened frames"),
+              ("round2_reopened", "#7fd1b9", "turn 2: human labels + the turn's own reopened frames")]
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6))
+    w = 0.27
+    for i, v in enumerate(vids):
+        F = pd.read_csv(ST_ / f"video{v:02d}" / "pseudo_reopened" / "pseudo_frames.csv")
+        held = F.frame[~F.kept].to_numpy()
+        for j, (m, c, lab) in enumerate(series):
+            ef = ST_ / f"video{v:02d}" / m / "eval.csv"
+            x = i + (j - 1) * w
+            if not ef.exists():
+                if m == "round2_reopened":
+                    for ax in axes:
+                        ax.text(x, 0.3, "not run", ha="center", va="bottom", fontsize=7, color="#888", rotation=90)
+                continue
+            e = pd.read_csv(ef).iloc[0]
+            axes[0].bar([x], [e.flagged_either_pct], w * 0.92, color=c, label=lab if i == 0 else None, edgecolor="white", linewidth=0.5)
+            bl = ""
+            bs = ST_ / f"video{v:02d}" / ("round1_reopened" if m == "teacher" else m) / "blind_scores.csv"
+            if bs.exists():
+                B_ = pd.read_csv(bs)
+                bl = f"\nblind {int(B_[B_.model == m].wrong_frames.sum())}/{int(B_[B_.model == m].frames.sum())}"
+            axes[0].text(x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f} %\ntruth {int(e.wrong_frames)}/70{bl}", ha="center", va="bottom", fontsize=7, color="#222")
+            if m == "teacher":
+                y = len(held)
+            else:
+                ff = ST_ / f"video{v:02d}" / m / "flags.csv.gz"
+                if not ff.exists():
+                    continue
+                Sf = pd.read_csv(ff).set_index("frame").loc[held]
+                y = int((Sf.fit_flag | Sf.pca_flag).sum())
+            axes[1].bar([x], [y], w * 0.92, color=c, label=lab if i == 0 else None, edgecolor="white", linewidth=0.5)
+            axes[1].text(x, y, f"{y} of {len(held)}", ha="center", va="bottom", fontsize=7.5, color="#222")
+    for ax in axes:
+        ax.set_xticks(range(len(vids)))
+        ax.set_xticklabels([str(v) for v in vids])
+        ax.set_xlabel("video")
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.4)
+    axes[0].set_ylabel("frames flagged, % of the video")
+    axes[0].set_title("(a) flagged share; labels: wrong truth frames, wrong blind frames", loc="left")
+    axes[0].legend(frameon=False, fontsize=8, loc="upper left")
+    axes[1].set_ylabel("frames flagged")
+    axes[1].set_title("(b) turn-1 reopened frames left out of the training set:\nhow many are still flagged", loc="left")
+    fig.tight_layout()
+    fig.savefig(OUT / "loop_exp4c_turns.png", dpi=170)
+    plt.close(fig)
+
+
+if __name__ == "__main__" and "--round2" in sys.argv:
+    fig_round2()
+    fig_round2_frames()
+    fig_exp4c_turns()
+    fig_experiment("round1_every30", second_label="experiment 1, second turn")
+    fig_experiment("round1_both")
+    print("round-2 figures written")

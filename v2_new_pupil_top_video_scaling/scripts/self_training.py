@@ -99,6 +99,7 @@ PIPE_FORMAL = PIPE + ["--order", "deviation", "--tiebreak", "margin-all", "--clo
 REOPENED_BASE = 8000                                  # experiment 4 (audit 2026-11-08): shuffle 8000 + 10 * video + 1, the reopened-frames student
 CONFCLOSED = "video{v:02d}_either_labelregion_all_smallest_confclosed"   # the committed run of the confidence closed-eye rule
 BOTH_BASE, MAX_ROUND = 5000, 3                      # the loop: shuffle 5000 + 10 * video + round; MAX_ROUND = the driver's run budget per launch, NOT part of the stop rule (user 2026-11-07)
+GRID_LATE_BASE = 9000                                # experiment 1 rounds >= 3 (2026-11-12): shuffle 9000 + 10 * video + round
 REPAIRED_VARIANT = 5                                  # shuffle 4000 + 10 * video + 5: the repaired-frames student
 HOLDOUT_BLOCKS, HELD_OUT = 20, (4, 9, 14, 19)         # repaired source: the time line in 20 equal blocks, these never trained on
 LINE = float(pd.read_csv(RES / "error_tier" / "tier.csv").iloc[0].line_eye_widths)
@@ -129,6 +130,8 @@ def student_shuffle(v, every, rnd, source="pipeline"):
         return REOPENED_BASE + 10 * v + rnd
     if source == "formal":
         return FORMAL_BASE + 10 * v + rnd
+    if rnd >= 3:   # 2026-11-12: from round 3 the formula below reaches the repaired-frames student's shuffle (4000 + 10 v + 5), so experiment 1's later rounds use 9000 + 10 v + round
+        return GRID_LATE_BASE + 10 * v + rnd
     return 4000 + 10 * v + 2 * (rnd - 1) + VARIANT[every]
 
 

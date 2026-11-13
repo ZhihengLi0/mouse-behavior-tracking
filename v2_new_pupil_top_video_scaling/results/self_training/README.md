@@ -461,6 +461,7 @@ the human labels plus this turn's frames only (shuffle 8000 + 10 x video + 2). B
 | video | closed on the source (opening / confidence rule) | reopened | fed back (after the bands) | epochs | iterations | median % | wrong of 70 | flagged either % | blind wrong (24 + 10) |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | 177 / 343 | 56 | 33 (1 near truth, 22 near blind) | 91 | 7007 | 3.14 (turn 1 2.88, teacher 2.94) | 7 (turn 1 1, teacher 8) | 12.31 (turn 1 7.37, teacher 15.31) | 10 + 8 = 18 (turn 1 4 + 4 = 8, teacher 11 + 6 = 17) |
+| 15 | 3978 / 942 | 19 | 5 (14 near blind) | 117 | 41301 | 2.45 (turn 1 2.50, teacher 2.42) | 0 (turn 1 0, teacher 0) | 8.02 (turn 1 4.41, teacher 7.67) | 5 + 2 = 7 (turn 1 3 + 2 = 5, teacher 7 + 3 = 10) |
 
 Video 1 (2026-11-12 16:36): the second turn falls back to about the starting model. Its 33 frames are other errors
 than turn 1's (top eyelid 33, top pupil point 27 replaced; turn 1 was the temporal corner), and the turn-1 frames are not
@@ -472,6 +473,13 @@ labels; in experiments 2 and 4c a second turn has only the few frames the improv
 22 to 306, 4c: 33), so the student is close to one trained on the human labels alone. Experiment 2 on video 8 (22 frames,
 blind 2 to 5, flagged 3.35 to 5.27 %) fits the same effect (not checked frame by frame). A second turn of experiments 2 and 4c therefore
 measures "the new frames alone", not "turn 1 plus the new frames".
+
+Video 15 (2026-11-13 00:24; training finished 2026-11-12 18:53, the prediction was stopped at the user's 19:27 stop and
+re-run from the saved snapshot 22:56 to 00:24 with `tools/finish_4c_v15.sh`, no retraining): 19 reopened frames, 14 of
+them near blind frames, so 5 enter the training set (nasal corner 2, top pupil point 2, left pupil point 1) with 700
+human frames. The student falls back to about the starting model as on video 1: flagged share 4.41 to 8.02 % (teacher
+7.67), blind 5 to 7 of 34 (teacher 10), truth 0 wrong; of the 186 held-out turn-1 reopened frames it flags 129 (turn-1
+student 3), of the 660 turn-1 training frames 408 (turn-1 student 4).
 
 ### Experiment 5: the final loop version (2026-11-08)
 
@@ -564,6 +572,39 @@ so video 6's loop stops at round 2; 4 repaired frames are fed back. All four loo
 at round 2, video 15 at round 3.
 
 Figures for the page: `scripts/self_training_figures.py` → `figures/loop_{truth,blind,examples,all_videos,turns}.*`.
+
+### Second turn of every experiment: summary (2026-11-13)
+
+`scripts/round2_analysis.py` (existing results only) writes `round2_analysis/summary.csv` (every model of videos 1, 8,
+15, 6: frames fed back, truth median and wrong frames, flagged share, blind wrong 24 + 10), `blind_changes.csv` (turn 1
+against turn 2 on each blind frame, by stratum) and `stop_rule.csv` (every stop decision of experiment 3 and 5b with
+two alternative rules). Figures `figures/loop_round2.png`, `loop_round2_frames.png`, `loop_exp4c_turns.png` (page
+Figures 9-26, 9-27, 9-23; `self_training_figures.py`, functions `fig_round2`, `fig_round2_frames`, `fig_exp4c_turns`).
+
+| blind wrong, sum over videos | videos | start | turn 1 | turn 2 | truth wrong (start → 1 → 2) | turn 2 against turn 1: wrong → right / right → wrong |
+|---|---|---|---|---|---|---|
+| experiment 1 (grid frames) | 1 8 15 6 | 48 | 17 | 13 | 9 → 2 → 1 | 6 / 2 |
+| experiment 2 (repaired frames) | 1 8 15 6 | 48 | 15 | 14 | 9 → 2 → 2 | 9 / 8 |
+| experiment 3 (both) | 1 8 15 6 | 48 | 14 | 16 | 9 → 1 → 1 | 3 / 5 |
+| 5b (final version) | 1 8 15 6 | 48 | 15 | 15 | 9 → 1 → 2 | 4 / 4 |
+| 4c (reopened frames) | 1 15 | 27 | 13 | 25 | 8 → 1 → 7 | 1 / 13 |
+
+- The gain is in turn 1; in turn 2 experiments 1, 2, 3 and 5b move by 0 to 4 blind frames over four videos, about
+  the seed noise (1 frame per video, one pair measured). Experiment 1's blind count is not under the same condition
+  (no blind band).
+- Every turn trains from the pretrained backbone on the human labels plus that turn's frames only. Experiments 1 and
+  3 carry turn 1 through about 2000 grid frames labeled by the turn-1 model; experiment 2 (22 to 306 frames) and 4c
+  (33 / 5) do not, and 4c falls back to about the starting model on both videos.
+- Stop rule in hindsight (`stop_rule.csv`): turn 1 flagged ratio 0.05 to 0.38, blind −4 to −13; the 10 later
+  decisions blind −2 to +2, flagged ratio 0.64 to 1.29 (below 0.9 six times without blind or truth gains). 7 of the 8
+  stops have the blind condition firing; the two extra turns (experiment 3 video 6, 5b video 15, turn 3) did not
+  improve. "Continue only if blind falls by 2 or more and flagged ratio below 0.9" would stop all 8 loops at turn 2.
+  The rule is unchanged.
+- Applied to the turn 2 of the comparison runs, the rule would continue experiment 1 on videos 1 (flagged 960 → 698,
+  blind 7 → 3) and 6 (319 → 250, 4 → 2) and experiment 2 on video 6 (2429 → 1542, 5 → 4). Their third turn runs
+  overnight 2026-11-12/13 (user: until 08:00, lossless, as many as fit): `tools/overnight_round3_1112.sh`, log
+  `round3.log`; experiment 1 rounds >= 3 use shuffle 9000 + 10 x video + round (the old formula reaches 4000 + 10 x
+  video + 5, the repaired-frames student). Rows are added when they finish.
 
 ## Files
 

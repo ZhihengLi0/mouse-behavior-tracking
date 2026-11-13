@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-12 14:32 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-13 00:26 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1163,12 +1163,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Frames added to the training set</span></th><td><span lang="en">Frames with status unflagged or repaired, every 30th, points kept by the shared per-point rule (points over the line before the repair are left blank, so repaired frames almost never enter: experiment 1 in effect uses the starting model's own unflagged predictions).</span></td></tr>
     <tr><th><span lang="en">Videos and counts</span></th><td><span lang="en">Ten videos: 0, 1, 2, 4, 6, 7, 8, 12, 15, 18; 368 to 2030 frames added to the training set per video, epochs by iteration matching with the starting model (Tables 9-4-4, 9-4-7).</span></td></tr>
-    <tr><th><span lang="en">Second turn</span></th><td><span lang="en">On videos 1 and 8 the new model's prediction gave a second batch of every-30th unflagged frames and one more training.</span></td></tr>
+    <tr><th><span lang="en">Second turn</span></th><td><span lang="en">On videos 1, 8, 15 and 6 the new model's prediction gave a second batch of every-30th unflagged frames and one more training (Table 9-4-13).</span></td></tr>
   </tbody></table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp1.png?v=20261107b" alt="Experiment 1: starting model against the loop model on ten videos: wrong truth frames, median error, flagged share, wrong blind frames"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_exp1.png?v=20261112" alt="Experiment 1: starting model against the loop model on ten videos: wrong truth frames, median error, flagged share, wrong blind frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-15:</span>Experiment 1, starting model (grey) against the loop model (orange) per video, with the second turn (pink) on videos 1 and 8: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 24 blind frames (the four videos with blind labels only).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-15:</span>Experiment 1, starting model (grey) against the loop model (orange) per video, with the second turn (pink) on videos 1, 8, 15 and 6: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 24 blind frames (the four videos with blind labels only).</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-1: experiment 1 on ten videos, starting model → loop model</span></b></p>
   <div class="tablebox"><table>
@@ -1194,7 +1194,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <li>Flagged share: falls on nine videos, mostly below a third.</li>
       <li>Blind frames: the wrong count falls to about a third on all four videos.</li>
       <li>Video 0: wrong frames 0 → 5. Its starting model has only 60 human frames and is not at its plateau; the loop has to start from the plateau model.</li>
-      <li>Second turn = experiment 1 once more with experiment 1's model as the new starting point (videos 1, 8): video 1 wrong truth frames 2 → 1, wrong blind frames 4 → 1, flagged share 1.3% → 1.0%; video 8 truth and blind unchanged, flagged share 3.2% → 2.1%.</li>
+      <li>Second turn = experiment 1 once more with experiment 1's model as the new starting point (videos 1, 8, 15, 6): the flagged share falls a little more on all four (1.3 → 1.0, 3.2 → 2.1, 2.7 → 2.2, 0.44 → 0.35%); wrong truth frames change only on video 1 (2 → 1); wrong predictions among the 24 blind frames 4 → 1, 2 → 2, 2 → 2, 3 → 2. Experiment 1's training frames do not avoid the blind frames, so these blind counts are not measured under the same condition as the other experiments' (Table 9-4-13).</li>
     </ul>
   </div>
   <h4><span lang="en">Experiment 2: only the repaired frames enter the training set</span></h4>
@@ -1235,7 +1235,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done. Turn 2 (run together with the second turns of experiments 1 and 2, Table 9-4-13): video 1 flags more frames than in turn 1 and its wrong blind frames do not fall, so it stops at turn 2; video 8 flags 64% of its turn-1 count but its wrong blind frames rise from 3 to 4, so it also stops at turn 2; video 15 flags 85% of its turn-1 count but its wrong blind frames rise from 4 to 6, so it also stops at turn 2; video 6 flags 76% of its turn-1 count and its wrong blind frames fall from 3 to 2, so neither condition fires and the decision is continue. Turn 3 (video 6 only): it flags 89% of its turn-2 count but its wrong blind frames rise from 2 to 3, so it stops at turn 3. All four videos have now stopped by the rule.</span></td></tr>
   </tbody></table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp3.png" alt="Experiment 3, turn 1: starting model against the loop model on three videos: wrong truth frames, median error, flagged share, wrong blind frames of 34"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_exp3.png?v=20261112" alt="Experiment 3, turn 1: starting model against the loop model on four videos: wrong truth frames, median error, flagged share, wrong blind frames of 34"></div>
     
     <figcaption lang="en"><span class="tag">Figure 9-17:</span>Experiment 3, turn 1, starting model (grey) against the loop model (blue) per video: wrong predictions among the 70 truth frames, median truth error, flagged share of the video, wrong predictions among the 34 blind frames.</figcaption>
   </figure>
@@ -1259,18 +1259,18 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_turns.png" alt="Experiment 3 turn by turn on the four videos: flagged share, wrong blind frames and wrong truth frames against the turn number"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_turns.png?v=20261112" alt="Experiment 3 turn by turn on the four videos: flagged share, wrong blind frames and wrong truth frames against the turn number"></div>
     
     <figcaption lang="en"><span class="tag">Figure 9-18:</span>Experiment 3 turn by turn on the four videos: share of the whole video flagged by either finder (blue circles), wrong share of the 34 blind frames (orange squares), wrong share of the 70 truth frames (green triangles); turn 0 is the starting model. A dotted vertical line marks the turn at which the loop stopped.</figcaption>
   </figure>
   
   <div class="text" lang="en">
-    <p><b>Conclusion: after turn 1 all three videos beat the starting model, and none is saturated yet.</b></p>
+    <p><b>Conclusion: after turn 1 all four videos beat the starting model; later turns do not improve further, and all four videos have stopped by the rule.</b></p>
     <ul>
-      <li>Truth frames: wrong frames 8 → 1, 1 → 0, 0 → 0; the median error is unchanged (within 0.3%).</li>
-      <li>Flagged share: down to 5% to 37% of the starting model's.</li>
-      <li>Blind frames (34): wrong predictions from 17 / 12 / 10 down to 4 / 3 / 4.</li>
-      <li>All three videos meet the condition for another turn; turn 2 in Tables 9-4-3 and 9-4-13.</li>
+      <li>Truth frames: wrong frames 8 → 1, 1 → 0, 0 → 0, 0 → 0; the median error is unchanged (within 0.3%).</li>
+      <li>Flagged share: down to 5% to 37% of the starting model's in turn 1, a little lower in later turns.</li>
+      <li>Blind frames (34): wrong predictions from 17 / 12 / 10 / 9 down to 4 / 3 / 4 / 3 in turn 1; 4 / 4 / 6 / 2 in turn 2 and 3 in video 6's turn 3, all close to what the random seed alone changes.</li>
+      <li>Videos 1, 8 and 15 stop at turn 2, video 6 at turn 3 (Table 9-4-3, Figure 9-18).</li>
     </ul>
   </div>
   
@@ -1278,6 +1278,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li>All three experiments beat the starting model: wrong truth frames 8 → 1 to 2 and 1 → 0, wrong blind frames to a third or less, the flagged share to a third or less, the median error unchanged. The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models.</li>
       <li>The unflagged frames and the repaired frames each improve the model when added to the training set, and so do both together, so no ranking between them is made and both enter the training set; experiment 3 is the form for actual use (every 30th unflagged frame plus all repaired frames enter the training set, turn after turn until saturation).</li>
+      <li>The gain is almost all in turn 1: in turns 2 and 3 the wrong blind and truth frames of every experiment move only about as much as the random seed alone moves them (Figure 9-26). Every turn trains afresh on the human labels plus that turn's frames; the previous turn's frames are not carried over.</li>
       <li>The remaining wrong frames are squinting frames both finders flag and the second peak cannot repair; the loop neither learns from them nor fixes them.</li>
       <li>The starting model has to be at its plateau: on video 0, with 60 human frames, the loop makes things worse (0 → 5 wrong).</li>
       <li>The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>
@@ -1424,7 +1425,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
 
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_truth.png" alt="Median error, wrong truth frames and flagged share of the starting model, the starting model with repair, and the loop models on videos 1, 8, 15 and 6"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_truth.png?v=20261112" alt="Median error, wrong truth frames and flagged share of the starting model, the starting model with repair, and the loop models on videos 1, 8, 15 and 6"></div>
     
     <figcaption lang="en"><span class="tag">Figure 9-19:</span>Three numbers per model on the four videos: median error on the 70 truth frames (left), wrong truth frames (middle), share of the whole video flagged by either finder (right). Grey = starting model, hatched = starting model + the repair of 9.3 (no flagged share of its own), orange = experiment 1, red = experiment 2, pink = the second turn of experiment 1, blue = the first turn of experiment 3.</figcaption>
   </figure>
@@ -1482,7 +1483,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </table></div>
 
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_blind.png" alt="Blind frames of the four videos: error of the starting model against the error of the two loop models, one point per frame, marker by stratum"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_blind.png?v=20261112" alt="Blind frames of the four videos: error of the starting model against the error of the two loop models, one point per frame, marker by stratum"></div>
     
     <figcaption lang="en"><span class="tag">Figure 9-21:</span>The 24 blind frames of the four videos, one point per frame: the starting model's error on the x axis, the loop model's error on the y axis (orange = experiment 1, red = experiment 2, blue = experiment 3, first turn), marker by stratum (circle A, square B, triangle C, diamond D), dashed lines at the 14% wrong-frame line, below the diagonal = better than the starting model. The stratum-A frames (starting model flagged, experiment 1 not) sit almost all at the lower right: the starting model is wrong, both loop models are right.</figcaption>
   </figure>
@@ -1526,9 +1527,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">What counts as truth</span></th><td><span lang="en">As in experiments 1 to 3: the 70 human-labeled truth frames of each video (wrong = error above 0.14 eye widths), the 34 human-labeled blind frames (videos 15 and 1 have them, video 11 does not), the flagged share of the video; plus the reopened frames left out of the training set (within 60 frames of a truth or blind frame): the starting model flags every one of them (a repaired frame is a flagged frame), and a student that has learned this kind of frame should no longer flag them.</span></td></tr>
   </tbody></table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp4c.png" alt="Experiment 4c: starting model against the student trained on the reopened frames only: flagged share with wrong truth and blind frames, and frames the confidence rule calls closed"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_exp4c_turns.png?v=20261113" alt="Experiment 4c: starting model against the student trained on the reopened frames only: flagged share with wrong truth and blind frames, and frames the confidence rule calls closed"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-23:</span>Experiment 4c, starting model (grey) against the student (green) per video. (a) Flagged share of the video, with the wrong frames of the 70 truth frames and of the 34 blind frames. (b) Of the reopened frames left out of the training set, how many are still flagged. Videos 11 and 1 are added as they finish.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-23:</span>Experiment 4c per video: starting model (grey), turn-1 student (green), turn-2 student (light green, videos 1 and 15 only). (a) Flagged share of the video, with the wrong frames of the 70 truth frames and of the 34 blind frames. (b) Of the turn-1 reopened frames left out of the training set, how many are still flagged.</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-11: experiment 4c, starting model → student</span></b></p>
   <div class="tablebox"><table>
@@ -1540,7 +1541,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion of 4c:</span>on all three videos, adding only these reopened and repaired frames gives a student better than its starting model: fewer wrong truth and blind frames, a lower flagged share; and the student hardly flags the frames of this kind it was not trained on, so it has learned them rather than memorised the training frames. The cause of the wrong closed call differs by video: in video 15 a narrowed eye with the left pupil point thrown outside the eye; in videos 11 and 1 a corner point thrown away, which widens the eye and makes the opening look collapsed. Video 1 improves with only 98 frames. The repaired closed-eye frames belong in the training set of the final version.</div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 4c:</span>on all three videos, adding only these reopened and repaired frames gives a student better than its starting model: fewer wrong truth and blind frames, a lower flagged share; and the student hardly flags the frames of this kind it was not trained on, so it has learned them rather than memorised the training frames. The cause of the wrong closed call differs by video: in video 15 a narrowed eye with the left pupil point thrown outside the eye; in videos 11 and 1 a corner point thrown away, which widens the eye and makes the opening look collapsed. Video 1 improves with only 98 frames. The repaired closed-eye frames belong in the training set of the final version. In turn 2 (videos 1 and 15) there are only 33 / 5 new frames of this kind and the turn-1 frames are not carried over, so the student falls back to about the starting model (Table 9-4-13).</div>
 
   <h4 id="exp5"><span lang="en">Experiment 5: the final loop version</span></h4>
   
@@ -1592,7 +1593,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text"><b><span lang="en">5b The loop in its final version</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Procedure</span></th><td><span lang="en">The procedure of experiment 3; the repair uses D of 5a and the confidence criterion of experiment 4; every other rule unchanged.</span></td></tr>
-    <tr><th><span lang="en">Stop</span></th><td><span lang="en">Stop when the flagged frames are not below 90% of the previous turn's. Basis: the same turn retrained with another random seed differs by about 9% in flagged share.</span></td></tr>
+    <tr><th><span lang="en">Stop</span></th><td><span lang="en">As in experiment 3: stop when the flagged frames are not below 90% of the previous turn's, or the wrong predictions among the 34 blind frames are not fewer. Basis of the 90%: the same turn retrained with another random seed differs by about 9% in flagged share.</span></td></tr>
     <tr><th><span lang="en">What to read</span></th><td><span lang="en">Against experiment 3's first turn on its videos 1, 8 and 15. Video 8 has almost no reopened frames, so its change is D's effect; what videos 15 and 1 change beyond that is the effect of the reopened frames.</span></td></tr>
     <tr><th><span lang="en">Progress</span></th><td><span lang="en">Turn 1: all four videos done (Table 9-4-12). Turn 2: the stop rule fires on videos 1 and 8, whose loops stop at turn 2 (video 1 flags more frames than turn 1 and its wrong blind frames do not fall; video 8 flags fewer frames but its wrong blind frames do not fall); video 15 continues. Turn 3: on video 15 the flagged frames and the wrong blind frames hardly change, so it stops at turn 3. On video 6 turn 2 flags only slightly fewer frames than turn 1 (its wrong blind frames fall), so the stop rule fires and it stops at turn 2 (the first attempt was cut by a restart of the computer and was retrained from scratch). All four loops have stopped. From turn 2 on few repaired frames enter the training set, because the previous turn's model already flags few frames. Each turn also records two detectors the loop never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds its 95% quantile; a check that a falling flagged share means fewer errors.</span></td></tr>
   </tbody></table></div>
@@ -1623,24 +1624,26 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   
   <div class="concl" lang="en"><span class="tag">Conclusion of turn 1 of 5b:</span>on all four videos the final version's first turn is better than its starting model: fewer wrong blind frames and a lower flagged share. On videos 1, 8 and 15 its differences from experiment 3's first turn in blind frames, truth frames and flagged share are within what the random seed alone changes, so D and the confidence criterion do not change the result of the first turn; the largest change is on video 15, which has many closed-eye frames, where clearly more repaired frames enter the training set. On all four videos the stop rule says continue.</div>
 
-  <p class="text"><b><span lang="en">Turn 2 of experiments 1, 2 and 3: which frames help</span></b></p>
+  <p class="text"><b><span lang="en">Turn 2 of every experiment: which frames help</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
-    <tr><th><span lang="en">Procedure</span></th><td><span lang="en">Each experiment turns once more under its own first-turn rules: the first-turn model takes the place of the starting model and its whole-video prediction is flagged again; experiments 2 and 3 repair with its own heatmap second peaks (as in experiment 3's next turn). Experiment 1 takes only unflagged frames, experiment 2 only repaired frames, experiment 3 both.</span></td></tr>
-    <tr><th><span lang="en">Videos</span></th><td><span lang="en">1, 8, 15, 6; experiment 1's second turn on videos 1 and 8 was run on 4 November.</span></td></tr>
+    <tr><th><span lang="en">Procedure</span></th><td><span lang="en">Each experiment turns once more under its own first-turn rules: the first-turn model takes the place of the starting model and its whole-video prediction is flagged again; experiments 2, 3 and 4c repair with its own heatmap second peaks (as in experiment 3's next turn). Experiment 1 takes only unflagged frames, experiment 2 only repaired frames, experiment 3 both, 4c only the frames closed under the opening rule and repaired under the confidence rule; 5b's second turn is in Table 9-4-12. Every model starts from the pretrained weights and trains on the human labels plus that turn's frames only; the previous turn's frames are not carried over.</span></td></tr>
+    <tr><th><span lang="en">Videos</span></th><td><span lang="en">1, 8, 15, 6; 4c on videos 1 and 15 only (videos 8 and 6 have 5 / 15 frames of this kind).</span></td></tr>
     <tr><th><span lang="en">Blind frames</span></th><td><span lang="en">Every model is counted on the same 34 frames (24 stratified plus 10 supplementary blind frames). Experiments 2 and 3 keep 60 frames on each side of the blind frames out of the training set; experiment 1 avoids only the truth frames (the blind frames were drawn after its first turn and exclude only that turn's training frames). In its second turn on video 1, 43 of the 60 blind frames have one of its training frames within 15 frames; in its second turn on video 15 one blind frame (one of the 24 scored) is itself in the training set, and every model predicts that frame correctly. So its blind counts are not measured under the same condition as those of experiments 2 and 3.</span></td></tr>
-    <tr><th><span lang="en">Progress</span></th><td><span lang="en">Videos 1, 8, 15 and 6 done. The conclusion is not written yet.</span></td></tr>
+    <tr><th><span lang="en">Progress</span></th><td><span lang="en">All done.</span></td></tr>
   </tbody></table></div>
-  <p class="text"><b><span lang="en">Table 9-4-13: turns 1 and 2 of experiments 1, 2 and 3</span></b></p>
+  <p class="text"><b><span lang="en">Table 9-4-13: turns 1 and 2 of every experiment</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="en">Video</span></th><th><span lang="en">Model</span></th><th><span lang="en">Turn</span></th><th><span lang="en">Frames added</span></th><th><span lang="en">Median truth error (% of eye width)</span></th><th><span lang="en">Wrong truth frames (of 70)</span></th><th><span lang="en">Flagged share (%)</span></th><th><span lang="en">Wrong among the 34 blind frames</span></th></tr></thead>
     <tbody>
-      <tr><td rowspan="7">1</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>2.94</td><td>8</td><td>15.31</td><td>17</td></tr>
+      <tr><td rowspan="9">1</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>2.94</td><td>8</td><td>15.31</td><td>17</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>1</td><td>1784</td><td>2.67</td><td>2</td><td>1.34</td><td>7</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>2</td><td>2064</td><td>2.82</td><td>1</td><td>0.98</td><td>3</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td>1</td><td>1784</td><td>2.73</td><td>2</td><td>1.51</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td>2</td><td>93</td><td>2.70</td><td>1</td><td>2.17</td><td>3</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>1</td><td>5347</td><td>2.56</td><td>1</td><td>0.83</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>2</td><td>1922</td><td>2.63</td><td>1</td><td>1.08</td><td>4</td></tr>
+      <tr><td><span lang="en">Experiment 4c</span></td><td>1</td><td>98</td><td>2.88</td><td>1</td><td>7.37</td><td>8</td></tr>
+      <tr><td><span lang="en">Experiment 4c</span></td><td>2</td><td>33</td><td>3.14</td><td>7</td><td>12.31</td><td>18</td></tr>
       <tr><td rowspan="7">8</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>5.02</td><td>1</td><td>8.90</td><td>12</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>1</td><td>1829</td><td>5.26</td><td>0</td><td>3.22</td><td>3</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>2</td><td>1994</td><td>5.06</td><td>0</td><td>2.13</td><td>4</td></tr>
@@ -1648,13 +1651,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td><span lang="en">Experiment 2</span></td><td>2</td><td>22</td><td>5.26</td><td>1</td><td>5.27</td><td>5</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>1</td><td>2508</td><td>4.85</td><td>0</td><td>3.30</td><td>3</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>2</td><td>1779</td><td>5.93</td><td>0</td><td>2.10</td><td>4</td></tr>
-      <tr><td rowspan="7">15</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>2.42</td><td>0</td><td>7.67</td><td>10</td></tr>
+      <tr><td rowspan="9">15</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>2.42</td><td>0</td><td>7.67</td><td>10</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>1</td><td>1776</td><td>2.39</td><td>0</td><td>2.69</td><td>3</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>2</td><td>1958</td><td>2.46</td><td>0</td><td>2.23</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td>1</td><td>548</td><td>2.75</td><td>0</td><td>3.37</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td>2</td><td>58</td><td>2.39</td><td>0</td><td>4.10</td><td>2</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>1</td><td>2254</td><td>2.50</td><td>0</td><td>2.77</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 3</span></td><td>2</td><td>1789</td><td>2.45</td><td>0</td><td>2.37</td><td>6</td></tr>
+      <tr><td><span lang="en">Experiment 4c</span></td><td>1</td><td>660</td><td>2.50</td><td>0</td><td>4.41</td><td>5</td></tr>
+      <tr><td><span lang="en">Experiment 4c</span></td><td>2</td><td>5</td><td>2.45</td><td>0</td><td>8.02</td><td>7</td></tr>
       <tr><td rowspan="7">6</td><td><span lang="en">Starting model</span></td><td>0</td><td></td><td>1.49</td><td>0</td><td>5.41</td><td>9</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>1</td><td>1859</td><td>1.44</td><td>0</td><td>0.44</td><td>4</td></tr>
       <tr><td><span lang="en">Experiment 1</span></td><td>2</td><td>2021</td><td>1.43</td><td>0</td><td>0.35</td><td>2</td></tr>
@@ -1664,6 +1669,26 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td><span lang="en">Experiment 3</span></td><td>2</td><td>1892</td><td>1.50</td><td>0</td><td>0.41</td><td>2</td></tr>
     </tbody>
   </table></div>
+  <p class="text"><span lang="en">4c's second turn is not run on videos 8 and 6: the starting model has only 5 and 15 frames of this kind there.</span></p>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_loop_round2.png?v=20261113" alt="Every experiment turn by turn on the four videos: wrong blind frames of 34 and flagged share, starting model, turn 1, turn 2"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-26:</span>Every experiment turn by turn on the four videos. Top: wrong predictions among the 34 blind frames; bottom: flagged share of the video (log axis). x: starting model, turn 1, turn 2; 4c is run on videos 1 and 15 only. The bar at the top right is how much the wrong blind count moves with the random seed alone (±1 frame, one pair measured on video 8).</figcaption>
+  </figure>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_loop_round2_frames.png?v=20261113" alt="Turn 2 against turn 1 on the blind frames, frame by frame: wrong in both turns, wrong to right, right to wrong, by stratum"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Turn 2 against turn 1 on the 34 blind frames, frame by frame, summed over the four videos (4c: videos 1 and 15): frames wrong in both turns, wrong to right, right to wrong; colour = the blind frame's stratum (A = flagged by the starting model only, B = flagged by both models, C, D = other strata, supplement = frames two models disagree on).</figcaption>
+  </figure>
+  
+  <div class="concl" lang="en"><span class="tag">Conclusion on turn 2:</span>
+    <ol>
+      <li>The gain is almost all in turn 1. Over the four videos' 136 blind frames the starting model is wrong on 48 and the experiments' first turns on 14 to 17; in turn 2 experiment 1 on 13, experiment 2 on 14, experiment 3 on 16, 5b on 15, about what the random seed alone changes (about 1 frame per video). Wrong truth frames summed over the four videos change by 0 or 1 in turn 2.</li>
+      <li>Frame by frame, turn 2 turns about as many frames from wrong to right as from right to wrong (experiment 1 6 / 2, experiment 2 9 / 8, experiment 3 3 / 5, 5b 4 / 4), and the frames wrong in both turns are mostly stratum B; no kind of frame improves consistently in turn 2. Experiment 1's 6 improved frames are not measured under the same condition: its training frames do not avoid the blind frames.</li>
+      <li>The second turns of experiments 1 and 3 still hold about 2000 grid frames labeled by the first-turn model, so what turn 1 learned is carried in those labels. The second turns of experiment 2 and 4c hold only the frames the first-turn model still gets wrong (experiment 2 22 to 306, 4c 33 / 5), and the previous turn's frames are not carried over, so they amount to "human labels plus a few new frames": 4c on video 1 falls back to about the starting model (wrong blind frames 8 → 18; of the 174 turn-1 frames of this kind left out of training it flags 165 again); video 15 likewise (flagged share 4.41% → 8.02%, starting model 7.67%; 129 of the 186 left-out frames of this kind flagged again; wrong blind frames 5 → 7). So the second turns of experiment 2 and 4c measure "the new frames alone", not "turn 1 plus the new frames"; the latter needs cumulative training, which is not run.</li>
+      <li>The stop rule in hindsight: in turn 1 the flagged frames fall to 5% to 38% of the previous turn's and the wrong blind frames by 4 to 13, far beyond the seed noise. In the 10 later decisions of experiment 3 and 5b the blind count changes by −2 to +2; the flagged frames still fall below 90% of the previous turn's 6 times, but the blind and truth frames do not improve with them, so the flagged count alone would keep turning without gain. Of the 8 stops, 7 have the blind condition firing; the two extra turns run (turn 3 of experiment 3 on video 6 and of 5b on video 15) did not improve. A rule "continue only if the wrong blind frames fall by 2 or more and the flagged frames fall below 90%" would stop all 8 loops at turn 2 with the same result. The rule is unchanged; under the current design there is no ground for another turn.</li>
+    </ol>
+  </div>
 </section>
 <!-- 10 -->
 <section id="s10">

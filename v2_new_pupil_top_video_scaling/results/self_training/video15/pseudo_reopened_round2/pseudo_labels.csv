@@ -1,0 +1,8 @@
+scorer,,,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng,Zhiheng
+bodyparts,,,pupil_top,pupil_top,pupil_bottom,pupil_bottom,pupil_left,pupil_left,pupil_right,pupil_right,eyelid_top,eyelid_top,eyelid_bottom,eyelid_bottom,eye_nasal_corner,eye_nasal_corner,eye_temporal_corner,eye_temporal_corner
+coords,,,x,y,x,y,x,y,x,y,x,y,x,y,x,y,x,y
+labeled-data,15_20251013_Terra_spont_1_pseudoreopenr2,img036110.png,619.633,447.02,606.911,564.862,536.905,501.831,661.161,505.3,718.39,489.598,610.228,563.146,459.318,458.947,839.292,537.771
+labeled-data,15_20251013_Terra_spont_1_pseudoreopenr2,img040606.png,631.033,472.211,567.165,551.747,512.669,506.825,623.429,505.802,614.092,472.086,582.104,540.961,467.318,466.947,797.65,535.824
+labeled-data,15_20251013_Terra_spont_1_pseudoreopenr2,img054591.png,603.727,491.495,580.304,558.493,528.08,524.73,621.96,521.63,606.422,498.678,593.634,553.427,462.282,488.258,789.977,561.508
+labeled-data,15_20251013_Terra_spont_1_pseudoreopenr2,img059282.png,603.727,491.495,584.356,563.673,574.214,541.667,626.855,525.903,607.426,494.538,594.901,552.307,447.896,482.089,804.516,545.57
+labeled-data,15_20251013_Terra_spont_1_pseudoreopenr2,img059300.png,623.927,483.372,578.892,561.65,508.269,523.352,626.186,521.899,617.163,491.852,591.669,549.563,445.365,478.985,807.071,536.532

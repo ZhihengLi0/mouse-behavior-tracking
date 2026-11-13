@@ -1,0 +1,19 @@
+video,loop,turn,flagged_prev,flagged,flagged_ratio,blind_prev,blind,blind_change,rule_in_use_stops,fired_flagged,fired_blind,blind_change_within_seed_noise,alt_flagged_only_stops,alt_flagged_or_blind_up_2_stops
+1,experiment 3,1,10987,598,0.05,17,4,-13,False,False,False,False,False,False
+1,experiment 3,2,598,774,1.29,4,4,0,True,True,True,True,True,True
+1,experiment 5b,1,10987,575,0.05,17,4,-13,False,False,False,False,False,False
+1,experiment 5b,2,575,698,1.21,4,5,1,True,True,True,True,True,True
+8,experiment 3,1,6383,2365,0.37,12,3,-9,False,False,False,False,False,False
+8,experiment 3,2,2365,1507,0.64,3,4,1,True,False,True,True,False,False
+8,experiment 5b,1,6383,2449,0.38,12,2,-10,False,False,False,False,False,False
+8,experiment 5b,2,2449,1838,0.75,2,4,2,True,False,True,False,False,True
+15,experiment 3,1,5500,1988,0.36,10,4,-6,False,False,False,False,False,False
+15,experiment 3,2,1988,1697,0.85,4,6,2,True,False,True,False,False,True
+15,experiment 5b,1,5500,1935,0.35,10,4,-6,False,False,False,False,False,False
+15,experiment 5b,2,1935,1269,0.66,4,3,-1,False,False,False,True,False,False
+15,experiment 5b,3,1269,1228,0.97,3,3,0,True,True,True,True,True,True
+6,experiment 3,1,3883,387,0.1,9,3,-6,False,False,False,False,False,False
+6,experiment 3,2,387,295,0.76,3,2,-1,False,False,False,True,False,False
+6,experiment 3,3,295,263,0.89,2,3,1,True,False,True,True,False,False
+6,experiment 5b,1,3883,322,0.08,9,5,-4,False,False,False,False,False,False
+6,experiment 5b,2,322,298,0.93,5,3,-2,True,True,False,False,True,True
