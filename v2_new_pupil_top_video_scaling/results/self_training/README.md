@@ -606,6 +606,20 @@ Figures 9-26, 9-27, 9-23; `self_training_figures.py`, functions `fig_round2`, `f
   `round3.log`; experiment 1 rounds >= 3 use shuffle 9000 + 10 x video + round (the old formula reaches 4000 + 10 x
   video + 5, the repaired-frames student). Rows are added when they finish.
 
+Third turn (2026-11-13, all three finished before 08:00: 00:26 to 02:16, 02:16 to 04:59, 04:59 to 07:41; no
+prediction had to be stopped). Same rules as each experiment's earlier turns, source = the turn-2 model.
+
+| experiment, video | model, shuffle | fed back | epochs / iterations | median % (turn 2 → 3) | wrong of 70 | flagged either % (turn 2 → 3) | flagged frames ratio | blind wrong 24 + 10 (turn 2 → 3) | stop rule |
+|---|---|---|---|---|---|---|---|---|---|
+| 1, video 1 | `round3_every30`, 9013 | 2077 | 7 / 7693 | 2.82 → 2.92 | 1 → 1 | 0.98 → 0.87 | 0.89 (turn-2 flags not saved; ratio of shares) | 1 + 2 → 2 + 2 (3 → 4) | stop (blind) |
+| 2, video 6 | `round3_repaired`, 4069 | 287 | 70 / 24080 | 1.51 → 1.50 | 0 → 0 | 2.15 → 1.63 | 0.76 (1542 → 1169) | 4 + 0 → 2 + 2 (4 → 4) | stop (blind) |
+| 1, video 6 | `round3_every30`, 9063 | 2047 | 20 / 24480 | 1.43 → 1.46 | 0 → 0 | 0.35 → 0.35 | 1.00 (250 → 250) | 2 + 0 → 2 + 0 (2 → 2) | stop (both) |
+
+Turn 2 against turn 3 frame by frame: experiment 1 video 1 one frame right to wrong (`img035.png`, A), none wrong to
+right; experiment 2 video 6 three wrong to right (`img011` D, `img024` B, `img042` A) and three right to wrong
+(`img033` A, `img102` F_n, `img107` F_t); experiment 1 video 6 no change. All three comparison runs now stop by the rule
+at turn 3; none moves beyond the seed noise.
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is

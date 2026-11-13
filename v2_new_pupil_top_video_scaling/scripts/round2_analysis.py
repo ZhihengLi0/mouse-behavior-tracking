@@ -65,7 +65,7 @@ def main():
     summ, chg = [], []
     for v in VIDEOS:
         P = blind_frames(v)
-        extra = blind_frames_model(v, [f"round{r}_reopened" for r in (1, 2)])
+        extra = blind_frames_model(v, [f"round{r}_reopened" for r in (1, 2)] + ["round3_every30", "round3_repaired"])   # models blind_test_set.py does not list
         P = pd.concat([P, extra], ignore_index=True)
         for src, label in [("teacher", "starting model")] + list(EXPS.items()):
             for r in ((0,) if src == "teacher" else (1, 2, 3)):
@@ -77,7 +77,7 @@ def main():
                 g = P[P.model == m]
                 main_ = g[~g.stratum.astype(str).str.startswith(("E", "F"))]
                 sup = g[g.stratum.astype(str).str.startswith(("E", "F"))]
-                if m.endswith("_reopened"):                       # the committed one-model score must agree
+                if m.endswith("_reopened") or m.startswith("round3_"):   # the committed one-model score must agree
                     bs = ST / f"video{v:02d}" / m / "blind_scores.csv"
                     if bs.exists() and len(g):
                         S = pd.read_csv(bs)
