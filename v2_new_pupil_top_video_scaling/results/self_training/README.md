@@ -652,6 +652,12 @@ Driver `tools/seed_replicates_1113.sh`, log `seed_replicates.log`; models `round
 | 15 | teacher | | 2.42 | 4.34 | 0 | 7.48 | 4.32 | 7.67 | 5500 | 7 + 3 = 10 |
 | 15 | round1_formal (5b turn 1) | 42 | 2.32 | 5.49 | 0 | 2.51 | 1.53 | 2.70 | 1935 | 2 + 2 = 4 |
 | 15 | round1_formal (5b turn 1) | 43 | 2.37 | 4.80 | 0 | 2.34 | 1.39 | 2.47 | 1773 | 2 + 2 = 4 |
+| 6 | teacher | | 1.49 | 2.47 | 0 | 5.32 | 3.13 | 5.41 | 3883 | 8 + 1 = 9 |
+| 6 | round1_formal (5b turn 1) | 42 | 1.42 | 2.38 | 0 | 0.38 | 0.34 | 0.45 | 322 | 4 + 1 = 5 |
+| 6 | round1_formal (5b turn 1) | 43 | 1.47 | 2.21 | 0 | 0.42 | 0.31 | 0.48 | 341 | 2 + 0 = 2 |
+| 8 | teacher | | 5.02 | 11.80 | 1 | 8.84 | 3.15 | 8.90 | 6383 | 9 + 3 = 12 |
+| 8 | round1_both (experiment 3 turn 1, 2026-11-08) | 42 | 4.85 | 11.65 | 0 | 3.26 | 0.88 | 3.30 | 2365 | 2 + 1 = 3 |
+| 8 | round1_both (experiment 3 turn 1, 2026-11-08) | 43 | 4.92 | 11.32 | 0 | 2.98 | 0.84 | 3.00 | 2150 | 2 + 0 = 2 |
 
 Video 0 (2026-11-13 23:51): with seed 43 the student has 2 wrong truth frames instead of 5, and they are not the same
 frames: seed 42 is wrong on 16250, 16323, 16911, 17205, 17719, seed 43 on 16323 (four points half an eye width off) and
@@ -679,6 +685,27 @@ flagged frames 1773 against 1935, a ratio of 0.92 (low-confidence detector 1.93 
 against 1.84 %); 1351 frames are flagged by both seeds, 584 by seed 42 only, 422 by seed 43 only; 2 of the 70 truth
 frames differ by more than 1 % of the eye width. On this video the seed moves the flagged count by 8 % and the blind
 count not at all, like the pair on video 8.
+
+Video 6 (2026-11-14 10:09, training 06:57 to 08:42, prediction to 10:09): seed 43 against seed 42: wrong truth frames
+0 and 0, median 1.47 and 1.42, no truth frame differing by more than 1 % of the eye width, flagged frames 341 against
+322 (ratio 1.06; 265 flagged by both, 57 by seed 42 only, 76 by seed 43 only), blind 2 of 34 against 5 (24: 2 and 4,
+supplement: 0 and 1): the largest blind difference of the pairs, with the smallest difference in flagged frames.
+
+Summary of the seed pairs (turn 1; seed 42 / seed 43; all else identical):
+
+| video | model | wrong truth of 70 | flagged frames | ratio | blind wrong of 34 | starting model: truth, flagged, blind |
+|---|---|---|---|---|---|---|
+| 8 | experiment 3 | 0 / 0 | 2365 / 2150 | 0.91 | 3 / 2 | 1, 6383, 12 |
+| 1 | 5b | 1 / 1 | 575 / 705 | 1.23 | 4 / 2 | 8, 10987, 17 |
+| 15 | 5b | 0 / 0 | 1935 / 1773 | 0.92 | 4 / 4 | 0, 5500, 10 |
+| 6 | 5b | 0 / 0 | 322 / 341 | 1.06 | 5 / 2 | 0, 3883, 9 |
+| 0 | experiment 1 | 5 / 2 | 474 / 410 | 0.86 | no blind set | 0, 220, |
+
+On the four videos with blind frames the first turn's gain holds with either seed (blind 12, 17, 10, 9 at the start
+against 2 to 5); between the seeds the wrong truth frames are equal, the flagged count differs by 6 to 23 %, and the
+blind count by 0 to 3 frames of 34 (1, 2, 0, 3). The earlier band "9 % and 1 frame" (one pair) was too narrow: a
+blind difference of up to 3 frames per video and a flagged ratio between about 0.8 and 1.25 cannot be told from
+training noise. Video 0 stays the exception: both seeds are worse than its starting model.
 
 ## Files
 

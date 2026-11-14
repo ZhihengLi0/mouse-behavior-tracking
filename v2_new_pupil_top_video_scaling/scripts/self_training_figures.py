@@ -536,7 +536,20 @@ R2EXP = [("every30", "experiment 1 (grid frames only)", "#e69f00", "o"), ("repai
          ("formal", "experiment 5b (final version)", "#cc79a7", "v")]
 
 
-def fig_round2(max_turn=2):
+SEED_PAIRS = [(1, "formal"), (15, "formal"), (6, "formal"), (8, "both")]   # turn-1 models trained again with seed 43 (round1_<source>_seed43)
+
+
+def seed43_point(v, src):
+    """Blind wrong count (of 34) and flagged share of the seed-43 replicate of a turn-1 model (its own eval.csv and blind_scores.csv)."""
+    d = RES / "self_training" / f"video{v:02d}" / f"round1_{src}_seed43"
+    if not (d / "eval.csv").exists() or not (d / "blind_scores.csv").exists():
+        return None
+    Bs = pd.read_csv(d / "blind_scores.csv")
+    return {"blind_wrong_34": int(Bs[Bs.model == f"round1_{src}_seed43"].wrong_frames.sum()),
+            "flagged_either_pct": float(pd.read_csv(d / "eval.csv").iloc[0].flagged_either_pct)}
+
+
+def fig_round2(max_turn=2, seeds=False):
     """Every experiment turn by turn on the four videos: wrong blind frames of 34 (top) and flagged share (bottom, log
     scale); turn 0 = the starting model. max_turn = 3 adds the third turns (written to loop_all_turns.png)."""
     S = pd.read_csv(R2 / "summary.csv")
@@ -552,6 +565,8 @@ def fig_round2(max_turn=2):
                 xs = [0] + [int(x) for x in g.turn]
                 ys = [float(t[col])] + [float(y) for y in g[col]]
                 ax.plot(xs, ys, marker=mk, color=c, linewidth=1.5, markersize=5, label=lab, alpha=0.95)
+                if seeds and (v, src) in SEED_PAIRS and seed43_point(v, src):   # the same turn-1 model with seed 43: hollow marker beside the seed-42 point
+                    ax.plot([1.16], [seed43_point(v, src)[col]], marker=mk, color=c, markerfacecolor="white", markeredgewidth=1.4, markersize=6.5, linestyle="", zorder=5)
             ax.set_xticks(range(max_turn + 1))
             ax.set_xticklabels(["start", "turn 1", "turn 2", "turn 3"][:max_turn + 1])
             ax.set_xlim(-0.25, max_turn + 0.25)
@@ -567,12 +582,17 @@ def fig_round2(max_turn=2):
                 ax.set_yticklabels(["0.3", "1", "3", "10"])
             if j == 0:
                 ax.set_ylabel(ylabel)
-    axes[0, 3].errorbar([max_turn + 0.12], [12], yerr=[1], color="#555", capsize=3, linewidth=1)
-    axes[0, 3].text(max_turn + 0.05, 12, "seed alone:\n\u00b11 frame", ha="right", va="center", fontsize=7.5, color="#555")
+    if not seeds:
+        axes[0, 3].errorbar([max_turn + 0.12], [12], yerr=[1], color="#555", capsize=3, linewidth=1)
+        axes[0, 3].text(max_turn + 0.05, 12, "seed alone:\n\u00b11 frame", ha="right", va="center", fontsize=7.5, color="#555")
     h, l = axes[0, 0].get_legend_handles_labels()
+    if seeds:
+        from matplotlib.lines import Line2D
+        h.append(Line2D([], [], marker="o", color="#555", markerfacecolor="white", markeredgewidth=1.4, markersize=6.5, linestyle=""))
+        l.append("hollow: the same turn-1 model trained with another seed")
     fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
-    fig.savefig(OUT / ("loop_round2.png" if max_turn == 2 else "loop_all_turns.png"), dpi=170)
+    fig.savefig(OUT / ("loop_all_turns_seeds.png" if seeds else "loop_round2.png" if max_turn == 2 else "loop_all_turns.png"), dpi=170)
     plt.close(fig)
 
 
@@ -682,11 +702,12 @@ if __name__ == "__main__" and "--round2" in sys.argv:
 
 
 # ---- experiments 1 and 2 with every turn run (page Figures 9-15, 9-16; 2026-11-13) ----
-TURN_COL = {"every30": ["#e69f00", "#f0c35c", "#f7e0a8"], "repaired": ["#d55e00", "#e89a5c", "#f5cfae"]}
-TURN_OUT = {"every30": ("loop_exp1_turns.png", "experiment 1"), "repaired": ("loop_exp2_turns.png", "experiment 2")}
+TURN_COL = {"every30": ["#e69f00", "#f0c35c", "#f7e0a8"], "repaired": ["#d55e00", "#e89a5c", "#f5cfae"], "both": ["#2f8fd0", "#86c1ea", "#cfe6f7"]}
+TURN_OUT = {"every30": ("loop_exp1_turns.png", "experiment 1"), "repaired": ("loop_exp2_turns.png", "experiment 2"), "both": ("loop_exp3_turns.png", "experiment 3")}
+TURN_BLIND = {"both": 34}   # experiment 3 is scored on all 34 blind frames (its training frames avoid them); experiments 1 and 2 on the 24 stratified ones, as in their tables
 
 
-def fig_experiment_turns(src):
+def fig_experiment_turns(src, seeds=False):
     """One experiment, every video and every turn it ran: wrong truth frames, median truth error, flagged share (each
     model's eval.csv) and wrong blind frames of the 24 stratified frames (round2_analysis/summary.csv); the starting
     model in grey, later turns in lighter tints of the experiment's colour."""
@@ -725,18 +746,31 @@ def fig_experiment_turns(src):
         draw(ax, vids, lambda v, r: float(E[(v, r)][col]) if (v, r) in E else None, fmt, fs)
         ax.set_ylabel(ylabel)
         ax.set_ylim(0, ax.get_ylim()[1] * 1.18)
+    if seeds:   # turn-1 replicates with seed 43 (videos without a second turn: the bar takes the empty turn-2 slot, hatched)
+        for ax, (col, ylabel, fmt) in zip(axes[:3], cols):
+            first = True
+            for i, v in enumerate(vids):
+                f = ST_ / f"video{v:02d}" / f"round1_{src}_seed43" / "eval.csv"
+                if not f.exists() or (v, 2) in E:
+                    continue
+                y = float(pd.read_csv(f).iloc[0][col])
+                x = i + (2 - 1.5) * w
+                ax.bar([x], [y], w * 0.9, color=TURN_COL[src][0], hatch="////", edgecolor="white", linewidth=0.5, label=f"{label}, turn 1 with another seed" if first else None)
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=fs, color="#222", rotation=90 if (len(vids) > 6 and "." in fmt.format(y)) else 0)
+                first = False
     bv = [v for v in vids if len(S[(S.video == v) & (S.experiment == "teacher")])]
 
     def blind(v, r):
         g = S[(S.video == v) & (S.experiment == ("teacher" if r == 0 else src)) & (S.turn == r)]
-        return float(g.blind_wrong_24.iloc[0]) if len(g) else None
+        return float(g[f"blind_wrong_{nb}"].iloc[0]) if len(g) else None
+    nb = TURN_BLIND.get(src, 24)
     draw(axes[3], bv, blind, "{:.0f}", 8)
-    axes[3].set_ylabel("wrong blind frames (of 24)")
-    axes[3].set_ylim(0, 14)
+    axes[3].set_ylabel(f"wrong blind frames (of {nb})")
+    axes[3].set_ylim(0, 20 if nb == 34 else 14)
     h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.legend(h, l, loc="upper center", ncol=5 if seeds else 4, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=9 if seeds else None)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
-    fig.savefig(OUT / fname, dpi=170)
+    fig.savefig(OUT / (fname.replace(".png", "_seeds.png") if seeds else fname), dpi=170)
     plt.close(fig)
 
 
@@ -744,4 +778,7 @@ if __name__ == "__main__" and "--turns" in sys.argv:
     fig_experiment_turns("every30")
     fig_experiment_turns("repaired")
     fig_round2(max_turn=3)
+    fig_experiment_turns("every30", seeds=True)
+    fig_experiment_turns("both")
+    fig_round2(max_turn=3, seeds=True)
     print("turn figures written")
