@@ -707,6 +707,31 @@ blind count by 0 to 3 frames of 34 (1, 2, 0, 3). The earlier band "9 % and 1 fra
 blind difference of up to 3 frames per video and a flagged ratio between about 0.8 and 1.25 cannot be told from
 training noise. Video 0 stays the exception: both seeds are worse than its starting model.
 
+### The two independent detectors for every model (2026-11-14)
+
+User 2026-11-14: "所有实验都要统计额外两个标出率". `scripts/independent_detectors.py` computes the low-confidence and the
+jump detector (the definitions of experiment 5b, thresholds where the video's starting model flags 5 %) for every
+model with a whole-video prediction and writes `round2_analysis/independent_detectors.csv` (66 models and 11 starting
+models; 25 models new, the 31 already in an `eval.csv` reproduced to the stored digits; no existing file changed).
+
+- Turn 1 of experiments 1, 2, 3 and 5b on videos 1, 8, 15, 6: low confidence 0.32 to 3.13 %, jump 0.42 to 4.35 %
+  (starting model 5.0 %). Experiment 4c is the exception on video 15: low confidence 12.98 % in turn 1 and 11.77 % in
+  turn 2, above the starting model. Video 0's experiment 1: 2.33 and 3.09 % (seed 43: 6.01 and 3.05 %).
+- Later turns: on video 6 the jump detector keeps falling (experiment 1 1.55 → 1.05 → 0.75, experiment 3 1.51 → 0.91
+  → 0.80, 5b 1.24 → 0.88) and on video 15 too (5b 1.84 → 1.29 → 1.26, experiment 3 1.80 → 1.60, experiment 1 1.97 →
+  1.65); on video 1 it rises for experiment 3 and 5b (0.42 → 0.60 and 0.56) and falls for experiment 1 (0.63 → 0.54 →
+  0.49); on video 8 it changes little. Experiment 2's later turns rise (video 6 low confidence 1.33 → 3.71, video 15
+  2.52 → 5.27, video 8 jump 0.97 → 1.93).
+- Seed pairs: the jump detector differs by 0.01 to 0.05 percentage points between seeds 42 and 43 (0.42 / 0.46, 1.84 /
+  1.79, 1.24 / 1.28, 1.06 / 1.07, video 0 3.09 / 3.05), the low-confidence detector by 0.01 to 0.23 on the four videos
+  and by 3.7 on video 0. So the fall of the jump detector in later turns on videos 6 and 15 is larger than the seed
+  difference, while the blind and truth counts (34 and 70 frames per video) show nothing.
+
+Figures (2026-11-14): one colour per experiment in every figure (experiment 1 orange, 2 vermillion, 3 blue, 4c green,
+5b pink; later turns lighter tints); `loop_all_turns_detectors.png` (page Figure 9-26: four rows, seed-43 turn-1 models
+as hollow markers), `loop_exp1_turns_seeds.png` (Figure 9-15), `loop_exp3_turns.png` (Figure 9-17), `loop_turns.png`,
+`loop_truth.png`, `loop_blind.png` redrawn with the palette.
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is

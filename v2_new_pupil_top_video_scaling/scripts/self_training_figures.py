@@ -27,7 +27,7 @@ MODELS = {"teacher": "starting model", "teacher + repair": "starting model + rep
           "round1_both": "experiment 3, first turn", "round2_both": "experiment 3, second turn",
           "round3_both": "experiment 3, third turn"}
 COL = {"teacher": "#6f6f6f", "teacher + repair": "#b9b9b9", "round1_every30": "#e69f00", "round1_repaired": "#d55e00",
-       "round2_every30": "#cc79a7", "round1_both": "#56b4e9", "round2_both": "#1f78b4", "round3_both": "#0b3d91"}
+       "round2_every30": "#f0c35c", "round1_both": "#0072b2", "round2_both": "#5aa5d6", "round3_both": "#b3d6ee"}   # 2026-11-14: one colour per experiment in every figure (1 orange, 2 vermillion, 3 blue, 4c green, 5b pink), later turns lighter
 LOOP = ("round1_every30", "round1_repaired", "round1_both")       # the three first-turn loop models shown side by side
 BARS = [m for m in MODELS if m not in ("round2_both", "round3_both")]   # later turns of experiment 3: figure loop_turns
 LINE = 14.0
@@ -190,9 +190,11 @@ def fig_turns():
     """Experiment 3 turn by turn: flagged share of the video, wrong blind frames (of 34) and wrong truth frames (of 70),
     turn 0 = the starting model; a dotted line marks the turn at which the stop rule stopped the loop."""
     C = comparison()
-    series = [("flagged_either_pct", "frames flagged by either finder, % of the video", "o", "#0072b2", (0, 5), "center"),
-              ("blind_wrong_pct", "wrong blind frames, % of 34", "s", "#d55e00", (0, 5), "center"),
-              ("truth_wrong_pct", "wrong truth frames, % of 70", "^", "#009e73", (7, -3), "left")]
+    series = [("flagged_either_pct", "frames flagged by either finder, % of the video", "o", "#0072b2", (0, 5), "center"),   # experiment 3's blue for all three; the measure is told by marker and line style
+              ("blind_wrong_pct", "wrong blind frames, % of 34", "s", "#0072b2", (0, 5), "center"),
+              ("truth_wrong_pct", "wrong truth frames, % of 70", "^", "#0072b2", (7, -3), "left")]
+    LS = {"flagged_either_pct": "-", "blind_wrong_pct": "--", "truth_wrong_pct": ":"}
+    FACE = {"flagged_either_pct": "#0072b2", "blind_wrong_pct": "white", "truth_wrong_pct": "#b3d6ee"}
     fig, axes = plt.subplots(1, 4, figsize=(13.5, 3.6), sharey=True)
     for ax, v in zip(axes, VIDEOS):
         rows = []
@@ -205,7 +207,7 @@ def fig_turns():
                          "blind_wrong_pct": 100 * blind_wrong(v, m) / 34, "truth_wrong_pct": 100 * float(c.iloc[0].wrong_frames) / 70})
         T = pd.DataFrame(rows)
         for col, label, marker, colour, off, ha in series:
-            ax.plot(T.turn, T[col], marker=marker, color=colour, linewidth=1.6, markersize=5.5, label=label)
+            ax.plot(T.turn, T[col], marker=marker, color=colour, linewidth=1.6, markersize=6, label=label, linestyle=LS[col], markerfacecolor=FACE[col], markeredgewidth=1.3)
             for x, y in zip(T.turn, T[col]):
                 ax.annotate(f"{y:.1f}", (x, y), textcoords="offset points", xytext=off, ha=ha, fontsize=6.5, color="#333")
         status = RES / "self_training" / f"video{v:02d}" / "loop_status.csv"
@@ -549,14 +551,21 @@ def seed43_point(v, src):
             "flagged_either_pct": float(pd.read_csv(d / "eval.csv").iloc[0].flagged_either_pct)}
 
 
-def fig_round2(max_turn=2, seeds=False):
+def fig_round2(max_turn=2, seeds=False, detectors=False):
     """Every experiment turn by turn on the four videos: wrong blind frames of 34 (top) and flagged share (bottom, log
-    scale); turn 0 = the starting model. max_turn = 3 adds the third turns (written to loop_all_turns.png)."""
+    scale); turn 0 = the starting model. max_turn = 3 adds the third turns (written to loop_all_turns.png).
+    detectors = True adds two rows with the independent detectors (round2_analysis/independent_detectors.csv: lowest
+    point confidence, largest frame-to-frame move; the starting model is 5 % by construction)."""
     S = pd.read_csv(R2 / "summary.csv")
-    fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.6), sharex=True)
+    metrics = [("blind_wrong_34", "wrong blind frames (of 34)"), ("flagged_either_pct", "frames flagged, % of the video")]
+    if detectors:
+        Dd = pd.read_csv(R2 / "independent_detectors.csv")
+        S = S.merge(Dd[Dd.seed == 42][["video", "model", "indep_lowconf_pct", "indep_jump_pct"]], on=["video", "model"], how="left")
+        metrics += [("indep_lowconf_pct", "low-confidence frames, % of the video"), ("indep_jump_pct", "jump frames, % of the video")]
+    fig, axes = plt.subplots(len(metrics), 4, figsize=(13.5, 3.05 * len(metrics) + 0.5), sharex=True)
     for j, v in enumerate(VIDEOS):
         t = S[(S.video == v) & (S.experiment == "teacher")].iloc[0]
-        for i, (col, ylabel) in enumerate([("blind_wrong_34", "wrong blind frames (of 34)"), ("flagged_either_pct", "frames flagged, % of the video")]):
+        for i, (col, ylabel) in enumerate(metrics):
             ax = axes[i, j]
             for k, (src, lab, c, mk) in enumerate(R2EXP):
                 g = S[(S.video == v) & (S.experiment == src) & (S.turn <= max_turn)].sort_values("turn")
@@ -566,7 +575,11 @@ def fig_round2(max_turn=2, seeds=False):
                 ys = [float(t[col])] + [float(y) for y in g[col]]
                 ax.plot(xs, ys, marker=mk, color=c, linewidth=1.5, markersize=5, label=lab, alpha=0.95)
                 if seeds and (v, src) in SEED_PAIRS and seed43_point(v, src):   # the same turn-1 model with seed 43: hollow marker beside the seed-42 point
-                    ax.plot([1.16], [seed43_point(v, src)[col]], marker=mk, color=c, markerfacecolor="white", markeredgewidth=1.4, markersize=6.5, linestyle="", zorder=5)
+                    if col.startswith("indep"):
+                        y43 = float(Dd[(Dd.video == v) & (Dd.model == f"round1_{src}_seed43")][col].iloc[0])
+                    else:
+                        y43 = seed43_point(v, src)[col]
+                    ax.plot([1.16], [y43], marker=mk, color=c, markerfacecolor="white", markeredgewidth=1.4, markersize=6.5, linestyle="", zorder=5)
             ax.set_xticks(range(max_turn + 1))
             ax.set_xticklabels(["start", "turn 1", "turn 2", "turn 3"][:max_turn + 1])
             ax.set_xlim(-0.25, max_turn + 0.25)
@@ -591,8 +604,8 @@ def fig_round2(max_turn=2, seeds=False):
         h.append(Line2D([], [], marker="o", color="#555", markerfacecolor="white", markeredgewidth=1.4, markersize=6.5, linestyle=""))
         l.append("hollow: the same turn-1 model trained with another seed")
     fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
-    fig.savefig(OUT / ("loop_all_turns_seeds.png" if seeds else "loop_round2.png" if max_turn == 2 else "loop_all_turns.png"), dpi=170)
+    fig.tight_layout(rect=(0, 0, 1, 0.955 if detectors else 0.92))
+    fig.savefig(OUT / ("loop_all_turns_detectors.png" if detectors else "loop_all_turns_seeds.png" if seeds else "loop_round2.png" if max_turn == 2 else "loop_all_turns.png"), dpi=170)
     plt.close(fig)
 
 
@@ -702,7 +715,7 @@ if __name__ == "__main__" and "--round2" in sys.argv:
 
 
 # ---- experiments 1 and 2 with every turn run (page Figures 9-15, 9-16; 2026-11-13) ----
-TURN_COL = {"every30": ["#e69f00", "#f0c35c", "#f7e0a8"], "repaired": ["#d55e00", "#e89a5c", "#f5cfae"], "both": ["#2f8fd0", "#86c1ea", "#cfe6f7"]}
+TURN_COL = {"every30": ["#e69f00", "#f0c35c", "#f7e0a8"], "repaired": ["#d55e00", "#e89a5c", "#f5cfae"], "both": ["#0072b2", "#5aa5d6", "#b3d6ee"]}
 TURN_OUT = {"every30": ("loop_exp1_turns.png", "experiment 1"), "repaired": ("loop_exp2_turns.png", "experiment 2"), "both": ("loop_exp3_turns.png", "experiment 3")}
 TURN_BLIND = {"both": 34}   # experiment 3 is scored on all 34 blind frames (its training frames avoid them); experiments 1 and 2 on the 24 stratified ones, as in their tables
 
@@ -781,4 +794,5 @@ if __name__ == "__main__" and "--turns" in sys.argv:
     fig_experiment_turns("every30", seeds=True)
     fig_experiment_turns("both")
     fig_round2(max_turn=3, seeds=True)
+    fig_round2(max_turn=3, seeds=True, detectors=True)
     print("turn figures written")
