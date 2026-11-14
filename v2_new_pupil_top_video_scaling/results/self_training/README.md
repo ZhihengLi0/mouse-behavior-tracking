@@ -738,6 +738,13 @@ the user judged (`flag_and_repair/subset_review/items/video15_f050265_r.jpg`, `v
 right). It is page Figure 9-23; the page figures after it moved up by one (4c 9-24, 5a 9-25 and 9-26, all turns 9-27,
 turn 2 against turn 1 9-28), so figure numbers quoted earlier in this file for those are one lower.
 
+Per-experiment figures with the detectors, and labels (2026-11-14): `figures/loop_exp{1,2,3}_full.png`
+(`fig_experiment_full`: six panels, with the low-confidence and the jump detector; page Figures 9-15 to 9-17) and
+`loop_exp4c_full.png` (`fig_exp4c_full`, four panels; page Figure 9-24); `python self_training_figures.py --full`.
+Every flagged share in the figures and on the page now names its algorithm in brackets: (fitting + PCA) for the two
+finders the loop uses, (low confidence) and (jump) for the two independent detectors. Captions and conclusions of page
+9.4 were shortened; numbers a table already gives are no longer repeated in the text.
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is

@@ -69,7 +69,7 @@ def fig_truth():
     bars(axes[0], C, "median_error_pct", models, "median error, 70 truth frames, % of eye width", lambda y: f"{y:.1f}", VIDEOS)
     bars(axes[1], C, "wrong_frames", models, "wrong truth frames (error over 14 %), of 70", lambda y: f"{y:.0f}", VIDEOS)
     bars(axes[2], C, "flagged_either_pct", [m for m in models if m != "teacher + repair"],
-         "frames flagged by either finder, % of the video", lambda y: f"{y:.1f}", VIDEOS)
+         "frames flagged (fitting + PCA), % of the video", lambda y: f"{y:.1f}", VIDEOS)
     axes[1].set_ylim(0, 9.5)
     axes[0].set_ylim(0, 6.2)
     axes[2].set_ylim(0, 17.5)
@@ -86,7 +86,7 @@ def fig_all_videos():
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 3.7))
     bars(axes[0], C, "median_error_pct", models, "median error, 70 truth frames, % of eye width", lambda y: f"{y:.1f}", ALL)
     bars(axes[1], C, "wrong_frames", models, "wrong truth frames of 70", lambda y: f"{y:.0f}", ALL)
-    bars(axes[2], C, "flagged_either_pct", models, "frames flagged by either finder, % of the video", lambda y: f"{y:.1f}", ALL)
+    bars(axes[2], C, "flagged_either_pct", models, "frames flagged (fitting + PCA), % of the video", lambda y: f"{y:.1f}", ALL)
     h, l = axes[0].get_legend_handles_labels()
     fig.legend(h, l, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.0))
     fig.tight_layout(rect=(0, 0, 1, 0.92))
@@ -190,7 +190,7 @@ def fig_turns():
     """Experiment 3 turn by turn: flagged share of the video, wrong blind frames (of 34) and wrong truth frames (of 70),
     turn 0 = the starting model; a dotted line marks the turn at which the stop rule stopped the loop."""
     C = comparison()
-    series = [("flagged_either_pct", "frames flagged by either finder, % of the video", "o", "#0072b2", (0, 5), "center"),   # experiment 3's blue for all three; the measure is told by marker and line style
+    series = [("flagged_either_pct", "frames flagged (fitting + PCA), % of the video", "o", "#0072b2", (0, 5), "center"),   # experiment 3's blue for all three; the measure is told by marker and line style
               ("blind_wrong_pct", "wrong blind frames, % of 34", "s", "#0072b2", (0, 5), "center"),
               ("truth_wrong_pct", "wrong truth frames, % of 70", "^", "#0072b2", (7, -3), "left")]
     LS = {"flagged_either_pct": "-", "blind_wrong_pct": "--", "truth_wrong_pct": ":"}
@@ -557,11 +557,11 @@ def fig_round2(max_turn=2, seeds=False, detectors=False):
     detectors = True adds two rows with the independent detectors (round2_analysis/independent_detectors.csv: lowest
     point confidence, largest frame-to-frame move; the starting model is 5 % by construction)."""
     S = pd.read_csv(R2 / "summary.csv")
-    metrics = [("blind_wrong_34", "wrong blind frames (of 34)"), ("flagged_either_pct", "frames flagged, % of the video")]
+    metrics = [("blind_wrong_34", "wrong blind frames (of 34)"), ("flagged_either_pct", "flagged (fitting + PCA), % of the video")]
     if detectors:
         Dd = pd.read_csv(R2 / "independent_detectors.csv")
         S = S.merge(Dd[Dd.seed == 42][["video", "model", "indep_lowconf_pct", "indep_jump_pct"]], on=["video", "model"], how="left")
-        metrics += [("indep_lowconf_pct", "low-confidence frames, % of the video"), ("indep_jump_pct", "jump frames, % of the video")]
+        metrics += [("indep_lowconf_pct", "flagged (low confidence), % of the video"), ("indep_jump_pct", "flagged (jump), % of the video")]
     fig, axes = plt.subplots(len(metrics), 4, figsize=(13.5, 3.05 * len(metrics) + 0.5), sharex=True)
     for j, v in enumerate(VIDEOS):
         t = S[(S.video == v) & (S.experiment == "teacher")].iloc[0]
@@ -835,3 +835,139 @@ def fig_exp4b_examples(items=(("video15_f050265_r", "video 15, frame 50265", "le
 if __name__ == "__main__" and "--exp4b" in sys.argv:
     fig_exp4b_examples()
     print("4b example figure written")
+
+
+# ---- per-experiment figures with the two independent detectors as well (page Figures 9-15 to 9-17, 9-24; 2026-11-14) ----
+def fig_experiment_full(src, seeds=False):
+    """One experiment, every video and every turn it ran, six panels: wrong truth frames, median truth error, wrong blind
+    frames (top); flagged share, low-confidence detector, jump detector (bottom; the two detectors from
+    round2_analysis/independent_detectors.csv, the starting model is 5 % by construction). Same bars and colours as
+    fig_experiment_turns; seeds = True adds the turn-1 replicate with another seed as a hatched bar (videos without a
+    second turn)."""
+    ST_ = RES / "self_training"
+    name = lambda r: "teacher" if r == 0 else f"round{r}_{src}"
+    vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / name(1) / "eval.csv").exists()]
+    fname, label = TURN_OUT[src]
+    nb = TURN_BLIND.get(src, 24)
+    series = [(0, COL["teacher"], "starting model")] + [(r, TURN_COL[src][r - 1], f"{label}, turn {r}") for r in (1, 2, 3)]
+    S = pd.read_csv(R2 / "summary.csv")
+    Dd = pd.read_csv(R2 / "independent_detectors.csv")
+    E = {(v, r): pd.read_csv(ST_ / f"video{v:02d}" / name(r) / "eval.csv").iloc[0] for v in vids for r in range(4)
+         if (ST_ / f"video{v:02d}" / name(r) / "eval.csv").exists()}
+    bv = [v for v in vids if len(S[(S.video == v) & (S.experiment == "teacher")])]
+
+    def ev(col):
+        return lambda v, r, m=None: (float(pd.read_csv(ST_ / f"video{v:02d}" / m / "eval.csv").iloc[0][col]) if m else float(E[(v, r)][col]) if (v, r) in E else None)
+
+    def det(col):
+        def f(v, r, m=None):
+            g = Dd[(Dd.video == v) & (Dd.model == (m or name(r)))]
+            return float(g[col].iloc[0]) if len(g) else None
+        return f
+
+    def blind(v, r, m=None):
+        if m:
+            return None
+        g = S[(S.video == v) & (S.experiment == ("teacher" if r == 0 else src)) & (S.turn == r)]
+        return float(g[f"blind_wrong_{nb}"].iloc[0]) if len(g) else None
+
+    panels = [(ev("wrong_frames"), "wrong truth frames (of 70)", "{:.0f}", vids), (ev("median_error_pct"), "median truth error, % of eye width", "{:.1f}", vids),
+              (blind, f"wrong blind frames (of {nb})", "{:.0f}", bv), (ev("flagged_either_pct"), "flagged (fitting + PCA), % of the video", "{:.1f}", vids),
+              (det("indep_lowconf_pct"), "flagged (low confidence), % of the video", "{:.1f}", vids), (det("indep_jump_pct"), "flagged (jump), % of the video", "{:.1f}", vids)]
+    fig, axes = plt.subplots(2, 3, figsize=(17.5, 7.6))
+    w = 0.8 / 4
+    for ax, (value, ylabel, fmt, xv) in zip(axes.ravel(), panels):
+        many = len(xv) > 6
+        fs = 6.5 if many else 8
+        rot = lambda t: 90 if (many and "." in t) else 0
+        for j, (r, c, lab) in enumerate(series):
+            pts = [(i, value(v, r)) for i, v in enumerate(xv)]
+            pts = [(i, y) for i, y in pts if y is not None and np.isfinite(y)]
+            xs = [i + (j - 1.5) * w for i, _ in pts]
+            ax.bar(xs, [y for _, y in pts], w * 0.9, color=c, label=lab, edgecolor=TURN_COL[src][0] if r > 1 else "white", linewidth=0.5)
+            for x, (_, y) in zip(xs, pts):
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=fs, color="#222", rotation=rot(fmt.format(y)))
+        if seeds:
+            first = True
+            for i, v in enumerate(xv):
+                m = f"round1_{src}_seed43"
+                if not (ST_ / f"video{v:02d}" / m / "eval.csv").exists() or (v, 2) in E:
+                    continue
+                y = value(v, 1, m)
+                if y is None:
+                    continue
+                x = i + 0.5 * w
+                ax.bar([x], [y], w * 0.9, color=TURN_COL[src][0], hatch="////", edgecolor="white", linewidth=0.5, label=f"{label}, turn 1 with another seed" if first else None)
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=fs, color="#222", rotation=rot(fmt.format(y)))
+                first = False
+        ax.set_xticks(range(len(xv)))
+        ax.set_xticklabels([str(v) for v in xv])
+        ax.set_xlabel("video")
+        ax.set_ylabel(ylabel)
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, (20 if nb == 34 else 14) if value is blind else ax.get_ylim()[1] * 1.18)
+    h, l = axes[1, 0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(OUT / fname.replace("_turns.png", "_full.png"), dpi=170)
+    plt.close(fig)
+
+
+def fig_exp4c_full():
+    """Experiment 4c with its second turn, four panels: (a) flagged share with the wrong truth and blind frames, (b) the
+    turn-1 reopened frames left out of the training set still flagged, (c) low-confidence detector, (d) jump detector."""
+    ST_ = RES / "self_training"
+    Dd = pd.read_csv(R2 / "independent_detectors.csv")
+    vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / "round1_reopened" / "eval.csv").exists()]
+    series = [("teacher", COL["teacher"], "starting model"), ("round1_reopened", "#009e73", "experiment 4c, turn 1"), ("round2_reopened", "#7fd1b9", "experiment 4c, turn 2")]
+    fig, axes = plt.subplots(1, 4, figsize=(17.5, 4.4))
+    w = 0.27
+    for i, v in enumerate(vids):
+        F = pd.read_csv(ST_ / f"video{v:02d}" / "pseudo_reopened" / "pseudo_frames.csv")
+        held = F.frame[~F.kept].to_numpy()
+        for j, (m, c, lab) in enumerate(series):
+            x = i + (j - 1) * w
+            ef = ST_ / f"video{v:02d}" / m / "eval.csv"
+            if not ef.exists():
+                for ax in axes:
+                    ax.text(x, 0, "not run", ha="center", va="bottom", fontsize=7, color="#888", rotation=90)
+                continue
+            e = pd.read_csv(ef).iloc[0]
+            kw = dict(color=c, edgecolor="#009e73" if m == "round2_reopened" else "white", linewidth=0.5)
+            axes[0].bar([x], [e.flagged_either_pct], w * 0.92, label=lab if i == 0 else None, **kw)
+            axes[0].text(x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f}", ha="center", va="bottom", fontsize=7.5, color="#222")   # truth and blind counts are in the page tables
+            if m == "teacher":
+                y = len(held)
+            else:
+                Sf = pd.read_csv(ST_ / f"video{v:02d}" / m / "flags.csv.gz").set_index("frame").loc[held]
+                y = int((Sf.fit_flag | Sf.pca_flag).sum())
+            axes[1].bar([x], [y], w * 0.92, **kw)
+            axes[1].text(x, y, f"{y}/{len(held)}", ha="center", va="bottom", fontsize=7, color="#222")
+            g = Dd[(Dd.video == v) & (Dd.model == m)].iloc[0]
+            for ax, col in ((axes[2], "indep_lowconf_pct"), (axes[3], "indep_jump_pct")):
+                ax.bar([x], [g[col]], w * 0.92, **kw)
+                ax.text(x, g[col], f"{g[col]:.1f}", ha="center", va="bottom", fontsize=7.5, color="#222")
+    for ax, yl, tt in zip(axes, ("flagged (fitting + PCA), % of the video", "frames flagged (fitting + PCA)", "flagged (low confidence), % of the video", "flagged (jump), % of the video"),
+                          ("(a) flagged share (fitting + PCA)", "(b) reopened frames left out of training:\nstill flagged (fitting + PCA)", "(c) flagged share (low confidence)", "(d) flagged share (jump)")):
+        ax.set_xticks(range(len(vids)))
+        ax.set_xticklabels([str(v) for v in vids])
+        ax.set_xlabel("video")
+        ax.set_ylabel(yl)
+        ax.set_title(tt, loc="left", fontsize=10)
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.15)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.savefig(OUT / "loop_exp4c_full.png", dpi=170)
+    plt.close(fig)
+
+
+if __name__ == "__main__" and "--full" in sys.argv:
+    fig_experiment_full("every30", seeds=True)
+    fig_experiment_full("repaired")
+    fig_experiment_full("both")
+    fig_exp4c_full()
+    print("full per-experiment figures written")
