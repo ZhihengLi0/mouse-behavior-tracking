@@ -1,0 +1,5 @@
+set,model,frames,median_error_pct,wrong_frames
+main,teacher,24,8.06,11
+main,round1_formal_seed43,24,4.7,2
+supplement,teacher,10,29.46,6
+supplement,round1_formal_seed43,10,8.07,0

@@ -646,6 +646,9 @@ Driver `tools/seed_replicates_1113.sh`, log `seed_replicates.log`; models `round
 | 0 | teacher (60 labels) | | 2.25 | 3.37 | 0 | 1.00 | 1.03 | 1.22 | 220 | no blind set |
 | 0 | round1_every30 | 42 | 2.42 | 3.81 | 5 | 2.55 | 2.02 | 2.63 | 474 | |
 | 0 | round1_every30 | 43 | 2.32 | 3.42 | 2 | 2.23 | 1.85 | 2.28 | 410 | |
+| 1 | teacher | | 2.94 | 19.25 | 8 | 15.25 | 8.53 | 15.31 | 10987 | 11 + 6 = 17 |
+| 1 | round1_formal (5b turn 1) | 42 | 2.64 | 4.83 | 1 | 0.78 | 0.50 | 0.80 | 575 | 2 + 2 = 4 |
+| 1 | round1_formal (5b turn 1) | 43 | 2.59 | 4.46 | 1 | 0.92 | 0.53 | 0.98 | 705 | 2 + 0 = 2 |
 
 Video 0 (2026-11-13 23:51): with seed 43 the student has 2 wrong truth frames instead of 5, and they are not the same
 frames: seed 42 is wrong on 16250, 16323, 16911, 17205, 17719, seed 43 on 16323 (four points half an eye width off) and
@@ -659,6 +662,13 @@ video. Seen with the human-only models of the video (20 to 100 labels: 1, 1, 0, 
 2.12, 1.00, 2.88, 1.80 %; computed 2026-11-13 from `predictions_step01..05`, not stored), the 60-label teacher is the
 best of the five and both students sit inside that range for the flagged share and just above it for the wrong frames.
 `labels_to_plateau.csv` gives 60 labels as video 0's plateau, so the starting model is the plateau model.
+
+Video 1 (2026-11-14 02:25, training 23:51 to 00:58, prediction to 02:25): seed 43 against seed 42 of the final
+loop's first turn: wrong truth frames 1 and 1, median 2.59 and 2.64, blind 2 of 34 against 4 (24: 2 and 2, supplement:
+0 and 2), flagged frames 705 against 575, a ratio of 1.23 (low-confidence detector 0.93 against 0.70 %, jump detector
+0.46 against 0.42 %). On this video the seed alone moves the flagged count by 23 % and the blind count by 2 frames,
+more than the one pair on video 8 (9 % and 1 frame). The second turn of the final loop on video 1 (698 flagged frames,
+blind 5) and of experiment 3 (774, blind 4), both read as "more flagged frames than turn 1", lie inside this band.
 
 ## Files
 
