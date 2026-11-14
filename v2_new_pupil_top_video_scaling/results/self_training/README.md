@@ -632,6 +632,34 @@ to wrong in total). On the flagged count alone 10 would continue after turn 2, 5
 Figures `figures/loop_exp1_turns.png`, `loop_exp2_turns.png` (`fig_experiment_turns`, page Figures 9-15, 9-16) and
 `loop_all_turns.png` (`fig_round2(max_turn=3)`, page Figure 9-26); `python self_training_figures.py --turns`.
 
+### Seed replicates (2026-11-13/14)
+
+User 2026-11-13: the same model trained again with seed 43 instead of 42, everything else identical (same pseudo set,
+same schedule), to see how much one training differs from another: video 0's experiment 1 (is its 0 → 5 wrong truth
+frames training noise?) and the final loop's first turn on videos 1, 15, 6 (so far one pair, video 8 experiment 3).
+Driver `tools/seed_replicates_1113.sh`, log `seed_replicates.log`; models `round1_every30_seed43` (shuffle 7003) and
+`round1_formal_seed43` (shuffle 7000 + 10 x video + 2). Video 0's pseudo image set was restored from the SSD backup
+(368 PNGs and the label files; rows and labeled points equal to the committed `pseudo_summary.csv`).
+
+| video | model | seed | median % | p90 % | wrong of 70 | flagged fit % | flagged PCA % | flagged either % | flagged frames | blind wrong (24 + 10) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | teacher (60 labels) | | 2.25 | 3.37 | 0 | 1.00 | 1.03 | 1.22 | 220 | no blind set |
+| 0 | round1_every30 | 42 | 2.42 | 3.81 | 5 | 2.55 | 2.02 | 2.63 | 474 | |
+| 0 | round1_every30 | 43 | 2.32 | 3.42 | 2 | 2.23 | 1.85 | 2.28 | 410 | |
+
+Video 0 (2026-11-13 23:51): with seed 43 the student has 2 wrong truth frames instead of 5, and they are not the same
+frames: seed 42 is wrong on 16250, 16323, 16911, 17205, 17719, seed 43 on 16323 (four points half an eye width off) and
+17498 (temporal corner 0.66 off; right with seed 42). Frames 16250, 16911 and 17719 are right with seed 43 (errors
+0.02 to 0.05), 17205 is at 0.108, under the line. Only 6 of the 70 truth frames differ by more than 1 % of the eye
+width between the two seeds (median difference 0.13 %). The flagged share is 2.28 % against 2.63 %; by tenth of the
+video the seed-43 student flags 5.0 % of the first tenth and 9.9 % of the last, like seed 42 (6.0 and 9.7 %). Reading:
+which truth frames go wrong, and how many (2 or 5), changes with the seed, so the count 5 is not a stable property of
+the loop; both seeds are still worse than the teacher (0 wrong, 1.22 % flagged), in the same two stretches of the
+video. Seen with the human-only models of the video (20 to 100 labels: 1, 1, 0, 0, 0 wrong; fitting-flagged 2.93,
+2.12, 1.00, 2.88, 1.80 %; computed 2026-11-13 from `predictions_step01..05`, not stored), the 60-label teacher is the
+best of the five and both students sit inside that range for the flagged share and just above it for the wrong frames.
+`labels_to_plateau.csv` gives 60 labels as video 0's plateau, so the starting model is the plateau model.
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is

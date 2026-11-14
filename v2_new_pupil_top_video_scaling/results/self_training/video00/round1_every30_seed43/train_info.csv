@@ -1,0 +1,2 @@
+video,model,shuffle,teacher_shuffle,train_human,train_pseudo,val,teacher_iterations,epochs,iterations,milestones,snapshot_every,final_snapshot,train_minutes,predict_minutes,prediction_h5
+0,round1_every30_seed43,7003,113,60,368,20,3600,17,3638,14/16,1,snapshot-017.pt,11.1,22.0,0_first5minvedioDLC_Resnet50_EyePupilEllipseSep20shuffle7003_snapshot_017.h5
