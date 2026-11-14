@@ -649,6 +649,9 @@ Driver `tools/seed_replicates_1113.sh`, log `seed_replicates.log`; models `round
 | 1 | teacher | | 2.94 | 19.25 | 8 | 15.25 | 8.53 | 15.31 | 10987 | 11 + 6 = 17 |
 | 1 | round1_formal (5b turn 1) | 42 | 2.64 | 4.83 | 1 | 0.78 | 0.50 | 0.80 | 575 | 2 + 2 = 4 |
 | 1 | round1_formal (5b turn 1) | 43 | 2.59 | 4.46 | 1 | 0.92 | 0.53 | 0.98 | 705 | 2 + 0 = 2 |
+| 15 | teacher | | 2.42 | 4.34 | 0 | 7.48 | 4.32 | 7.67 | 5500 | 7 + 3 = 10 |
+| 15 | round1_formal (5b turn 1) | 42 | 2.32 | 5.49 | 0 | 2.51 | 1.53 | 2.70 | 1935 | 2 + 2 = 4 |
+| 15 | round1_formal (5b turn 1) | 43 | 2.37 | 4.80 | 0 | 2.34 | 1.39 | 2.47 | 1773 | 2 + 2 = 4 |
 
 Video 0 (2026-11-13 23:51): with seed 43 the student has 2 wrong truth frames instead of 5, and they are not the same
 frames: seed 42 is wrong on 16250, 16323, 16911, 17205, 17719, seed 43 on 16323 (four points half an eye width off) and
@@ -669,6 +672,13 @@ loop's first turn: wrong truth frames 1 and 1, median 2.59 and 2.64, blind 2 of 
 0.46 against 0.42 %). On this video the seed alone moves the flagged count by 23 % and the blind count by 2 frames,
 more than the one pair on video 8 (9 % and 1 frame). The second turn of the final loop on video 1 (698 flagged frames,
 blind 5) and of experiment 3 (774, blind 4), both read as "more flagged frames than turn 1", lie inside this band.
+
+Video 15 (2026-11-14 06:57, training 02:25 to 05:30, prediction to 06:57): seed 43 against seed 42: wrong truth
+frames 0 and 0, median 2.37 and 2.32, p90 4.80 and 5.49, blind 4 of 34 and 4 (24: 2 and 2, supplement: 2 and 2),
+flagged frames 1773 against 1935, a ratio of 0.92 (low-confidence detector 1.93 against 2.08 %, jump detector 1.79
+against 1.84 %); 1351 frames are flagged by both seeds, 584 by seed 42 only, 422 by seed 43 only; 2 of the 70 truth
+frames differ by more than 1 % of the eye width. On this video the seed moves the flagged count by 8 % and the blind
+count not at all, like the pair on video 8.
 
 ## Files
 
