@@ -1,0 +1,2 @@
+video,unit,frames,models,within_frames_of_truth_or_blind,eligible,whole_T1,whole_TB,whole_T2,whole_TN,eligible_T1,eligible_TB,eligible_T2,eligible_TN,drawn_T1,drawn_TB,drawn_T2,drawn_TN,eye_width_px,seed
+6,6_20251028_Pluto_spont_1,71748,round1_formal / round2_formal,30,4923,74,248,50,71376,13,73,18,4819,13,12,10,4,454.0,42

@@ -1,0 +1,2 @@
+video,unit,frames,models,within_frames_of_truth_or_blind,eligible,removed_near_a_training_frame,whole_T1,whole_TB,whole_T2,whole_TN,eligible_T1,eligible_TB,eligible_T2,eligible_TN,drawn_T1,drawn_TB,drawn_T2,drawn_TN,eye_width_px,seed
+15,15_20251013_Terra_spont_1,71748,round1_formal / round2_formal,30,5200,22,884,1051,218,69595,148,257,52,4743,14,12,10,4,428.8,42
