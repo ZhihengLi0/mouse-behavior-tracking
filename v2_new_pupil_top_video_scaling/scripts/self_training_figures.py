@@ -915,52 +915,70 @@ def fig_experiment_full(src, seeds=False):
 
 
 def fig_exp4c_full():
-    """Experiment 4c with its second turn, four panels: (a) flagged share with the wrong truth and blind frames, (b) the
-    turn-1 reopened frames left out of the training set still flagged, (c) low-confidence detector, (d) jump detector."""
+    """Experiment 4c with its second turn, the same measures as the figures of experiments 1 to 3 plus the reopened
+    frames left out of training. Top: wrong truth frames, median truth error, wrong blind frames (of 34; video 11 has no
+    blind set), turn-1 reopened frames left out of the training set that are still flagged. Bottom: flagged share by
+    the two finders, by the low-confidence detector, by the jump detector."""
     ST_ = RES / "self_training"
     Dd = pd.read_csv(R2 / "independent_detectors.csv")
     vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / "round1_reopened" / "eval.csv").exists()]
     series = [("teacher", COL["teacher"], "starting model"), ("round1_reopened", "#009e73", "experiment 4c, turn 1"), ("round2_reopened", "#7fd1b9", "experiment 4c, turn 2")]
-    fig, axes = plt.subplots(1, 4, figsize=(17.5, 4.4))
+    fig, axes = plt.subplots(2, 4, figsize=(17.5, 7.6))
+    ax_truth, ax_med, ax_blind, ax_held, ax_flag, ax_low, ax_jump, ax_off = axes.ravel()
+    ax_off.axis("off")
     w = 0.27
+
+    def put(ax, x, y, txt, **kw):
+        ax.bar([x], [y], w * 0.92, **kw)
+        ax.text(x, y, txt, ha="center", va="bottom", fontsize=8, color="#222")
+
     for i, v in enumerate(vids):
         F = pd.read_csv(ST_ / f"video{v:02d}" / "pseudo_reopened" / "pseudo_frames.csv")
         held = F.frame[~F.kept].to_numpy()
+        bsf = ST_ / f"video{v:02d}" / "round1_reopened" / "blind_scores.csv"
+        if not bsf.exists():
+            ax_blind.text(i, 0.2, "no blind set", ha="center", va="bottom", fontsize=8, color="#888")
         for j, (m, c, lab) in enumerate(series):
             x = i + (j - 1) * w
             ef = ST_ / f"video{v:02d}" / m / "eval.csv"
             if not ef.exists():
-                for ax in axes:
+                for ax in (ax_truth, ax_med, ax_held, ax_flag, ax_low, ax_jump):
                     ax.text(x, 0, "not run", ha="center", va="bottom", fontsize=7, color="#888", rotation=90)
                 continue
             e = pd.read_csv(ef).iloc[0]
             kw = dict(color=c, edgecolor="#009e73" if m == "round2_reopened" else "white", linewidth=0.5)
-            axes[0].bar([x], [e.flagged_either_pct], w * 0.92, label=lab if i == 0 else None, **kw)
-            axes[0].text(x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f}", ha="center", va="bottom", fontsize=7.5, color="#222")   # truth and blind counts are in the page tables
+            ax_truth.bar([x], [e.wrong_frames], w * 0.92, label=lab if i == 0 else None, **kw)
+            ax_truth.text(x, e.wrong_frames, f"{int(e.wrong_frames)}", ha="center", va="bottom", fontsize=8, color="#222")
+            put(ax_med, x, e.median_error_pct, f"{e.median_error_pct:.1f}", **kw)
+            bs = ST_ / f"video{v:02d}" / ("round1_reopened" if m == "teacher" else m) / "blind_scores.csv"
+            if bs.exists():
+                B_ = pd.read_csv(bs)
+                nbw = int(B_[B_.model == m].wrong_frames.sum())
+                put(ax_blind, x, nbw, f"{nbw}", **kw)
             if m == "teacher":
                 y = len(held)
             else:
                 Sf = pd.read_csv(ST_ / f"video{v:02d}" / m / "flags.csv.gz").set_index("frame").loc[held]
                 y = int((Sf.fit_flag | Sf.pca_flag).sum())
-            axes[1].bar([x], [y], w * 0.92, **kw)
-            axes[1].text(x, y, f"{y}/{len(held)}", ha="center", va="bottom", fontsize=7, color="#222")
+            put(ax_held, x, y, f"{y}/{len(held)}", **kw)
+            put(ax_flag, x, e.flagged_either_pct, f"{e.flagged_either_pct:.1f}", **kw)
             g = Dd[(Dd.video == v) & (Dd.model == m)].iloc[0]
-            for ax, col in ((axes[2], "indep_lowconf_pct"), (axes[3], "indep_jump_pct")):
-                ax.bar([x], [g[col]], w * 0.92, **kw)
-                ax.text(x, g[col], f"{g[col]:.1f}", ha="center", va="bottom", fontsize=7.5, color="#222")
-    for ax, yl, tt in zip(axes, ("flagged (fitting + PCA), % of the video", "frames flagged (fitting + PCA)", "flagged (low confidence), % of the video", "flagged (jump), % of the video"),
-                          ("(a) flagged share (fitting + PCA)", "(b) reopened frames left out of training:\nstill flagged (fitting + PCA)", "(c) flagged share (low confidence)", "(d) flagged share (jump)")):
+            put(ax_low, x, g.indep_lowconf_pct, f"{g.indep_lowconf_pct:.1f}", **kw)
+            put(ax_jump, x, g.indep_jump_pct, f"{g.indep_jump_pct:.1f}", **kw)
+    labels = [(ax_truth, "wrong truth frames (of 70)"), (ax_med, "median truth error, % of eye width"), (ax_blind, "wrong blind frames (of 34)"),
+              (ax_held, "reopened frames left out of training:\nstill flagged (fitting + PCA)"), (ax_flag, "flagged (fitting + PCA), % of the video"),
+              (ax_low, "flagged (low confidence), % of the video"), (ax_jump, "flagged (jump), % of the video")]
+    for ax, yl in labels:
         ax.set_xticks(range(len(vids)))
         ax.set_xticklabels([str(v) for v in vids])
         ax.set_xlabel("video")
         ax.set_ylabel(yl)
-        ax.set_title(tt, loc="left", fontsize=10)
         ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
         ax.set_axisbelow(True)
         ax.set_ylim(0, ax.get_ylim()[1] * 1.15)
-    h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0))
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    h, l = ax_truth.get_legend_handles_labels()
+    ax_off.legend(h, l, loc="center", frameon=False, fontsize=11)
+    fig.tight_layout()
     fig.savefig(OUT / "loop_exp4c_full.png", dpi=170)
     plt.close(fig)
 

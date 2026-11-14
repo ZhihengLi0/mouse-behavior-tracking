@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-14 12:41 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-14 12:43 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1529,9 +1529,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">What counts as truth</span></th><td><span lang="en">As in experiments 1 to 3: the 70 human-labeled truth frames of each video (wrong = error above 0.14 eye widths), the 34 human-labeled blind frames (videos 15 and 1 have them, video 11 does not), the flagged share (fitting + PCA) of the video; plus the reopened frames left out of the training set (within 60 frames of a truth or blind frame): the starting model flags every one of them (a repaired frame is a flagged frame), and a student that has learned this kind of frame should no longer flag them.</span></td></tr>
   </tbody></table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp4c_full.png?v=20261114b" alt="Experiment 4c: flagged share (fitting + PCA), reopened frames left out of training still flagged, flagged share (low confidence), flagged share (jump)"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_exp4c_full.png?v=20261114c" alt="Experiment 4c: flagged share (fitting + PCA), reopened frames left out of training still flagged, flagged share (low confidence), flagged share (jump)"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-24:</span>Experiment 4c. Grey = starting model, green = turn 1, light green = turn 2 (videos 1 and 15 only). (a) Flagged share (fitting + PCA); (b) reopened frames left out of the turn-1 training set that are still flagged; (c) flagged share (low confidence); (d) flagged share (jump).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-24:</span>Experiment 4c. Grey = starting model, green = turn 1, light green = turn 2 (videos 1 and 15 only). Top: wrong truth frames, median truth error, wrong predictions among the 34 blind frames (video 11 has no blind set), reopened frames left out of the turn-1 training set that are still flagged (fitting + PCA). Bottom: flagged share (fitting + PCA), flagged share (low confidence), flagged share (jump).</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-11: experiment 4c, starting model → student</span></b></p>
   <div class="tablebox"><table>
@@ -1543,7 +1543,15 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   
-  <div class="concl" lang="en"><span class="tag">Conclusion of 4c:</span>with only these frames added, the student beats its starting model on all three videos, and it hardly flags the frames of this kind it was not trained on, so it has learned them (Table 9-4-11). The wrong closed call comes from one thrown point: the left pupil point on video 15, a corner point on videos 11 and 1. These frames belong in the training set of the final version. Turn 2 has only 33 and 5 new frames and the student falls back to about the starting model. On video 15 the flagged share (low confidence) is above the starting model (Figure 9-24c).</div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 4c:</span>the frames wrongly called closed and then repaired improve the model when added alone; they belong in the training set of the final version.
+    <ol>
+      <li>Turn 1: the student beats its starting model on all three videos; the wrong truth frames, the wrong blind frames and the flagged share (fitting + PCA) all fall (Table 9-4-11).</li>
+      <li>The student hardly flags the frames of this kind it was not trained on, so it has learned them rather than memorised the training frames.</li>
+      <li>The wrong closed call comes from one thrown point: the left pupil point on video 15, a corner point on videos 11 and 1.</li>
+      <li>Turn 2 has only 33 and 5 new frames and the student falls back to about the starting model.</li>
+      <li>On video 15 the flagged share (low confidence) is above the starting model's (Figure 9-24).</li>
+    </ol>
+  </div>
 
   <h4 id="exp5"><span lang="en">Experiment 5: the final loop version</span></h4>
   
