@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-14 17:24 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-14 17:25 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1658,12 +1658,13 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tbody>
       <tr><td><span lang="en">After the review</span></td><td>24 → 9 → 12</td><td>17 → 7 → 8</td><td>11 → 5 → 4</td><td>7 → 4 → 3</td><td>59 → 25 → 27</td></tr>
       <tr><td><span lang="en">Before the review (fully blind)</span></td><td>24 → 9 → 12</td><td>18 → 8 → 10</td><td>13 → 6 → 7</td><td>8 → 5 → 5</td><td>63 → 28 → 34</td></tr>
+      <tr><td><span lang="en">5b turn 1 retrained with another random seed (after the review)</span></td><td>7</td><td><span lang="en">not run</span></td><td>6</td><td>4</td><td>—</td></tr>
     </tbody>
   </table></div>
   
   <div class="concl" lang="en"><span class="tag">Conclusion of 5c:</span>on new frames neither turn has seen, the second turn of 5b is not wrong on fewer frames than the first; one turn is enough.
     <ol>
-      <li>On all four videos turn 1 is wrong on far fewer frames than the starting model; turn 2 is about the same as turn 1: 3 and 1 more wrong frames on videos 1 and 8, 1 fewer on each of videos 15 and 6, all within what the random seed alone changes (Figure 9-28, Table 9-4-13).</li>
+      <li>On all four videos turn 1 is wrong on far fewer frames than the starting model; turn 2 is about the same as turn 1: 3 and 1 more wrong frames on videos 1 and 8, 1 fewer on each of videos 15 and 6 (Figure 9-28). For reference, turn 1 retrained with another random seed differs from the original by 2, 1 and 0 frames on the same frames (videos 1, 15 and 6; Table 9-4-13).</li>
       <li>The conclusion is the same before and after the review.</li>
     </ol>
   </div>
