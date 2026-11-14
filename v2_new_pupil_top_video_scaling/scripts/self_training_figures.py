@@ -536,9 +536,9 @@ R2EXP = [("every30", "experiment 1 (grid frames only)", "#e69f00", "o"), ("repai
          ("formal", "experiment 5b (final version)", "#cc79a7", "v")]
 
 
-def fig_round2():
+def fig_round2(max_turn=2):
     """Every experiment turn by turn on the four videos: wrong blind frames of 34 (top) and flagged share (bottom, log
-    scale); turn 0 = the starting model."""
+    scale); turn 0 = the starting model. max_turn = 3 adds the third turns (written to loop_all_turns.png)."""
     S = pd.read_csv(R2 / "summary.csv")
     fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.6), sharex=True)
     for j, v in enumerate(VIDEOS):
@@ -546,15 +546,15 @@ def fig_round2():
         for i, (col, ylabel) in enumerate([("blind_wrong_34", "wrong blind frames (of 34)"), ("flagged_either_pct", "frames flagged, % of the video")]):
             ax = axes[i, j]
             for k, (src, lab, c, mk) in enumerate(R2EXP):
-                g = S[(S.video == v) & (S.experiment == src) & (S.turn <= 2)].sort_values("turn")
+                g = S[(S.video == v) & (S.experiment == src) & (S.turn <= max_turn)].sort_values("turn")
                 if not len(g):
                     continue
                 xs = [0] + [int(x) for x in g.turn]
                 ys = [float(t[col])] + [float(y) for y in g[col]]
                 ax.plot(xs, ys, marker=mk, color=c, linewidth=1.5, markersize=5, label=lab, alpha=0.95)
-            ax.set_xticks([0, 1, 2])
-            ax.set_xticklabels(["start", "turn 1", "turn 2"])
-            ax.set_xlim(-0.25, 2.25)
+            ax.set_xticks(range(max_turn + 1))
+            ax.set_xticklabels(["start", "turn 1", "turn 2", "turn 3"][:max_turn + 1])
+            ax.set_xlim(-0.25, max_turn + 0.25)
             ax.grid(color="#eee", linewidth=0.5)
             ax.set_axisbelow(True)
             if i == 0:
@@ -567,12 +567,12 @@ def fig_round2():
                 ax.set_yticklabels(["0.3", "1", "3", "10"])
             if j == 0:
                 ax.set_ylabel(ylabel)
-    axes[0, 3].errorbar([2.12], [10], yerr=[1], color="#555", capsize=3, linewidth=1)
-    axes[0, 3].text(2.05, 10, "seed alone:\n\u00b11 frame", ha="right", va="center", fontsize=7.5, color="#555")
+    axes[0, 3].errorbar([max_turn + 0.12], [12], yerr=[1], color="#555", capsize=3, linewidth=1)
+    axes[0, 3].text(max_turn + 0.05, 12, "seed alone:\n\u00b11 frame", ha="right", va="center", fontsize=7.5, color="#555")
     h, l = axes[0, 0].get_legend_handles_labels()
     fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0), fontsize=8.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
-    fig.savefig(OUT / "loop_round2.png", dpi=170)
+    fig.savefig(OUT / ("loop_round2.png" if max_turn == 2 else "loop_all_turns.png"), dpi=170)
     plt.close(fig)
 
 
@@ -679,3 +679,69 @@ if __name__ == "__main__" and "--round2" in sys.argv:
     fig_experiment("round1_every30", second_label="experiment 1, second turn")
     fig_experiment("round1_both")
     print("round-2 figures written")
+
+
+# ---- experiments 1 and 2 with every turn run (page Figures 9-15, 9-16; 2026-11-13) ----
+TURN_COL = {"every30": ["#e69f00", "#f0c35c", "#f7e0a8"], "repaired": ["#d55e00", "#e89a5c", "#f5cfae"]}
+TURN_OUT = {"every30": ("loop_exp1_turns.png", "experiment 1"), "repaired": ("loop_exp2_turns.png", "experiment 2")}
+
+
+def fig_experiment_turns(src):
+    """One experiment, every video and every turn it ran: wrong truth frames, median truth error, flagged share (each
+    model's eval.csv) and wrong blind frames of the 24 stratified frames (round2_analysis/summary.csv); the starting
+    model in grey, later turns in lighter tints of the experiment's colour."""
+    ST_ = RES / "self_training"
+    name = lambda r: "teacher" if r == 0 else f"round{r}_{src}"
+    vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / name(1) / "eval.csv").exists()]
+    fname, label = TURN_OUT[src]
+    series = [(0, COL["teacher"], "starting model")] + [(r, TURN_COL[src][r - 1], f"{label}, turn {r}") for r in (1, 2, 3)]
+    S = pd.read_csv(R2 / "summary.csv")
+    E = {(v, r): pd.read_csv(ST_ / f"video{v:02d}" / name(r) / "eval.csv").iloc[0] for v in vids for r in range(4)
+         if (ST_ / f"video{v:02d}" / name(r) / "eval.csv").exists()}
+    fig, axes = plt.subplots(2, 2, figsize=(13.5, 7.2))
+    axes = axes.ravel()
+    cols = [("wrong_frames", "wrong truth frames (of 70)", "{:.0f}"), ("median_error_pct", "median truth error, % of eye width", "{:.1f}"),
+            ("flagged_either_pct", "frames flagged, % of the video", "{:.1f}")]
+    w = 0.8 / 4
+
+    def draw(ax, xs_vids, value, fmt, fs):
+        for j, (r, c, lab) in enumerate(series):
+            pts = [(i, value(v, r)) for i, v in enumerate(xs_vids)]
+            pts = [(i, y) for i, y in pts if y is not None and np.isfinite(y)]
+            xs = [i + (j - 1.5) * w for i, _ in pts]
+            ys = [y for _, y in pts]
+            ax.bar(xs, ys, w * 0.9, color=c, label=lab, edgecolor=TURN_COL[src][0] if r > 1 else "white", linewidth=0.5)
+            for x, y in zip(xs, ys):
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=fs, color="#222",
+                        rotation=90 if (len(xs_vids) > 6 and "." in fmt.format(y)) else 0)
+        ax.set_xticks(range(len(xs_vids)))
+        ax.set_xticklabels([str(v) for v in xs_vids])
+        ax.set_xlabel("video")
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+
+    fs = 6.5 if len(vids) > 6 else 8
+    for ax, (col, ylabel, fmt) in zip(axes[:3], cols):
+        draw(ax, vids, lambda v, r: float(E[(v, r)][col]) if (v, r) in E else None, fmt, fs)
+        ax.set_ylabel(ylabel)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.18)
+    bv = [v for v in vids if len(S[(S.video == v) & (S.experiment == "teacher")])]
+
+    def blind(v, r):
+        g = S[(S.video == v) & (S.experiment == ("teacher" if r == 0 else src)) & (S.turn == r)]
+        return float(g.blind_wrong_24.iloc[0]) if len(g) else None
+    draw(axes[3], bv, blind, "{:.0f}", 8)
+    axes[3].set_ylabel("wrong blind frames (of 24)")
+    axes[3].set_ylim(0, 14)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(OUT / fname, dpi=170)
+    plt.close(fig)
+
+
+if __name__ == "__main__" and "--turns" in sys.argv:
+    fig_experiment_turns("every30")
+    fig_experiment_turns("repaired")
+    fig_round2(max_turn=3)
+    print("turn figures written")

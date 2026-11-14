@@ -600,7 +600,7 @@ Figures 9-26, 9-27, 9-23; `self_training_figures.py`, functions `fig_round2`, `f
   stops have the blind condition firing; the two extra turns (experiment 3 video 6, 5b video 15, turn 3) did not
   improve. "Continue only if blind falls by 2 or more and flagged ratio below 0.9" would stop all 8 loops at turn 2.
   The rule is unchanged.
-- Applied to the turn 2 of the comparison runs, the rule would continue experiment 1 on videos 1 (flagged 960 → 698,
+- Applied to the turn 2 of the comparison runs, the rule would continue experiment 1 on videos 1 (flagged 960 → 703,
   blind 7 → 3) and 6 (319 → 250, 4 → 2) and experiment 2 on video 6 (2429 → 1542, 5 → 4). Their third turn runs
   overnight 2026-11-12/13 (user: until 08:00, lossless, as many as fit): `tools/overnight_round3_1112.sh`, log
   `round3.log`; experiment 1 rounds >= 3 use shuffle 9000 + 10 x video + round (the old formula reaches 4000 + 10 x
@@ -619,6 +619,18 @@ Turn 2 against turn 3 frame by frame: experiment 1 video 1 one frame right to wr
 right; experiment 2 video 6 three wrong to right (`img011` D, `img024` B, `img042` A) and three right to wrong
 (`img033` A, `img102` F_n, `img107` F_t); experiment 1 video 6 no change. All three comparison runs now stop by the rule
 at turn 3; none moves beyond the seed noise.
+
+Correction 2026-11-13: the line above first read "flagged 960 → 698" for experiment 1 on video 1; 698 is the final
+loop's count. Experiment 1's turn-2 model flags 0.98 % of 71748 frames = 703 (its `flags.csv.gz` was not saved).
+
+All turns on the page (2026-11-13): `round2_analysis/stop_rule.csv` now also holds the comparison runs (experiments 1,
+2, 4c; the same rule applied afterwards, column `rule_ran_in_the_driver` False) and `blind_changes_turn3.csv` holds
+turn 2 against turn 3 frame by frame. Over all runs: in turn 1 the 18 models flag 5 to 63 % of the starting model's
+count and are wrong on 4 to 13 fewer blind frames (no stop); at turn 2 the rule stops 13 and lets 5 continue, and all
+5 third turns stop without a gain (blind +1, 0, 0, +1, 0; truth unchanged; frame by frame 3 wrong to right, 5 right
+to wrong in total). On the flagged count alone 10 would continue after turn 2, 5 of them with a rising blind count.
+Figures `figures/loop_exp1_turns.png`, `loop_exp2_turns.png` (`fig_experiment_turns`, page Figures 9-15, 9-16) and
+`loop_all_turns.png` (`fig_round2(max_turn=3)`, page Figure 9-26); `python self_training_figures.py --turns`.
 
 ## Files
 

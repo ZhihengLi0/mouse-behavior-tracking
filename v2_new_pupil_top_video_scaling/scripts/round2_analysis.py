@@ -8,7 +8,10 @@ Reads existing results only and changes none of them. Writes three small tables 
                      right -> wrong, wrong in both, right in both (wrong = error over the 14 % line)
   stop_rule.csv      every stop decision of experiment 3 and of the final loop (5b) with the flagged ratio and the blind
                      change, next to what two other rules would have decided (flagged ratio alone; blind count must
-                     rise by 2 or more to stop). The rule in use is not changed.
+                     rise by 2 or more to stop). The rule in use is not changed. The comparison runs (experiments 1, 2,
+                     4c) had no stop rule in their drivers; the same rule is applied to their turns afterwards
+                     (rule_ran_in_the_driver False).
+  blind_changes_turn3.csv  turn 2 against turn 3 on the blind frames where a third turn was run
 
   python scripts/round2_analysis.py
 """
@@ -62,7 +65,7 @@ def blind_frames_model(v, models):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    summ, chg = [], []
+    summ, chg, chg3 = [], [], []
     for v in VIDEOS:
         P = blind_frames(v)
         extra = blind_frames_model(v, [f"round{r}_reopened" for r in (1, 2)] + ["round3_every30", "round3_repaired"])   # models blind_test_set.py does not list
@@ -91,6 +94,16 @@ def main():
                              "blind_frames": len(g), "blind_wrong_24": int((main_.error > LINE).sum()) if len(g) else np.nan,
                              "blind_wrong_10": int((sup.error > LINE).sum()) if len(g) else np.nan,
                              "blind_wrong_34": int((g.error > LINE).sum()) if len(g) else np.nan})
+        for src in EXPS:                                          # turn 2 against turn 3 where a third turn was run (one row per video and experiment)
+            a, b = P[P.model == f"round2_{src}"], P[P.model == f"round3_{src}"]
+            if not len(a) or not len(b):
+                continue
+            M = a.merge(b, on=["frame", "blind_name", "stratum"], suffixes=("_2", "_3"))
+            w2, w3 = M.error_2 > LINE, M.error_3 > LINE
+            chg3.append({"video": v, "experiment": src, "frames": len(M), "wrong_turn2": int(w2.sum()), "wrong_turn3": int(w3.sum()),
+                         "wrong_to_right": int((w2 & ~w3).sum()), "right_to_wrong": int((~w2 & w3).sum()), "wrong_both": int((w2 & w3).sum()),
+                         "wrong_to_right_frames": " ".join(M.blind_name[w2 & ~w3] + "(" + M.stratum[w2 & ~w3].astype(str) + ")"),
+                         "right_to_wrong_frames": " ".join(M.blind_name[~w2 & w3] + "(" + M.stratum[~w2 & w3].astype(str) + ")")})
         for src in EXPS:                                          # turn 1 against turn 2, frame by frame
             a, b = P[P.model == f"round1_{src}"], P[P.model == f"round2_{src}"]
             if not len(a) or not len(b):
@@ -110,6 +123,8 @@ def main():
     S.to_csv(OUT / "summary.csv", index=False)
     C = pd.DataFrame(chg)
     C.to_csv(OUT / "blind_changes.csv", index=False)
+    C3 = pd.DataFrame(chg3)
+    C3.to_csv(OUT / "blind_changes_turn3.csv", index=False)
 
     stop = []
     for v in VIDEOS:
@@ -127,7 +142,30 @@ def main():
                              "blind_change_within_seed_noise": bool(abs(d) <= 1),
                              "alt_flagged_only_stops": bool(ratio >= 0.9),
                              "alt_flagged_or_blind_up_2_stops": bool(ratio >= 0.9 or d >= 2)})
+    for v in VIDEOS:                                              # comparison runs: no stop rule in their drivers; the same rule applied afterwards
+        n = int(pd.read_csv(ST / f"video{v:02d}" / "pseudo_every30" / "pseudo_summary.csv").iloc[0].frames)
+        t0 = int(pd.read_csv(ST / f"video{v:02d}" / "loop_status.csv").iloc[0].flagged_prev)     # the starting model's flagged frames (round 0 of the loop)
+        for src, name in (("every30", "experiment 1"), ("repaired", "experiment 2"), ("reopened", "experiment 4c")):
+            prev_f, prev_b = t0, int(S[(S.video == v) & (S.experiment == "teacher")].blind_wrong_34.iloc[0])
+            for r in (1, 2, 3):
+                g = S[(S.video == v) & (S.experiment == src) & (S.turn == r)]
+                if not len(g):
+                    break
+                f = ST / f"video{v:02d}" / f"round{r}_{src}" / "flags.csv.gz"
+                if f.exists():
+                    F = pd.read_csv(f, usecols=["fit_flag", "pca_flag"])
+                    fl = int((F.fit_flag | F.pca_flag).sum())
+                else:                                             # flags not saved for this model: the count from its flagged share
+                    fl = int(round(float(g.flagged_either_pct.iloc[0]) * n / 100))
+                bl = int(g.blind_wrong_34.iloc[0])
+                ratio, d = fl / prev_f, bl - prev_b
+                stop.append({"video": v, "loop": name, "turn": r, "flagged_prev": prev_f, "flagged": fl, "flagged_ratio": round(ratio, 2),
+                             "blind_prev": prev_b, "blind": bl, "blind_change": d, "rule_in_use_stops": bool(ratio >= 0.9 or d >= 0),
+                             "fired_flagged": bool(ratio >= 0.9), "fired_blind": bool(d >= 0), "blind_change_within_seed_noise": bool(abs(d) <= 1),
+                             "alt_flagged_only_stops": bool(ratio >= 0.9), "alt_flagged_or_blind_up_2_stops": bool(ratio >= 0.9 or d >= 2)})
+                prev_f, prev_b = fl, bl
     R = pd.DataFrame(stop)
+    R["rule_ran_in_the_driver"] = R.loop.isin(["experiment 3", "experiment 5b"])
     R.to_csv(OUT / "stop_rule.csv", index=False)
 
     pd.set_option("display.width", 250)
@@ -140,6 +178,7 @@ def main():
     print("\nby stratum")
     print(C.groupby(["experiment", "stratum"])[["frames", "wrong_to_right", "right_to_wrong", "wrong_both"]].sum().to_string())
     print("\nstop rule\n", R.to_string(index=False))
+    print("\nturn 2 -> turn 3 on the blind frames\n", C3.to_string(index=False))
 
 
 if __name__ == "__main__":

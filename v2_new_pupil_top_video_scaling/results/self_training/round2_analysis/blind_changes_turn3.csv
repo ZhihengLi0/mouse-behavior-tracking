@@ -1,0 +1,6 @@
+video,experiment,frames,wrong_turn2,wrong_turn3,wrong_to_right,right_to_wrong,wrong_both,wrong_to_right_frames,right_to_wrong_frames
+1,every30,34,3,4,0,1,3,,img035.png(A)
+15,formal,34,3,3,0,0,3,,
+6,every30,34,2,2,0,0,2,,
+6,repaired,34,4,4,3,3,1,img011.png(D) img024.png(B) img042.png(A),img033.png(A) img102.png(F_n) img107.png(F_t)
+6,both,34,2,3,0,1,2,,img033.png(A)
