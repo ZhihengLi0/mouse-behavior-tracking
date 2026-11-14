@@ -992,7 +992,7 @@ if __name__ == "__main__" and "--full" in sys.argv:
 
 
 # ---- experiment 5b with every turn, and 5c: the blind check of turn 2 (page 9.4, 2026-11-14) ----
-PINK = ["#cc79a7", "#e0adc9", "#f1d6e4"]   # experiment 5b: turn 1, 2, 3
+PINK = ["#cc79a7", "#5b4a9e", "#a8672a"]   # experiment 5b: turn 1 pink (its colour in every figure), turn 2 indigo, turn 3 brown (user 2026-11-14: later turns need not be pink)
 
 
 def fig_exp5b_full():
@@ -1039,7 +1039,7 @@ def fig_exp5b_full():
             pts = [(i, value(v, m)) for i, v in enumerate(vids)]
             pts = [(i, y) for i, y in pts if y is not None and np.isfinite(y)]
             xs = [i + (j - (len(slots) - 1) / 2) * w for i, _ in pts]
-            ax.bar(xs, [y for _, y in pts], w * 0.9, color=c, hatch=hatch, label=lab, edgecolor="white" if j < 3 else PINK[0], linewidth=0.5)
+            ax.bar(xs, [y for _, y in pts], w * 0.9, color=c, hatch=hatch, label=lab, edgecolor="white", linewidth=0.5)
             for x, (_, y) in zip(xs, pts):
                 ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=7.5, color="#222")
         ax.set_xticks(range(len(vids)))
@@ -1079,7 +1079,7 @@ def fig_exp5c(suffix=""):
                 continue
             y = int(gm.wrong.sum())
             x = i + (j - (len(slots) - 1) / 2) * w
-            ax.bar([x], [y], w * 0.9, color=c, hatch=hatch, edgecolor="white" if j < 3 else PINK[0], linewidth=0.5, label=lab if first else None)
+            ax.bar([x], [y], w * 0.9, color=c, hatch=hatch, edgecolor="white", linewidth=0.5, label=lab if first else None)
             ax.text(x, y, str(y), ha="center", va="bottom", fontsize=8.5, color="#222")
             first = False
     ax.set_xticks(range(len(groups)))
@@ -1097,7 +1097,7 @@ def fig_exp5c(suffix=""):
             g = E[(E.stratum == s) & (E.model == m)]
             y = int(g.wrong.sum())
             x = i + (j - 1) * w
-            ax.bar([x], [y], w * 0.9, color=c, edgecolor="white" if j < 2 else PINK[0], linewidth=0.5)
+            ax.bar([x], [y], w * 0.9, color=c, edgecolor="white", linewidth=0.5)
             ax.text(x, y, str(y), ha="center", va="bottom", fontsize=8.5, color="#222")
     ax.set_xticks(range(4))
     ax.set_xticklabels([f"{names[s]}\n{int(((E.stratum == s) & (E.model == 'teacher')).sum())} frames" for s in names])

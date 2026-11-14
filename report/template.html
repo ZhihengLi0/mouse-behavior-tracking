@@ -2004,9 +2004,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp5b_full.png?v=20261114" alt="Experiment 5b, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share by the two finders, by low confidence, by jumps"></div>
-    <figcaption lang="zh"><span class="tag">图 9-27：</span>实验五 5b。灰 = 起点模型，粉 = 各圈的模型（圈数越后越浅），斜纹 = 第一圈只换随机种子重训。面板同图 9-15，盲测帧是全部 34 帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Experiment 5b. Grey = starting model, pink = the model of each turn (lighter for later turns), hatched = turn 1 trained again with another random seed. Panels as in Figure 9-15, with all 34 blind frames.</figcaption>
+    <div class="figbox wide"><img src="assets/fig_loop_exp5b_full.png?v=20261114b" alt="Experiment 5b, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share by the two finders, by low confidence, by jumps"></div>
+    <figcaption lang="zh"><span class="tag">图 9-27：</span>实验五 5b。灰 = 起点模型，粉 = 第一圈，斜纹 = 第一圈只换随机种子重训，紫 = 第二圈，棕 = 第三圈。面板同图 9-15，盲测帧是全部 34 帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Experiment 5b. Grey = starting model, pink = turn 1, hatched = turn 1 trained again with another random seed, purple = turn 2, brown = turn 3. Panels as in Figure 9-15, with all 34 blind frames.</figcaption>
   </figure>
   <div class="concl" lang="zh"><span class="tag">5b 的结论：</span>第一圈四个视频都比起点模型好，和实验三第一圈的差别在只换随机种子的波动之内（表 9-4-12），所以换成 D 和置信度判据没有改变结果。之后错帧不再减少：视频 1、8、6 停在第二圈，视频 15 停在第三圈。</div>
   <div class="concl" lang="en"><span class="tag">Conclusion of 5b:</span>in turn 1 all four videos beat the starting model, and the differences from experiment 3's first turn are within what the random seed alone changes (Table 9-4-12), so D and the confidence criterion do not change the result. Afterwards the wrong frames no longer fall: videos 1, 8 and 6 stop at turn 2, video 15 at turn 3.</div>
@@ -2020,9 +2020,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><span lang="zh"><code>scripts/blind_turn2_set.py</code>, <code>blind_turn2_score.py</code>; <code>results/blind_test/videoNN/turn2/</code></span><span lang="en"><code>scripts/blind_turn2_set.py</code>, <code>blind_turn2_score.py</code>; <code>results/blind_test/videoNN/turn2/</code></span></td></tr>
   </tbody></table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp5c.png?v=20261114" alt="Experiment 5c: wrong frames on the hand-labeled frames per video and in total, by stratum, and turn 1 against turn 2 frame by frame"></div>
-    <figcaption lang="zh"><span class="tag">图 9-28：</span>5c，新抽的人工标注帧上的错帧数。灰 = 起点模型，粉 = 5b 第一圈，斜纹 = 第一圈只换随机种子重训，浅粉 = 第二圈，最浅 = 第三圈（只有视频 15）。(a) 每个视频和合计；(b) 按抽帧时的四层（哪一圈的模型标出（fitting + PCA）这一帧），四个视频相加；(c) 第一圈对第二圈逐帧。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-28:</span>5c, wrong frames on the newly drawn hand-labeled frames. Grey = starting model, pink = 5b turn 1, hatched = turn 1 trained again with another random seed, light pink = turn 2, lightest = turn 3 (video 15 only). (a) Per video and in total; (b) by the four strata of the draw (which turn's model flags the frame, fitting + PCA), the four videos summed; (c) turn 1 against turn 2 frame by frame.</figcaption>
+    <div class="figbox wide"><img src="assets/fig_loop_exp5c.png?v=20261114b" alt="Experiment 5c: wrong frames on the hand-labeled frames per video and in total, by stratum, and turn 1 against turn 2 frame by frame"></div>
+    <figcaption lang="zh"><span class="tag">图 9-28：</span>5c，新抽的人工标注帧上的错帧数。灰 = 起点模型，粉 = 5b 第一圈，斜纹 = 第一圈只换随机种子重训，紫 = 第二圈，棕 = 第三圈（只有视频 15）。(a) 每个视频和合计；(b) 按抽帧时的四层（哪一圈的模型标出（fitting + PCA）这一帧），四个视频相加；(c) 第一圈对第二圈逐帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-28:</span>5c, wrong frames on the newly drawn hand-labeled frames. Grey = starting model, pink = 5b turn 1, hatched = turn 1 trained again with another random seed, purple = turn 2, brown = turn 3 (video 15 only). (a) Per video and in total; (b) by the four strata of the draw (which turn's model flags the frame, fitting + PCA), the four videos summed; (c) turn 1 against turn 2 frame by frame.</figcaption>
   </figure>
   <p class="text"><b><span lang="zh">表 9-4-13：5c，错帧数：起点模型 → 5b 第一圈 → 5b 第二圈</span><span lang="en">Table 9-4-13: 5c, wrong frames: starting model → 5b turn 1 → 5b turn 2</span></b></p>
   <div class="tablebox"><table>
