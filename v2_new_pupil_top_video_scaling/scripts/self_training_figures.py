@@ -1138,21 +1138,22 @@ def fig_exp5c_videos(suffix=""):
     E = pd.concat([pd.read_csv(RES / "blind_test" / f"video{v:02d}" / "turn2" / f"per_frame{suffix}.csv").assign(video=v) for v in VIDEOS], ignore_index=True)
     E["wrong"] = E.error > LINE / 100
     slots = [("teacher", COL["teacher"], "starting model"), ("round1_formal", PINK[0], "experiment 5b, turn 1"), ("round2_formal", PINK[1], "experiment 5b, turn 2")]
-    fig, ax = plt.subplots(figsize=(11.5, 4.3))
+    fig, ax = plt.subplots(figsize=(8.6, 4.6))
     w = 0.8 / 3
     for j, (m, c, lab) in enumerate(slots):
         ys = [int(E[(E.video == v) & (E.model == m)].wrong.sum()) for v in VIDEOS]
         xs = [i + (j - 1) * w for i in range(len(VIDEOS))]
         ax.bar(xs, ys, w * 0.9, color=c, edgecolor="white", linewidth=0.5, label=lab)
         for x, y in zip(xs, ys):
-            ax.text(x, y, str(y), ha="center", va="bottom", fontsize=10, color="#222")
+            ax.text(x, y + 0.2, str(y), ha="center", va="bottom", fontsize=14, color="#222")
     ax.set_xticks(range(len(VIDEOS)))
     ax.set_xticklabels([f"video {v}\n{int(((E.video == v) & (E.model == 'teacher')).sum())} frames" for v in VIDEOS])
-    ax.set_ylabel("wrong frames")
+    ax.set_ylabel("wrong frames", fontsize=14)
+    ax.tick_params(labelsize=13)
     ax.set_ylim(0, 28)
     ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, fontsize=10, loc="upper right")
+    ax.legend(frameon=False, fontsize=13, loc="upper right")
     fig.tight_layout()
     fig.savefig(OUT / f"loop_exp5c_videos{suffix}.png", dpi=170)
     plt.close(fig)
