@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-13 21:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-13 23:00 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1129,7 +1129,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </ul>
   </div>
   <div class="tablebox"><table>
-    <thead><tr><th></th><th><span lang="en">Frames added to the training set</span></th><th><span lang="en">What it answers</span></th><th><span lang="en">Videos</span></th><th><span lang="en">Turns run</span></th><th><span lang="en">Wrong blind frames: start → turn 1 → turn 2</span></th></tr></thead>
+    <thead><tr><th></th><th><span lang="en">Frames added to the training set</span></th><th><span lang="en">What it answers</span></th><th><span lang="en">Videos</span></th><th><span lang="en">Turns run</span></th><th><span lang="en">Wrong blind frames, videos 1, 8, 15 and 6 summed (136 frames): start → turn 1 → turn 2</span></th></tr></thead>
     <tbody>
       <tr><td><span lang="en">Experiment 1</span></td><td><span lang="en">unflagged frames unchanged, every 30th</span></td><td><span lang="en">do the unflagged frames help on their own</span></td><td><span lang="en">0 1 2 4 6 7 8 12 15 18 (blind frames on 1 8 15 6)</span></td><td><span lang="en">turn 1 on ten videos; turn 2 on videos 1, 8, 15, 6; turn 3 on videos 1, 6</span></td><td>48 → 17 → 13</td></tr>
       <tr><td><span lang="en">Experiment 2</span></td><td><span lang="en">repaired frames only, count capped at experiment 1's</span></td><td><span lang="en">do the repaired frames help on their own</span></td><td>1 8 15 6</td><td><span lang="en">two turns; turn 3 on video 6</span></td><td>48 → 15 → 14</td></tr>
@@ -1138,7 +1138,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td><span lang="en">Experiment 5b</span></td><td><span lang="en">experiment 3's procedure with the settled replacement rule (5a) and closed-eye criterion (4a)</span></td><td><span lang="en">the final version</span></td><td>1 8 15 6</td><td><span lang="en">videos 1, 8, 6 stop at turn 2, video 15 at turn 3</span></td><td>48 → 15 → 15</td></tr>
     </tbody>
   </table></div>
-  <p class="text"><span lang="en">The blind column sums the four videos, 34 frames each, 136 in all; experiment 1's training frames do not avoid the blind frames, so its counts are not measured under the same condition as the others'.</span></p>
+  <p class="text"><span lang="en">The blind column is not one video's count: it sums videos 1, 8, 15 and 6, 34 frames each (the starting models are wrong on 17, 12, 10 and 9 frames, 48 in all); the per-video counts are in Table 9-4-13. Experiment 1's training frames do not avoid the blind frames, so its counts are not measured under the same condition as the others'.</span></p>
   <p class="text"><b><span lang="en">Shared configuration and formulas (the same for every experiment, not repeated below)</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="en">Starting model</span></th><td><span lang="en">The plateau model of each video (step 5); its whole-video prediction is the one used in 9.2 and 9.3; the all-eight-points, smallest-subset run of 9.3 is turn 0 of the loop. Human training frames: video 1 120 (100 of video 0 plus 20 of itself), video 8 420 (400 of earlier videos plus 20), video 15 700 (660 plus 40), video 6 400 (380 plus 20); 20 validation frames each.</span></td></tr>
