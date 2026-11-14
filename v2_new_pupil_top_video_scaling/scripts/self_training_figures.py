@@ -989,3 +989,144 @@ if __name__ == "__main__" and "--full" in sys.argv:
     fig_experiment_full("both")
     fig_exp4c_full()
     print("full per-experiment figures written")
+
+
+# ---- experiment 5b with every turn, and 5c: the blind check of turn 2 (page 9.4, 2026-11-14) ----
+PINK = ["#cc79a7", "#e0adc9", "#f1d6e4"]   # experiment 5b: turn 1, 2, 3
+
+
+def fig_exp5b_full():
+    """The final loop (5b), every video and turn, six panels as in fig_experiment_full: wrong truth frames, median truth
+    error, wrong blind frames of 34 (top); flagged share by the two finders, by the low-confidence detector, by the
+    jump detector (bottom). Bars: starting model, turn 1, turn 1 trained again with another seed (hatched), turn 2, turn 3."""
+    ST_ = RES / "self_training"
+    S = pd.read_csv(R2 / "summary.csv")
+    Dd = pd.read_csv(R2 / "independent_detectors.csv")
+    vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / "round1_formal" / "eval.csv").exists()]
+    slots = [("teacher", COL["teacher"], None, "starting model"), ("round1_formal", PINK[0], None, "experiment 5b, turn 1"),
+             ("round1_formal_seed43", PINK[0], "////", "experiment 5b, turn 1 with another seed"),
+             ("round2_formal", PINK[1], None, "experiment 5b, turn 2"), ("round3_formal", PINK[2], None, "experiment 5b, turn 3")]
+
+    def ev(col):
+        def f(v, m):
+            p = ST_ / f"video{v:02d}" / m / "eval.csv"
+            return float(pd.read_csv(p).iloc[0][col]) if p.exists() else None
+        return f
+
+    def det(col):
+        def f(v, m):
+            g = Dd[(Dd.video == v) & (Dd.model == m)]
+            return float(g[col].iloc[0]) if len(g) else None
+        return f
+
+    def blind(v, m):
+        g = S[(S.video == v) & (S.model == m)]
+        if len(g):
+            return float(g.blind_wrong_34.iloc[0])
+        p = ST_ / f"video{v:02d}" / m / "blind_scores.csv"
+        if p.exists():
+            Bs = pd.read_csv(p)
+            return float(Bs[Bs.model == m].wrong_frames.sum())
+        return None
+
+    panels = [(ev("wrong_frames"), "wrong truth frames (of 70)", "{:.0f}"), (ev("median_error_pct"), "median truth error, % of eye width", "{:.1f}"),
+              (blind, "wrong blind frames (of 34)", "{:.0f}"), (ev("flagged_either_pct"), "flagged (fitting + PCA), % of the video", "{:.1f}"),
+              (det("indep_lowconf_pct"), "flagged (low confidence), % of the video", "{:.1f}"), (det("indep_jump_pct"), "flagged (jump), % of the video", "{:.1f}")]
+    fig, axes = plt.subplots(2, 3, figsize=(17.5, 7.6))
+    w = 0.8 / len(slots)
+    for ax, (value, ylabel, fmt) in zip(axes.ravel(), panels):
+        for j, (m, c, hatch, lab) in enumerate(slots):
+            pts = [(i, value(v, m)) for i, v in enumerate(vids)]
+            pts = [(i, y) for i, y in pts if y is not None and np.isfinite(y)]
+            xs = [i + (j - (len(slots) - 1) / 2) * w for i, _ in pts]
+            ax.bar(xs, [y for _, y in pts], w * 0.9, color=c, hatch=hatch, label=lab, edgecolor="white" if j < 3 else PINK[0], linewidth=0.5)
+            for x, (_, y) in zip(xs, pts):
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=7.5, color="#222")
+        ax.set_xticks(range(len(vids)))
+        ax.set_xticklabels([str(v) for v in vids])
+        ax.set_xlabel("video")
+        ax.set_ylabel(ylabel)
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, 20 if value is blind else ax.get_ylim()[1] * 1.18)
+    h, l = axes[0, 0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(OUT / "loop_exp5b_full.png", dpi=170)
+    plt.close(fig)
+
+
+def fig_exp5c(suffix=""):
+    """Experiment 5c: the frames labeled blind for turn 2 against turn 1 of the final loop (results/blind_test/videoNN/
+    turn2/per_frame.csv; suffix "_before_review" = the labels before the user's review). (a) wrong frames per video and
+    in total; (b) by stratum, the four videos summed; (c) turn 1 against turn 2 frame by frame."""
+    E = pd.concat([pd.read_csv(RES / "blind_test" / f"video{v:02d}" / "turn2" / f"per_frame{suffix}.csv").assign(video=v) for v in VIDEOS], ignore_index=True)
+    E["wrong"] = E.error > LINE / 100
+    slots = [("teacher", COL["teacher"], None, "starting model"), ("round1_formal", PINK[0], None, "experiment 5b, turn 1"),
+             ("round1_formal_seed43", PINK[0], "////", "turn 1 with another seed"), ("round2_formal", PINK[1], None, "experiment 5b, turn 2"),
+             ("round3_formal", PINK[2], None, "experiment 5b, turn 3")]
+    fig, axes = plt.subplots(1, 3, figsize=(17.5, 4.9), gridspec_kw={"width_ratios": [2.5, 1.9, 1.0]})
+    # (a) per video and total
+    ax = axes[0]
+    groups = [(f"video {v}\n{int((E[(E.video == v) & (E.model == 'teacher')]).shape[0])} frames", E[E.video == v]) for v in VIDEOS] + \
+             [(f"all four\n{int((E.model == 'teacher').sum())} frames", E)]
+    w = 0.8 / len(slots)
+    for j, (m, c, hatch, lab) in enumerate(slots):
+        first = True
+        for i, (name, g) in enumerate(groups):
+            gm = g[g.model == m]
+            if not len(gm) or gm.video.nunique() < g.video.nunique():     # a model missing on some video is not summed into the total
+                continue
+            y = int(gm.wrong.sum())
+            x = i + (j - (len(slots) - 1) / 2) * w
+            ax.bar([x], [y], w * 0.9, color=c, hatch=hatch, edgecolor="white" if j < 3 else PINK[0], linewidth=0.5, label=lab if first else None)
+            ax.text(x, y, str(y), ha="center", va="bottom", fontsize=8.5, color="#222")
+            first = False
+    ax.set_xticks(range(len(groups)))
+    ax.set_xticklabels([n for n, _ in groups])
+    ax.set_ylabel("wrong frames (error over 14 % of the eye width)")
+    ax.set_title("(a) per video and in total", loc="left", fontsize=10.5)
+    ax.legend(frameon=False, fontsize=8.5, loc="upper left", ncol=2)
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.22)
+    # (b) by stratum
+    ax = axes[1]
+    names = {"T1": "turn 1 only", "TB": "both turns", "T2": "turn 2 only", "TN": "neither"}
+    w = 0.8 / 3
+    for j, (m, c, hatch, lab) in enumerate([slots[0], slots[1], slots[3]]):
+        for i, s in enumerate(names):
+            g = E[(E.stratum == s) & (E.model == m)]
+            y = int(g.wrong.sum())
+            x = i + (j - 1) * w
+            ax.bar([x], [y], w * 0.9, color=c, edgecolor="white" if j < 2 else PINK[0], linewidth=0.5)
+            ax.text(x, y, str(y), ha="center", va="bottom", fontsize=8.5, color="#222")
+    ax.set_xticks(range(4))
+    ax.set_xticklabels([f"{names[s]}\n{int(((E.stratum == s) & (E.model == 'teacher')).sum())} frames" for s in names])
+    ax.set_xlabel("frame flagged (fitting + PCA) by the model of")
+    ax.set_title("(b) by how the frame was drawn, four videos summed", loc="left", fontsize=10.5)
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.12)
+    # (c) frame by frame
+    ax = axes[2]
+    a = E[E.model == "round1_formal"].set_index(["video", "frame"]).wrong
+    b = E[E.model == "round2_formal"].set_index(["video", "frame"]).wrong.reindex(a.index)
+    vals = [("wrong\n→ right", int((a & ~b).sum())), ("right\n→ wrong", int((~a & b).sum())), ("wrong\nin both", int((a & b).sum()))]
+    ax.bar(range(3), [y for _, y in vals], 0.6, color="#8a8a8a", edgecolor="white")
+    for i, (_, y) in enumerate(vals):
+        ax.text(i, y, str(y), ha="center", va="bottom", fontsize=9, color="#222")
+    ax.set_xticks(range(3))
+    ax.set_xticklabels([n for n, _ in vals])
+    ax.set_title("(c) turn 1 against turn 2,\nframe by frame", loc="left", fontsize=10.5)
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.12)
+    for ax in axes:
+        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+        ax.set_axisbelow(True)
+    fig.tight_layout()
+    fig.savefig(OUT / f"loop_exp5c{suffix}.png", dpi=170)
+    plt.close(fig)
+    return {"per video (teacher, turn 1, turn 2)": {int(v): [int(E[(E.video == v) & (E.model == m)].wrong.sum()) for m in ("teacher", "round1_formal", "round2_formal")] for v in VIDEOS},
+            "by stratum": {s: [int(E[(E.stratum == s) & (E.model == m)].wrong.sum()) for m in ("teacher", "round1_formal", "round2_formal")] for s in names}, "frame by frame": dict(vals)}
+
+
+if __name__ == "__main__" and "--exp5" in sys.argv:
+    fig_exp5b_full()
+    print("5c:", fig_exp5c())
+    print("5c before review:", fig_exp5c("_before_review"))

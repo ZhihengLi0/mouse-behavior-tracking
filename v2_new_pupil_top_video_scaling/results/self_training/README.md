@@ -745,6 +745,51 @@ Every flagged share in the figures and on the page now names its algorithm in br
 finders the loop uses, (low confidence) and (jump) for the two independent detectors. Captions and conclusions of page
 9.4 were shortened; numbers a table already gives are no longer repeated in the text.
 
+### Experiment 5c: turn 2 of the final loop checked on hand-labeled frames (2026-11-14)
+
+User 2026-11-14: after turn 1 the 70 truth frames and the 34 blind frames hold almost no wrong frame, so they cannot
+show whether turn 2 changes anything; a new set is drawn for the final version only ("只看最终的，自己跟自己比").
+
+- Draw (`scripts/blind_turn2_set.py select --video N`, seed 42, `results/blind_test/videoNN/turn2/`): strata by the
+  per-frame flags (fitting or PCA) of `round1_formal` and `round2_formal`: T1 flagged by turn 1 only, TB by both, T2
+  by turn 2 only, TN by neither; 14 / 12 / 10 / 4 drawn per video (video 6: 13 T1, all there were), k-means over the
+  pose inside a stratum. Only frames within 30 frames of an existing truth or blind frame are eligible, so every frame
+  is at least 31 frames from every training frame of experiments 2 to 5b at every turn (checked: 31 to 39); the one
+  experiment-2 training frame inside that band on video 15 (35908) has its neighbourhood left out. Experiment 1 does
+  not keep the band free. The user then asked for 28 per video: a random subset per stratum, T1 10 / TB 8 / T2 7 / TN 3
+  (`subset` and `weight_subset` in `selection_key.csv`; the other PNGs are in `labeling/not_labeled/`).
+- Labels: by the user in napari, image only, no pre-labels. napari-deeplabcut does not open a folder without a label
+  file and, with an empty one, loads the keypoint names as NaN (no advance to the next keypoint, an error on every
+  click); a placeholder first frame `img000.png` with one point makes the file non-empty and is ignored by the scorer.
+  Video 1 28 frames 200 points, video 8 28 / 188, video 15 24 / 152 (4 frames with a closed eye left without a point:
+  img211, img215, img234, img239, all TB), video 6 28 / 204; 108 frames scored.
+- Label check: no swapped points, none outside the eye or the image, no duplicates. The user's nasal corner lay
+  further toward the nose than the models' (median 0.07 eye widths, 0.29 on TB frames). Told so, the user reviewed
+  every frame: no point added or removed, the nasal corner moved in 94 of 108 frames by a median of 21 to 32 px inward,
+  a few eyelid points by 6 to 19 px. Both label sets are kept: `labeling/blind/CollectedData_Zhiheng.csv` (after the
+  review) and `labeling/before_review/CollectedData_Zhiheng.csv` (fully blind).
+- Scores (`scripts/blind_turn2_score.py --video N [--labels before_review]` → `per_frame[_before_review].csv`,
+  `scores[_before_review].csv`; same frame error and 0.14 line as `blind_test_set.py`). Wrong frames, starting model →
+  5b turn 1 → 5b turn 2:
+
+| labels | video 1 (28) | video 8 (28) | video 15 (24) | video 6 (28) | total (108) |
+|---|---|---|---|---|---|
+| after the review | 24 → 9 → 12 | 17 → 7 → 8 | 11 → 5 → 4 | 7 → 4 → 3 | 59 → 25 → 27 |
+| before the review | 24 → 9 → 12 | 18 → 8 → 10 | 13 → 6 → 7 | 8 → 5 → 5 | 63 → 28 → 34 |
+
+  After the review, by stratum (four videos): T1 (40 frames) 16 → 4 → 1, TB (28) 21 → 20 → 21, T2 (28) 16 → 1 → 5,
+  TN (12) 6 → 0 → 0. Turn 1 against turn 2 frame by frame: 4 wrong to right, 6 right to wrong, 21 wrong in both.
+  Turn 1 with seed 43: video 1 7, video 15 6, video 6 4 (seed 42: 9, 5, 4); video 15 turn 3: 5.
+- Reading: on frames neither turn has seen, turn 2 is not wrong on fewer frames than turn 1 (two videos more, two
+  fewer, all within the seed band), before and after the review; turn 1's gain over the starting model is confirmed.
+  The frames only turn 1 flags are mostly right for turn 1 (false alarms), the frames both flag are mostly wrong for
+  both, the frames only turn 2 flags are more often wrong for turn 2. Limits: the frames lie within half a second of
+  earlier test frames and cover about a fifth of each video, so the counts are not whole-video rates; the review is
+  not blind for the nasal corner.
+- Page: 5c after 5b (Figure 9-28 `figures/loop_exp5c.png`, Table 9-4-13; the turn table is now 9-4-14), a 5b figure in
+  the style of the other experiments (Figure 9-27 `figures/loop_exp5b_full.png`); the two all-experiment figures of the
+  turns subsection are no longer on the page. `python self_training_figures.py --exp5` (`fig_exp5b_full`, `fig_exp5c`).
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is

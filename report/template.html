@@ -1389,7 +1389,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td><span lang="zh">实验五 5b</span><span lang="en">Experiment 5b</span></td><td><span lang="zh">实验三的做法，修复用选定的替换方式（5a）和闭眼判据（4a）</span><span lang="en">experiment 3's procedure with the settled replacement rule (5a) and closed-eye criterion (4a)</span></td><td><span lang="zh">最终版本</span><span lang="en">the final version</span></td><td>1 8 15 6</td><td><span lang="zh">视频 1、8、6 停在第二圈，视频 15 停在第三圈</span><span lang="en">videos 1, 8, 6 stop at turn 2, video 15 at turn 3</span></td><td>48 → 15 → 15</td></tr>
     </tbody>
   </table></div>
-  <p class="text"><span lang="zh">盲测帧一列不是某一个视频的数：是视频 1、8、15、6 各 34 帧相加（起点模型四个视频分别错 17、12、10、9 帧，合计 48 帧）；每个视频各自的数在表 9-4-13。实验一的训练帧没有避开盲测帧，它的数和其他实验不在同一条件下。</span><span lang="en">The blind column is not one video's count: it sums videos 1, 8, 15 and 6, 34 frames each (the starting models are wrong on 17, 12, 10 and 9 frames, 48 in all); the per-video counts are in Table 9-4-13. Experiment 1's training frames do not avoid the blind frames, so its counts are not measured under the same condition as the others'.</span></p>
+  <p class="text"><span lang="zh">盲测帧一列不是某一个视频的数：是视频 1、8、15、6 各 34 帧相加（起点模型四个视频分别错 17、12、10、9 帧，合计 48 帧）；每个视频各自的数在表 9-4-14。实验一的训练帧没有避开盲测帧，它的数和其他实验不在同一条件下。</span><span lang="en">The blind column is not one video's count: it sums videos 1, 8, 15 and 6, 34 frames each (the starting models are wrong on 17, 12, 10 and 9 frames, 48 in all); the per-video counts are in Table 9-4-14. Experiment 1's training frames do not avoid the blind frames, so its counts are not measured under the same condition as the others'.</span></p>
   <p class="text"><b><span lang="zh">共用的配置和公式（各实验相同，下面不再重复）</span><span lang="en">Shared configuration and formulas (the same for every experiment, not repeated below)</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">起点模型</span><span lang="en">Starting model</span></th><td><span lang="zh">每个视频平台点的模型（第 5 步），整段视频的预测和 9.2、9.3 用的是同一份；9.3 修全部 8 个点、最小子集替换的那次运行就是 loop 的第 0 圈。人工训练帧：视频 1 共 120 帧（视频 0 的 100 帧加本视频 20 帧），视频 8 共 420 帧（之前视频 400 帧加本视频 20 帧），视频 15 共 700 帧（660 加 40），视频 6 共 400 帧（380 加 20）；每个视频另有 20 帧验证帧。</span><span lang="en">The plateau model of each video (step 5); its whole-video prediction is the one used in 9.2 and 9.3; the all-eight-points, smallest-subset run of 9.3 is turn 0 of the loop. Human training frames: video 1 120 (100 of video 0 plus 20 of itself), video 8 420 (400 of earlier videos plus 20), video 15 700 (660 plus 40), video 6 400 (380 plus 20); 20 validation frames each.</span></td></tr>
@@ -1438,7 +1438,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">进入训练集的帧</span><span lang="en">Frames added to the training set</span></th><td><span lang="zh">状态为没被标出或修复的帧，每 30 帧取一帧，按共用的逐点规则留点（修复前超线的点留空，所以修复帧几乎进不来：实验一用的实际上是起点模型自己预测、没被标出的帧）。</span><span lang="en">Frames with status unflagged or repaired, every 30th, points kept by the shared per-point rule (points over the line before the repair are left blank, so repaired frames almost never enter: experiment 1 in effect uses the starting model's own unflagged predictions).</span></td></tr>
     <tr><th><span lang="zh">视频和帧数</span><span lang="en">Videos and counts</span></th><td><span lang="zh">十个视频：0、1、2、4、6、7、8、12、15、18；每个视频进入训练集 368 到 2030 帧，轮次按迭代次数和起点模型相同来定（表 9-4-4、9-4-7）。</span><span lang="en">Ten videos: 0, 1, 2, 4, 6, 7, 8, 12, 15, 18; 368 to 2030 frames added to the training set per video, epochs by iteration matching with the starting model (Tables 9-4-4, 9-4-7).</span></td></tr>
-    <tr><th><span lang="zh">后面几圈</span><span lang="en">Later turns</span></th><td><span lang="zh">视频 1、8、15、6 第二圈，视频 1、6 第三圈：用上一圈模型的预测再取一次每 30 帧的未标出帧，再训练一次（表 9-4-13）。</span><span lang="en">Turn 2 on videos 1, 8, 15, 6 and turn 3 on videos 1, 6: the previous turn's prediction gives another batch of every-30th unflagged frames and one more training (Table 9-4-13).</span></td></tr>
+    <tr><th><span lang="zh">后面几圈</span><span lang="en">Later turns</span></th><td><span lang="zh">视频 1、8、15、6 第二圈，视频 1、6 第三圈：用上一圈模型的预测再取一次每 30 帧的未标出帧，再训练一次（表 9-4-14）。</span><span lang="en">Turn 2 on videos 1, 8, 15, 6 and turn 3 on videos 1, 6: the previous turn's prediction gives another batch of every-30th unflagged frames and one more training (Table 9-4-14).</span></td></tr>
   </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp1_full.png?v=20261114b" alt="Experiment 1, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share (fitting + PCA), flagged share (low confidence), flagged share (jump)"></div>
@@ -1466,7 +1466,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ul>
       <li>九个视频上真值错帧、整段标出率（fitting + PCA）和盲测错帧都下降，中位误差不变（表 9-4-1）。</li>
       <li>视频 0：loop 没有帮助，换随机种子重训也一样。这个视频只有 5 分钟，最后三分之一没有帧能进训练集，人工标注和训练量都是十个视频里最少的。</li>
-      <li>再转几圈：整段标出率（fitting + PCA）和两项独立标出率（最低置信度、跳变）小幅下降，错帧不再减少（表 9-4-13）。</li>
+      <li>再转几圈：整段标出率（fitting + PCA）和两项独立标出率（最低置信度、跳变）小幅下降，错帧不再减少（表 9-4-14）。</li>
       <li>实验一的训练帧没有避开盲测帧，它的盲测数和其他实验不在同一条件下。</li>
     </ul>
   </div>
@@ -1475,7 +1475,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ul>
       <li>On nine videos the wrong truth frames, the flagged share (fitting + PCA) and the wrong blind frames fall, with the median error unchanged (Table 9-4-1).</li>
       <li>Video 0: the loop does not help, also when trained again with another random seed. The video is only 5 minutes long, no frame of its last third can enter the training set, and its human labels and training length are the smallest of the ten.</li>
-      <li>Further turns: the flagged share (fitting + PCA) and the two independent flagged shares (low confidence, jump) fall a little, the wrong frames no longer do (Table 9-4-13).</li>
+      <li>Further turns: the flagged share (fitting + PCA) and the two independent flagged shares (low confidence, jump) fall a little, the wrong frames no longer do (Table 9-4-14).</li>
       <li>Experiment 1's training frames do not avoid the blind frames, so its blind counts are not measured under the same condition as the other experiments'.</li>
     </ul>
   </div>
@@ -1483,7 +1483,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">进入训练集的帧</span><span lang="en">Frames added to the training set</span></th><td><span lang="zh">状态为修复的全部帧，8 个点都取修复后的坐标；帧数不超过实验一在该视频用的帧数（超过时按时间均匀抽）；留出时段 4、9、14、19（视频分 20 段）不进入训练集，补充盲测帧只从留出时段抽。</span><span lang="en">All frames with status repaired, all 8 points at their repaired coordinates; count capped at experiment 1's on the video (evenly spread over time when above); the held-out blocks 4, 9, 14, 19 (of 20) never enter the training set, and the supplementary blind frames are drawn only there.</span></td></tr>
     <tr><th><span lang="zh">视频和帧数</span><span lang="en">Videos and counts</span></th><td><span lang="zh">视频 1 / 8 / 15 / 6 进入训练集 1784 / 616 / 548 / 1130 帧（只有视频 1 碰到上限），轮次 8 / 48 / 65 / 32，迭代次数和起点模型相同（表 9-4-5、9-4-7）。修复帧绝大多数是换了 pupil_left 的帧（视频 6：1107 / 1130）。</span><span lang="en">Videos 1 / 8 / 15 / 6: 1784 / 616 / 548 / 1130 frames added to the training set (only video 1 hits the cap), 8 / 48 / 65 / 32 epochs, iterations equal to the starting model's (Tables 9-4-5, 9-4-7). Most repaired frames are pupil_left replacements (video 6: 1107 of 1130).</span></td></tr>
-    <tr><th><span lang="zh">后面几圈</span><span lang="en">Later turns</span></th><td><span lang="zh">视频 1、8、15、6 第二圈，视频 6 第三圈：上一圈的模型取代起点模型，用它自己的热图第二峰修复，再只取修复帧。第二圈进入训练集 93 / 22 / 58 / 306 帧，视频 6 第三圈 287 帧（表 9-4-13）。</span><span lang="en">Turn 2 on videos 1, 8, 15, 6 and turn 3 on video 6: the previous turn's model takes the place of the starting model, its prediction is repaired with its own heatmap second peaks, and again only the repaired frames are taken. 93 / 22 / 58 / 306 frames added in turn 2, 287 in video 6's turn 3 (Table 9-4-13).</span></td></tr>
+    <tr><th><span lang="zh">后面几圈</span><span lang="en">Later turns</span></th><td><span lang="zh">视频 1、8、15、6 第二圈，视频 6 第三圈：上一圈的模型取代起点模型，用它自己的热图第二峰修复，再只取修复帧。第二圈进入训练集 93 / 22 / 58 / 306 帧，视频 6 第三圈 287 帧（表 9-4-14）。</span><span lang="en">Turn 2 on videos 1, 8, 15, 6 and turn 3 on video 6: the previous turn's model takes the place of the starting model, its prediction is repaired with its own heatmap second peaks, and again only the repaired frames are taken. 93 / 22 / 58 / 306 frames added in turn 2, 287 in video 6's turn 3 (Table 9-4-14).</span></td></tr>
   </tbody></table></div>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp2_full.png?v=20261114b" alt="Experiment 2, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share (fitting + PCA), flagged share (low confidence), flagged share (jump)"></div>
@@ -1505,7 +1505,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ul>
       <li>第一圈：真值错帧和盲测错帧减少，整段标出率（fitting + PCA）下降，中位误差不变（表 9-4-2）。</li>
       <li>局限：修复帧的类型单一（几乎都是换 pupil_left 的帧），修复本身的小偏差会被学进去。这是实验三把没被标出的帧也放进训练集的理由。</li>
-      <li>后面几圈：新的修复帧只有几十到几百帧，上一圈的帧不带过来；整段标出率（fitting + PCA）在三个视频上回升，两项独立标出率（最低置信度、跳变）多数回升（表 9-4-13）。</li>
+      <li>后面几圈：新的修复帧只有几十到几百帧，上一圈的帧不带过来；整段标出率（fitting + PCA）在三个视频上回升，两项独立标出率（最低置信度、跳变）多数回升（表 9-4-14）。</li>
     </ul>
   </div>
   <div class="text" lang="en">
@@ -1513,7 +1513,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ul>
       <li>Turn 1: fewer wrong truth and blind frames, a lower flagged share (fitting + PCA), the median error unchanged (Table 9-4-2).</li>
       <li>Limit: the repaired frames are of one kind (almost all pupil_left replacements), so the repair's own small bias is learned. That is why experiment 3 adds the unflagged frames to the training set.</li>
-      <li>Later turns: only tens to hundreds of new repaired frames, and the previous turn's frames are not carried over; the flagged share (fitting + PCA) rises again on three videos and the two independent flagged shares (low confidence, jump) mostly rise (Table 9-4-13).</li>
+      <li>Later turns: only tens to hundreds of new repaired frames, and the previous turn's frames are not carried over; the flagged share (fitting + PCA) rises again on three videos and the two independent flagged shares (low confidence, jump) mostly rise (Table 9-4-14).</li>
     </ul>
   </div>
   <h4><span lang="zh">实验三：没被标出的帧和修复过的帧一起进入训练集，转到饱和</span><span lang="en">Experiment 3: the unflagged frames and the repaired frames enter the training set together, turn after turn until saturation</span></h4>
@@ -1924,6 +1924,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ul>
       <li><b>5a</b> 训练之前，先用实验选定修复时的替换方式：一帧里几个点都可以换、几种换法都能通过验收时，换哪些点。</li>
       <li><b>5b</b> 用选定的替换方式和实验四的闭眼判据，从起点模型重新跑 loop。</li>
+      <li><b>5c</b> 另抽一批帧人工标注，检验 5b 的第二圈有没有减少错帧。</li>
     </ul>
   </div>
   <div class="text" lang="en">
@@ -1931,6 +1932,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ul>
       <li><b>5a</b> before training, settles the replacement rule by experiment: when several points of a frame could be replaced and several replacements pass the acceptance, which points to replace.</li>
       <li><b>5b</b> runs the loop again from the starting models with that rule and the closed-eye criterion of experiment 4.</li>
+      <li><b>5c</b> draws and hand-labels a new set of frames to check whether the second turn of 5b has fewer wrong frames.</li>
     </ul>
   </div>
 
@@ -2001,8 +2003,49 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
       <tr><td>6</td><td><span lang="zh">最终版本第二圈</span><span lang="en">Final version, turn 2</span></td><td>1855</td><td>1.45</td><td>0</td><td>0.42</td><td>3</td><td>0.29</td><td>0.88</td></tr>
     </tbody>
   </table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_loop_exp5b_full.png?v=20261114" alt="Experiment 5b, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share by the two finders, by low confidence, by jumps"></div>
+    <figcaption lang="zh"><span class="tag">图 9-27：</span>实验五 5b。灰 = 起点模型，粉 = 各圈的模型（圈数越后越浅），斜纹 = 第一圈只换随机种子重训。面板同图 9-15，盲测帧是全部 34 帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Experiment 5b. Grey = starting model, pink = the model of each turn (lighter for later turns), hatched = turn 1 trained again with another random seed. Panels as in Figure 9-15, with all 34 blind frames.</figcaption>
+  </figure>
   <div class="concl" lang="zh"><span class="tag">5b 的结论：</span>第一圈四个视频都比起点模型好，和实验三第一圈的差别在只换随机种子的波动之内（表 9-4-12），所以换成 D 和置信度判据没有改变结果。之后错帧不再减少：视频 1、8、6 停在第二圈，视频 15 停在第三圈。</div>
   <div class="concl" lang="en"><span class="tag">Conclusion of 5b:</span>in turn 1 all four videos beat the starting model, and the differences from experiment 3's first turn are within what the random seed alone changes (Table 9-4-12), so D and the confidence criterion do not change the result. Afterwards the wrong frames no longer fall: videos 1, 8 and 6 stop at turn 2, video 15 at turn 3.</div>
+
+  <p class="text" id="exp5c"><b><span lang="zh">5c 第二圈的人工检验：第二圈没有减少错帧</span><span lang="en">5c Turn 2 checked on hand-labeled frames: turn 2 does not have fewer wrong frames</span></b></p>
+  <div class="tablebox"><table class="info"><tbody>
+    <tr><th><span lang="zh">问题</span><span lang="en">Question</span></th><td><span lang="zh">5b 第一圈之后，再转一圈有没有减少错帧。原有的真值帧和盲测帧在第一圈之后几乎没有错帧了，量不出来，所以新抽一批帧。</span><span lang="en">After the first turn of 5b, does another turn reduce the wrong frames? The existing truth and blind frames hold almost no wrong frame after turn 1 and cannot show it, so a new set of frames is drawn.</span></td></tr>
+    <tr><th><span lang="zh">真值是什么</span><span lang="en">What counts as truth</span></th><td><span lang="zh">每个视频 28 帧，由标注者只看图片标 8 个点：看不到帧号和任何模型的点，看不清的点留空。帧误差和错帧线同前（误差超过眼宽的 14% 算错）。视频 15 有 4 帧眼睛闭着、没有可标的点，不计；共 108 帧。</span><span lang="en">28 frames per video, labeled by a person who sees only the image: no frame number, no model's points, a point that cannot be judged is left blank. Frame error and error line as before (wrong = error over 14% of the eye width). On video 15, 4 frames show a closed eye with no point to label and are not counted; 108 frames in all.</span></td></tr>
+    <tr><th><span lang="zh">怎么抽</span><span lang="en">How the frames are drawn</span></th><td><span lang="zh">按 5b 第一圈、第二圈的模型各自标出（fitting + PCA）与否分四层，每层按姿态分散抽：只有第一圈标出 10 帧，两圈都标出 8 帧，只有第二圈标出 7 帧，两圈都没标出 3 帧。只在离已有真值帧或盲测帧 30 帧以内的范围里抽：这些帧离实验二到 5b 任何一圈的训练帧都至少 31 帧，所以两圈的模型都没见过它们附近的画面。</span><span lang="en">Four strata by whether the turn-1 and the turn-2 model of 5b flag the frame (fitting + PCA), spread over the pose space inside each stratum: 10 frames flagged by turn 1 only, 8 by both, 7 by turn 2 only, 3 by neither. Frames are drawn only within 30 frames of an existing truth or blind frame: such a frame is at least 31 frames from every training frame of experiments 2 to 5b at every turn, so neither model has seen its surroundings.</span></td></tr>
+    <tr><th><span lang="zh">复核</span><span lang="en">Review</span></th><td><span lang="zh">标完后，标注者按统一标准把每一帧复核了一遍，主要是把内眼角往眼睛里面挪（108 帧里 94 帧，中位数 21 到 32 像素）。复核是在得知“内眼角比模型的更靠外”之后做的，所以复核前（完全盲标）和复核后的结果都列出（表 9-4-13）；图用复核后的标注。</span><span lang="en">After labeling, the labeler went through every frame again with one standard, mainly moving the nasal corner inward (94 of the 108 frames, by a median of 21 to 32 px). The review was made after learning that the nasal corner lay further out than the models', so the results before the review (fully blind) and after it are both given (Table 9-4-13); the figure uses the reviewed labels.</span></td></tr>
+    <tr><th><span lang="zh">脚本和结果</span><span lang="en">Script and results</span></th><td><span lang="zh"><code>scripts/blind_turn2_set.py</code>, <code>blind_turn2_score.py</code>; <code>results/blind_test/videoNN/turn2/</code></span><span lang="en"><code>scripts/blind_turn2_set.py</code>, <code>blind_turn2_score.py</code>; <code>results/blind_test/videoNN/turn2/</code></span></td></tr>
+  </tbody></table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_loop_exp5c.png?v=20261114" alt="Experiment 5c: wrong frames on the hand-labeled frames per video and in total, by stratum, and turn 1 against turn 2 frame by frame"></div>
+    <figcaption lang="zh"><span class="tag">图 9-28：</span>5c，新抽的人工标注帧上的错帧数。灰 = 起点模型，粉 = 5b 第一圈，斜纹 = 第一圈只换随机种子重训，浅粉 = 第二圈，最浅 = 第三圈（只有视频 15）。(a) 每个视频和合计；(b) 按抽帧时的四层（哪一圈的模型标出（fitting + PCA）这一帧），四个视频相加；(c) 第一圈对第二圈逐帧。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-28:</span>5c, wrong frames on the newly drawn hand-labeled frames. Grey = starting model, pink = 5b turn 1, hatched = turn 1 trained again with another random seed, light pink = turn 2, lightest = turn 3 (video 15 only). (a) Per video and in total; (b) by the four strata of the draw (which turn's model flags the frame, fitting + PCA), the four videos summed; (c) turn 1 against turn 2 frame by frame.</figcaption>
+  </figure>
+  <p class="text"><b><span lang="zh">表 9-4-13：5c，错帧数：起点模型 → 5b 第一圈 → 5b 第二圈</span><span lang="en">Table 9-4-13: 5c, wrong frames: starting model → 5b turn 1 → 5b turn 2</span></b></p>
+  <div class="tablebox"><table>
+    <thead><tr><th><span lang="zh">标注</span><span lang="en">Labels</span></th><th><span lang="zh">视频 1（28 帧）</span><span lang="en">Video 1 (28 frames)</span></th><th><span lang="zh">视频 8（28 帧）</span><span lang="en">Video 8 (28 frames)</span></th><th><span lang="zh">视频 15（24 帧）</span><span lang="en">Video 15 (24 frames)</span></th><th><span lang="zh">视频 6（28 帧）</span><span lang="en">Video 6 (28 frames)</span></th><th><span lang="zh">合计（108 帧）</span><span lang="en">Total (108 frames)</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="zh">复核后</span><span lang="en">After the review</span></td><td>24 → 9 → 12</td><td>17 → 7 → 8</td><td>11 → 5 → 4</td><td>7 → 4 → 3</td><td>59 → 25 → 27</td></tr>
+      <tr><td><span lang="zh">复核前（完全盲标）</span><span lang="en">Before the review (fully blind)</span></td><td>24 → 9 → 12</td><td>18 → 8 → 10</td><td>13 → 6 → 7</td><td>8 → 5 → 5</td><td>63 → 28 → 34</td></tr>
+    </tbody>
+  </table></div>
+  <div class="concl" lang="zh"><span class="tag">5c 的结论：</span>在两圈都没见过的新帧上，5b 第二圈没有比第一圈少错；转一圈就够。
+    <ol>
+      <li>第一圈对起点模型的进步在这批帧上再次确认；第二圈和第一圈持平，两个视频多错、两个视频少错，都在只换随机种子的波动之内（表 9-4-13）。</li>
+      <li>只有第一圈标出（fitting + PCA）的帧，第一圈多数其实是对的；两圈都标出的帧，两圈大多都错；只有第二圈标出的帧，第二圈错得更多（图 9-28b）。</li>
+      <li>复核前后结论相同。</li>
+    </ol>
+  </div>
+  <div class="concl" lang="en"><span class="tag">Conclusion of 5c:</span>on new frames neither turn has seen, the second turn of 5b is not wrong on fewer frames than the first; one turn is enough.
+    <ol>
+      <li>The gain of turn 1 over the starting model is confirmed on these frames; turn 2 is level with turn 1, worse on two videos and better on two, all within what the random seed alone changes (Table 9-4-13).</li>
+      <li>On the frames only turn 1 flags (fitting + PCA), turn 1 is mostly right; on the frames both flag, both are mostly wrong; on the frames only turn 2 flags, turn 2 is wrong more often (Figure 9-28b).</li>
+      <li>The conclusion is the same before and after the review.</li>
+    </ol>
+  </div>
 
   <h4 id="turns"><span lang="zh">转几圈：各实验的第二、三圈</span><span lang="en">How many turns: turns 2 and 3 of every experiment</span></h4>
   <div class="tablebox"><table class="info"><tbody>
@@ -2010,7 +2053,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">圈数</span><span lang="en">Turns</span></th><td><span lang="zh">实验三和 5b 转到停止规则触发。实验一、二、4c 都跑第二圈；把同一条停止规则套上去仍判继续的三个（实验一视频 1、6，实验二视频 6）再跑第三圈。4c 只在视频 1、15 上跑第二圈：视频 8、6 这类帧只有 5 帧和 15 帧。</span><span lang="en">Experiments 3 and 5b turn until the stop rule fires. Experiments 1, 2 and 4c all run a second turn; the three the same stop rule would still let continue (experiment 1 on videos 1 and 6, experiment 2 on video 6) run a third. 4c runs its second turn on videos 1 and 15 only: videos 8 and 6 have 5 and 15 frames of this kind.</span></td></tr>
     <tr><th><span lang="zh">盲测帧</span><span lang="en">Blind frames</span></th><td><span lang="zh">所有模型都在同样的 34 帧（24 帧分层盲测帧加 10 帧补充盲测帧）上数预测错的帧。实验二、三进入训练集的帧避开盲测帧前后各 60 帧；实验一只避开真值帧（盲测帧是在实验一第一圈之后抽的，只排除了第一圈的训练帧）。视频 1 第二圈 60 帧盲测帧里有 43 帧在 15 帧以内就有实验一的训练帧；视频 15 第二圈有一帧盲测帧（计分的 24 帧之一）本身进了训练集，所有模型在这一帧上都预测对。所以实验一的盲测数和实验二、三不在同一条件下。</span><span lang="en">Every model is counted on the same 34 frames (24 stratified plus 10 supplementary blind frames). Experiments 2 and 3 keep 60 frames on each side of the blind frames out of the training set; experiment 1 avoids only the truth frames (the blind frames were drawn after its first turn and exclude only that turn's training frames). In its second turn on video 1, 43 of the 60 blind frames have one of its training frames within 15 frames; in its second turn on video 15 one blind frame (one of the 24 scored) is itself in the training set, and every model predicts that frame correctly. So its blind counts are not measured under the same condition as those of experiments 2 and 3.</span></td></tr>
   </tbody></table></div>
-  <p class="text"><b><span lang="zh">表 9-4-13：各实验每一圈的数字，每格是 起点模型 → 第一圈 → 第二圈 → 第三圈（跑过的圈才有）</span><span lang="en">Table 9-4-13: every experiment turn by turn; each cell is starting model → turn 1 → turn 2 → turn 3 (the turns that were run)</span></b></p>
+  <p class="text"><b><span lang="zh">表 9-4-14：各实验每一圈的数字，每格是 起点模型 → 第一圈 → 第二圈 → 第三圈（跑过的圈才有）</span><span lang="en">Table 9-4-14: every experiment turn by turn; each cell is starting model → turn 1 → turn 2 → turn 3 (the turns that were run)</span></b></p>
   <div class="tablebox"><table>
     <thead><tr><th><span lang="zh">视频</span><span lang="en">Video</span></th><th><span lang="zh">实验</span><span lang="en">Experiment</span></th><th><span lang="zh">进入训练集的帧（第一 / 二 / 三圈）</span><span lang="en">Frames added (turn 1 / 2 / 3)</span></th><th><span lang="zh">真值帧中位误差（% 眼宽）</span><span lang="en">Median truth error (% of eye width)</span></th><th><span lang="zh">真值错帧（/70）</span><span lang="en">Wrong truth frames (of 70)</span></th><th><span lang="zh">整段标出率（fitting + PCA，%）</span><span lang="en">Flagged share (fitting + PCA, %)</span></th><th><span lang="zh">34 帧盲测帧里预测错的</span><span lang="en">Wrong among the 34 blind frames</span></th><th><span lang="zh">标出率（最低置信度，%）</span><span lang="en">Flagged share (low confidence, %)</span></th><th><span lang="zh">标出率（跳变，%）</span><span lang="en">Flagged share (jump, %)</span></th></tr></thead>
     <tbody>
@@ -2035,19 +2078,9 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <p class="text"><span lang="zh">最后两列是 loop 不用来找帧或修复的两项独立标出率（最低置信度、跳变）：一帧 8 个点里的最低置信度低于起点模型 5% 分位的帧占比，相邻帧最大位移超过起点模型 95% 分位的帧占比；起点模型按定义是 5.00%。</span><span lang="en">The last two columns are two detectors the loop never uses to pick or repair frames: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds the starting model's 95% quantile; the starting model is 5.00% by construction.</span></p>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_all_turns_detectors.png?v=20261114b" alt="Every experiment turn by turn on the four videos: wrong blind frames of 34 and flagged share (fitting + PCA), starting model, turns 1 to 3"></div>
-    <figcaption lang="zh"><span class="tag">图 9-27：</span>各实验在四个视频上一圈一圈的变化，每个实验一种颜色。四排：34 帧盲测帧里预测错的、整段标出率（fitting + PCA）、标出率（最低置信度）、标出率（跳变）（后三排是对数轴）。空心点 = 同一个第一圈模型只换随机种子重训。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Every experiment turn by turn on the four videos, one colour per experiment. Four rows: wrong predictions among the 34 blind frames, flagged share (fitting + PCA), flagged share (low confidence), flagged share (jump) (log axes on the last three). Hollow marker = the same turn-1 model trained again with another random seed.</figcaption>
-  </figure>
-  <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_round2_frames.png?v=20261113" alt="Turn 2 against turn 1 on the blind frames, frame by frame: wrong in both turns, wrong to right, right to wrong, by stratum"></div>
-    <figcaption lang="zh"><span class="tag">图 9-28：</span>第二圈对第一圈，盲测帧逐帧比较，四个视频相加：两圈都错、错变对、对变错的帧数。颜色是盲测帧的层（A = 只有起点模型标出，B = 两个模型都标出，C、D = 其他层，补充 = 两个模型意见不同的帧）。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-28:</span>Turn 2 against turn 1 on the blind frames, frame by frame, summed over the four videos: frames wrong in both turns, wrong to right, right to wrong. Colour = the blind frame's stratum (A = flagged by the starting model only, B = flagged by both models, C, D = other strata, supplement = frames two models disagree on).</figcaption>
-  </figure>
   <div class="concl" lang="zh"><span class="tag">第二、三圈的结论：</span>
     <ol>
-      <li>提升都在第一圈。第二、三圈的盲测错帧和真值错帧只在换随机种子的波动之内变化（表 9-4-13、图 9-27）。</li>
+      <li>提升都在第一圈。第二、三圈的盲测错帧和真值错帧只在换随机种子的波动之内变化（表 9-4-14）；专门为第二圈抽帧、人工标注的检验里，5b 第二圈也没有比第一圈少错（5c，图 9-28）。</li>
       <li>整段标出率（fitting + PCA）和两项独立标出率（最低置信度、跳变）在后面几圈仍小幅下降（视频 6、15），在视频 1 上回升。这样小的变化，34 帧盲测帧和 70 帧真值帧量不出来。</li>
       <li>每一圈只用人工标注加这一圈的帧。实验二和 4c 的第二圈只剩少量新帧，结果回退；把前几圈的帧一起带上的累积训练没有做。</li>
       <li>停止规则：第一圈没有一个触发停止；第二圈 18 个里停 13 个、继续 5 个，继续的 5 个第三圈错帧都没有减少。多数是被盲测条件停下的，而盲测的变化在种子波动之内，所以"停下"不等于"证明不会再变好"。</li>
@@ -2055,7 +2088,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion on turns 2 and 3:</span>
     <ol>
-      <li>The gain is all in turn 1. In turns 2 and 3 the wrong blind and truth frames move only within what the random seed alone changes (Table 9-4-13, Figure 9-27).</li>
+      <li>The gain is all in turn 1. In turns 2 and 3 the wrong blind and truth frames move only within what the random seed alone changes (Table 9-4-14); on the frames drawn and hand-labeled for turn 2, the second turn of 5b is not wrong on fewer frames than the first either (5c, Figure 9-28).</li>
       <li>The flagged share (fitting + PCA) and the two independent flagged shares (low confidence, jump) still fall a little in later turns (videos 6, 15) and rise again on video 1. The 34 blind frames and 70 truth frames per video cannot resolve changes that small.</li>
       <li>Every turn trains on the human labels plus that turn's frames only. The second turns of experiment 2 and 4c are left with few new frames and fall back; cumulative training that carries the earlier turns' frames along was not run.</li>
       <li>The stop rule: no model triggers it in turn 1; in turn 2 it stops 13 of 18 and lets 5 continue, and none of those 5 has fewer wrong frames in turn 3. Most stops come from the blind condition, whose change is within the seed noise, so "stopped" does not mean "shown not to improve further".</li>
@@ -2065,7 +2098,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li><b>loop 有用。</b>第一圈之后，四个视频 136 帧盲测帧里预测错的从 48 帧降到 14 到 17 帧，真值错帧和整段标出率（fitting + PCA）也下降。只换随机种子重训，结果稳定（盲测错帧相差 0 到 3 帧，标出帧数（fitting + PCA）相差 6% 到 23%），说明提升不是某一次训练的偶然。</li>
       <li><b>三种帧各自都起作用，合起来相当。</b>差别在种子波动之内，所以不排名；最终版本（5b）三种都用。</li>
-      <li><b>转一圈。</b>之后错帧不再减少；整段标出率（fitting + PCA）和两项独立标出率（最低置信度、跳变）在部分视频上仍小幅下降。</li>
+      <li><b>转一圈。</b>之后错帧不再减少，专门抽帧、人工标注的检验也是这个结果（5c）；整段标出率（fitting + PCA）和两项独立标出率（最低置信度、跳变）在部分视频上仍小幅下降。</li>
       <li><b>这个结果对现在的做法成立。</b>每一圈不带上一圈的帧；把前几圈的帧一起带上的累积训练没有做。</li>
       <li><b>剩下的问题。</b>视频 0 上 loop 没有帮助。剩下的错帧多是两种信号都标出、第二峰也修不了的眯眼帧，loop 学不到它们。整条链对新视频是自动的：阈值都来自该视频自己的标注。</li>
     </ol>
@@ -2074,7 +2107,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li><b>The loop helps.</b> After one turn the wrong predictions among the four videos' 136 blind frames fall from 48 to 14 to 17, and the wrong truth frames and the flagged share (fitting + PCA) fall too. Trained again with another random seed the result is stable (wrong blind frames 0 to 3 apart, flagged frames (fitting + PCA) 6% to 23% apart), so the gain is not the accident of one training.</li>
       <li><b>Each of the three kinds of frames helps, and together they do about the same.</b> The differences are within the seed noise, so no ranking is made; the final version (5b) uses all three.</li>
-      <li><b>One turn.</b> Afterwards the wrong frames no longer fall; the flagged share (fitting + PCA) and the two independent flagged shares (low confidence, jump) still fall a little on some videos.</li>
+      <li><b>One turn.</b> Afterwards the wrong frames no longer fall, and the check on frames drawn and hand-labeled for it says the same (5c); the flagged share (fitting + PCA) and the two independent flagged shares (low confidence, jump) still fall a little on some videos.</li>
       <li><b>The result holds for the current procedure.</b> A turn does not carry the previous turn's frames over; cumulative training that carries the earlier turns' frames along was not run.</li>
       <li><b>What remains.</b> On video 0 the loop does not help. The remaining wrong frames are mostly squinting frames both finders flag and the second peak cannot repair; the loop does not learn them. The whole chain is automatic for a new video: every threshold comes from the video's own labels.</li>
     </ol>
