@@ -732,6 +732,12 @@ Figures (2026-11-14): one colour per experiment in every figure (experiment 1 or
 as hollow markers), `loop_exp1_turns_seeds.png` (Figure 9-15), `loop_exp3_turns.png` (Figure 9-17), `loop_turns.png`,
 `loop_truth.png`, `loop_blind.png` redrawn with the palette.
 
+Experiment 4b example figure (2026-11-14, user: two samples, before and after, four pictures in a row):
+`figures/loop_exp4b_examples.jpg` (`self_training_figures.py --exp4b`, `fig_exp4b_examples`), cut from the review items
+the user judged (`flag_and_repair/subset_review/items/video15_f050265_r.jpg`, `video01_f059597_r.jpg`, both judged
+right). It is page Figure 9-23; the page figures after it moved up by one (4c 9-24, 5a 9-25 and 9-26, all turns 9-27,
+turn 2 against turn 1 9-28), so figure numbers quoted earlier in this file for those are one lower.
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is

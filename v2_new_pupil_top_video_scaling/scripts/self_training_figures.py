@@ -796,3 +796,42 @@ if __name__ == "__main__" and "--turns" in sys.argv:
     fig_round2(max_turn=3, seeds=True)
     fig_round2(max_turn=3, seeds=True, detectors=True)
     print("turn figures written")
+
+
+# ---- experiment 4b: two judged frames before and after the repair (page Figure 9-23, 2026-11-14) ----
+def fig_exp4b_examples(items=(("video15_f050265_r", "video 15, frame 50265", "left pupil point replaced"),
+                              ("video01_f059597_r", "video 1, frame 59597", "temporal corner replaced"))):
+    """Two of the 20 frames judged in experiment 4b (both judged right), cut from the review items the user saw
+    (flag_and_repair/subset_review/items/*_r.jpg: frame | model's points | opening rule | confidence rule): the model's
+    points before the repair and the points after it, side by side."""
+    src = FAR / "subset_review" / "items"
+    crops = []
+    for name, where, what in items:
+        im = cv2.cvtColor(cv2.imread(str(src / f"{name}.jpg")), cv2.COLOR_BGR2RGB)
+        pw = (im.shape[1] - 30) // 4                         # four panels, 10 px apart
+        x0 = [i * (pw + 10) for i in range(4)]
+        plain = im[24:, x0[0]:x0[0] + pw].mean(axis=2)       # the bare frame: its non-black part is the picture
+        rows, cols = np.where(plain.mean(axis=1) > 20)[0], np.where(plain.mean(axis=0) > 20)[0]
+        r0, r1, c0, c1 = rows.min() + 24, rows.max() + 24, cols.min(), cols.max()
+        crops.append([(im[r0:r1, x0[1] + c0:x0[1] + c1], f"{where}: before the repair"), (im[r0:r1, x0[3] + c0:x0[3] + c1], f"after: {what}")])
+    hh = min(c[0][0].shape[0] for c in crops)                # same height for both frames (cut at the bottom), widths in proportion
+    ws = [c[0][0].shape[1] for c in crops]
+    fig, axes = plt.subplots(1, 5, figsize=(13.5, 13.2 * hh / (2 * sum(ws) + 0.04 * sum(ws)) + 0.42),
+                             gridspec_kw={"wspace": 0.03, "width_ratios": [ws[0], ws[0], 0.04 * sum(ws), ws[1], ws[1]]})
+    axes[2].axis("off")
+    for k, pair in enumerate(crops):
+        for j, (img, title) in enumerate(pair):
+            ax = axes[3 * k + j]
+            ax.imshow(img[:hh], aspect="auto")
+            ax.set_title(title, fontsize=9.5, loc="left")
+            ax.set_xticks([]); ax.set_yticks([])
+            for sp in ax.spines.values():
+                sp.set_visible(False)
+    fig.subplots_adjust(left=0.005, right=0.995, top=0.9, bottom=0.01)
+    fig.savefig(OUT / "loop_exp4b_examples.jpg", dpi=170, pil_kwargs={"quality": 90})
+    plt.close(fig)
+
+
+if __name__ == "__main__" and "--exp4b" in sys.argv:
+    fig_exp4b_examples()
+    print("4b example figure written")

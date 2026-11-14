@@ -78,7 +78,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-14 10:28 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="en">page built</span> 2026-11-14 10:31 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   
   <div class="text" lang="en">
@@ -1518,6 +1518,11 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="en">Procedure</span></th><td><span lang="en">Under the criterion of 4a, frames that are not fully closed are no longer held back as closed and are repaired by the procedure of 9.3.</span></td></tr>
     <tr><th><span lang="en">Truth</span></th><td><span lang="en">20 frames judged one by one by the labeler: drawn from the frames repaired this way, one per run of consecutive frames, at most 5 per video; each shown with the points before and after the repair and judged right or not.</span></td></tr>
   </tbody></table></div>
+  <figure>
+    <div class="figbox wide"><img src="assets/fig_loop_exp4b_examples.jpg?v=20261114" alt="Two judged frames of experiment 4b, each before and after the repair"></div>
+    
+    <figcaption lang="en"><span class="tag">Figure 9-23:</span>Two of the 20 judged frames, each before (left) and after (right) the repair. Red circles = pupil points, yellow = eyelid and corner points, blue = the replaced point, with an arrow from where it was (from the edge when that lies outside the picture). In the left frame (video 15) the left pupil point was thrown outside the eye, in the right frame (video 1) the temporal corner was thrown below it; both eyes are open, the earlier opening rule called them closed and left them unrepaired, and under the confidence criterion they are repaired.</figcaption>
+  </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion of 4b:</span>in 19 of the 20 frames the replaced points are right, and none is a truly closed eye. These frames can enter the training set like any other repaired frame.</div>
 
@@ -1529,7 +1534,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp4c_turns.png?v=20261113" alt="Experiment 4c: starting model against the student trained on the reopened frames only: flagged share with wrong truth and blind frames, and frames the confidence rule calls closed"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-23:</span>Experiment 4c per video: starting model (grey), turn-1 student (green), turn-2 student (light green, videos 1 and 15 only). (a) Flagged share of the video, with the wrong frames of the 70 truth frames and of the 34 blind frames. (b) Of the turn-1 reopened frames left out of the training set, how many are still flagged.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-24:</span>Experiment 4c per video: starting model (grey), turn-1 student (green), turn-2 student (light green, videos 1 and 15 only). (a) Flagged share of the video, with the wrong frames of the 70 truth frames and of the 34 blind frames. (b) Of the turn-1 reopened frames left out of the training set, how many are still flagged.</figcaption>
   </figure>
   <p class="text"><b><span lang="en">Table 9-4-11: experiment 4c, starting model → student</span></b></p>
   <div class="tablebox"><table>
@@ -1580,12 +1585,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp5a.png" alt="Experiment 5a: points replaced by the four variants on the 19 videos and frames where they differ; frames with every point right per variant on the judged frames"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-24:</span>(a) The 19 whole videos: the four variants repair the same frames and differ only slightly in the points replaced. (b) Judged frames with every point right per variant, dark for the frames where A, B, C differ, light for those where C and D differ.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-25:</span>(a) The 19 whole videos: the four variants repair the same frames and differ only slightly in the points replaced. (b) Judged frames with every point right per variant, dark for the frames where A, B, C differ, light for those where C and D differ.</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_exp5a_examples.jpg" alt="Two judged frames: one where D replaces a further point and is right, one where C and D agree"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-25:</span>Two judged frames. Blue circles are the replaced points, arrows from the model's position. Top: D replaces one corner point more and is judged right. Bottom: C and D agree and are judged right.</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-26:</span>Two judged frames. Blue circles are the replaced points, arrows from the model's position. Top: D replaces one corner point more and is judged right. Bottom: C and D agree and are judged right.</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion of 5a:</span>the four variants give the same result on the truth frames; where they differ, the judgment by eye favours D. The final version uses D.</div>
@@ -1657,12 +1662,12 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_all_turns_detectors.png?v=20261114" alt="Every experiment turn by turn on the four videos: wrong blind frames of 34 and flagged share, starting model, turns 1 to 3"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-26:</span>Every experiment turn by turn on the four videos, four rows from the top: wrong predictions among the 34 blind frames; flagged share of the video; the low-confidence detector; the jump detector (log axes on the last three; on the last two the starting model is 5% by construction). Each experiment has the same colour in every figure. x: starting model, turns 1 to 3, a point for every turn that was run; 4c is run on videos 1 and 15 only. A hollow marker is the same turn-1 model trained again with another random seed (5b on videos 1, 15, 6, experiment 3 on video 8).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Every experiment turn by turn on the four videos, four rows from the top: wrong predictions among the 34 blind frames; flagged share of the video; the low-confidence detector; the jump detector (log axes on the last three; on the last two the starting model is 5% by construction). Each experiment has the same colour in every figure. x: starting model, turns 1 to 3, a point for every turn that was run; 4c is run on videos 1 and 15 only. A hollow marker is the same turn-1 model trained again with another random seed (5b on videos 1, 15, 6, experiment 3 on video 8).</figcaption>
   </figure>
   <figure>
     <div class="figbox wide"><img src="assets/fig_loop_round2_frames.png?v=20261113" alt="Turn 2 against turn 1 on the blind frames, frame by frame: wrong in both turns, wrong to right, right to wrong, by stratum"></div>
     
-    <figcaption lang="en"><span class="tag">Figure 9-27:</span>Turn 2 against turn 1 on the 34 blind frames, frame by frame, summed over the four videos (4c: videos 1 and 15): frames wrong in both turns, wrong to right, right to wrong; colour = the blind frame's stratum (A = flagged by the starting model only, B = flagged by both models, C, D = other strata, supplement = frames two models disagree on).</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-28:</span>Turn 2 against turn 1 on the 34 blind frames, frame by frame, summed over the four videos (4c: videos 1 and 15): frames wrong in both turns, wrong to right, right to wrong; colour = the blind frame's stratum (A = flagged by the starting model only, B = flagged by both models, C, D = other strata, supplement = frames two models disagree on).</figcaption>
   </figure>
   
   <div class="concl" lang="en"><span class="tag">Conclusion on turns 2 and 3:</span>
@@ -1678,7 +1683,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <ol>
       <li><b>The loop helps.</b> After one turn the wrong predictions among the four videos' 136 blind frames fall from 48 to 14 to 17, the wrong frames among the 280 truth frames from 9 to 1 or 2, the flagged share to 5% to 38% of the starting model's (experiment 2: 10% to 63%), and the median error is about unchanged (within 0.4% of the eye width). The repair of 9.3 does not reach this: on the same hard blind frames 15 are still wrong after the repair, 0 to 3 for the loop models. Training turn 1 again with the random seed changed from 42 to 43 and nothing else (5b on videos 1, 15, 6, experiment 3 on video 8) gives a stable result: the same wrong truth frames, wrong blind frames 0 to 3 apart and still far fewer than the starting model's (2 to 5 against 9 to 17), so the gain of turn 1 is not the accident of one training. Between two seeds the flagged count differs by 6% to 23%, which is the yardstick for calling two models different; on video 0 the wrong truth frames go from 5 to 2 with the other seed, on different frames, and both seeds are worse than the starting model.</li>
       <li><b>Each of the three kinds of frames helps, and together they do about the same.</b> The unflagged frames (experiment 1), the repaired frames (experiment 2) and the frames wrongly called closed and then repaired (4c) each improve the model when added alone. The first turns of experiments 1, 2, 3 and 5b are wrong on 17 / 15 / 14 / 15 blind frames over the four videos, differences of about the size of the seed noise, so no ranking is made between them; the final version (5b) uses all three: every 30th unflagged frame plus all repaired frames, with the confidence criterion for closed eyes.</li>
-      <li><b>One turn.</b> In turns 2 and 3 the wrong blind and truth frames of every experiment move only about as much as the random seed alone moves them, and every experiment has stopped by the stop rule (Table 9-4-13, Figure 9-26). The flagged share and the two independent detectors (low confidence and jump, computed for every turn of every experiment) keep falling a little afterwards on videos 6 and 15, the jump detector by more than two seeds differ (video 6: from 1.2% to 1.6% down to 0.8% to 0.9%, against 0.04 percentage points between seeds), and rise again on video 1 for experiments 3 and 5b; the wrong blind and truth frames do not fall with them, and with 34 and 70 frames per video these two yardsticks cannot resolve a change that small.</li>
+      <li><b>One turn.</b> In turns 2 and 3 the wrong blind and truth frames of every experiment move only about as much as the random seed alone moves them, and every experiment has stopped by the stop rule (Table 9-4-13, Figure 9-27). The flagged share and the two independent detectors (low confidence and jump, computed for every turn of every experiment) keep falling a little afterwards on videos 6 and 15, the jump detector by more than two seeds differ (video 6: from 1.2% to 1.6% down to 0.8% to 0.9%, against 0.04 percentage points between seeds), and rise again on video 1 for experiments 3 and 5b; the wrong blind and truth frames do not fall with them, and with 34 and 70 frames per video these two yardsticks cannot resolve a change that small.</li>
       <li><b>The result holds for the current procedure.</b> Every turn trains on the human labels plus that turn's frames only, and the previous turn's frames are not carried over; a second turn left with few new frames (experiment 2, 4c) falls back. Cumulative training that carries the earlier turns' frames along was not run. Each video has 34 blind frames, and the random seed alone moves the count by 0 to 3.</li>
       <li><b>Conditions of use and the remaining wrong frames.</b> On video 0 the loop does not help (wrong truth frames 0 → 5, 0 → 2 with another seed): the video is 5 minutes long, no frame of its last third can enter the training set, and its human labels and training length are the smallest. The remaining wrong frames are mostly squinting frames both finders flag and the second peak cannot repair; the loop does not learn them. The whole chain is automatic for a new video: every threshold comes from the video's own labels, no further labels needed.</li>
     </ol>
