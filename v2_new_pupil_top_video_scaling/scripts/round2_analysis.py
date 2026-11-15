@@ -68,10 +68,10 @@ def main():
     summ, chg, chg3 = [], [], []
     for v in VIDEOS:
         P = blind_frames(v)
-        extra = blind_frames_model(v, [f"round{r}_reopened" for r in (1, 2)] + ["round3_every30", "round3_repaired"])   # models blind_test_set.py does not list
+        extra = blind_frames_model(v, [f"round{r}_reopened" for r in (1, 2)] + ["round3_every30", "round3_repaired", "round4_repaired"])   # models blind_test_set.py does not list
         P = pd.concat([P, extra], ignore_index=True)
         for src, label in [("teacher", "starting model")] + list(EXPS.items()):
-            for r in ((0,) if src == "teacher" else (1, 2, 3)):
+            for r in ((0,) if src == "teacher" else (1, 2, 3, 4)):   # turn 4: experiment 2 on video 6 only (2026-11-15)
                 m = "teacher" if src == "teacher" else f"round{r}_{src}"
                 e = ST / f"video{v:02d}" / m / "eval.csv"
                 if not e.exists():
@@ -80,7 +80,7 @@ def main():
                 g = P[P.model == m]
                 main_ = g[~g.stratum.astype(str).str.startswith(("E", "F"))]
                 sup = g[g.stratum.astype(str).str.startswith(("E", "F"))]
-                if m.endswith("_reopened") or m.startswith("round3_"):   # the committed one-model score must agree
+                if m.endswith("_reopened") or m.startswith(("round3_", "round4_")):   # the committed one-model score must agree
                     bs = ST / f"video{v:02d}" / m / "blind_scores.csv"
                     if bs.exists() and len(g):
                         S = pd.read_csv(bs)
@@ -147,7 +147,7 @@ def main():
         t0 = int(pd.read_csv(ST / f"video{v:02d}" / "loop_status.csv").iloc[0].flagged_prev)     # the starting model's flagged frames (round 0 of the loop)
         for src, name in (("every30", "experiment 1"), ("repaired", "experiment 2"), ("reopened", "experiment 4c")):
             prev_f, prev_b = t0, int(S[(S.video == v) & (S.experiment == "teacher")].blind_wrong_34.iloc[0])
-            for r in (1, 2, 3):
+            for r in (1, 2, 3, 4):
                 g = S[(S.video == v) & (S.experiment == src) & (S.turn == r)]
                 if not len(g):
                     break

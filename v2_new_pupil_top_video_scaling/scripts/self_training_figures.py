@@ -849,10 +849,12 @@ def fig_experiment_full(src, seeds=False):
     vids = [v for v in range(19) if (ST_ / f"video{v:02d}" / name(1) / "eval.csv").exists()]
     fname, label = TURN_OUT[src]
     nb = TURN_BLIND.get(src, 24)
-    series = [(0, COL["teacher"], "starting model")] + [(r, TURN_COL[src][r - 1], f"{label}, turn {r}") for r in (1, 2, 3)]
+    turns = (1, 2, 3) + tuple(r for r in (4,) if any((ST_ / f"video{v:02d}" / name(r) / "eval.csv").exists() for v in vids))   # a fourth turn exists for experiment 2 on video 6 only (2026-11-15)
+    cols = TURN_COL[src] + ["#fcefe3"]
+    series = [(0, COL["teacher"], "starting model")] + [(r, cols[r - 1], f"{label}, turn {r}") for r in turns]
     S = pd.read_csv(R2 / "summary.csv")
     Dd = pd.read_csv(R2 / "independent_detectors.csv")
-    E = {(v, r): pd.read_csv(ST_ / f"video{v:02d}" / name(r) / "eval.csv").iloc[0] for v in vids for r in range(4)
+    E = {(v, r): pd.read_csv(ST_ / f"video{v:02d}" / name(r) / "eval.csv").iloc[0] for v in vids for r in range(5)
          if (ST_ / f"video{v:02d}" / name(r) / "eval.csv").exists()}
     bv = [v for v in vids if len(S[(S.video == v) & (S.experiment == "teacher")])]
 
@@ -875,7 +877,7 @@ def fig_experiment_full(src, seeds=False):
               (blind, f"wrong blind frames (of {nb})", "{:.0f}", bv), (ev("flagged_either_pct"), "flagged (fitting + PCA), % of the video", "{:.1f}", vids),
               (det("indep_lowconf_pct"), "flagged (low confidence), % of the video", "{:.1f}", vids), (det("indep_jump_pct"), "flagged (jump), % of the video", "{:.1f}", vids)]
     fig, axes = plt.subplots(2, 3, figsize=(17.5, 7.6))
-    w = 0.8 / 4
+    w = 0.8 / (len(turns) + 1)
     for ax, (value, ylabel, fmt, xv) in zip(axes.ravel(), panels):
         many = len(xv) > 6
         fs = 6.5 if many else 8
@@ -883,7 +885,7 @@ def fig_experiment_full(src, seeds=False):
         for j, (r, c, lab) in enumerate(series):
             pts = [(i, value(v, r)) for i, v in enumerate(xv)]
             pts = [(i, y) for i, y in pts if y is not None and np.isfinite(y)]
-            xs = [i + (j - 1.5) * w for i, _ in pts]
+            xs = [i + (j - len(turns) / 2) * w for i, _ in pts]
             ax.bar(xs, [y for _, y in pts], w * 0.9, color=c, label=lab, edgecolor=TURN_COL[src][0] if r > 1 else "white", linewidth=0.5)
             for x, (_, y) in zip(xs, pts):
                 ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=fs, color="#222", rotation=rot(fmt.format(y)))
@@ -896,7 +898,7 @@ def fig_experiment_full(src, seeds=False):
                 y = value(v, 1, m)
                 if y is None:
                     continue
-                x = i + 0.5 * w
+                x = i + (2 - len(turns) / 2) * w
                 ax.bar([x], [y], w * 0.9, color=TURN_COL[src][0], hatch="////", edgecolor="white", linewidth=0.5, label=f"{label}, turn 1 with another seed" if first else None)
                 ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=fs, color="#222", rotation=rot(fmt.format(y)))
                 first = False

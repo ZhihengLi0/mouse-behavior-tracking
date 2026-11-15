@@ -1,0 +1,5 @@
+set,model,frames,median_error_pct,wrong_frames
+main,teacher,24,10.93,9
+main,round3_every30,24,6.2,2
+supplement,teacher,10,13.01,3
+supplement,round3_every30,10,12.37,2

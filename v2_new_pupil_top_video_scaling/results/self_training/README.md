@@ -804,6 +804,36 @@ show whether turn 2 changes anything; a new set is drawn for the final version o
   the style of the other experiments (Figure 9-27 `figures/loop_exp5b_full.png`); the two all-experiment figures of the
   turns subsection are no longer on the page. `python self_training_figures.py --exp5` (`fig_exp5b_full`, `fig_exp5c`).
 
+### Two chains turned once past the stop rule (2026-11-14/15)
+
+User 2026-11-14: "把实验12最最没有饱和的视频继续跑", stopped at noon, resumed in the evening ("我们没跑完的继续跑", "一直跑…直到
+补齐所有实验"). The two comparison chains whose flagged frames (fitting + PCA) fell most in their last turn, although the
+stop rule had already fired on the blind condition, were given one more turn with each experiment's own rules:
+experiment 1 on video 8, turn 3 (`round3_every30`, shuffle 9083) and experiment 2 on video 6, turn 4
+(`round4_repaired`, shuffle 9564 = 9500 + 10 x video + round). Drivers `tools/more_turns_1114.sh`,
+`tools/finish_more_turns_1114.sh`, `tools/continue_to_stop_1114.sh` (applies the stop rule after each turn with
+`tools/stop_check.py`, the formula of `round2_analysis.py`, and would have gone on to turn 5); log `more_turns.log`.
+
+| chain | frames added | median truth error (%) | wrong truth of 70 | flagged frames (fitting + PCA) | flagged share (%) | blind wrong of 34 | low confidence (%) | jump (%) | stop rule |
+|---|---|---|---|---|---|---|---|---|---|
+| experiment 1, video 8, turn 2 → 3 | 1994 → 2035 | 5.06 → 4.87 | 0 → 0 | 1528 → 1510 (0.99) | 2.13 → 2.10 | 4 → 4 | 0.87 → 0.82 | 0.95 → 0.94 | stop (both conditions) |
+| experiment 2, video 6, turn 3 → 4 | 287 → 155 | 1.50 → 1.64 | 0 → 0 | 1169 → 6887 (5.89) | 1.63 → 9.60 | 4 → 3 | 1.49 → 2.93 | 4.56 → 6.74 | stop (flagged) |
+
+- Experiment 1, video 8: turn 3 is level with turn 2 on every measure; on the blind frames one frame turns right
+  (img104, E_t) and one wrong (img103, E_t).
+- Experiment 2, video 6: with 155 repaired frames (138 of them with `eyelid_top` replaced) on top of the 400 human
+  labels the model falls back: 9.60 % of the video flagged, above the starting model's 5.41 % (fitting 9.25 %, PCA
+  6.86 %), jump detector 6.74 % against the starting model's 5.00 %. Only 347 of the 6887 flagged frames were flagged
+  in turn 3; 76 % of them lie in the fifth to seventh tenth of the video. The 70 truth frames stay right and the blind
+  count is 3 (24: 3, supplement: 0), so the truth and blind frames do not show the fall. Same pattern as the second
+  turns of experiment 2 on videos 1, 8, 15 and of 4c: a turn trains on the human labels plus that turn's frames only,
+  and a turn left with few frames loses what the earlier turns had added.
+- Every chain of experiments 1, 2, 3, 4c and 5b has now stopped by the rule in use (`round2_analysis/stop_rule.csv`,
+  43 rows). `round2_analysis.py` covers turn 4 (summary 47 rows, +2; no existing row changed);
+  `independent_detectors.csv` 70 rows (+2). Page: Table 9-4-14 rows of video 8 experiment 1 and video 6 experiment 2,
+  Figures 9-15 and 9-16 (`fig_experiment_full` draws a fourth turn when one exists; the experiment 3 figure is
+  byte-identical after the change).
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is
