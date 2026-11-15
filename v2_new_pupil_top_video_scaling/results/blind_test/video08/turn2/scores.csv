@@ -11,6 +11,10 @@ round2_formal,T2,7,0,8.48
 round2_formal,T1,10,0,7.86
 round2_formal,TB,8,8,60.57
 round2_formal,TN,3,0,7.16
+round1_formal_seed43,T2,7,1,7.85
+round1_formal_seed43,T1,10,0,9.25
+round1_formal_seed43,TB,8,8,60.65
+round1_formal_seed43,TN,3,0,5.38
 round1_both,T2,7,0,8.43
 round1_both,T1,10,0,9.5
 round1_both,TB,8,8,65.03
@@ -30,6 +34,7 @@ round2_repaired,TN,3,0,5.06
 teacher,all,28,17,21.39
 round1_formal,all,28,7,8.89
 round2_formal,all,28,8,9.02
+round1_formal_seed43,all,28,9,9.71
 round1_both,all,28,8,10.02
 round2_both,all,28,8,10.06
 round1_repaired,all,28,7,8.63

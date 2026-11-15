@@ -691,6 +691,13 @@ Video 6 (2026-11-14 10:09, training 06:57 to 08:42, prediction to 10:09): seed 4
 322 (ratio 1.06; 265 flagged by both, 57 by seed 42 only, 76 by seed 43 only), blind 2 of 34 against 5 (24: 2 and 4,
 supplement: 0 and 1): the largest blind difference of the pairs, with the smallest difference in flagged frames.
 
+Video 8, final loop 5b (2026-11-14 21:08, training 17:42, prediction to 21:07; added because the 5b replicate existed
+for videos 1, 15, 6 only; driver `tools/seed_replicate_v8_1114.sh`, shuffle 7082): seed 43 against seed 42: wrong truth
+frames 0 and 0, median 5.04 and 5.08, per-frame truth errors differ by 0.08 % of the eye width in the median (largest
+5.6, 5 of 70 frames by more than 1 %), flagged frames 2673 against 2449 (ratio 1.09; 1311 flagged by both, 1138 by
+seed 42 only, 1362 by seed 43 only), blind 2 of 34 against 2 (24: 2 and 2, supplement: 0 and 0); low confidence 0.87
+against 0.86 %, jump 1.27 against 1.09 % (`round2_analysis/independent_detectors.csv`, one row added, no other row changed).
+
 Summary of the seed pairs (turn 1; seed 42 / seed 43; all else identical):
 
 | video | model | wrong truth of 70 | flagged frames | ratio | blind wrong of 34 | starting model: truth, flagged, blind |
@@ -699,6 +706,7 @@ Summary of the seed pairs (turn 1; seed 42 / seed 43; all else identical):
 | 1 | 5b | 1 / 1 | 575 / 705 | 1.23 | 4 / 2 | 8, 10987, 17 |
 | 15 | 5b | 0 / 0 | 1935 / 1773 | 0.92 | 4 / 4 | 0, 5500, 10 |
 | 6 | 5b | 0 / 0 | 322 / 341 | 1.06 | 5 / 2 | 0, 3883, 9 |
+| 8 | 5b (added 2026-11-14 evening) | 0 / 0 | 2449 / 2673 | 1.09 | 2 / 2 | 1, 6383, 12 |
 | 0 | experiment 1 | 5 / 2 | 474 / 410 | 0.86 | no blind set | 0, 220, |
 
 On the four videos with blind frames the first turn's gain holds with either seed (blind 12, 17, 10, 9 at the start
@@ -706,6 +714,7 @@ against 2 to 5); between the seeds the wrong truth frames are equal, the flagged
 blind count by 0 to 3 frames of 34 (1, 2, 0, 3). The earlier band "9 % and 1 frame" (one pair) was too narrow: a
 blind difference of up to 3 frames per video and a flagged ratio between about 0.8 and 1.25 cannot be told from
 training noise. Video 0 stays the exception: both seeds are worse than its starting model.
+The pair added later (video 8, 5b) lies inside these ranges: flagged count 9 % apart, blind count equal.
 
 ### The two independent detectors for every model (2026-11-14)
 
@@ -780,6 +789,11 @@ show whether turn 2 changes anything; a new set is drawn for the final version o
   After the review, by stratum (four videos): T1 (40 frames) 16 → 4 → 1, TB (28) 21 → 20 → 21, T2 (28) 16 → 1 → 5,
   TN (12) 6 → 0 → 0. Turn 1 against turn 2 frame by frame: 4 wrong to right, 6 right to wrong, 21 wrong in both.
   Turn 1 with seed 43: video 1 7, video 15 6, video 6 4 (seed 42: 9, 5, 4); video 15 turn 3: 5.
+  Added 2026-11-14 21:08: video 8 turn 1 with seed 43: 9 (seed 42: 7; before the review 9 against 8), so the four
+  videos give 26 with seed 43 against 25 with seed 42 and 27 for turn 2; per video the seeds differ by 2, 2, 1, 0
+  frames (videos 1, 8, 15, 6) and turn 2 differs from turn 1 by +3, +1, -1, -1. Correction to the reading below:
+  "all within the seed band" is not exact for video 1 (+3 against a seed difference of 2 on these frames); the page
+  now gives both sets of numbers instead of that phrase.
 - Reading: on frames neither turn has seen, turn 2 is not wrong on fewer frames than turn 1 (two videos more, two
   fewer, all within the seed band), before and after the review; turn 1's gain over the starting model is confirmed.
   The frames only turn 1 flags are mostly right for turn 1 (false alarms), the frames both flag are mostly wrong for

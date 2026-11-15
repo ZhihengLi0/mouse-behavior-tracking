@@ -1976,7 +1976,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
   <p class="text"><b><span lang="zh">5b 最终版本的 loop</span><span lang="en">5b The loop in its final version</span></b></p>
   <div class="tablebox"><table class="info"><tbody>
     <tr><th><span lang="zh">做法</span><span lang="en">Procedure</span></th><td><span lang="zh">实验三的流程；修复用 5a 的 D 和实验四的置信度判据，其余规则不变。</span><span lang="en">The procedure of experiment 3; the repair uses D of 5a and the confidence criterion of experiment 4; every other rule unchanged.</span></td></tr>
-    <tr><th><span lang="zh">停止</span><span lang="en">Stop</span></th><td><span lang="zh">和实验三相同：标出帧数（fitting + PCA）不低于上一圈的 90%，或 34 帧盲测帧里预测错的没有减少，就停。90% 的依据：同一圈只换随机种子重训，标出帧数就会差 6% 到 23%（四个视频各一对；定规则时只有视频 8 的一对，差 9%）。</span><span lang="en">As in experiment 3: stop when the flagged frames (fitting + PCA) are not below 90% of the previous turn's, or the wrong predictions among the 34 blind frames are not fewer. Basis of the 90%: the same turn retrained with another random seed differs by 6% to 23% in flagged frames (one pair on each of four videos; when the rule was set only the pair on video 8 existed, 9% apart).</span></td></tr>
+    <tr><th><span lang="zh">停止</span><span lang="en">Stop</span></th><td><span lang="zh">和实验三相同：标出帧数（fitting + PCA）不低于上一圈的 90%，或 34 帧盲测帧里预测错的没有减少，就停。90% 的依据：同一圈只换随机种子重训，标出帧数就会差 6% 到 23%（四个视频共五对；定规则时只有视频 8 的一对，差 9%）。</span><span lang="en">As in experiment 3: stop when the flagged frames (fitting + PCA) are not below 90% of the previous turn's, or the wrong predictions among the 34 blind frames are not fewer. Basis of the 90%: the same turn retrained with another random seed differs by 6% to 23% in flagged frames (five pairs on four videos; when the rule was set only the pair on video 8 existed, 9% apart).</span></td></tr>
     <tr><th><span lang="zh">看什么</span><span lang="en">What to read</span></th><td><span lang="zh">在四个视频上和实验三第一圈比（表 9-4-12）。视频 8、6 几乎没有放出来的闭眼帧，它们的变化是 D 的效果；视频 15、1 多出来的变化是闭眼帧的效果。</span><span lang="en">Against experiment 3's first turn on the four videos (Table 9-4-12). Videos 8 and 6 have almost no reopened frames, so their change is D's effect; what videos 15 and 1 change beyond that is the effect of the reopened frames.</span></td></tr>
     <tr><th><span lang="zh">结果</span><span lang="en">Result</span></th><td><span lang="zh">四个视频的 loop 都按停止规则停下：视频 1、8、6 停在第二圈，视频 15 停在第三圈（表 9-4-12）。每圈另记录两项 loop 本身不用的检测指标：8 个点里最低置信度低于起点模型 5% 分位的帧占比，相邻帧最大位移超过起点模型 95% 分位的帧占比；用来检查标出率（fitting + PCA）下降是不是错误真的变少。</span><span lang="en">All four loops have stopped by the rule: videos 1, 8 and 6 at turn 2, video 15 at turn 3 (Table 9-4-12). Every turn also records two detectors the loop itself never uses: the share of frames whose lowest point confidence is below the starting model's 5% quantile, and the share whose largest frame-to-frame move exceeds the starting model's 95% quantile; they check that a falling flagged share (fitting + PCA) means fewer errors.</span></td></tr>
   </tbody></table></div>
@@ -2004,7 +2004,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     </tbody>
   </table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_exp5b_full.png?v=20261114b" alt="Experiment 5b, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share by the two finders, by low confidence, by jumps"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_exp5b_full.png?v=20261114c" alt="Experiment 5b, every video and turn: wrong truth frames, median error, wrong blind frames, flagged share by the two finders, by low confidence, by jumps"></div>
     <figcaption lang="zh"><span class="tag">图 9-27：</span>实验五 5b。灰 = 起点模型，粉 = 第一圈，斜纹 = 第一圈只换随机种子重训，紫 = 第二圈，棕 = 第三圈。面板同图 9-15，盲测帧是全部 34 帧。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-27:</span>Experiment 5b. Grey = starting model, pink = turn 1, hatched = turn 1 trained again with another random seed, purple = turn 2, brown = turn 3. Panels as in Figure 9-15, with all 34 blind frames.</figcaption>
   </figure>
@@ -2030,18 +2030,18 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tbody>
       <tr><td><span lang="zh">复核后</span><span lang="en">After the review</span></td><td>24 → 9 → 12</td><td>17 → 7 → 8</td><td>11 → 5 → 4</td><td>7 → 4 → 3</td><td>59 → 25 → 27</td></tr>
       <tr><td><span lang="zh">复核前（完全盲标）</span><span lang="en">Before the review (fully blind)</span></td><td>24 → 9 → 12</td><td>18 → 8 → 10</td><td>13 → 6 → 7</td><td>8 → 5 → 5</td><td>63 → 28 → 34</td></tr>
-      <tr><td><span lang="zh">5b 第一圈只换随机种子重训（复核后）</span><span lang="en">5b turn 1 retrained with another random seed (after the review)</span></td><td>7</td><td><span lang="zh">没有跑</span><span lang="en">not run</span></td><td>6</td><td>4</td><td>—</td></tr>
+      <tr><td><span lang="zh">5b 第一圈只换随机种子重训（复核后）</span><span lang="en">5b turn 1 retrained with another random seed (after the review)</span></td><td>7</td><td>9</td><td>6</td><td>4</td><td>26</td></tr>
     </tbody>
   </table></div>
   <div class="concl" lang="zh"><span class="tag">5c 的结论：</span>在两圈都没见过的新帧上，5b 第二圈没有比第一圈少错；转一圈就够。
     <ol>
-      <li>四个视频上，第一圈都比起点模型错得少得多；第二圈和第一圈差不多：视频 1、8 多错 3 帧和 1 帧，视频 15、6 各少错 1 帧（图 9-28）。作为参照，第一圈只换随机种子重训，在同一批帧上和原来相差 2、1、0 帧（视频 1、15、6；表 9-4-13）。</li>
+      <li>四个视频上，第一圈都比起点模型错得少得多；第二圈和第一圈差不多：视频 1、8 多错 3 帧和 1 帧，视频 15、6 各少错 1 帧（图 9-28）。作为参照，第一圈只换随机种子重训，在同一批帧上每个视频和原来相差 0 到 2 帧（表 9-4-13）。</li>
       <li>复核前后结论相同。</li>
     </ol>
   </div>
   <div class="concl" lang="en"><span class="tag">Conclusion of 5c:</span>on new frames neither turn has seen, the second turn of 5b is not wrong on fewer frames than the first; one turn is enough.
     <ol>
-      <li>On all four videos turn 1 is wrong on far fewer frames than the starting model; turn 2 is about the same as turn 1: 3 and 1 more wrong frames on videos 1 and 8, 1 fewer on each of videos 15 and 6 (Figure 9-28). For reference, turn 1 retrained with another random seed differs from the original by 2, 1 and 0 frames on the same frames (videos 1, 15 and 6; Table 9-4-13).</li>
+      <li>On all four videos turn 1 is wrong on far fewer frames than the starting model; turn 2 is about the same as turn 1: 3 and 1 more wrong frames on videos 1 and 8, 1 fewer on each of videos 15 and 6 (Figure 9-28). For reference, turn 1 retrained with another random seed differs from the original by 0 to 2 frames per video on the same frames (Table 9-4-13).</li>
       <li>The conclusion is the same before and after the review.</li>
     </ol>
   </div>
