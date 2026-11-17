@@ -1,0 +1,2 @@
+video,unit,frames,centres,centres_flagged,centres_unflagged,starting_model_flagged_pct,guard_frames,min_spacing,frames_in_centre_bands,frames_in_truth_bands,kept_out_of_training_pct,flagged_frames_in_centre_bands,seed
+0,0_first5minvedio,18014,15,3,12,1.22,60,121,1815,6080,43.8,12,42

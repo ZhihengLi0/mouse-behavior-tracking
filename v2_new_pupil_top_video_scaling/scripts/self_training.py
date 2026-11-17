@@ -161,9 +161,13 @@ def holdout_mask(n):
 
 
 def blind_frames(v):
-    """Every frame drawn for the blind test set of the video (all 50, labeled or not) and for its supplement, or an empty list."""
+    """Every frame drawn for the blind test set of the video (all 50, labeled or not) and for its supplement, or an empty list.
+    2026-11-16: also the reserved centre frames of final_check_set.py (videoNN/reserve/selection_key.csv), written for the
+    videos that have no blind set before the final loop runs on them; the four videos with a blind set have no such
+    file, so their frames are unchanged."""
     out = []
-    for f in (RES / "blind_test" / f"video{v:02d}" / "selection_key.csv", RES / "blind_test" / f"video{v:02d}" / "supplement" / "selection_key.csv"):
+    for f in (RES / "blind_test" / f"video{v:02d}" / "selection_key.csv", RES / "blind_test" / f"video{v:02d}" / "supplement" / "selection_key.csv",
+              RES / "blind_test" / f"video{v:02d}" / "reserve" / "selection_key.csv"):
         if f.exists():
             out += pd.read_csv(f).frame.astype(int).tolist()
     return out
