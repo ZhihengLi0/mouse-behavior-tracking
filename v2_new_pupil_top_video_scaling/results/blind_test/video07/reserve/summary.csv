@@ -1,0 +1,2 @@
+video,unit,frames,centres,centres_flagged,centres_unflagged,starting_model_flagged_pct,guard_frames,min_spacing,frames_in_centre_bands,frames_in_truth_bands,kept_out_of_training_pct,flagged_frames_in_centre_bands,seed
+7,7_20251027_Pluto_spont1,71748,60,19,41,0.99,60,121,7260,8410,21.8,306,42
