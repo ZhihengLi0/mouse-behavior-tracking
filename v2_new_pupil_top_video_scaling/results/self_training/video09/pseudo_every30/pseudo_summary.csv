@@ -1,0 +1,2 @@
+video,unit,every,round,source,frames,usable_frames,near_truth_excluded,candidates,kept_frames,dropped_frames,kept_ok,kept_repaired,points_total,points_dropped_likelihood,points_dropped_fitting,points_dropped_pca,labeled_points_in_kept_frames,frames_with_8_points,eye_width_px,thr_eye_widths,thr_pca_eye_widths,guard_frames
+9,9_20251023_Pluto1,30,1,9_20251023_Pluto1DLC_Resnet50_EyePupilEllipseSep20shuffle1014_snapshot_120.h5,71748,70695,273,2080,2027,53,2027,0,16640,0,1,95,16209,2021,413.6,0.14,0.024689316009915516,60
