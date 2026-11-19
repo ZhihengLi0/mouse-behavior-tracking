@@ -1,0 +1,2 @@
+video,unit,frames,models,within_frames_of_truth_or_centre,anchors,eligible,removed_near_a_training_frame,min_distance_to_a_training_frame,whole_S,whole_T1,whole_TB,whole_T2,whole_N,eligible_S,eligible_T1,eligible_TB,eligible_T2,eligible_N,drawn_S,drawn_T1,drawn_TB,drawn_T2,drawn_N,eye_width_px,seed
+9,9_20251023_Pluto1,71748,starting model / round1_formal / round2_formal,30,130,7135,0,36,478,140,644,87,70399,174,37,285,37,6602,10,8,5,7,4,413.6,42
