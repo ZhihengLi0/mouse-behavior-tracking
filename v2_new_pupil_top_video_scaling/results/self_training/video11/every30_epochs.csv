@@ -1,0 +1,2 @@
+video,epochs,source
+11,28,train --every 30 --dry-run on pseudo_every30 (experiment 1 not trained on this video)
