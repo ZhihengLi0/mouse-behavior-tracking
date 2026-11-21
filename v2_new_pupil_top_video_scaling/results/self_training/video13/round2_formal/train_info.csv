@@ -1,0 +1,2 @@
+video,model,shuffle,teacher_shuffle,train_human,train_pseudo,val,teacher_iterations,epochs,iterations,milestones,snapshot_every,final_snapshot,train_minutes,predict_minutes,prediction_h5
+13,round2_formal,6132,1411,600,1878,20,36000,28,34692,22/27,2,snapshot-028.pt,109.3,86.3,13_20251015_Terra_spont_1DLC_Resnet50_EyePupilEllipseSep20shuffle6132_snapshot_028.h5
