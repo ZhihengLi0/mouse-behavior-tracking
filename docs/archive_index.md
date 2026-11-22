@@ -30,7 +30,7 @@ Paths inside the archive start at `dlc_projects/EyePupilEllipse-Zhiheng-2026-09-
 Shuffle numbering: video n step k = (n+1)*10 + k; 951-974 = the detector comparison on video 9; fewer-labels subsets =
 2000 + 10*video + 1..4 (sub05a, sub05b, sub10a, sub10b); 40NN = self-training students (4000 + 10*video + 1 every30, + 2 every100, + 3 second turn, + 5 repaired only); 50NN = experiment 3 loop (5000 + 10*video + round); 7081 = seed experiment; 80NN = experiment 4c (8000 + 10*video + turn); 60NN = final loop 5b (6000 + 10*video + turn); 70NN = seed-43 replicates (7003 = video 0 experiment 1; 7000 + 10*video + 2 = 5b turn 1); 90NN = experiment 1 from turn 3 (9000 + 10*video + turn); 95NN = experiment 2 from turn 4 (9500 + 10*video + turn). Scripts: `pack_models_round.sh` (tools folder of the Claude session).
 
-## Not yet on Kaiwen's Drive (state 2026-11-19 22:30)
+## Not yet on Kaiwen's Drive (state 2026-11-21 23:30)
 AnyDesk to the Ubuntu machine has failed since 2026-11-18 (`desk_rt_ipc_error`: the connection is made, the remote side
 closes it before the password step), so "Make a copy" in Kaiwen's Chrome cannot be done; Kaiwen will look at the machine
 after the weekend of 2026-11-21. Until a group is copied by Kaiwen it stays listed here, with every place that holds it.
@@ -39,7 +39,7 @@ Update the "where" columns whenever a copy is removed from the Mac, so the group
 | group | models (shuffle numbers) | size | on the Mac | on the SSD backup | on the UMN Drive | still to do |
 |---|---|---|---|---|---|---|
 | round 11 (row 11 above) | 32 models | 41.5 GB | all snapshots | all files, same sizes (dry-run comparison 2026-11-19 22:25) | packed and uploaded (13 files) | copy by Kaiwen, check sizes, delete the UMN originals |
-| round 12, not packed | final loop 5b on the other videos: 6001, 6002, 6021, 6022, 6031, 6032, 6041, 6042, 6051, 6052, 6071, 6072, 6091, 6092, 6101, 6102, 6111 (17 models so far; videos 0, 2, 3, 4, 5, 7, 9, 10 two turns, video 11 turn 1); the models of videos 11 to 18 are added as they finish | 22.8 GB so far | all snapshots | all files of the 17 models, same sizes (dry-run comparison 2026-11-19 22:25) | no (the 50 GB quota is taken by round 11) | pack once round 11 has left the UMN Drive, upload, copy by Kaiwen |
+| round 12, not packed | final loop 5b on the other videos: 6001, 6002, 6021, 6022, 6031, 6032, 6041, 6042, 6051, 6052, 6071, 6072, 6091, 6092, 6101, 6102, 6111, 6112, 6121, 6122, 6131, 6132, 6141, 6142, 6161 (25 models so far; videos 0, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14 two turns, video 16 turn 1); 6162 and the models of videos 17 and 18 are added as they finish | 31.5 GB so far | all snapshots | all files of the 25 models, same sizes (checksum pass and dry-run comparison 2026-11-21 23:30); 6162 onward not yet | no (the 50 GB quota is taken by round 11) | pack once round 11 has left the UMN Drive, upload, copy by Kaiwen |
 
 ## Other archives in `zhiheng_results/`
 | folder | content | packed | copied by Kaiwen |
