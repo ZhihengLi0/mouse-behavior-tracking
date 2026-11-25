@@ -1,0 +1,5 @@
+blind_name,frame,stratum,cluster,stratum_frames,stratum_share,weight,turn2_flag,turn3_flag,nearest_anchor_distance,video,subset,weight_subset
+img401.png,670,TN,0,5196.0,1.0,0.25,False,False,17,7,False,
+img402.png,22503,TN,3,5196.0,1.0,0.25,False,False,29,7,True,0.3333333333333333
+img403.png,59912,TN,2,5196.0,1.0,0.25,False,False,9,7,True,0.3333333333333333
+img404.png,69676,TN,1,5196.0,1.0,0.25,False,False,21,7,True,0.3333333333333333
