@@ -1,3 +1,4 @@
 video,round,flagged_prev,flagged,blind_frames,blind_wrong_prev,blind_wrong,stop,reason,wrong_truth,flagged_pct,indep_lowconf_pct,indep_jump_pct
 6,1,3883,322,34,9,5,False,,0,0.45,0.32,1.24
 6,2,322,298,34,5,3,True,flagged 298 not below 90 % of 322,0,0.42,0.29,0.88
+6,3,298,272,34,3,4,True,flagged 272 not below 90 % of 298; blind wrong 4 not below 3,0,0.38,0.32,1.0
