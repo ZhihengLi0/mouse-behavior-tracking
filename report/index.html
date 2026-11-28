@@ -81,7 +81,7 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
 
 <header>
   <h1><span lang="zh">小鼠眼睛关键点追踪：做了什么，结果是什么</span><span lang="en">Mouse eye keypoint tracking: what was done and what came out</span></h1>
-  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-28 12:45 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
+  <p class="muted small">Zhiheng Li (University of Minnesota), Kaiwen Sheng (Stanford) · <span lang="zh">页面生成时间</span><span lang="en">page built</span> 2026-11-28 12:47 · <a href="https://github.com/ZhihengLi0/mouse-behavior-tracking">GitHub: ZhihengLi0/mouse-behavior-tracking</a></p>
 
   <div class="text" lang="zh">
     <p><b>任务：</b>用 DeepLabCut 在小鼠眼睛视频的每一帧上找 8 个点：瞳孔上、下、左、右，上眼睑、下眼睑，鼻侧眼角、颞侧眼角。由这 8 个点得到瞳孔大小、眼睛睁开程度和眨眼，之后与脑记录对齐。</p>
@@ -2169,27 +2169,27 @@ math[display="block"]{margin:10px 0 6px;text-align:left;overflow-x:auto;max-widt
     <tr><th><span lang="zh">脚本和结果</span><span lang="en">Scripts and results</span></th><td><code>scripts/final_check_set.py</code>, <code>blind_turn2_set.py</code>, <code>blind_turn2_score.py</code>, <code>final_loop_summary.py</code>, <code>final_loop_figures.py</code>; <code>results/self_training/final_loop_summary.csv</code>, <code>results/blind_test/videoNN/final/</code>, <code>turn3/</code></td></tr>
   </tbody></table></div>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_final_truth_frames.png?v=20261128c" alt="Final loop on all 19 videos: wrong truth frames and median truth error for the starting model and turns 1 to 3"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_final_truth_frames.png?v=20261128d" alt="Final loop on all 19 videos: wrong truth frames and median truth error for the starting model and turns 1 to 3"></div>
     <figcaption lang="zh"><span class="tag">图 9-29：</span>5d，19 个视频的真值帧（每个视频固定的 70 帧）。灰 = 起点模型，粉 = 第一圈，紫 = 第二圈，棕 = 第三圈。上：真值帧里预测错的帧数；下：真值帧的误差中位数。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-29:</span>5d, truth frames of the 19 videos (the same 70 frames of every video). Grey = starting model, pink = turn 1, purple = turn 2, brown = turn 3. Top: wrong truth frames; bottom: median error on the truth frames.</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_final_flagged.png?v=20261128c" alt="Final loop on all 19 videos: flagged share of the whole video (fitting + PCA) for the starting model and turns 1 to 3"></div>
-    <figcaption lang="zh"><span class="tag">图 9-30：</span>5d，整段标出率，不用人工标注。颜色同图 9-29。上：loop 自己用的两种找帧信号的标出率（fitting + PCA），视频 1 起点模型的柱超出纵轴，数值写在柱上。下：对照，loop 不用的检测的标出率（跳变），虚线是起点模型（按定义 5%）。</figcaption>
-    <figcaption lang="en"><span class="tag">Figure 9-30:</span>5d, flagged share of the whole video, no hand labels involved. Colours as in Figure 9-29. Top: flagged share by the two finders the loop uses (fitting + PCA); the starting-model bar of video 1 exceeds the axis and carries its value. Bottom: the control, flagged share by a detector the loop never uses (jump); the dashed line is the starting model (5% by construction).</figcaption>
+    <div class="figbox wide"><img src="assets/fig_loop_final_flagged.png?v=20261128d" alt="Final loop on all 19 videos: flagged share of the whole video (fitting + PCA) for the starting model and turns 1 to 3"></div>
+    <figcaption lang="zh"><span class="tag">图 9-30：</span>5d，整段标出率，不用人工标注。颜色同图 9-29。上：loop 自己用的两种找帧信号的标出率（fitting + PCA），视频 1 起点模型的柱超出纵轴，数值写在柱上。下：对照，loop 不用的检测的标出率（跳变），起点模型按定义是 5%。</figcaption>
+    <figcaption lang="en"><span class="tag">Figure 9-30:</span>5d, flagged share of the whole video, no hand labels involved. Colours as in Figure 9-29. Top: flagged share by the two finders the loop uses (fitting + PCA); the starting-model bar of video 1 exceeds the axis and carries its value. Bottom: the control, flagged share by a detector the loop never uses (jump); the starting model is 5% by construction.</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_final_check_turn1.png?v=20261128c" alt="Final loop, turn 1 against the starting model: wrong frames per video among the frames labeled to check turn 1"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_final_check_turn1.png?v=20261128d" alt="Final loop, turn 1 against the starting model: wrong frames per video among the frames labeled to check turn 1"></div>
     <figcaption lang="zh"><span class="tag">图 9-31：</span>5d，检验第一圈：检验第一圈的帧里预测错的帧数，起点模型和第一圈。视频号下面是比较的帧数，带 * 的是有盲测帧的四个视频。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-31:</span>5d, check of turn 1: wrong frames among the frames labeled to check turn 1, starting model and turn 1. Below each video number: frames compared; * marks the four videos with blind frames.</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_final_check_turn2.png?v=20261128c" alt="Final loop, turn 2 against turn 1: wrong frames per video among the frames labeled to check turn 2"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_final_check_turn2.png?v=20261128d" alt="Final loop, turn 2 against turn 1: wrong frames per video among the frames labeled to check turn 2"></div>
     <figcaption lang="zh"><span class="tag">图 9-32：</span>5d，检验第二圈：检验第二圈的帧里预测错的帧数，第一圈和第二圈。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-32:</span>5d, check of turn 2: wrong frames among the frames labeled to check turn 2, turn 1 and turn 2.</figcaption>
   </figure>
   <figure>
-    <div class="figbox wide"><img src="assets/fig_loop_final_check_turn3.png?v=20261128c" alt="Final loop, turn 3 against turn 2: wrong frames per video among the frames labeled to check turn 3, three videos labeled so far"></div>
+    <div class="figbox wide"><img src="assets/fig_loop_final_check_turn3.png?v=20261128d" alt="Final loop, turn 3 against turn 2: wrong frames per video among the frames labeled to check turn 3, three videos labeled so far"></div>
     <figcaption lang="zh"><span class="tag">图 9-33：</span>5d，检验第三圈：检验第三圈的帧里预测错的帧数，第二圈和第三圈。只有已标的视频 0、1、2 有柱；其余 16 个视频还没标。</figcaption>
     <figcaption lang="en"><span class="tag">Figure 9-33:</span>5d, check of turn 3: wrong frames among the frames labeled to check turn 3, turn 2 and turn 3. Only videos 0, 1 and 2, labeled so far, have bars; the other 16 videos are not labeled yet.</figcaption>
   </figure>

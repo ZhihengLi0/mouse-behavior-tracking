@@ -101,13 +101,14 @@ def fig_flagged(T):
     turns = [m for m in MODELS if m != "teacher"]
     start = T[T.model == "teacher"].jump.dropna()
     assert (start == 5.0).all(), "the starting model flags 5 % by construction"
-    grouped(ax, T, "jump", "flagged (jump), % of the video", models=turns)
-    ax.axhline(5.0, color=MODELS["teacher"][1], linestyle="--", linewidth=1.2, label="starting model: 5 % by construction")
-    ax.set_ylim(0, 5.6)
+    J = T.copy()                                 # the threshold is the starting model's own 95 % quantile, so its share is 5 %
+    J.loc[J.model == "teacher", "jump"] = 5.0    # on every video (older eval.csv files of the starting model do not store it)
+    grouped(ax, J, "jump", "flagged (jump), % of the video")
+    ax.set_ylim(0, 6.3)
     mj = T.groupby("model").jump.mean()
     ax.set_title("Control, a detector the loop never uses (jump): mean over the 19 videos 5.00 → "
-                 + " → ".join(f"{mj[m]:.2f}" for m in turns) + " % of the video", fontsize=11, loc="left")
-    ax.legend(ncol=4, frameon=False, loc="upper right", bbox_to_anchor=(1.0, 0.9))
+                 + " → ".join(f"{mj[m]:.2f}" for m in turns) + " % of the video  (starting model: 5 % by construction)", fontsize=11, loc="left")
+    ax.legend(ncol=4, frameon=False, loc="upper right")
     ax.set_xlabel("video")
     fig.tight_layout()
     fig.savefig(OUT / "loop_final_flagged.png", dpi=170)
