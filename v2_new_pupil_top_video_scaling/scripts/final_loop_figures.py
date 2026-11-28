@@ -43,16 +43,17 @@ def truth():
         for m in MODELS:
             e = pd.read_csv(ST / f"video{v:02d}" / m / "eval.csv").iloc[0]
             rows.append({"video": v, "model": m, "wrong": int(e.wrong_frames), "median": float(e.median_error_pct),
-                         "flagged": float(e.flagged_either_pct)})
+                         "flagged": float(e.flagged_either_pct), "jump": float(e.get("indep_jump_pct", np.nan))})
     return pd.DataFrame(rows)
 
 
-def grouped(ax, T, col, ylabel, labels=False, clip=None, fmt="{:.0f}"):
-    """Four bars per video (starting model and the three turns)."""
+def grouped(ax, T, col, ylabel, labels=False, clip=None, fmt="{:.0f}", models=None):
+    """One bar per model and video (by default the starting model and the three turns)."""
+    models = {m: MODELS[m] for m in (models or MODELS)}
     w = 0.8 / len(MODELS)
-    for j, (m, (lab, c)) in enumerate(MODELS.items()):
+    for j, (m, (lab, c)) in enumerate(models.items()):
         g = T[T.model == m].sort_values("video")
-        xs = g.video.to_numpy() + (j - (len(MODELS) - 1) / 2) * w
+        xs = g.video.to_numpy() + (j - (len(models) - 1) / 2) * w
         ys = g[col].to_numpy()
         ax.bar(xs, np.minimum(ys, clip) if clip else ys, w * 0.9, color=c, label=lab, edgecolor="white", linewidth=0.5)
         for x, y in zip(xs, ys):
@@ -86,13 +87,27 @@ def fig_truth(T):
 
 
 def fig_flagged(T):
-    """Flagged share of the whole video, no labels involved."""
-    fig, ax = plt.subplots(figsize=(15.5, 4.3))
+    """Flagged share of the whole video, no labels involved. Top: the two finders the loop uses (fitting + PCA).
+    Bottom, as a control: the jump detector, which the loop never uses to pick or repair frames (largest frame-to-frame
+    move of any point, threshold where the starting model flags 5 % of the video, self_training.independent_detectors)."""
+    fig, axes = plt.subplots(2, 1, figsize=(15.5, 8.2), sharex=True)
+    ax = axes[0]
     grouped(ax, T, "flagged", "flagged (fitting + PCA), % of the video", clip=9.5)
     mean = T.groupby("model").flagged.mean()
-    ax.set_title("Flagged share of the whole video (fitting + PCA): mean over the 19 videos "
-                 + " → ".join(f"{mean[m]:.2f}" for m in MODELS) + " %", fontsize=11, loc="left")
+    ax.set_title("Flagged by the loop's own finders (fitting + PCA): mean over the 19 videos "
+                 + " → ".join(f"{mean[m]:.2f}" for m in MODELS) + " % of the video", fontsize=11, loc="left")
     ax.legend(ncol=4, frameon=False, loc="upper right")
+    ax = axes[1]
+    turns = [m for m in MODELS if m != "teacher"]
+    start = T[T.model == "teacher"].jump.dropna()
+    assert (start == 5.0).all(), "the starting model flags 5 % by construction"
+    grouped(ax, T, "jump", "flagged (jump), % of the video", models=turns)
+    ax.axhline(5.0, color=MODELS["teacher"][1], linestyle="--", linewidth=1.2, label="starting model: 5 % by construction")
+    ax.set_ylim(0, 5.6)
+    mj = T.groupby("model").jump.mean()
+    ax.set_title("Control, a detector the loop never uses (jump): mean over the 19 videos 5.00 → "
+                 + " → ".join(f"{mj[m]:.2f}" for m in turns) + " % of the video", fontsize=11, loc="left")
+    ax.legend(ncol=4, frameon=False, loc="upper right", bbox_to_anchor=(1.0, 0.9))
     ax.set_xlabel("video")
     fig.tight_layout()
     fig.savefig(OUT / "loop_final_flagged.png", dpi=170)

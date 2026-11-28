@@ -900,6 +900,12 @@ share (fitting + PCA), mean over the videos 4.08 → 1.46 → 1.29 → 1.05 % (l
 of the 19 videos); median truth error, median over the videos 2.17 → 2.15 → 2.29 → 2.40 % of the eye width (after
 three turns above the starting model's on 14 videos, below on 3, by 0.13 % of the eye width on average).
 
+Control for the flagged share: the jump detector, which the loop never uses to find or repair frames (largest
+frame-to-frame move of any point, threshold where the starting model flags 5 % of the video, `indep_jump_pct` in
+`eval.csv`). Mean over the videos 5.00 → 1.98 → 1.77 → 1.54 %; lower than the turn before on 15 (turn 2) and 16
+(turn 3) of the 19 videos. So the fall of the flagged share in turns 2 and 3 is also seen by a detector outside the
+loop, while the wrong check frames of turn 2 do not fall. Lower panel of `figures/loop_final_flagged.png`.
+
 Cost per turn (`final_loop_cost.csv`, medians over the 19 videos):
 
 | turn | frames from the model in the training set | training, min | whole-video prediction, min | all 19 videos, hours |
