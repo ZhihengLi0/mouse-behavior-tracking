@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 """Figures and two small tables for the final loop (experiment 5b) on all 19 videos, three turns (2026-11-28).
 
+Layout (user 2026-11-28): the measures every model shares get one figure each, and every turn gets its own figure on
+the frames hand-labeled for that turn:
+    loop_final_truth_frames.png   the 70 truth frames of every video: wrong frames and median error, all four models
+    loop_final_flagged.png        flagged share of the whole video (fitting + PCA), all four models
+    loop_final_check_turn1.png    turn 1 against the starting model on the check frames of turn 1
+    loop_final_check_turn2.png    turn 2 against turn 1 on the check frames of turn 2
+    loop_final_check_turn3.png    turn 3 against turn 2 on the check frames of turn 3 (only the videos labeled so far)
+
 Reads only result tables, nothing is recomputed from predictions:
     results/self_training/videoNN/{teacher,round1_formal,round2_formal,round3_formal}/eval.csv   truth frames, flagged share
     results/self_training/videoNN/roundN_formal/train_info.csv                                     frames fed back, minutes
     results/self_training/final_loop_summary.csv        written by final_loop_summary.py, which holds the decision rule
     results/blind_test/videoNN/final/per_frame.csv      hand-labeled check frames of the 15 videos without a blind set
 
-    python final_loop_figures.py  ->  results/self_training/figures/loop_final_all_videos.png    truth frames, 19 videos
-                                      results/self_training/figures/loop_final_check_frames.png  hand-labeled check frames
-                                      results/self_training/final_loop_by_stratum.csv
-                                      results/self_training/final_loop_cost.csv
+    python final_loop_figures.py  ->  the five figures in results/self_training/figures/,
+                                      results/self_training/final_loop_by_stratum.csv, final_loop_cost.csv
 
 Colours as in the other loop figures: grey = starting model, pink = turn 1, indigo = turn 2, brown = turn 3.
 """
@@ -41,76 +47,101 @@ def truth():
     return pd.DataFrame(rows)
 
 
-def fig_truth(T):
-    """Truth frames (70 per video) and the flagged share of the whole video, four bars per video."""
-    panels = [("wrong", "wrong truth frames (of 70)", "{:.0f}", None),
-              ("flagged", "flagged (fitting + PCA), % of the video", "{:.1f}", 9.5),
-              ("median", "median truth error, % of eye width", "{:.1f}", None)]
-    fig, axes = plt.subplots(3, 1, figsize=(15.5, 10.2), sharex=True)
+def grouped(ax, T, col, ylabel, labels=False, clip=None, fmt="{:.0f}"):
+    """Four bars per video (starting model and the three turns)."""
     w = 0.8 / len(MODELS)
-    for ax, (col, ylabel, fmt, clip) in zip(axes, panels):
-        for j, (m, (lab, c)) in enumerate(MODELS.items()):
-            g = T[T.model == m].sort_values("video")
-            xs = g.video.to_numpy() + (j - (len(MODELS) - 1) / 2) * w
-            ys = g[col].to_numpy()
-            ax.bar(xs, np.minimum(ys, clip) if clip else ys, w * 0.9, color=c, label=lab, edgecolor="white", linewidth=0.5)
-            for x, y in zip(xs, ys):
-                if col == "wrong" and y > 0:
-                    ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=7.5, color="#222")
-                if clip and y > clip:            # the bar is cut at the axis limit: its value is written above it
-                    ax.text(x, clip, fmt.format(y) + " ↑", ha="center", va="bottom", fontsize=8, color="#222")
-        if clip:
-            ax.set_ylim(0, clip * 1.08)
-        ax.set_ylabel(ylabel)
-        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
-        ax.set_axisbelow(True)
+    for j, (m, (lab, c)) in enumerate(MODELS.items()):
+        g = T[T.model == m].sort_values("video")
+        xs = g.video.to_numpy() + (j - (len(MODELS) - 1) / 2) * w
+        ys = g[col].to_numpy()
+        ax.bar(xs, np.minimum(ys, clip) if clip else ys, w * 0.9, color=c, label=lab, edgecolor="white", linewidth=0.5)
+        for x, y in zip(xs, ys):
+            if labels and y > 0:
+                ax.text(x, y, fmt.format(y), ha="center", va="bottom", fontsize=7.5, color="#222")
+            if clip and y > clip:                # the bar is cut at the axis limit: its value is written above it
+                ax.text(x, clip, f"{y:.1f} ↑", ha="center", va="bottom", fontsize=8, color="#222")
+    if clip:
+        ax.set_ylim(0, clip * 1.08)
+    ax.set_ylabel(ylabel)
+    ax.set_xticks(range(19))
+    ax.set_xlim(-0.6, 18.6)
+    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+    ax.set_axisbelow(True)
+
+
+def fig_truth(T):
+    """The 70 truth frames of every video: wrong frames and median error for the four models."""
+    fig, axes = plt.subplots(2, 1, figsize=(15.5, 7.2), sharex=True)
+    grouped(axes[0], T, "wrong", "wrong truth frames (of 70)", labels=True)
+    grouped(axes[1], T, "median", "median truth error, % of eye width")
     tot = T.groupby("model").wrong.sum()
-    axes[0].set_title("Final loop on all 19 videos, truth frames: wrong frames in total "
+    axes[0].set_title("Truth frames (70 per video, the same frames for every model): wrong frames in total "
                       + " → ".join(str(int(tot[m])) for m in MODELS) + " of 1,330", fontsize=11, loc="left")
     axes[0].legend(ncol=4, frameon=False, loc="upper right")
     axes[0].set_ylim(0, T.wrong.max() + 1.6)
-    axes[-1].set_xticks(range(19))
-    axes[-1].set_xlim(-0.6, 18.6)
     axes[-1].set_xlabel("video")
     fig.tight_layout()
-    fig.savefig(OUT / "loop_final_all_videos.png", dpi=170)
+    fig.savefig(OUT / "loop_final_truth_frames.png", dpi=170)
     plt.close(fig)
 
 
-def fig_check(S):
-    """Hand-labeled check frames: per video the wrong frames before and after each turn, as compared in final_loop_summary.csv."""
-    comps = [("start -> turn 1", "teacher", "round1_formal", "Starting model → turn 1"),
-             ("turn 1 -> turn 2", "round1_formal", "round2_formal", "Turn 1 → turn 2"),
-             ("turn 2 -> turn 3 (earlier check frames)", "round2_formal", "round3_formal", "Turn 2 → turn 3 (check frames drawn after turn 2)")]
-    fig, axes = plt.subplots(3, 1, figsize=(15.5, 10.6))
-    w = 0.38
-    for ax, (name, a, b, title) in zip(axes, comps):
-        G = S[S.comparison == name]
-        A = G[G.video.astype(str) == "all"].iloc[0]
-        g = G[G.video.astype(str) != "all"].copy()
-        g["video"] = g.video.astype(int)
-        g = g.sort_values("video")
-        x = np.arange(len(g))
-        for k, (col, m) in enumerate((("wrong_a", a), ("wrong_b", b))):
-            ys = g[col].to_numpy()
-            ax.bar(x + (k - 0.5) * w, ys, w * 0.92, color=MODELS[m][1], label=MODELS[m][0], edgecolor="white", linewidth=0.5)
-            for xi, y in zip(x + (k - 0.5) * w, ys):
-                ax.text(xi, y, f"{int(y)}", ha="center", va="bottom", fontsize=8, color="#222")
-        ax.set_xticks(x)
-        ax.set_xticklabels([f"{v}{'*' if v in BLIND4 else ''}\n{int(n)}" for v, n in zip(g.video, g.frames)])
-        ax.set_xlim(-0.6, len(g) - 0.4)
-        ax.set_ylim(0, max(g.wrong_a.max(), g.wrong_b.max()) * 1.2 + 1)
-        ax.set_ylabel("wrong frames")
-        ax.set_title(f"{title}: {int(A.wrong_a)} → {int(A.wrong_b)} wrong of {int(A.frames)} hand-labeled frames; "
-                     f"seed band {A.seed_band:.1f} frames; videos better / worse / same {int(A.videos_better)} / {int(A.videos_worse)} / {int(A.videos_same)}",
-                     fontsize=10.5, loc="left")
-        ax.legend(ncol=2, frameon=False, loc="upper right")
-        ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
-        ax.set_axisbelow(True)
-    axes[-1].set_xlabel("video (below: frames compared).  * videos with a blind set: their 34 blind frames in the top panel, their turn-2 check frames in the other two;"
-                        " the other videos: the frames drawn after turn 2")
+def fig_flagged(T):
+    """Flagged share of the whole video, no labels involved."""
+    fig, ax = plt.subplots(figsize=(15.5, 4.3))
+    grouped(ax, T, "flagged", "flagged (fitting + PCA), % of the video", clip=9.5)
+    mean = T.groupby("model").flagged.mean()
+    ax.set_title("Flagged share of the whole video (fitting + PCA): mean over the 19 videos "
+                 + " → ".join(f"{mean[m]:.2f}" for m in MODELS) + " %", fontsize=11, loc="left")
+    ax.legend(ncol=4, frameon=False, loc="upper right")
+    ax.set_xlabel("video")
     fig.tight_layout()
-    fig.savefig(OUT / "loop_final_check_frames.png", dpi=170)
+    fig.savefig(OUT / "loop_final_flagged.png", dpi=170)
+    plt.close(fig)
+
+
+CHECKS = {1: ("start -> turn 1", "teacher", "round1_formal", "Turn 1 against the starting model, on the frames labeled to check turn 1",
+              "* videos with a blind set: their 34 blind frames, drawn before the loop;  the other videos: the frames drawn after turn 2"),
+          2: ("turn 1 -> turn 2", "round1_formal", "round2_formal", "Turn 2 against turn 1, on the frames labeled to check turn 2",
+              "all videos: frames drawn after turn 2  (* by the flags of turn 1 and turn 2; the other videos by the flags of the starting model, turn 1 and turn 2)"),
+          3: ("turn 2 -> turn 3", "round2_formal", "round3_formal", "Turn 3 against turn 2, on the frames labeled to check turn 3",
+              "all videos: frames drawn after turn 3 by the flags of turn 2 and turn 3;  videos without bars are not labeled yet")}
+
+
+def fig_check(S, turn):
+    """One turn against the one before, on the check frames hand-labeled for that turn (rows of final_loop_summary.csv)."""
+    name, a, b, title, note = CHECKS[turn]
+    G = S[S.comparison == name]
+    A = G[G.video.astype(str) == "all"].iloc[0]
+    g = G[G.video.astype(str) != "all"].copy()
+    g["video"] = g.video.astype(int)
+    g = g.set_index("video")
+    fig, ax = plt.subplots(figsize=(15.5, 4.6))
+    w = 0.38
+    for k, (col, m) in enumerate((("wrong_a", a), ("wrong_b", b))):
+        xs = np.array(g.index) + (k - 0.5) * w
+        ys = g[col].to_numpy()
+        ax.bar(xs, ys, w * 0.92, color=MODELS[m][1], label=MODELS[m][0], edgecolor="white", linewidth=0.5)
+        for xi, y in zip(xs, ys):
+            ax.text(xi, y, f"{int(y)}", ha="center", va="bottom", fontsize=8, color="#222")
+    ax.set_xticks(range(19))
+    ax.set_xticklabels([f"{v}{'*' if v in BLIND4 else ''}\n{int(g.frames[v]) if v in g.index else '–'}" for v in range(19)])
+    ax.set_xlim(-0.6, 18.6)
+    top = max(g.wrong_a.max(), g.wrong_b.max()) * 1.2 + 1
+    ax.set_ylim(0, top)
+    missing = [v for v in range(19) if v not in g.index]
+    if missing:
+        ax.text((min(missing) + max(missing)) / 2, top * 0.5, f"videos {min(missing)} to {max(missing)}: not labeled yet", ha="center", va="center", fontsize=11, color="#888")
+    ax.set_ylabel("wrong frames")
+    part = f" ({len(g)} of 19 videos labeled)" if missing else ""
+    ax.set_title(f"{title}{part}: {int(A.wrong_a)} → {int(A.wrong_b)} wrong of {int(A.frames)} hand-labeled frames; "
+                 f"seed band {A.seed_band:.1f} frames; videos better / worse / same {int(A.videos_better)} / {int(A.videos_worse)} / {int(A.videos_same)}",
+                 fontsize=10.5, loc="left")
+    ax.legend(ncol=2, frameon=False, loc="upper right")
+    ax.grid(axis="y", color="#e4e4e4", linewidth=0.6)
+    ax.set_axisbelow(True)
+    ax.set_xlabel("video (below: frames compared).  " + note)
+    fig.tight_layout()
+    fig.savefig(OUT / f"loop_final_check_turn{turn}.png", dpi=170)
     plt.close(fig)
 
 
@@ -148,8 +179,10 @@ def cost():
 def main():
     T = truth()
     fig_truth(T)
+    fig_flagged(T)
     S = pd.read_csv(ST / "final_loop_summary.csv")
-    fig_check(S)
+    for turn in (1, 2, 3):
+        fig_check(S, turn)
     P = by_stratum()
     C = cost()
     pd.set_option("display.width", 220)
@@ -158,11 +191,8 @@ def main():
                                  flagged_median=("flagged", "median")).reindex(list(MODELS)).round(2).to_string())
     print("\nwrong frames by stratum, check frames of the 15 videos without a blind set")
     print(P.to_string())
-    print("\ncost per turn (all videos that ran the turn)")
-    print(C.groupby("turn").agg(videos=("video", "size"), frames_from_the_model_median=("frames_from_the_model", "median"),
-                                train_minutes_median=("train_minutes", "median"), predict_minutes_median=("predict_minutes", "median"),
-                                hours_total=("train_minutes", lambda x: 0)).assign(
-        hours_total=lambda d: [round(float((C[C.turn == t].train_minutes + C[C.turn == t].predict_minutes).sum()) / 60, 1) for t in d.index]).round(1).to_string())
+    print("\ncost per turn, medians over the videos")
+    print(C.groupby("turn")[["frames_from_the_model", "train_minutes", "predict_minutes"]].median().round(1).to_string())
     print(f"\nfigures in {OUT}")
 
 

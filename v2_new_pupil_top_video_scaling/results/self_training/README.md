@@ -874,9 +874,12 @@ and with seed 43 disagree, and (b) more videos improve than worsen with a two-si
 - Turns 2 and 3: the change of the total (-7 and +3 frames of 601) is inside the seed band; in each turn some frames go
   from wrong to right and about as many from right to wrong.
 - The interim row on the `turn3/` frames covers 3 videos only: with 3 videos the sign test cannot reach p < 0.05
-  whatever the frames show, so it is recorded and not read as a result. It is not on the page.
+  whatever the frames show, so it is recorded and not read as a result. On the page this row is shown as not judged
+  yet (3 of 19 videos labeled).
 - What the check frames drawn after turn 2 cannot show for turn 3: frames flagged by the turn-3 model only were not
-  drawn for them.
+  drawn for them. For this reason the page shows every turn on the frames labeled for that turn only (user
+  2026-11-28); the comparison of turn 2 with turn 3 on the frames drawn after turn 2 (91 → 94 of 601) stays in
+  `final_loop_summary.csv` and in the table above.
 
 Wrong frames by stratum on the `final/` frames of the 15 videos (`final_loop_by_stratum.csv`):
 
@@ -913,8 +916,10 @@ tables are written before that point and are complete.
 
 Scripts: `final_check_set.py`, `blind_turn2_set.py`, `blind_turn2_score.py`, `final_loop_summary.py`,
 `final_loop_figures.py`. Tables: `final_loop_summary.csv`, `final_loop_by_stratum.csv`, `final_loop_cost.csv`.
-Figures: `figures/loop_final_all_videos.png`, `figures/loop_final_check_frames.png`. Page: 9.4, experiment 5,
-block 5d (Figures 9-29 and 9-30, Table 9-4-14; the table of the later turns is now Table 9-4-15).
+Figures: `figures/loop_final_truth_frames.png` and `loop_final_flagged.png` (the measures all four models share), and
+one figure per turn on the frames labeled for that turn, `loop_final_check_turn1.png`, `_turn2.png`, `_turn3.png`
+(turn 3: the videos labeled so far). Page: 9.4, experiment 5, block 5d (Figures 9-29 to 9-33, Table 9-4-14; the table
+of the later turns is now Table 9-4-15).
 
 ## Files
 
