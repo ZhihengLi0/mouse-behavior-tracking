@@ -1,0 +1,7 @@
+stratum,videos,meaning,frames,teacher,round1_formal,round2_formal,round3_formal
+S,15,flagged by the starting model only,150,78,3,3,6
+T1,15,"flagged by turn 1, not by turn 2",120,45,24,0,10
+TB,15,flagged by turn 1 and turn 2,70,48,44,40,36
+T2,15,"flagged by turn 2, not by turn 1",93,47,2,21,11
+N,15,flagged by none of the three,60,0,0,0,0
+all,15,all strata,493,218,73,64,63

@@ -14,6 +14,12 @@ round2_formal,TB,5,4,52.21
 round2_formal,N,4,0,3.1
 round2_formal,T2,7,1,5.94
 round2_formal,T1,8,0,3.66
+round3_formal,S,10,1,4.24
+round3_formal,TB,5,4,28.75
+round3_formal,N,4,0,2.99
+round3_formal,T2,7,0,5.1
+round3_formal,T1,8,0,3.47
 teacher,all,34,23,34.15
 round1_formal,all,34,9,5.9
 round2_formal,all,34,5,4.61
+round3_formal,all,34,5,4.44

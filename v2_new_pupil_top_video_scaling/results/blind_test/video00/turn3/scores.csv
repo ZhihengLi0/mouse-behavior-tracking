@@ -1,0 +1,17 @@
+model,stratum,frames,wrong,median_error_pct
+teacher,T2,10,1,4.05
+teacher,TB,5,2,8.35
+teacher,TN,3,0,3.64
+round1_formal,T2,10,1,5.13
+round1_formal,TB,5,3,17.69
+round1_formal,TN,3,0,3.66
+round2_formal,T2,10,5,13.68
+round2_formal,TB,5,5,53.7
+round2_formal,TN,3,0,3.59
+round3_formal,T2,10,0,4.27
+round3_formal,TB,5,3,15.34
+round3_formal,TN,3,0,3.68
+teacher,all,18,3,4.26
+round1_formal,all,18,4,5.24
+round2_formal,all,18,10,22.06
+round3_formal,all,18,3,4.74

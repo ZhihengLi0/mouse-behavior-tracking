@@ -834,6 +834,88 @@ experiment 1 on video 8, turn 3 (`round3_every30`, shuffle 9083) and experiment 
   Figures 9-15 and 9-16 (`fig_experiment_full` draws a fourth turn when one exists; the experiment 3 figure is
   byte-identical after the change).
 
+### Experiment 5d: the final loop on all 19 videos, three turns (2026-11-16 to 2026-11-28)
+
+The procedure of 5b on every video, three turns each (models `round1_formal`, `round2_formal`, `round3_formal`,
+shuffles 6000 + 10 * video + turn). Videos 1, 8, 15, 6 have blind frames and the stop rule; videos 1, 8 and 6 stop at
+turn 2, their turn 3 is run beyond the rule and only recorded (`loop_status_formal.csv`). The other 15 videos have no
+blind frames, so no stop rule applies and a fixed number of turns is run.
+
+**Hand-labeled check frames.** Labeled by one person who sees only the image (8 points, no frame number, no model's
+points, a point that cannot be judged left blank).
+- 15 videos without blind frames: `final_check_set.py reserve` keeps 60 centres per video (± 60 frames) out of every
+  turn's training set; after turn 2 `final_check_set.py select` draws one set per video within 30 frames of a truth
+  frame or a centre, in five strata by the flags (fitting + PCA) of the starting model, turn 1 and turn 2 (S 10, T1 8,
+  TB 5, T2 7, N 4; fewer when a stratum is short): 498 frames drawn, 493 with a point to label
+  (`results/blind_test/videoNN/final/`).
+- 4 videos with blind frames: their 34 blind frames each for start → turn 1, the 108 frames of 5c (`turn2/`) for the
+  later comparisons.
+- A separate set for turn 3 (`blind_turn2_set.py select --turn 3`, strata T2 / TB / T3 / TN, `turn3/`) is drawn on all
+  19 videos: 601 frames drawn, 439 kept to label; labeled so far on videos 0, 1, 2 (74 frames). All 19 draws were
+  recomputed from the rules and drawn again with the same script on 2026-11-28: identical.
+
+**Decision rule** (in the docstring of `scripts/final_loop_summary.py`, fixed before the turn-3 results): a turn
+"reduces wrong frames" when on its check frames (a) the total drop is larger than the seed band 2 * sqrt(p_flip * N),
+with N the frames compared and p_flip = 9 / 108 the share of the 5c check frames on which turn 1 trained with seed 42
+and with seed 43 disagree, and (b) more videos improve than worsen with a two-sided sign test p < 0.05; otherwise
+"no effect seen". The rule is not applied to the truth frames.
+
+| comparison | frames | n | wrong before → after | wrong to right / right to wrong | seed band | videos better / worse / same | sign test p | McNemar p | bootstrap 95 % of the change | weighted wrong share, % | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| start → turn 1 | check frames (final/ of 15 videos, blind + supplement of 4) | 629 | 266 → 88 | 191 / 13 | 14.5 | 18 / 0 / 1 | < 0.0001 | < 0.0001 | -215 to -138 | 8.62 → 2.93 | reduces wrong frames |
+| turn 1 → turn 2 | check frames (final/ of 15 videos, turn2/ of 4) | 601 | 98 → 91 | 36 / 29 | 14.2 | 8 / 5 / 6 | 0.5811 | 0.4570 | -25 to 10 | 2.14 → 2.05 | no effect seen |
+| turn 2 → turn 3 | the same check frames as the row above | 601 | 91 → 94 | 25 / 28 | 14.2 | 7 / 7 / 5 | 1.0000 | 0.7838 | -17 to 23 | 2.05 → 1.96 | no effect seen |
+| turn 2 → turn 3, interim | turn3/ check frames, videos 0, 1, 2 only | 74 | 28 → 21 | 13 / 6 | 5.0 | 2 / 1 / 0 | 1.0000 | 0.1671 | -21 to 3 | 1.28 → 0.90 | no effect seen |
+| start → turn 1 | truth frames | 1,330 | 23 → 8 | – | – | 6 / 1 / 12 | 0.1250 | – | – | – | – |
+| turn 1 → turn 2 | truth frames | 1,330 | 8 → 8 | – | – | 1 / 2 / 16 | 1.0000 | – | – | – | – |
+| turn 2 → turn 3 | truth frames | 1,330 | 8 → 7 | – | – | 2 / 2 / 15 | 1.0000 | – | – | – | – |
+
+- Turn 1 reduces the wrong frames: 18 of 19 videos improve, video 16 has no wrong check frame before or after.
+- Turns 2 and 3: the change of the total (-7 and +3 frames of 601) is inside the seed band; in each turn some frames go
+  from wrong to right and about as many from right to wrong.
+- The interim row on the `turn3/` frames covers 3 videos only: with 3 videos the sign test cannot reach p < 0.05
+  whatever the frames show, so it is recorded and not read as a result. It is not on the page.
+- What the check frames drawn after turn 2 cannot show for turn 3: frames flagged by the turn-3 model only were not
+  drawn for them.
+
+Wrong frames by stratum on the `final/` frames of the 15 videos (`final_loop_by_stratum.csv`):
+
+| stratum | meaning | frames | starting model | turn 1 | turn 2 | turn 3 |
+|---|---|---|---|---|---|---|
+| S | flagged by the starting model only | 150 | 78 | 3 | 3 | 6 |
+| T1 | flagged by turn 1, not by turn 2 | 120 | 45 | 24 | 0 | 10 |
+| TB | flagged by turn 1 and turn 2 | 70 | 48 | 44 | 40 | 36 |
+| T2 | flagged by turn 2, not by turn 1 | 93 | 47 | 2 | 21 | 11 |
+| N | flagged by none of the three | 60 | 0 | 0 | 0 | 0 |
+| all | all strata | 493 | 218 | 73 | 64 | 63 |
+
+Most of the frames flagged by both turn 1 and turn 2 are wrong for every model (36 to 48 of 70); no frame is wrong
+among those flagged by none of the three.
+
+Truth frames and whole-video measures (per-video `eval.csv`): wrong truth frames 23 → 8 → 8 → 7 of 1,330; flagged
+share (fitting + PCA), mean over the videos 4.08 → 1.46 → 1.29 → 1.05 % (lower than the turn before on 18, 13 and 16
+of the 19 videos); median truth error, median over the videos 2.17 → 2.15 → 2.29 → 2.40 % of the eye width (after
+three turns above the starting model's on 14 videos, below on 3, by 0.13 % of the eye width on average).
+
+Cost per turn (`final_loop_cost.csv`, medians over the 19 videos):
+
+| turn | frames from the model in the training set | training, min | whole-video prediction, min | all 19 videos, hours |
+|---|---|---|---|---|
+| 1 | 1,907 | 98 | 88 | 57.6 |
+| 2 | 1,855 | 86 | 88 | 54.2 |
+| 3 | 1,867 | 86 | 88 | 54.1 |
+
+Scoring notes. `final_check_set.py score` and `blind_turn2_score.py` were run again on 2026-11-28 so that the check
+frames also carry the turn-3 model: rows of `round3_formal` were added to `final/per_frame.csv`, `final/scores.csv`
+(15 videos) and `turn2/` (videos 1, 6, 8); every earlier row is unchanged (checked against copies). On video 0
+`blind_turn2_score.py --turn 3` stops at its printed table because the set has no turn-3-only stratum; the two result
+tables are written before that point and are complete.
+
+Scripts: `final_check_set.py`, `blind_turn2_set.py`, `blind_turn2_score.py`, `final_loop_summary.py`,
+`final_loop_figures.py`. Tables: `final_loop_summary.csv`, `final_loop_by_stratum.csv`, `final_loop_cost.csv`.
+Figures: `figures/loop_final_all_videos.png`, `figures/loop_final_check_frames.png`. Page: 9.4, experiment 5,
+block 5d (Figures 9-29 and 9-30, Table 9-4-14; the table of the later turns is now Table 9-4-15).
+
 ## Files
 
 - `videoNN/repair/`: the final pipeline re-run with `--save-coords` (local csv.gz, not committed; the summary is
